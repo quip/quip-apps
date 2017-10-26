@@ -1,0 +1,56 @@
+{
+    "name": "quip-apps-calendar",
+    "version": "1.0.0",
+    "description": "Quip Calendar Live App",
+    "license": "UNLICENSED",
+    "repository": "quip/quip-apps",
+    "private": true,
+    "bugs": {
+        "url": "https://github.com/quip/quip-apps/issues"
+    },
+    "scripts": {
+        "test": "jest",
+        "dev": "NODE_ENV=development webpack -d --watch",
+        "dev-prod": "NODE_ENV=production webpack -d --watch",
+        "dev-server": "NODE_ENV=development webpack-dev-server --https",
+        "dev-server-prod": "NODE_ENV=production webpack-dev-server --https -p",
+        "build": "NODE_ENV=production webpack -p"
+    },
+    "author": "Quip",
+    "devDependencies": {
+        "babel-preset-flow": "^6.23.0",
+        "empty": "^0.10.1",
+        "eslint": "^4.6.1",
+        "eslint-config-prettier": "^2.4.0",
+        "eslint-plugin-flowtype": "^2.35.1",
+        "eslint-plugin-jest": "^21.2.0",
+        "eslint-plugin-prettier": "^2.2.0",
+        "eslint-plugin-react": "^7.3.0",
+        "flow-typed": "^2.2.0",
+        "hoist-non-react-statics": "^2.3.1",
+        "jest": "^21.2.1",
+        "prettier": "^1.6.1",
+        "react-redux": "^5.0.6",
+        "redux": "^3.7.2"
+    },
+    "babel": {
+        "presets": [
+            "env",
+            "flow",
+            "react"
+        ]
+    },
+    "dependencies": {
+        "babel-preset-jest": "^21.2.0",
+        "classnames": "^2.2.5",
+        "date-fns": "^1.28.5",
+        "lodash.chunk": "^4.2.0",
+        "lodash.includes": "^4.3.0",
+        "lodash.isnil": "^4.0.0",
+        "lodash.range": "^3.2.0",
+        "lodash.throttle": "^4.1.1",
+        "svg-react-loader": "^0.4.4",
+        "quip-apps-chevron": "^0.0.4",
+        "quip-apps-webpack-config": "^0.0.6"
+    }
+}

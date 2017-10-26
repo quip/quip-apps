@@ -1,0 +1,162 @@
+// Copyright 2017 Quip
+
+.wrapper {
+    position: relative; // for the debug order bubble
+}
+
+.movingEventSortGuide {
+    position: absolute;
+    content: "";
+    left: 2px;
+    right: 2px;
+    height: 2px;
+    z-index: 2;
+
+    &.before {
+        top: -1px;
+    }
+    &.after {
+        bottom: -1px;
+    }
+}
+
+.orderDebug {
+    background: white;
+    border: 1px solid grey;
+    border-radius: 50%;
+    font-size: 8px;
+    left: -4px;
+    position: absolute;
+    text-align: center;
+    top: -4px;
+    user-select: none;
+    width: 12px;
+    z-index: 2;
+}
+
+.movingEventWrapper {
+    position: fixed;
+    transform: translateZ(0);
+    // Above dayHighlight
+    z-index: 2;
+}
+
+.event {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    margin: 2px 3px 2px 2px;
+    position: relative;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        .bottomRow {
+            cursor: grabbing;
+        }
+    }
+
+    &.isMoving {
+        opacity: 0;
+    }
+
+    .bottomRow {
+        cursor: grab;
+        min-height: 20px;
+        align-items: flex-end;
+        position: relative;
+
+        .isSmallScreen & {
+            min-height: 0;
+        }
+    }
+
+    &:hover .commentBubble {
+        display: initial;
+    }
+
+    // TODO(elsigh): use fontSize prop on RichTextBox when avail
+    :global .rich-text-box article .content {
+        font-size: 12px !important;
+    }
+}
+
+.commentBubble {
+    display: none;
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    cursor: pointer;
+    user-select: none;
+
+    &.commented {
+        display: initial;
+    }
+}
+
+.compactContainer {
+    min-height: 18px;
+}
+
+.extendRight {
+    margin-right: 0;
+    position: relative;
+    z-index: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.extendLeft {
+    margin-left: -1px;
+    position: relative;
+    z-index: 1;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    min-height: 20px;
+    position: relative;
+}
+
+.title {
+    flex: 1;
+    padding-left: 4px;
+}
+
+.handleContainer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.titleContinuation {
+    margin-left: 4px;
+}
+
+@circlesize: 6px;
+.continueCircleStart,
+.continueCircleEnd {
+    border-radius: 50%;
+    height: @circlesize;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: @circlesize;
+}
+
+.continueCircleStart {
+    left: -@circlesize / 2;
+}
+
+.continueCircleEnd {
+    right: -@circlesize / 2;
+}

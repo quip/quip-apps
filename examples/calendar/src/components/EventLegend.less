@@ -1,0 +1,58 @@
+.container {
+    list-style: none;
+    margin: 5px 0 0;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.event {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid;
+    padding: 0 5px;
+    background: none;
+
+    & + & {
+        margin-top: 5px;
+    }
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    position: relative;
+    &:first-child {
+        padding: 5px 0;
+    }
+    &:last-child {
+        padding-bottom: 5px;
+    }
+
+    .colPrimary {
+        flex: 1;
+        padding-right: 20px;
+    }
+
+    .colComments,
+    .colDropdown {
+        position: relative;
+        width: 30px;
+    }
+
+    .colComments {
+        align-items: center;
+        display: flex;
+        height: 20px;
+    }
+}
+
+.richTextBox {
+    flex: 1;
+}
+
+.commentTrigger {
+    padding: 3px;
+}

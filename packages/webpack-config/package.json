@@ -1,0 +1,29 @@
+{
+  "name": "quip-apps-webpack-config",
+  "version": "0.0.6",
+  "description": "Quip Apps Webpack Config",
+  "license": "UNLICENSED",
+  "repository": "quip/quip-apps",
+  "author": "Quip",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "autoprefixer": "7.1.2",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react-app": "^3.0.3",
+    "babel-runtime": "^6.23.0",
+    "css-loader": "0.28.4",
+    "extract-text-webpack-plugin": "3.0.2",
+    "file-loader": "0.11.2",
+    "less-loader": "3.0.0",
+    "less": "2.7.2",
+    "postcss-loader": "2.0.6",
+    "style-loader": "0.18.2",
+    "url-loader": "^0.6.2",
+    "webpack": "3.5.1",
+    "webpack-dev-server": "2.8.2",
+    "write-file-webpack-plugin": "4.0.2"
+  }
+}

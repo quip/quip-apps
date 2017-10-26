@@ -1,0 +1,121 @@
+// Copyright 2017 Quip
+
+@import "../styles/constants.less";
+
+.Calendar {
+    display: flex;
+    flex-direction: column;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+
+    &.moving,
+    &.moving * {
+        cursor: grabbing !important;
+        user-select: none;
+    }
+    &.resizing,
+    &.resizing * {
+        cursor: nwse-resize !important;
+        user-select: none;
+    }
+
+    .isSmallScreen {
+        touch-action: manipulation;
+    }
+}
+
+.weekHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: 4px;
+    user-select: none;
+    pointer-events: none;
+    color: #333;
+    .cell {
+        width: calc(100% / 7);
+    }
+}
+
+.grid {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e5e5e5;
+    position: relative;
+    cursor: pointer;
+
+    .weekRow {
+        min-height: 67px;
+        position: relative;
+        &:first-child .day {
+            border-top: 1px solid #e5e5e5;
+        }
+
+        &:last-child .day {
+            border-bottom: 1px solid #e5e5e5;
+        }
+    }
+
+    .weekRowBackground {
+        display: flex;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .day {
+        background-color: #fff;
+        border-bottom: 1px solid @cell-border-gray;
+        border-right: 1px solid @cell-border-gray;
+        flex: 1;
+        position: relative;
+        user-select: none;
+
+        &:last-child {
+            border-right: 1px solid #e5e5e5;
+        }
+
+        &.isWeekend {
+            background-color: @background-gray;
+        }
+
+        .dayNumber {
+            cursor: default;
+            font-size: 12px;
+            padding: 3px 6px;
+            text-align: right;
+            user-select: none;
+            color: #333;
+            cursor: pointer;
+
+            &.isInOtherMonth {
+                color: #ccc;
+            }
+            &.isToday {
+                font-weight: bold;
+            }
+        }
+
+        .dayHighlight {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            bottom: -1px;
+            right: -1px;
+            pointer-events: none;
+            z-index: 1;
+        }
+    }
+
+    .weekAgenda {
+        display: flex;
+        flex-direction: column;
+        padding: 22px 0 1px;
+        .weekAgendaRow {
+            display: flex;
+            &:last-child {
+                padding-bottom: 2px;
+            }
+        }
+    }
+}

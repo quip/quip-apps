@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "keywords": [
+    "quip"
+  ],
+  "description": "Quip Live Apps API for creating applications in Quip documents",
+  "repository": "quip/quip-apps",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/quip/quip-apps/issues"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.0.1",
+    "eslint": "^4.9.0",
+    "lerna": "^2.4.0",
+    "prettier": "^1.7.4"
+  }
+}

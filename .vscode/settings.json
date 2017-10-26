@@ -1,0 +1,9 @@
+{
+  "javascript.validate.enable": false,
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/app.ele": true
+  }
+}

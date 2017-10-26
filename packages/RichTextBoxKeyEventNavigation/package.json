@@ -1,0 +1,15 @@
+{
+    "name": "quip-apps-richtextbox-key-event-navigation",
+    "version": "0.0.1",
+    "description": "Quip Apps RTB Key Event Navigation",
+    "license": "UNLICENSED",
+    "repository": "quip/quip-apps",
+    "author": "Quip",
+    "main": "dist/Chevron.js",
+    "scripts": {
+        "build": "NODE_ENV=production webpack -p"
+    },
+    "dependencies": {
+        "quip-apps-webpack-config": "^0.0.6"
+    }
+}

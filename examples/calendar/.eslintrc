@@ -1,0 +1,34 @@
+{
+    "parser": "babel-eslint",
+    "plugins": ["prettier", "react", "flowtype"],
+    "rules": {
+        "no-console": 0,
+        "no-class-assign": [1],
+
+        /* React rules */
+        "react/display-name": [0],
+        "react/no-find-dom-node": [1],
+        "react/no-deprecated": 1,
+
+        /* Flowtype */
+        "flowtype/define-flow-type": 1 /* squelches no-def on flow type annotations */,
+        "flowtype/use-flow-type": 1,
+        "flowtype/no-types-missing-file-annotation": 0
+    },
+    "settings": {
+        "flowtype": {
+            "onlyFilesWithFlowAnnotation": false
+        }
+    },
+    "env": {
+        "browser": true,
+        "es6": true,
+        "jest": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:flowtype/recommended",
+        "prettier"
+    ]
+}

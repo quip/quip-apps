@@ -1,0 +1,20 @@
+{
+  "name": "create-quip-app",
+  "version": "0.0.2",
+  "keywords": [
+    "quip"
+  ],
+  "description": "Create Quip apps with no build configuration",
+  "repository": "quip/quip-apps",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=8"
+  },
+  "bugs": {
+    "url": "https://github.com/quip/quip-apps/issues"
+  },
+  "bin": {
+    "create-quip-app": "./bin/create-quip-app.py"
+  },
+  "dependencies": {}
+}
