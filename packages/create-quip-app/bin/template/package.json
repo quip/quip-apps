@@ -1,0 +1,17 @@
+{
+    "name": "$APP_DIR_NAME",
+    "version": "0.0.1",
+    "description": "$APP_DIR_NAME Quip App ",
+    "license": "UNLICENSED",
+    "scripts": {
+        "dev": "NODE_ENV=development webpack -d --watch",
+        "dev-prod": "NODE_ENV=production webpack -d --watch",
+        "dev-server": "NODE_ENV=development webpack-dev-server --https",
+        "dev-server-prod": "NODE_ENV=production webpack-dev-server --https -p",
+        "build": "NODE_ENV=production webpack -p"
+    },
+    "author": "",
+    "devDependencies": {
+        "quip-apps-webpack-config": ">=0.0.6"
+    }
+}

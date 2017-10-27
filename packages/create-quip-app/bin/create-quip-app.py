@@ -13,6 +13,7 @@ import shutil
 import sys
 import zipfile
 
+
 def sanitize_app_name(app_name):
     for remove in ["\"", "$", "'", "\\"]:
         app_name = app_name.replace(remove, "")
@@ -28,24 +29,21 @@ def create_app_dir_name(app_name):
     return app_dir_name
 
 
-def init_app(app_name, app_id):
-    app_name = sanitize_app_name(app_name)
-    app_dir_name = create_app_dir_name(app_name)
-    app_dir = os.path.join("apps", app_dir_name)
+def init_app(app_dir_name):
+    app_dir = os.path.join(os.getcwd(), app_dir_name)
     if os.path.exists(app_dir):
         logging.error("Directory '%s' already exists" % app_dir)
         return
-    shutil.copytree(os.path.join("apps", "template"), app_dir,
-        ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
+    lib_path = os.path.dirname(os.path.realpath(__file__))
+    shutil.copytree(os.path.join(lib_path, "template"), app_dir,
+                    ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
 
     def replace_placeholders(file_path):
         with open(os.path.join(app_dir, file_path), "r+") as f:
             content = f.read()
             f.seek(0)
             f.write(content
-                .replace("$APP_ID", app_id)
-                .replace("$APP_NAME", app_name)
-                .replace("$APP_DIR_NAME", app_dir_name))
+                    .replace("$APP_DIR_NAME", app_dir_name))
             f.truncate()
     for file_path in ["app/manifest.json", "package.json"]:
         replace_placeholders(file_path)
@@ -85,6 +83,7 @@ def is_enumerated_path(manifest, path):
     resource_patterns = old_resources + manifest.get("other_resources", [])
     js_filenames = set(manifest.get("js_files", []))
     css_filenames = set(manifest.get("css_files", []))
+
     def matches_resource_pattern(resource_patterns, path):
         for pattern in resource_patterns:
             if fnmatch.fnmatch(path, pattern):
@@ -140,20 +139,20 @@ def main():
     parser = argparse.ArgumentParser(prog="quip-apps")
     parser.add_argument("--output", type=str, default=None)
     # Webpack, for example, uses `eval` when compiling in debug mode.
-    parser.add_argument("command", choices=["init", "pack"])
+    #parser.add_argument("command", choices=["pack"])
     parser.add_argument("args", nargs=argparse.REMAINDER)
     args = parser.parse_args()
-    if args.command == "init":
-        if len(args.args) == 0:
-            logging.error("Please specify your new App's name")
-            sys.exit(1)
-        init_app(args.args[0], args.args[1] if len(args.args) > 1 else "")
-
-    elif args.command == "pack":
-        if len(args.args) != 1:
+    if len(args.args) == 0:
+        logging.error(
+            "Please specify the directory to create your live app in")
+        sys.exit(1)
+    if args.args[0] == "pack":
+        if len(args.args) != 2:
             logging.error("Please specify the app directory location")
             sys.exit(1)
-        create_package(args.args[0], args.output)
+        create_package(args.args[1], args.output)
+    else:
+        init_app(args.args[0])
 
 
 if __name__ == "__main__":
