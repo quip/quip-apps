@@ -76,7 +76,8 @@ def init_app(app_dir_name):
 
     if not installed_packages:
         logging.error(
-            "Heads up that we were unable to run `%s install`, you will need to do that yourself.", yarn_or_npm)
+            "Heads up that we were unable to run `%s install`, "
+            "you will need to do that yourself.", yarn_or_npm)
 
 
 def init_success_msg(app_dir_name, app_dir, yarn_or_npm):
@@ -88,12 +89,34 @@ Inside that directory, you can run several commands:
     Starts the development server (for Use Local Resources mode).
 
   {2} build
-    Builds and packages your live app at {0}/app/app.ele for upload to production.
+    Builds and packages your {0}/app/app.ele for upload to production.
 
-We suggest that you begin by typing:
-
-  cd test-create-react-app
-  {2} start
+To get started with local development you'll need to:
+  - Visit the Quip Dev Portal at https://quip.com/api/apps
+  - Click Create New Live App
+  - cd {1}
+  - Edit app/manifest.json
+    - Give it a name (hereafter $YOUR_APP_NAME)
+    - Paste in your new App ID from the Quip Dev Portal
+  - Run {2} build
+  - Click the "Upload Bundle" button on the Quip Dev Portal
+    - Select your app/app.ele file and click Update
+  - Make a new Quip document and insert your Live App
+    - by typing the "@" key followed by $YOUR_APP_NAME
+  - Run {2} start (starts up a webpack dev server on https://localhost:8888)
+    - In Chrome, visit chrome://flags and make sure you've enabled
+      "Allow invalid certificates for resources loaded from localhost."
+  - Click Document -> Advanced -> Debug $YOUR_APP_NAME
+  - Click on your Live App and then click the Debug button and choose
+    Use Local Resources from the drop-down. Refresh the page.
+  - Iterate on your code, and click the Live App Debug button -> Refresh to see
+    your code update in Quip
+  - When you're done, re-run {2} build, upload app/app.ele, disable
+    Use Local Resources for yourself.
+  - Share the Document with others so they can see your Live App in action
+  - While we're in Beta, you'll need to add someone as a Developer of your App
+    in the Quip Dev Portal to enable them to insert your element in a new
+    Document, but anyone can see your Live App in a shared Document.
 
 Happy Hacking!
 Documentation: https://quip.com/dev
@@ -186,6 +209,10 @@ def create_package(app_dir, package_path=None):
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    logging.info(init_success_msg("foo", "bar", "yarn"))
+    exit
+
     parser = argparse.ArgumentParser(prog="quip-apps")
     parser.add_argument("--output", type=str, default=None)
     parser.add_argument("args", nargs=argparse.REMAINDER)
