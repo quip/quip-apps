@@ -209,10 +209,6 @@ def create_package(app_dir, package_path=None):
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-
-    logging.info(init_success_msg("foo", "bar", "yarn"))
-    exit
-
     parser = argparse.ArgumentParser(prog="quip-apps")
     parser.add_argument("--output", type=str, default=None)
     parser.add_argument("args", nargs=argparse.REMAINDER)
