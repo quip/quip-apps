@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import shutil
+import subprocess
 import sys
 import zipfile
 
@@ -30,10 +31,14 @@ def create_app_dir_name(app_name):
 
 
 def init_app(app_dir_name):
-    app_dir = os.path.join(os.getcwd(), app_dir_name)
+    yarn_or_npm = "yarn"
+    cwd = os.getcwd()
+    app_dir = os.path.join(cwd, app_dir_name)
     if os.path.exists(app_dir):
         logging.error("Directory '%s' already exists" % app_dir)
         return
+
+    logging.info("Creating a new Quip app in %s", app_dir)
     lib_path = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(os.path.join(lib_path, "template"), app_dir,
                     ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
@@ -42,12 +47,52 @@ def init_app(app_dir_name):
         with open(os.path.join(app_dir, file_path), "r+") as f:
             content = f.read()
             f.seek(0)
-            f.write(content
-                    .replace("$APP_DIR_NAME", app_dir_name))
+            f.write(content.replace("$APP_DIR_NAME", app_dir_name))
             f.truncate()
     for file_path in ["app/manifest.json", "package.json"]:
         replace_placeholders(file_path)
-    logging.info("Successfully initialized %s" % (app_dir))
+
+    installed_packages = False
+    try:
+        #subprocess.check_call("npm -help", shell=True)
+        logging.info(
+            "Installing packages. This might take a couple of minutes.")
+        os.chdir(app_dir)
+        subprocess.check_call("%s install" % yarn_or_npm, shell=True)
+        os.chdir(cwd)
+        installed_packages = True
+    except subprocess.CalledProcessError as error:
+        logging.error("%s", error.output)
+        pass
+    # except:
+    #    logging.error("Unexpected error: %s", sys.exc_info())
+        # pass
+    logging.info(init_success_msg(app_dir_name, app_dir, yarn_or_npm))
+
+    if not installed_packages:
+        logging.error(
+            "Heads up that we were unable to run `%s install`, you will need to do that yourself.", yarn_or_npm)
+
+
+def init_success_msg(app_dir_name, app_dir, yarn_or_npm):
+    return """
+Success! Created {0} at {1}
+Inside that directory, you can run several commands:
+
+  {2} start
+    Starts the development server (for Use Local Resources mode).
+
+  {2} build
+    Bundles your live app at {0}/app/app.ele for upload to production.
+
+We suggest that you begin by typing:
+
+  cd test-create-react-app
+  {2} start
+
+Happy Hacking!
+Documentation: https://quip.com/dev
+""".format(app_dir_name, app_dir, yarn_or_npm)
 
 
 def read_manifest():
@@ -138,8 +183,6 @@ def main():
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(prog="quip-apps")
     parser.add_argument("--output", type=str, default=None)
-    # Webpack, for example, uses `eval` when compiling in debug mode.
-    #parser.add_argument("command", choices=["pack"])
     parser.add_argument("args", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     if len(args.args) == 0:
