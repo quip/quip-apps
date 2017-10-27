@@ -31,14 +31,13 @@ def create_app_dir_name(app_name):
 
 
 def init_app(app_dir_name):
-    yarn_or_npm = "yarn"
     cwd = os.getcwd()
     app_dir = os.path.join(cwd, app_dir_name)
     if os.path.exists(app_dir):
         logging.error("Directory '%s' already exists" % app_dir)
         return
 
-    logging.info("Creating a new Quip app in %s", app_dir)
+    logging.info("Creating a new Quip app in %s\n", app_dir)
     lib_path = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(os.path.join(lib_path, "template"), app_dir,
                     ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
@@ -53,20 +52,26 @@ def init_app(app_dir_name):
         replace_placeholders(file_path)
 
     installed_packages = False
+
+    FNULL = open(os.devnull, 'w')
+    yarn_or_npm = "yarn"
     try:
-        #subprocess.check_call("npm -help", shell=True)
+        subprocess.check_call("%s --version" % yarn_or_npm, shell=True,
+                              stdout=FNULL, stderr=subprocess.STDOUT)
+    except:
+        yarn_or_npm = "npm"
+
+    try:
         logging.info(
             "Installing packages. This might take a couple of minutes.")
         os.chdir(app_dir)
         subprocess.check_call("%s install" % yarn_or_npm, shell=True)
         os.chdir(cwd)
         installed_packages = True
-    except subprocess.CalledProcessError as error:
-        logging.error("%s", error.output)
+    except:
+        #logging.error("Unexpected error: %s", sys.exc_info())
         pass
-    # except:
-    #    logging.error("Unexpected error: %s", sys.exc_info())
-        # pass
+
     logging.info(init_success_msg(app_dir_name, app_dir, yarn_or_npm))
 
     if not installed_packages:
@@ -83,7 +88,7 @@ Inside that directory, you can run several commands:
     Starts the development server (for Use Local Resources mode).
 
   {2} build
-    Bundles your live app at {0}/app/app.ele for upload to production.
+    Builds and packages your live app at {0}/app/app.ele for upload to production.
 
 We suggest that you begin by typing:
 
@@ -180,7 +185,7 @@ def create_package(app_dir, package_path=None):
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     parser = argparse.ArgumentParser(prog="quip-apps")
     parser.add_argument("--output", type=str, default=None)
     parser.add_argument("args", nargs=argparse.REMAINDER)

@@ -221,8 +221,8 @@ export class EventRecord extends quip.elements.Record {
     getDateRange(): DateRange {
         const { start, end } = JSON.parse(this.get("dateRange"));
         return {
-            start: new Date(start),
-            end: new Date(end),
+            start: getAllDayEventDateTimeInCurrentTimezone(start),
+            end: getAllDayEventDateTimeInCurrentTimezone(end),
         };
     }
 
@@ -253,6 +253,18 @@ export class EventRecord extends quip.elements.Record {
     setColor(color: string) {
         this.set("color", color);
     }
+}
+
+const padNumberAsTwoCharString = n => {
+    return n < 10 ? "0" + n : n + "";
+};
+
+const gmtHoursT = padNumberAsTwoCharString(new Date().getTimezoneOffset() / 60);
+
+function getAllDayEventDateTimeInCurrentTimezone(dt: number): Date {
+    return new Date(
+        new Date(dt).toISOString().replace(/T\d\d/, `T${gmtHoursT}`),
+    );
 }
 
 quip.elements.registerClass(RootRecord, "Root");
