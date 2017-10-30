@@ -88,10 +88,10 @@ Inside that directory, you can run several commands:
   {2} start
     Starts the development server (for Use Local Resources mode).
 
-  {2} build
+  {2} run build
     Builds and packages your {0}/app/app.ele for upload to production.
 
-Visit https://github.com/quip/quip-apps for instructions on how to get started.
+Visit https://github.com/quip/quip-apps for getting started instructions.
 
 Happy Hacking!
 """.format(app_dir_name, app_dir, yarn_or_npm)
