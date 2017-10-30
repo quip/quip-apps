@@ -19,6 +19,24 @@ export const colors = [
     quip.elements.ui.ColorMap.VIOLET.KEY,
 ];
 
+const formatDateForAllDayEvent = (d: Date): string => {
+    return `${d.getFullYear()},${d.getMonth()},${d.getDate()}`;
+};
+
+const parseAllDayStringToDate = (s: string): Date => {
+    if (typeof s === "number") {
+        // We formerly used timestamps in storage but that has tz issues.
+        return new Date(s);
+    } else {
+        const [year, monthIndex, day] = s.split(",");
+        return new Date(
+            window.parseInt(year, 10),
+            window.parseInt(monthIndex, 10),
+            window.parseInt(day, 10),
+        );
+    }
+};
+
 export class RootRecord extends quip.elements.RootRecord {
     static getProperties() {
         return {
@@ -55,8 +73,6 @@ export class RootRecord extends quip.elements.RootRecord {
     }
 
     addEvent(start: Date, end: Date): EventRecord {
-        const startTime = start.getTime();
-        const endTime = end.getTime();
         let color = quip.elements.ui.ColorMap.RED.KEY;
         const lastEvent = this.getLastEvent();
         if (lastEvent) {
@@ -71,8 +87,8 @@ export class RootRecord extends quip.elements.RootRecord {
         const newEvent = this.get("events").add(
             {
                 dateRange: JSON.stringify({
-                    start: startTime,
-                    end: endTime,
+                    start: formatDateForAllDayEvent(start),
+                    end: formatDateForAllDayEvent(end),
                 }),
                 color,
             },
@@ -220,9 +236,10 @@ export class EventRecord extends quip.elements.Record {
 
     getDateRange(): DateRange {
         const { start, end } = JSON.parse(this.get("dateRange"));
+        // TODO(elsigh): update when we support time
         return {
-            start: getAllDayEventDateTimeInCurrentTimezone(start),
-            end: getAllDayEventDateTimeInCurrentTimezone(end),
+            start: parseAllDayStringToDate(start),
+            end: parseAllDayStringToDate(end),
         };
     }
 
@@ -231,13 +248,12 @@ export class EventRecord extends quip.elements.Record {
             console.error("start", start, "end", end);
             throw new Error("start and end must both be Date types");
         }
-        const startTime = start.getTime();
-        const endTime = end.getTime();
+        // TODO(elsigh): update when we start using time
         this.set(
             "dateRange",
             JSON.stringify({
-                start: startTime,
-                end: endTime,
+                start: formatDateForAllDayEvent(start),
+                end: formatDateForAllDayEvent(end),
             }),
         );
         //quip.elements.sendMessage("moved an event");
@@ -253,18 +269,6 @@ export class EventRecord extends quip.elements.Record {
     setColor(color: string) {
         this.set("color", color);
     }
-}
-
-const padNumberAsTwoCharString = n => {
-    return n < 10 ? "0" + n : n + "";
-};
-
-const gmtHoursT = padNumberAsTwoCharString(new Date().getTimezoneOffset() / 60);
-
-function getAllDayEventDateTimeInCurrentTimezone(dt: number): Date {
-    return new Date(
-        new Date(dt).toISOString().replace(/T\d\d/, `T${gmtHoursT}`),
-    );
 }
 
 quip.elements.registerClass(RootRecord, "Root");

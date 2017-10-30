@@ -94,9 +94,9 @@ Inside that directory, you can run several commands:
 To get started with local development you'll need to:
   - Visit the Quip Dev Portal at https://quip.com/api/apps
   - Click Create New Live App
-  - cd {1}
+  - cd {0}
   - Edit app/manifest.json
-    - Give it a name (hereafter $YOUR_APP_NAME)
+    - Give your app a name (hereafter $YOUR_APP_NAME)
     - Paste in your new App ID from the Quip Dev Portal
   - Run {2} build
   - Click the "Upload Bundle" button on the Quip Dev Portal

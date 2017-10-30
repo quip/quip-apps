@@ -411,6 +411,9 @@ class Calendar extends React.Component<Props, null> {
                     this.props.setMovingEvent(null);
                 }, 0);
             }
+        } else {
+            this.props.setSelectedEvent(null);
+            this.props.setMovingEvent(null);
         }
         this.props.setMouseCoordinates(null);
     };
