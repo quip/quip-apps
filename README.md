@@ -11,8 +11,6 @@ You'll need to have node >= 6 on your machine.
 npm install -g create-quip-app
 
 create-quip-app my-app
-cd my-app/
-npm start
 ```
 
 `create-quip-app my-app` will create a directory called `my-app` inside the current folder.
