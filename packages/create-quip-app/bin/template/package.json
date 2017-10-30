@@ -1,10 +1,10 @@
 {
     "name": "$APP_DIR_NAME",
     "version": "0.0.1",
-    "description": "$APP_DIR_NAME Quip App ",
+    "description": "$APP_DIR_NAME Quip App",
     "license": "UNLICENSED",
     "scripts": {
-        "start": "NODE_ENV=development webpack -d --watch",
+        "start": "NODE_ENV=development webpack-dev-server --https",
         "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
     },
     "author": "",

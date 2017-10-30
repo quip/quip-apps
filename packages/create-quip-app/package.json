@@ -1,6 +1,6 @@
 {
   "name": "create-quip-app",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "keywords": [
     "quip"
   ],
@@ -8,7 +8,7 @@
   "repository": "quip/quip-apps",
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=8"
+    "node": ">=6"
   },
   "bugs": {
     "url": "https://github.com/quip/quip-apps/issues"
