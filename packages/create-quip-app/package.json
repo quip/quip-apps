@@ -15,6 +15,5 @@
   },
   "bin": {
     "create-quip-app": "./bin/create-quip-app.py"
-  },
-  "dependencies": {}
+  }
 }
