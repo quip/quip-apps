@@ -33,8 +33,8 @@ my-app
 │   └── manifest.json
 └── src
     └── App.less
-    └── App.js
-    └── root.js
+    └── App.jsx
+    └── root.jsx
 ```
 
 
@@ -84,7 +84,34 @@ my-app
     in the Quip Dev Portal to enable them to insert your element in a new
     Document, but anyone can see your Live App in a shared Document.
 
-
+## Understand your Live App
+  - The full source code for your Hello World App lives in the <code>src/</code> directory:
+  <pre><code>// root.jsx
+import quip from "quip";
+import App from "./App.jsx";
+quip.apps.initialize({
+    initializationCallback: function(rootNode) {
+        ReactDOM.render(&lt;App/&gt;, rootNode);
+    }
+});
+</code></pre>
+  <pre><code>// App.jsx
+import Styles from "./App.less";
+class App extends React.Component {
+    render() {
+        return &lt;div className={Styles.hello}&gt;YES it worked!&lt;/div&gt;;
+    }
+}</code></pre>
+  <pre><code>// App.less
+.hello {
+    display: flex;
+    justify-content: center;
+}</code></pre>
+  - <code>quip.apps.initialize()</code> is the starting point. It tells the Quip document your Javascript code has loaded and that the element is ready to receive the data and info needed to set up Your Live App.
+  - The Quip document calls back into Your Live App via <code>initializationCallback</code> to say that setup is complete and that all data for Your Live App instance has been cached locally. It created an iframe for Your Live App — inside that iframe, <code>rootNode</code> is the empty HTML element where Your Live App should live. Your code can add anything to this HTML element, with or without React.
+  - This code uses React to render <code><App /></code> into the HTML element.
+    - <code>Styles.hello</code> refers to the <code>.hello</code> class name imported from <code>App.less</code>
+  - As you develop Your Live App, you'll add new <code>jsx</code> <code>less</code> files to the <code>src/</code> directory (or subdirectories).
 ### Thanks
 
 
