@@ -3,10 +3,10 @@ const path = require("path");
 const cwd = process.cwd();
 
 let Config = require("quip-apps-webpack-config");
-Config.entry = [path.resolve(cwd, "./RichTextBoxKeyEventNavigation.js")];
+Config.entry = [path.resolve(cwd, "./handleRichTextBoxKeyEventNavigation.js")];
 Config.output = {
     path: path.resolve(cwd, "./dist"),
-    filename: "RichTextBoxKeyEventNavigation.js",
+    filename: "handleRichTextBoxKeyEventNavigation.js",
     libraryTarget: "umd",
     publicPath: "dist"
 };
