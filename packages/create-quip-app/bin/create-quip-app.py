@@ -91,7 +91,8 @@ Inside that directory, you can run several commands:
   {2} run build
     Builds and packages your {0}/app/app.ele for upload to production.
 
-Visit https://github.com/quip/quip-apps for getting started instructions.
+Live Apps Getting Started Guide:
+https://quip.com/dev/liveapps/#getting-started
 
 Happy Hacking!
 """.format(app_dir_name, app_dir, yarn_or_npm)

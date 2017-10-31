@@ -9,23 +9,23 @@ collections	../packages/create-quip-app/bin/create-quip-app.py	/^import collecti
 copy	../packages/create-quip-app/bin/create-quip-app.py	/^import copy$/;"	kind:namespace	line:7
 create-quip-app.py	../packages/create-quip-app/bin/create-quip-app.py	1;"	kind:file	line:1
 create_app_dir_name	../packages/create-quip-app/bin/create-quip-app.py	/^def create_app_dir_name(app_name):$/;"	kind:function	line:24
-create_package	../packages/create-quip-app/bin/create-quip-app.py	/^def create_package(app_dir, package_path=None):$/;"	kind:function	line:180
+create_package	../packages/create-quip-app/bin/create-quip-app.py	/^def create_package(app_dir, package_path=None):$/;"	kind:function	line:154
 fnmatch	../packages/create-quip-app/bin/create-quip-app.py	/^import fnmatch$/;"	kind:namespace	line:8
 init_app	../packages/create-quip-app/bin/create-quip-app.py	/^def init_app(app_dir_name):$/;"	kind:function	line:33
 init_success_msg	../packages/create-quip-app/bin/create-quip-app.py	/^def init_success_msg(app_dir_name, app_dir, yarn_or_npm):$/;"	kind:function	line:83
-is_enumerated_path	../packages/create-quip-app/bin/create-quip-app.py	/^def is_enumerated_path(manifest, path):$/;"	kind:function	line:152
-is_map	../packages/create-quip-app/bin/create-quip-app.py	/^    def is_map(manifest, path, suffix):$/;"	kind:function	line:174
-is_map_path	../packages/create-quip-app/bin/create-quip-app.py	/^def is_map_path(manifest, path):$/;"	kind:function	line:173
+is_enumerated_path	../packages/create-quip-app/bin/create-quip-app.py	/^def is_enumerated_path(manifest, path):$/;"	kind:function	line:126
+is_map	../packages/create-quip-app/bin/create-quip-app.py	/^    def is_map(manifest, path, suffix):$/;"	kind:function	line:148
+is_map_path	../packages/create-quip-app/bin/create-quip-app.py	/^def is_map_path(manifest, path):$/;"	kind:function	line:147
 json	../packages/create-quip-app/bin/create-quip-app.py	/^import json$/;"	kind:namespace	line:9
 logging	../packages/create-quip-app/bin/create-quip-app.py	/^import logging$/;"	kind:namespace	line:10
-main	../packages/create-quip-app/bin/create-quip-app.py	/^def main():$/;"	kind:function	line:210
-matches_resource_pattern	../packages/create-quip-app/bin/create-quip-app.py	/^    def matches_resource_pattern(resource_patterns, path):$/;"	kind:function	line:160
+main	../packages/create-quip-app/bin/create-quip-app.py	/^def main():$/;"	kind:function	line:184
+matches_resource_pattern	../packages/create-quip-app/bin/create-quip-app.py	/^    def matches_resource_pattern(resource_patterns, path):$/;"	kind:function	line:134
 os	../packages/create-quip-app/bin/create-quip-app.py	/^import os$/;"	kind:namespace	line:11
-read_manifest	../packages/create-quip-app/bin/create-quip-app.py	/^def read_manifest():$/;"	kind:function	line:126
+read_manifest	../packages/create-quip-app/bin/create-quip-app.py	/^def read_manifest():$/;"	kind:function	line:100
 replace_placeholders	../packages/create-quip-app/bin/create-quip-app.py	/^    def replace_placeholders(file_path):$/;"	kind:function	line:45
 sanitize_app_name	../packages/create-quip-app/bin/create-quip-app.py	/^def sanitize_app_name(app_name):$/;"	kind:function	line:18
 shutil	../packages/create-quip-app/bin/create-quip-app.py	/^import shutil$/;"	kind:namespace	line:12
 subprocess	../packages/create-quip-app/bin/create-quip-app.py	/^import subprocess$/;"	kind:namespace	line:13
 sys	../packages/create-quip-app/bin/create-quip-app.py	/^import sys$/;"	kind:namespace	line:14
-warn_missing_paths	../packages/create-quip-app/bin/create-quip-app.py	/^def warn_missing_paths(manifest, written_paths, app_dir):$/;"	kind:function	line:135
+warn_missing_paths	../packages/create-quip-app/bin/create-quip-app.py	/^def warn_missing_paths(manifest, written_paths, app_dir):$/;"	kind:function	line:109
 zipfile	../packages/create-quip-app/bin/create-quip-app.py	/^import zipfile$/;"	kind:namespace	line:15
