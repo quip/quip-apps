@@ -1,0 +1,15 @@
+{
+    "name": "quip-apps-handle-richtextbox-key-event-navigation",
+    "version": "0.0.11",
+    "description": "Quip Apps RichTextBox Key Event Navigation",
+    "license": "UNLICENSED",
+    "repository": "quip/quip-apps",
+    "author": "Quip",
+    "main": "dist/handleRichTextBoxKeyEventNavigation.js",
+    "scripts": {
+        "build": "NODE_ENV=production webpack -p  --output-library-target umd"
+    },
+    "dependencies": {
+        "quip-apps-webpack-config": "^0.0.7"
+    }
+}
