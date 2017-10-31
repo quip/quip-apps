@@ -1,0 +1,192 @@
+// Copyright 2017 Quip
+
+.root {
+    margin-bottom: 8px;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    :global .document-content .section {
+        // TODO(elsigh): remove when remote editor style/width bug is fixed
+        width: auto !important;
+    }
+}
+
+.inputCheckContainer {
+    width: 24px;
+    height: 24px;
+    margin: 6px 12px 6px 0;
+    cursor: pointer;
+}
+
+.inputCircle,
+.inputCheckbox {
+    width: 24px;
+    height: 24px;
+    margin: 6px 12px 6px 0;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    align-self: center;
+
+    &.selected {
+        border: none;
+    }
+}
+
+.inputCircle::after {
+    position: absolute;
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.inputCheckbox {
+    border-radius: 3px;
+}
+
+.optionContainer {
+    position: relative;
+    display: flex;
+    flex: 1;
+    border-radius: 3px;
+}
+
+.optionBorder {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "";
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid;
+    z-index: 10;
+}
+
+.option {
+    flex: 1;
+    min-height: 36px;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 3px;
+    display: flex;
+    z-index: 1;
+    position: relative;
+}
+
+.optionContents {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.label {
+    flex: 1;
+    word-break: break-word;
+    :global .document-content .section[data-section-style="0"] > .content {
+        line-height: 20px !important;
+    }
+}
+
+.votes {
+    display: none;
+    font-weight: normal;
+    margin-left: 8px;
+    text-align: right;
+    white-space: nowrap;
+    &.voted {
+        display: initial;
+    }
+}
+
+.progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 0;
+    transition: right 0.4s ease;
+    border-radius: 3px 0 0 3px;
+    border-right: 1px solid;
+}
+
+.progressFull {
+    border-radius: 3px;
+}
+
+.progressFull,
+.progressEmpty {
+    border-right: none;
+}
+
+.delete {
+    cursor: pointer;
+}
+
+.dropdown {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    position: relative;
+    text-align: center;
+    width: 30px;
+    z-index: 2;
+}
+
+.root:hover .commentsTrigger {
+    //display: initial;
+    visibility: visible;
+}
+
+.commentsTrigger {
+    //display: none;
+    margin-left: 8px;
+    visibility: hidden;
+    width: 16px;
+    &.commented {
+        visibility: visible;
+        //display: initial;
+    }
+}
+
+.pollCheckmark {
+    fill: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes scale {
+    0%,
+    100% {
+        transform: none;
+    }
+    50% {
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}

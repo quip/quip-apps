@@ -1,0 +1,23 @@
+/* Copyright 2017 Quip */
+
+// TODO(elsigh): Once RTBs support not allowing Bold we can remove this
+:global .button-group-buttons button:nth-child(2) {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+:global .rich-text-box article .content {
+    font-weight: bold;
+}
+
+@arrowwidth: 26px;
+@arrowmargin: 5px;
+
+.container {
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+    display: flex;
+    min-width: 800px;
+    justify-content: center;
+    flex-direction: row;
+}

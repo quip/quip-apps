@@ -1,0 +1,19 @@
+{
+    "parser": "babel-eslint",
+    "plugins": ["react"],
+    "rules": {
+        "no-console": 0,
+        "no-class-assign": [1],
+
+        /* React rules */
+        "react/display-name": [0],
+        "react/no-find-dom-node": [1],
+        "react/no-deprecated": 1
+    },
+    "settings": {
+        "flowtype": {
+            "onlyFilesWithFlowAnnotation": true
+        }
+    },
+    "extends": ["eslint:recommended", "plugin:react/recommended"]
+}

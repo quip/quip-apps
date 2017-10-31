@@ -1,0 +1,54 @@
+.step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 180px;
+    padding-right: 16px;
+    padding-left: 20px;
+    -webkit-clip-path: polygon(
+        0% 0%,
+        calc(100% ~"-" 8px) 0%,
+        100% 50%,
+        calc(100% ~"-" 8px) 100%,
+        0 100%,
+        8px 50%
+    );
+    margin-right: -6px;
+    font-weight: bold;
+
+    word-break: break-word;
+
+    &:last-child {
+        margin-right: 0px;
+    }
+    &:hover .commentsTrigger {
+        visibility: initial;
+    }
+}
+
+.commentsTrigger {
+    align-self: center;
+    padding: 3px 6px;
+    visibility: hidden;
+
+    &.commented {
+        visibility: initial;
+    }
+}
+
+.contents {
+    display: flex;
+}
+
+.label {
+    flex: 1;
+}
+
+.chevron {
+    align-self: center;
+    cursor: pointer;
+    height: 20px;
+    text-align: center;
+    width: 20px;
+}

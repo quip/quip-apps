@@ -1,0 +1,39 @@
+/* Copyright 2017 Quip */
+@import (reference) "base.less";
+
+.addCard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px 1px @ui-border-color inset;
+    background-color: white;
+    svg {
+        fill: @gray;
+    }
+
+    &:active {
+        background-color: @gray-light;
+    }
+
+    &.columnSelected {
+        box-shadow: 0px 0px 0px 1px @ui-border-color inset;
+
+        &:active {
+            background-color: @gray-light;
+        }
+    }
+
+    &.hidden {
+        opacity: 0;
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}

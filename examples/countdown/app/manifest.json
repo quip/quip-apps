@@ -1,0 +1,15 @@
+{
+    "id": "GFDAjALQHe8",
+    "manifest_version": 1,
+    "name": "Countdown",
+    "version_name": "1.0",
+    "version_number": 1,
+    "disable_app_level_comments": true,
+    "sizing_mode": "fit_content",
+    "initial_height": 116,
+    "initial_width": 400,
+    "toolbar_color": "yellow",
+    "toolbar_icon": "countdown",
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"]
+}

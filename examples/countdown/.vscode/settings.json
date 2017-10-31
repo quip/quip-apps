@@ -1,0 +1,5 @@
+{
+    "javascript.validate.enable": true,
+    "editor.formatOnSave": true,
+    "git.autofetch": false
+}

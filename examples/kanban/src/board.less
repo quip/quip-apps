@@ -1,0 +1,26 @@
+/* Copyright 2017 Quip */
+
+.board {
+    outline: none;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+
+    .columnDropTarget,
+    .cardDropTarget {
+        position: absolute;
+    }
+
+    .columnDropTarget {
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        margin-left: 9px;
+        margin-right: 9px;
+    }
+
+    .cardDropTarget {
+        height: 2px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+}

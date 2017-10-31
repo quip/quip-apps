@@ -1,0 +1,31 @@
+{
+    "name": "quip-process-bar",
+    "version": "1.0.0",
+    "description": "Quip Process Bar Element",
+    "license": "UNLICENSED",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:quip/quip.git"
+    },
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
+    },
+    "author": "Quip",
+    "devDependencies": {
+        "eslint": "^4.7.1",
+        "eslint-config-prettier": "^2.5.0",
+        "eslint-plugin-flowtype": "^2.35.1",
+        "eslint-plugin-prettier": "^2.3.1",
+        "eslint-plugin-react": "^7.3.0",
+        "prettier": "^1.7.0"
+    },
+    "dependencies": {
+        "classnames": "^2.2.5",
+        "lodash.debounce": "^4.0.8",
+        "lodash.omit": "^4.5.0",
+        "quip-apps-chevron": ">=0.0.7",
+        "quip-apps-webpack-config": ">=0.0.7",
+        "quip-apps-handle-richtextbox-key-event-navigation": ">=0.0.10"
+    }
+}

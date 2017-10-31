@@ -1,0 +1,24 @@
+{
+  "name": "quip-poll",
+  "version": "1.0.0",
+  "description": "Quip Poll Element",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:quip/quip.git"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development webpack-dev-server --https",
+    "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
+  },
+  "author": "Quip",
+  "devDependencies": {
+    "prettier": "^1.7.0"
+  },
+  "dependencies": {
+    "classnames": "2.2.5",
+    "quip-apps-chevron": "^0.0.8",
+    "quip-apps-webpack-config": ">=0.0.7",
+    "quip-apps-handle-richtextbox-key-event-navigation": ">=0.0.11"
+  }
+}

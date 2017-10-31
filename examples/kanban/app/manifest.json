@@ -1,0 +1,16 @@
+{
+    "id": "KORAjAYHE50",
+    "manifest_version": 1,
+    "name": "Kanban Board",
+    "version_name": "0.1.0",
+    "version_number": 1,
+    "min_api_version": "0.1.022",
+    "disable_app_level_comments": true,
+    "sizing_mode": "fit_content",
+    "initial_height": 96,
+    "initial_width": 800,
+    "toolbar_color": "yellow",
+    "toolbar_icon": "kanban",
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"]
+}

@@ -1,0 +1,17 @@
+{
+    "id": "TPVAjA9RErP",
+    "manifest_version": 1,
+    "name": "Process Bar",
+    "version_name": "1.0",
+    "version_number": 1,
+    "min_api_version": "0.1.022",
+    "disable_app_level_comments": true,
+    "sizing_mode": "fit_content",
+    "allow_tiny_size": true,
+    "initial_height": 43,
+    "initial_width": 800,
+    "toolbar_color": "violet",
+    "toolbar_icon": "process_bar",
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"]
+}

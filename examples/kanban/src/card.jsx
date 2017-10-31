@@ -1,0 +1,333 @@
+// Copyright 2017 Quip
+
+/* eslint react/no-find-dom-node:0 */
+
+import { Motion } from "react-motion";
+import cx from "classnames";
+
+import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
+
+import { kColumnWidth } from "./board.jsx";
+import { CardEntity, entityListener } from "./model.jsx";
+import {
+    animateTo,
+    getCardToFocus,
+    listenForCardFocus,
+    unlistenForCardFocus,
+} from "./root.jsx";
+
+import Chevron from "quip-apps-chevron";
+
+import Grabber from "./icons/Grabber.js";
+
+import styles from "./card.less";
+
+export const kHorizontalMargin = 4; // 4 * 2 = 8
+const kPaddingBetweenCards = 12; // 8
+
+class Card extends React.Component {
+    static propTypes = {
+        cardDraggableAreaHeight: React.PropTypes.number.isRequired,
+        columnDragging: React.PropTypes.bool.isRequired,
+        dragging: React.PropTypes.bool.isRequired,
+        entity: React.PropTypes.instanceOf(CardEntity).isRequired,
+        focused: React.PropTypes.bool.isRequired,
+        left: React.PropTypes.number.isRequired,
+        onContextMenu: React.PropTypes.func.isRequired,
+        onHeightChanged: React.PropTypes.func.isRequired,
+        onMouseDown: React.PropTypes.func.isRequired,
+        selected: React.PropTypes.bool.isRequired,
+        setFocusedCard: React.PropTypes.func.isRequired,
+        top: React.PropTypes.number.isRequired,
+        isDraggingSomething: React.PropTypes.bool.isRequired,
+        onCardRest: React.PropTypes.func.isRequired,
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            editing: false,
+            commentHover: false,
+        };
+        // Each card calculates its height only after its remote editor has
+        // first been rendered. Until then, it won"t be able to know its correct
+        // y position in its column. When the card first renders in its
+        // correct y position, this boolean is used to make sure it appears
+        // at that position immediately, rather than animating to it.
+        this.renderedWithHeight_ = false;
+    }
+
+    componentDidMount() {
+        this.onCardFocus_();
+        listenForCardFocus(this.onCardFocus_);
+        quip.elements.addEventListener(
+            quip.elements.EventType.ELEMENT_BLUR,
+            this.stopEditing_,
+        );
+        if (this.props.dragging) {
+            quip.elements.addDetachedNode(ReactDOM.findDOMNode(this));
+        }
+        if (!this.props.entity.isHeader())
+            this.props.entity.supportsComments = () => true;
+    }
+
+    componentWillUnmount() {
+        unlistenForCardFocus(this.onCardFocus_);
+        quip.elements.removeEventListener(
+            quip.elements.EventType.ELEMENT_BLUR,
+            this.stopEditing_,
+        );
+        if (this.props.dragging) {
+            quip.elements.removeDetachedNode(ReactDOM.findDOMNode(this));
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.dragging != nextProps.dragging) {
+            if (this.props.dragging) {
+                quip.elements.removeDetachedNode(ReactDOM.findDOMNode(this));
+            }
+            if (nextProps.dragging) {
+                quip.elements.addDetachedNode(ReactDOM.findDOMNode(this));
+            }
+        }
+    }
+
+    render() {
+        const {
+            columnDragging,
+            entity,
+            dragging,
+            left,
+            focused,
+            selected,
+            top,
+            isDraggingSomething,
+        } = this.props;
+
+        const isMobile = quip.elements.isMobile();
+
+        const isHeader = entity.isHeader();
+        const showComments =
+            (this.state.commentHover && !dragging) ||
+            entity.getCommentCount() > 0 ||
+            isMobile;
+
+        // toUpperCase for backwards compat with kanban < 9-19-2017
+        let entityColor = entity.getColor() && entity.getColor().toUpperCase();
+        let richTextBoxColor = null;
+        if (entityColor) {
+            if (entityColor === "PURPLE") {
+                entityColor = quip.elements.ui.ColorMap.VIOLET.KEY;
+            }
+            richTextBoxColor = selected
+                ? quip.elements.ui.ColorMap.WHITE.KEY
+                : quip.elements.ui.ColorMap[entityColor].KEY;
+        }
+
+        const style = {
+            translateX: isDraggingSomething ? animateTo(left) : left,
+            translateY:
+                this.renderedWithHeight_ && isDraggingSomething
+                    ? animateTo(top)
+                    : top,
+            zIndex: animateTo(2),
+            scale: animateTo(1),
+            draggingBoxShadowOpacity: animateTo(0),
+        };
+        if (dragging || columnDragging) {
+            style.translateX = left;
+            style.translateY = top;
+            style.zIndex = 99;
+            if (dragging) {
+                style.draggingBoxShadowOpacity = animateTo(0.75);
+            }
+        }
+        if (entity.height > 0) {
+            this.renderedWithHeight_ = true;
+        }
+
+        return (
+            <Motion
+                style={style}
+                onRest={() => {
+                    this.props.onCardRest(entity.id());
+                }}
+            >
+                {({
+                    translateX,
+                    translateY,
+                    scale,
+                    draggingBoxShadowOpacity,
+                    zIndex,
+                }) => {
+                    let style = {
+                        width: kColumnWidth - kHorizontalMargin * 2,
+                        transform: `translate3d(${translateX}px,
+                        ${translateY}px, 0) scale(${scale})`,
+                        boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
+                        zIndex: zIndex,
+                    };
+
+                    if (!isHeader) {
+                        style.boxShadow += `, inset 0px 0px 0px 1px ${quip
+                            .elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
+                        style.backgroundColor = selected
+                            ? quip.elements.ui.ColorMap[entityColor].VALUE
+                            : quip.elements.ui.ColorMap[entityColor]
+                                  .VALUE_LIGHT;
+                    }
+
+                    return (
+                        <div
+                            ref={node => (entity.domNode = node)}
+                            className={cx(styles.card, {
+                                [styles.header]: isHeader,
+                                [styles.selected]: selected,
+                                [styles.isFocused]: focused,
+                                [styles.dragging]: dragging,
+                            })}
+                            style={style}
+                            onMouseEnter={this.onMouseEnter_}
+                            onMouseLeave={this.onMouseLeave_}
+                        >
+                            <div className={styles.titleRow}>
+                                {isHeader && (
+                                    <div
+                                        ref={n => (this.commentWrapper = n)}
+                                        style={{
+                                            visibility: isMobile
+                                                ? "hidden"
+                                                : "",
+                                        }}
+                                        className={cx(
+                                            "quip-color-text-secondary",
+                                            styles.draggable,
+                                            styles.draggableHeader,
+                                        )}
+                                        onMouseDown={
+                                            isMobile ? null : this.onMouseDown_
+                                        }
+                                    >
+                                        <Grabber />
+                                    </div>
+                                )}
+                                <div className={styles.remoteEditor}>
+                                    <quip.elements.ui.RichTextBox
+                                        allowedStyles={[
+                                            quip.elements.RichTextRecord.Style
+                                                .TEXT_PLAIN,
+                                        ]}
+                                        color={richTextBoxColor}
+                                        scrollable={true}
+                                        width="100%"
+                                        onComponentHeightChanged={
+                                            this.onEditorHeightChanged_
+                                        }
+                                        entity={entity}
+                                        readOnly={false}
+                                        onFocus={this.onEditorFocus}
+                                        onBlur={this.stopEditing_}
+                                        useDocumentTheme={false}
+                                        handleKeyEvent={this.handleKeyEvent_}
+                                    />
+                                </div>
+                                <div
+                                    className={styles.chevron}
+                                    onClick={this.onClickChevron_}
+                                >
+                                    <Chevron
+                                        color={
+                                            richTextBoxColor &&
+                                            quip.elements.ui.ColorMap[
+                                                richTextBoxColor
+                                            ].VALUE
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            {!isHeader && (
+                                <div
+                                    ref={n => (this.commentWrapper = n)}
+                                    className={cx(styles.commentWrapper, {
+                                        [styles.draggable]: !isMobile,
+                                    })}
+                                    onMouseDown={
+                                        isMobile ? null : this.onMouseDown_
+                                    }
+                                >
+                                    <div
+                                        className={cx(
+                                            styles.realCommentWrapper,
+                                            {
+                                                [styles.realCommentWrapperHide]: !showComments,
+                                            },
+                                        )}
+                                    >
+                                        <quip.elements.ui.CommentsTrigger
+                                            className={styles.commentsTrigger}
+                                            color={entityColor}
+                                            invertColor={selected}
+                                            entity={entity}
+                                            showEmpty={true}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }}
+            </Motion>
+        );
+    }
+
+    onEditorFocus = () => {
+        this.props.setFocusedCard(this.props.entity);
+    };
+
+    onClickChevron_ = e => {
+        this.props.onContextMenu(e, this.props.entity);
+    };
+
+    handleKeyEvent_ = e => {
+        return handleRichTextBoxKeyEventNavigation(e, this.props.entity);
+    };
+
+    onMouseDown_ = e => {
+        if (e.button !== 0) {
+            return;
+        }
+        this.props.onMouseDown(e, this.props.entity);
+    };
+
+    onMouseEnter_ = () => this.setState({ commentHover: true });
+    onMouseLeave_ = () => this.setState({ commentHover: false });
+
+    onCardFocus_ = () => {
+        const cardToFocus = getCardToFocus();
+        if (cardToFocus && cardToFocus.id() === this.props.entity.id()) {
+            this.startEditing_();
+        }
+    };
+
+    onEditorHeightChanged_ = height => {
+        this.props.entity.setHeight(
+            height + kPaddingBetweenCards + this.commentWrapper.clientHeight,
+        );
+        this.props.onHeightChanged();
+    };
+
+    startEditing_ = () => {
+        if (!this.state.editing) {
+            this.setState({ editing: true }, () => this.props.entity.focus());
+        }
+    };
+
+    stopEditing_ = () => {
+        if (this.props.entity.isDeleted()) {
+            return;
+        }
+        this.setState({ editing: false });
+    };
+}
+export default entityListener(Card);
