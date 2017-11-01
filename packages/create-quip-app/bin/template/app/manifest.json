@@ -1,5 +1,5 @@
 {
-    "id": "REPLACE THIS WITH YOUR ID FROM quip.com/api/apps",
+    "id": "REPLACE THIS WITH YOUR APP ID",
     "manifest_version": 1,
     "name": "$APP_DIR_NAME",
     "version_name": "1.0",
