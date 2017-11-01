@@ -1,4 +1,4 @@
-# Quip Apps 
+# Quip Apps
 The Quip Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
 
 <ul>
@@ -22,10 +22,9 @@ Inside that directory, it will generate the initial project structure and instal
 
 ```
 my-app
-├── node_modules
 ├── package.json
+├── node_modules
 ├── webpack.config.js
-├── .gitignore
 ├── app
 │   └── manifest.json
 └── src
