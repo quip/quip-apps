@@ -37,7 +37,7 @@ def init_app(app_dir_name):
         logging.error("Directory '%s' already exists" % app_dir)
         return
 
-    logging.info("Creating a new Quip app in %s\n", app_dir)
+    logging.info("Creating a new Quip App in %s\n", app_dir)
     lib_path = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(os.path.join(lib_path, "template"), app_dir,
                     ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
