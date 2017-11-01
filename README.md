@@ -34,6 +34,8 @@ my-app
     └── root.jsx
 ```
 
+## Getting Started
+
 Follow the <a href="https://quip.com/dev/liveapps/">Getting Started Guide</a> to start creating your own live app.
 
 ## Publishing
