@@ -1,10 +1,10 @@
 # Quip Apps 
-The Quip Live Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
+The Quip Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
 
 <ul>
-    <li><a href="https://quip.com/dev/liveapps/">Getting Started</a> - Learn how to create a live app.</li>
+    <li><a href="https://quip.com/dev/liveapps/">Getting Started</a> - Learn how to create an app.</li>
     <li><a href="https://quip.com/dev/liveapps/documentation">API Reference</a> - Explore the nuts and bolts of the API.</li>
-    <li><a href="https://quip.com/dev/liveapps/samples">Sample Apps</a> - Browse open-source code.</li>
+    <li><a href="https://quip.com/dev/liveapps/examples">Example Apps</a> - Browse open-source code.</li>
 </ul>
 
 The platform is currently in beta.
