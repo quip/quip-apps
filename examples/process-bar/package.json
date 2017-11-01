@@ -2,7 +2,7 @@
     "name": "quip-process-bar",
     "version": "1.0.0",
     "description": "Quip Process Bar Element",
-    "license": "UNLICENSED",
+    "license": "Apache-2.0",
     "repository": {
         "type": "git",
         "url": "git@github.com:quip/quip.git"

@@ -2,7 +2,7 @@
     "name": "quip-apps-calendar",
     "version": "1.0.0",
     "description": "Quip Calendar Live App",
-    "license": "UNLICENSED",
+    "license": "Apache-2.0",
     "repository": "quip/quip-apps",
     "private": true,
     "bugs": {

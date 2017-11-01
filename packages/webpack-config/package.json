@@ -2,7 +2,7 @@
   "name": "quip-apps-webpack-config",
   "version": "0.0.7",
   "description": "Quip Apps Webpack Config",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "repository": "quip/quip-apps",
   "author": "Quip",
   "main": "webpack.config.js",

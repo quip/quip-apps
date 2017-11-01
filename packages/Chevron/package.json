@@ -2,7 +2,7 @@
     "name": "quip-apps-chevron",
     "version": "0.0.8",
     "description": "Quip Apps Chevron",
-    "license": "UNLICENSED",
+    "license": "Apache-2.0",
     "repository": "quip/quip-apps",
     "author": "Quip",
     "main": "dist/Chevron.js",

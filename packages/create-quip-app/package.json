@@ -6,7 +6,7 @@
   ],
   "description": "Create Quip apps with no build configuration",
   "repository": "quip/quip-apps",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=6"
   },

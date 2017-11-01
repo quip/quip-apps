@@ -5,7 +5,7 @@
   ],
   "description": "Quip Live Apps API for creating applications in Quip documents",
   "repository": "quip/quip-apps",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/quip/quip-apps/issues"
   },
