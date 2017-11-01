@@ -1,4 +1,4 @@
-# quip-apps
+# Quip Apps 
 The Quip Live Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
 
 <ul>
