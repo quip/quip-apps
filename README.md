@@ -1,16 +1,13 @@
 # quip-apps
-Quip Live Apps API for creating applications in Quip documents
+The Quip Live Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
 
 <ul>
-    <li><a href="https://quip.com/dev/liveapps">Documentation and tutorials</a></li>
-    <li><a href="https://quip.com/dev/liveapps/documentation">API Reference</a>
-    <li><a href="examples">Example Apps</a></li>
+    <li><a href="https://quip.com/dev/liveapps/">Getting Started</a> - Learn how to create a live app.</li>
+    <li><a href="https://quip.com/dev/liveapps/documentation">API Reference</a> - Explore the nuts and bolts of the API.</li>
+    <li><a href="https://quip.com/dev/liveapps/samples">Sample Apps</a> - Browse open-source code.</li>
 </ul>
 
-
-
-The platform is currently in Beta.
-
+The platform is currently in beta.
 
 ## Quick Overview
 
@@ -37,14 +34,9 @@ my-app
     └── root.jsx
 ```
 
-## Live Apps Getting Started Guide
-https://quip.com/dev/liveapps/#getting-started
+Follow the <a href="https://quip.com/dev/liveapps/">Getting Started Guide</a> to start creating your own live app.
 
-## Beta and publishing
-  - While we're in Beta, you'll need to add someone as a Developer of your App
-    in the Quip Dev Portal to enable them to insert your element in a new
-    Document, but anyone can see your Live App in a shared Document.
+## Publishing
+During the beta period, only developers of your app will be able to insert the app. To add a developer, go to the Quip Dev Portal. To insert the live app in a Quip document, type @ followed by the app name.
 
-### Thanks
-
-
+Others can view and interact with the app, but they won't be able to create new instances of it yet.
