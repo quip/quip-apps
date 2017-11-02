@@ -8,6 +8,7 @@ import copy
 import fnmatch
 import json
 import logging
+import re
 import os
 import shutil
 import subprocess
@@ -30,7 +31,45 @@ def create_app_dir_name(app_name):
     return app_dir_name
 
 
+def check_environment(yarn_or_npm):
+    def check_min_major_version(command, min_version):
+        version_re = re.compile("^v?(\d+)\.\d+\.\d+")
+        try:
+            installed_version = subprocess.check_output(
+                "%s --version" % command, shell=True)
+        except:
+            return False
+        if installed_version:
+            match = version_re.match(installed_version.strip())
+            if match and match.group(1):
+                major_version = int(match.group(1))
+                if major_version >= min_version:
+                    return True
+        return False
+    min_npm = 3
+    min_node = 6
+    if yarn_or_npm == "npm":
+        if not check_min_major_version("npm", min_npm):
+            logging.error("Requires npm version >= %d" % (min_npm))
+            return False
+    if not check_min_major_version("node", min_node):
+        logging.error("Requires node version >= %d" % (min_node))
+        return False
+    return True
+
+
 def init_app(app_dir_name):
+    yarn_or_npm = "yarn"
+    try:
+        subprocess.check_call("%s --version" % yarn_or_npm, shell=True,
+                              stdout=FNULL, stderr=subprocess.STDOUT)
+    except:
+        yarn_or_npm = "npm"
+
+    if not check_environment(yarn_or_npm):
+        logging.error("Initialization failed.")
+        return
+
     cwd = os.getcwd()
     app_dir = os.path.join(cwd, app_dir_name)
     if os.path.exists(app_dir):
@@ -54,12 +93,6 @@ def init_app(app_dir_name):
     installed_packages = False
 
     FNULL = open(os.devnull, 'w')
-    yarn_or_npm = "yarn"
-    try:
-        subprocess.check_call("%s --version" % yarn_or_npm, shell=True,
-                              stdout=FNULL, stderr=subprocess.STDOUT)
-    except:
-        yarn_or_npm = "npm"
 
     try:
         logging.info(
