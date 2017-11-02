@@ -1,23 +1,23 @@
 import quip from "quip";
 import App from "./App.jsx";
 
-class PostItRoot extends quip.apps.RootRecord {
+class StickyNoteRoot extends quip.apps.RootRecord {
     static getProperties() {
         return {
-            postIt: quip.apps.RichTextRecord,
+            stickyNote: quip.apps.RichTextRecord,
         };
     }
 }
-quip.apps.registerClass(PostItRoot, "root");
+quip.apps.registerClass(StickyNoteRoot, "root");
 
 quip.apps.initialize({
     initializationCallback: function(rootNode, params) {
         let rootRecord = quip.apps.getRootRecord();
         if (params.isCreation) {
-            rootRecord.set("postIt", {});
+            rootRecord.set("stickyNote", {});
         }
         ReactDOM.render(
-            <App richTextRecord={rootRecord.get("postIt")} />,
+            <App richTextRecord={rootRecord.get("stickyNote")} />,
             rootNode,
         );
     },

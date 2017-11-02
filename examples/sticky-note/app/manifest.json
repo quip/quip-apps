@@ -1,7 +1,7 @@
 {
-    "id": "REPLACE THIS WITH YOUR ID FROM quip.com/api/apps",
+    "id": "REPLACE THIS WITH YOUR ID",
     "manifest_version": 1,
-    "name": "post-it",
+    "name": "sticky-note",
     "version_name": "1.0",
     "version_number": 1,
     "sizing_mode": "fit_content",

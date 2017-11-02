@@ -1,7 +1,7 @@
 {
-    "name": "post-it",
+    "name": "Sticky Note",
     "version": "0.0.1",
-    "description": "post-it Quip App",
+    "description": "Sticky Note Quip App",
     "license": "Apache-2.0",
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --https",
