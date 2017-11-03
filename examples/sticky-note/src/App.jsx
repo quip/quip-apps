@@ -13,7 +13,6 @@ export default class App extends React.Component {
             border: `1px solid ${quip.apps.ui.ColorMap.YELLOW.VALUE}`,
             boxShadow: "0 2px 5px 5px rgba(0, 0, 0, 0.1)",
             padding: 10,
-            margin: 20,
         };
         return (
             <div className={Styles.hello} style={style}>
