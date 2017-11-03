@@ -3,6 +3,6 @@ import App from "./App.jsx";
 
 quip.apps.initialize({
     initializationCallback: function(rootNode) {
-        ReactDOM.render(<App />, rootNode);
+        ReactDOM.render(<App/>, rootNode);
     },
 });
