@@ -1,0 +1,17 @@
+{
+    "id": "REPLACE THIS WITH YOUR ID",
+    "manifest_version": 1,
+    "name": "google-drive",
+    "version_name": "1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 300,
+    "initial_width": 300,
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"],
+    "csp_sources": {
+        "img_srcs": [
+            "https://drive-thirdparty.googleusercontent.com/"
+        ]
+    }
+}
