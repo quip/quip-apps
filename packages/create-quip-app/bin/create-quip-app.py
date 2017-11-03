@@ -13,6 +13,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 import zipfile
 
 
@@ -210,9 +211,13 @@ def create_package(app_dir, package_path=None):
     if not warn_missing_paths(manifest, written_paths, app_dir):
         with zipfile.ZipFile(package_path, 'w') as zfile:
             for path in written_paths:
-                zfile.write(path)
+                info = zipfile.ZipInfo(path, date_time=time.gmtime(315576000))
+                with open(path, "rb") as f:
+                    zfile.writestr(info, f.read())
 
         logging.info("Built package at '%s/%s'" % (app_dir, package_path))
+    else:
+        sys.exit(1)
 
 
 def main():
