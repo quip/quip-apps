@@ -14,7 +14,6 @@ export default class App extends React.Component {
             boxShadow: "0 2px 5px 5px rgba(0, 0, 0, 0.1)",
             padding: 10,
             margin: 20,
-            transform: "rotate(-2deg)",
         };
         return (
             <div className={Styles.hello} style={style}>
