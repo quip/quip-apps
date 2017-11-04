@@ -1,0 +1,29 @@
+{
+  "name": "quip-field-builder",
+  "version": "1.0.0",
+  "description": "Quip Field Builder Element",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:quip/quip.git"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development webpack-dev-server --https",
+    "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app",
+    "lint": "eslint --ext .jsx --ext .js ./src/"
+  },
+  "author": "Quip",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-plugin-react": "^7.0.1"
+  },
+  "dependencies": {
+    "intl": "^1.2.5",
+    "moment": "2.18.1",
+    "react-modal": "^2.3.2",
+    "react-sortable-hoc": "0.6.1",
+    "whatwg-fetch": "^2.0.3",
+    "create-quip-app": "^0.0.7",
+    "quip-apps-webpack-config": ">=0.0.7"
+  }
+}

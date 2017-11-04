@@ -1,0 +1,35 @@
+/* Copyright 2017 Quip */
+
+.dialog {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid @borderColor;
+    border-radius: 5px;
+    height: 400px;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    font-weight: bold;
+}
+
+.picker {
+    display: flex;
+    flex-direction: row;
+    border-top: 1px solid @borderColor;
+    border-bottom: 1px solid @borderColor;
+    height: 320px;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 40px;
+    margin-right: 5px;
+    > :not(:first-child) {
+        margin-left: 5px;
+    }
+}
