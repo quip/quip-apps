@@ -12,3 +12,6 @@ Paste the link into Quip and select the Spotify live app.
 
 Or, Type @Spotify to insert the default playlist.
 
+## Example
+
+![screenshot](https://quip-build-static-resources.s3-us-west-2.amazonaws.com/HouWzq6XnJm1gTDsj558JA "Screenshot")
