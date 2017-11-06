@@ -5,7 +5,7 @@ import cx from "classnames";
 import AddCardIcon from "./icons/add-card.jsx";
 import { kColumnWidth } from "./board.jsx";
 import { kHorizontalMargin } from "./card.jsx";
-import { ColumnEntity } from "./model.jsx";
+import { ColumnRecord } from "./model.jsx";
 import { animateTo, focusCard } from "./root.jsx";
 
 import styles from "./add-card.less";
@@ -14,7 +14,7 @@ export const kAddCardHeight = 34;
 
 export default class AddCard extends React.Component {
     static propTypes = {
-        columnEntity: React.PropTypes.instanceOf(ColumnEntity).isRequired,
+        columnRecord: React.PropTypes.instanceOf(ColumnRecord).isRequired,
         top: React.PropTypes.number.isRequired,
         left: React.PropTypes.number.isRequired,
         columnSelected: React.PropTypes.bool.isRequired,
@@ -74,6 +74,6 @@ export default class AddCard extends React.Component {
 
     onClick_ = e => {
         e.stopPropagation();
-        focusCard(this.props.columnEntity.addCard(false));
+        focusCard(this.props.columnRecord.addCard(false));
     };
 }

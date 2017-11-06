@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 
 import App from "./components/App.jsx";
 
-import connectEntity from "./lib/connectEntity";
+import connectRecord from "./connectRecord";
 import { allMenuCommands, getToolbarCommandIds } from "./menus";
 import registerModels from "./model";
 
@@ -22,7 +22,7 @@ quip.apps.initialize({
         }
 
         quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);
-        const ConnectedApp = connectEntity(rootRecord, App);
+        const ConnectedApp = connectRecord(rootRecord, App);
         ReactDOM.render(<ConnectedApp />, rootNode, () => {
             isCreation &&
                 rootRecord

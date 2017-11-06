@@ -28,10 +28,10 @@ const ACTIVITY_LOG_MESSAGES = {
     },
 };
 
-export class BoardEntity extends quip.apps.RootEntity {
+export class BoardRecord extends quip.apps.RootRecord {
     static getProperties() {
         return {
-            columns: quip.apps.RecordList.Type(ColumnEntity),
+            columns: quip.apps.RecordList.Type(ColumnRecord),
             // TODO(elsigh): why not just compute this?
             nextColumnColor: "string",
         };
@@ -62,8 +62,8 @@ export class BoardEntity extends quip.apps.RootEntity {
         return newColumn;
     }
 
-    moveColumn(columnEntity, index) {
-        this.get("columns").move(columnEntity, index);
+    moveColumn(columnRecord, index) {
+        this.get("columns").move(columnRecord, index);
         quip.apps.recordQuipMetric("move_column");
     }
 
@@ -88,11 +88,11 @@ export class BoardEntity extends quip.apps.RootEntity {
     }
 }
 
-export class ColumnEntity extends quip.apps.Record {
+export class ColumnRecord extends quip.apps.Record {
     static getProperties() {
         return {
             color: "string",
-            cards: quip.apps.RecordList.Type(CardEntity),
+            cards: quip.apps.RecordList.Type(CardRecord),
         };
     }
 
@@ -152,14 +152,14 @@ export class ColumnEntity extends quip.apps.Record {
         );
     }
 
-    insertCard(cardEntity, index) {
-        const prevColumnName = cardEntity
+    insertCard(cardRecord, index) {
+        const prevColumnName = cardRecord
             .getColumn()
             .getHeader()
             .getTextContent()
             .trim();
-        this.get("cards").move(cardEntity, index);
-        const nextColumnName = cardEntity
+        this.get("cards").move(cardRecord, index);
+        const nextColumnName = cardRecord
             .getColumn()
             .getHeader()
             .getTextContent()
@@ -170,8 +170,8 @@ export class ColumnEntity extends quip.apps.Record {
         quip.apps.recordQuipMetric("move_card");
     }
 
-    moveCard(cardEntity, index) {
-        this.get("cards").move(cardEntity, index);
+    moveCard(cardRecord, index) {
+        this.get("cards").move(cardRecord, index);
     }
 
     calculateHeight() {
@@ -202,9 +202,9 @@ export class ColumnEntity extends quip.apps.Record {
         return this.getPreviousSibling();
     }
 }
-ColumnEntity.CONSTRUCTOR_KEY = "kanban-column";
+ColumnRecord.CONSTRUCTOR_KEY = "kanban-column";
 
-export class CardEntity extends quip.apps.RichTextRecord {
+export class CardRecord extends quip.apps.RichTextRecord {
     static getProperties() {
         return {
             isHeader: "boolean",
@@ -321,27 +321,27 @@ export class CardEntity extends quip.apps.RichTextRecord {
         return next;
     }
 }
-CardEntity.CONSTRUCTOR_KEY = "kanban-card";
+CardRecord.CONSTRUCTOR_KEY = "kanban-card";
 
 export function entityListener(WrappedComponent) {
-    return class EntityListenerComponent extends React.Component {
+    return class RecordListenerComponent extends React.Component {
         static propTypes = {
-            entity: React.PropTypes.instanceOf(quip.apps.Entity),
+            entity: React.PropTypes.instanceOf(quip.apps.Record),
         };
 
         componentDidMount() {
-            this.props.entity.listen(this.onEntityChange_);
+            this.props.entity.listen(this.onRecordChange_);
         }
 
         componentWillUnmount() {
-            this.props.entity.unlisten(this.onEntityChange_);
+            this.props.entity.unlisten(this.onRecordChange_);
         }
 
         render() {
             return <WrappedComponent {...this.props} />;
         }
 
-        onEntityChange_ = () => {
+        onRecordChange_ = () => {
             this.forceUpdate();
         };
     };

@@ -11,11 +11,6 @@
     &:last-child {
         margin-bottom: 0;
     }
-
-    :global .document-content .section {
-        // TODO(elsigh): remove when remote editor style/width bug is fixed
-        width: auto !important;
-    }
 }
 
 .inputCheckContainer {
@@ -150,18 +145,15 @@
 }
 
 .root:hover .commentsTrigger {
-    //display: initial;
     visibility: visible;
 }
 
 .commentsTrigger {
-    //display: none;
     margin-left: 8px;
     visibility: hidden;
     width: 16px;
     &.commented {
         visibility: visible;
-        //display: initial;
     }
 }
 

@@ -3,7 +3,7 @@
 import quip from "quip";
 import ReactDOM from "react-dom";
 
-import connectEntity from "./connectEntity";
+import connectRecord from "./connectRecord";
 import { formatDate } from "./humanTime";
 
 import App from "./components/App.jsx";
@@ -21,8 +21,8 @@ let rootInstance = null;
 const setRootInstance = val => (rootInstance = val);
 
 export function updateToolbar() {
-    const rootEntity = quip.apps.getRootRecord();
-    const deadline = rootEntity && rootEntity.get("deadline");
+    const rootRecord = quip.apps.getRootRecord();
+    const deadline = rootRecord && rootRecord.get("deadline");
     quip.apps.updateToolbar({
         menuCommands: allMenuCommands(new Date(deadline)),
     });
@@ -59,20 +59,20 @@ quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["color", "date"],
     initializationCallback: function(rootNode, params) {
-        const rootEntity = quip.apps.getRootRecord();
+        const rootRecord = quip.apps.getRootRecord();
 
         if (params.isCreation) {
-            rootEntity.set("color", quip.apps.ui.ColorMap.YELLOW.KEY);
+            rootRecord.set("color", quip.apps.ui.ColorMap.YELLOW.KEY);
             const tomorrowDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
-            rootEntity.set("deadline", tomorrowDate.getTime());
-        } else if (colors.indexOf(rootEntity.get("color")) === -1) {
+            rootRecord.set("deadline", tomorrowDate.getTime());
+        } else if (colors.indexOf(rootRecord.get("color")) === -1) {
             // backwards compat for timers < 9-20-2017
-            rootEntity.set("color", quip.apps.ui.ColorMap.YELLOW.KEY);
+            rootRecord.set("color", quip.apps.ui.ColorMap.YELLOW.KEY);
         }
-        updateToolbar(rootEntity.get("deadline"));
-        quip.apps.updateToolbarCommandsState([], [rootEntity.get("color")]);
+        updateToolbar(rootRecord.get("deadline"));
+        quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);
 
-        const ConnectedApp = connectEntity(rootEntity, App);
+        const ConnectedApp = connectRecord(rootRecord, App);
         ReactDOM.render(
             <ConnectedApp setRootInstance={setRootInstance} />,
             rootNode,

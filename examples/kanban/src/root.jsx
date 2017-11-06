@@ -8,7 +8,7 @@ import {
     onSelectedCardChanged,
     refreshToolbar,
 } from "./menus.js";
-import { BoardEntity, CardEntity, ColumnEntity } from "./model.jsx";
+import { BoardRecord, CardRecord, ColumnRecord } from "./model.jsx";
 
 const kInitialColumns = [
     {
@@ -39,8 +39,8 @@ let cardFocusListeners = [];
 export function getCardToFocus() {
     return cardToFocus;
 }
-export function focusCard(cardEntity) {
-    cardToFocus = cardEntity;
+export function focusCard(cardRecord) {
+    cardToFocus = cardRecord;
     cardFocusListeners.forEach(listener => listener());
 }
 export function listenForCardFocus(listener) {
@@ -53,32 +53,32 @@ export function unlistenForCardFocus(listener) {
     }
 }
 
-function ensureBoardPopulated(boardEntity) {
+function ensureBoardPopulated(boardRecord) {
     kInitialColumns.forEach(column => {
-        const columnEntity = boardEntity.addColumn(column.headerText);
-        while (columnEntity.getCards().length - 1 < column.numCards) {
-            focusCard(columnEntity.addCard(false));
+        const columnRecord = boardRecord.addColumn(column.headerText);
+        while (columnRecord.getCards().length - 1 < column.numCards) {
+            focusCard(columnRecord.addCard(false));
         }
     });
 }
 
-quip.apps.registerClass(BoardEntity, "Root");
-quip.apps.registerClass(ColumnEntity, ColumnEntity.CONSTRUCTOR_KEY);
-quip.apps.registerClass(CardEntity, CardEntity.CONSTRUCTOR_KEY);
+quip.apps.registerClass(BoardRecord, "Root");
+quip.apps.registerClass(ColumnRecord, ColumnRecord.CONSTRUCTOR_KEY);
+quip.apps.registerClass(CardRecord, CardRecord.CONSTRUCTOR_KEY);
 
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["insert-column"],
     initializationCallback: (root, params) => {
-        const boardEntity = quip.apps.getRootRecord();
+        const boardRecord = quip.apps.getRootRecord();
         const justCreated = params.isCreation;
         if (justCreated) {
-            ensureBoardPopulated(boardEntity);
+            ensureBoardPopulated(boardRecord);
             //quip.apps.sendMessage("created a Kanban Board");
         }
         ReactDOM.render(
             <Board
-                entity={boardEntity}
+                entity={boardRecord}
                 onSelectedCardChanged={onSelectedCardChanged}
                 focusOnMount={justCreated}
             />,

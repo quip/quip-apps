@@ -194,10 +194,7 @@ class Option extends ListenerRecord {
     }
 
     clearVotes() {
-        // TODO: this.clear("votes") should work instead after bugfix on 8/21/17
-        this.get("votes")
-            .getRecords()
-            .forEach(vote => vote.delete());
+        this.clear("votes");
     }
 
     getCurrentVote() {

@@ -8,7 +8,7 @@ import cx from "classnames";
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 
 import { kColumnWidth } from "./board.jsx";
-import { CardEntity, entityListener } from "./model.jsx";
+import { CardRecord, entityListener } from "./model.jsx";
 import {
     animateTo,
     getCardToFocus,
@@ -30,7 +30,7 @@ class Card extends React.Component {
         cardDraggableAreaHeight: React.PropTypes.number.isRequired,
         columnDragging: React.PropTypes.bool.isRequired,
         dragging: React.PropTypes.bool.isRequired,
-        entity: React.PropTypes.instanceOf(CardEntity).isRequired,
+        entity: React.PropTypes.instanceOf(CardRecord).isRequired,
         focused: React.PropTypes.bool.isRequired,
         left: React.PropTypes.number.isRequired,
         onContextMenu: React.PropTypes.func.isRequired,

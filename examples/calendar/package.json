@@ -5,7 +5,7 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "git@github.com:quip/quip.git"
+        "url": "git@github.com:quip/quip-apps.git"
     },
     "scripts": {
         "test": "jest",

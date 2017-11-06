@@ -162,12 +162,14 @@ export function getMovingEventRectMap(
     let rectMap = {};
     Object.keys(movingEventElMap).forEach((weekStartTime, i) => {
         const el = movingEventElMap[weekStartTime];
-        rectMap[weekStartTime] = getMovingEventRect(
-            el,
-            mouseStartCoordinates,
-            mouseCoordinates,
-        );
-        //console.log("weekStartTime", weekStartTime, el, rectMap[weekStartTime]);
+        if (el.ownerDocument.body.contains(el)) {
+            rectMap[weekStartTime] = getMovingEventRect(
+                el,
+                mouseStartCoordinates,
+                mouseCoordinates,
+            );
+            //console.log("weekStartTime", weekStartTime, rectMap[weekStartTime]);
+        }
     });
     return rectMap;
 }
@@ -177,14 +179,6 @@ function getMovingEventRect(
     mouseStartCoordinates: MouseStartCoordinates,
     mouseCoordinates: ?MouseCoordinates,
 ): MovingEventRect {
-    /*
-    console.log(
-        "getMovingEventRect: ",
-        el,
-        mouseStartCoordinates,
-        mouseCoordinates,
-    );
-    */
     mouseCoordinates = mouseCoordinates || mouseStartCoordinates;
     const rect = el.getBoundingClientRect();
     const offsetX = mouseStartCoordinates.x - rect.left;
@@ -195,6 +189,16 @@ function getMovingEventRect(
     // $FlowFixMe
     const width = wrapperEl.offsetWidth;
     const height = rect.height;
+    /*
+    console.log(
+        "getMovingEventRect: ",
+        left,
+        top,
+        rect,
+        mouseStartCoordinates,
+        mouseCoordinates,
+    );
+    */
     return {
         height,
         left,

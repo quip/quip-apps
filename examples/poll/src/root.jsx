@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import quip from "quip";
 
-import Connect from "./connectEntity";
+import Connect from "./connectRecord";
 import registerModels from "./model";
 
 import App from "./components/App.jsx";

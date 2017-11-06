@@ -31,28 +31,28 @@ export function allMenuCommands() {
             id: "delete-card",
             label: "Delete",
             handler: (name, context) => {
-                context.cardEntity.deleteCard();
+                context.cardRecord.deleteCard();
             },
         },
         {
             id: "delete-column",
             label: "Delete",
             handler: (name, context) => {
-                context.cardEntity.getColumn().deleteColumn();
+                context.cardRecord.getColumn().deleteColumn();
             },
         },
         {
             id: "comment",
             label: "Comment",
             handler: (name, context) => {
-                quip.apps.showComments(context.cardEntity.id());
+                quip.apps.showComments(context.cardRecord.id());
             },
         },
         {
             id: "automatic-color",
             label: "Automatic",
             handler: (name, context) => {
-                context.cardEntity.clearColor();
+                context.cardRecord.clearColor();
                 refreshToolbar();
             },
         },
@@ -60,11 +60,11 @@ export function allMenuCommands() {
             id: color,
             label: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
             handler: (name, context) => {
-                const cardEntity = context.cardEntity;
-                if (cardEntity.isHeader()) {
-                    cardEntity.getColumn().setColor(color);
+                const cardRecord = context.cardRecord;
+                if (cardRecord.isHeader()) {
+                    cardRecord.getColumn().setColor(color);
                 } else {
-                    cardEntity.setColor(color);
+                    cardRecord.setColor(color);
                 }
                 refreshToolbar();
             },
@@ -72,9 +72,9 @@ export function allMenuCommands() {
     ];
 }
 
-export function showCardContextMenu(e, cardEntity, onDismiss) {
+export function showCardContextMenu(e, cardRecord, onDismiss) {
     let commands;
-    if (cardEntity.isHeader()) {
+    if (cardRecord.isHeader()) {
         commands = [
             ...colors,
             quip.apps.DocumentMenuCommands.SEPARATOR,
@@ -92,30 +92,30 @@ export function showCardContextMenu(e, cardEntity, onDismiss) {
     quip.apps.showContextMenuFromButton(
         e,
         commands,
-        getHighlightedCommands(cardEntity),
+        getHighlightedCommands(cardRecord),
         null,
         onDismiss,
         {
-            cardEntity: cardEntity,
+            cardRecord: cardRecord,
         },
     );
 }
 
-function getHighlightedCommands(cardEntity) {
-    if (!cardEntity) {
+function getHighlightedCommands(cardRecord) {
+    if (!cardRecord) {
         return [];
     } else {
-        const cardColor = cardEntity.isHeader()
-            ? cardEntity.getColumn().getColor()
-            : cardEntity.getIntrinsicColor();
-        return !cardEntity.isHeader() && !cardColor
+        const cardColor = cardRecord.isHeader()
+            ? cardRecord.getColumn().getColor()
+            : cardRecord.getIntrinsicColor();
+        return !cardRecord.isHeader() && !cardColor
             ? ["automatic-color"]
             : [cardColor];
     }
 }
 
-function getDisabledCommands(cardEntity) {
-    if (!cardEntity) {
+function getDisabledCommands(cardRecord) {
+    if (!cardRecord) {
         return [
             "delete-card",
             "delete-column",
@@ -123,7 +123,7 @@ function getDisabledCommands(cardEntity) {
             "automatic-color",
             ...colors,
         ];
-    } else if (cardEntity.isHeader()) {
+    } else if (cardRecord.isHeader()) {
         return ["delete-card", "comment", "automatic-color"];
     } else {
         return [];

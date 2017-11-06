@@ -3,7 +3,7 @@
 import AddCard, { kAddCardHeight } from "./add-card.jsx";
 import Card from "./card.jsx";
 import { showCardContextMenu } from "./menus.js";
-import { BoardEntity, entityListener } from "./model.jsx";
+import { BoardRecord, entityListener } from "./model.jsx";
 import getClosest from "./getClosest";
 
 import styles from "./board.less";
@@ -16,7 +16,7 @@ const minDragXYDiff = 15;
 
 class Board extends React.Component {
     static propTypes = {
-        entity: React.PropTypes.instanceOf(BoardEntity).isRequired,
+        entity: React.PropTypes.instanceOf(BoardRecord).isRequired,
         onSelectedCardChanged: React.PropTypes.func.isRequired,
         focusOnMount: React.PropTypes.bool.isRequired,
     };
@@ -82,14 +82,14 @@ class Board extends React.Component {
         const { isDraggingSomething } = this.state;
         let children = [];
         let left = 0;
-        this.props.entity.getColumns().forEach((columnEntity, i) => {
+        this.props.entity.getColumns().forEach((columnRecord, i) => {
             const columnDragging = Boolean(
                 draggingCard &&
                     draggingCard.isHeader() &&
-                    draggingCard.getColumn().id() === columnEntity.id(),
+                    draggingCard.getColumn().id() === columnRecord.id(),
             );
             const dropTargetIndex =
-                columnEntity.id() === cardDropTargetColumnId
+                columnRecord.id() === cardDropTargetColumnId
                     ? cardDropTargetIndex
                     : undefined;
             if (columnDropTargetIndex === 0 && i === 0) {
@@ -100,7 +100,7 @@ class Board extends React.Component {
             }
             children = children.concat(
                 this.getColumnContents_(
-                    columnEntity,
+                    columnRecord,
                     columnDragging && i > columnDropTargetIndex
                         ? left - kColumnWidth
                         : left,
@@ -142,7 +142,7 @@ class Board extends React.Component {
     }
 
     getColumnContents_(
-        columnEntity,
+        columnRecord,
         left,
         columnDragging,
         draggingCard,
@@ -159,7 +159,7 @@ class Board extends React.Component {
         const columnSelected = Boolean(
             selectedCard &&
                 selectedCard.isHeader() &&
-                selectedCard.getColumn().id() === columnEntity.id(),
+                selectedCard.getColumn().id() === columnRecord.id(),
         );
         let contents = [];
         let top = 0;
@@ -169,19 +169,19 @@ class Board extends React.Component {
         }
         const kCardDropTargetHeight =
             (draggingCard && draggingCard.getHeight()) || 0;
-        columnEntity.getCards().forEach((cardEntity, i) => {
+        columnRecord.getCards().forEach((cardRecord, i) => {
             const selected = Boolean(
                 this.state.selectedCard &&
-                    cardEntity.id() === this.state.selectedCard.id(),
+                    cardRecord.id() === this.state.selectedCard.id(),
             );
             const focused = Boolean(
                 this.state.focusedCard &&
-                    cardEntity.id() === this.state.focusedCard.id(),
+                    cardRecord.id() === this.state.focusedCard.id(),
             );
             const dragging = Boolean(
                 !columnDragging &&
                     draggingCard &&
-                    cardEntity.id() === draggingCard.id(),
+                    cardRecord.id() === draggingCard.id(),
             );
 
             let cardTop = top;
@@ -199,10 +199,10 @@ class Board extends React.Component {
                     cardDraggableAreaHeight={cardDraggableAreaHeight}
                     columnDragging={columnDragging}
                     dragging={dragging}
-                    entity={cardEntity}
+                    entity={cardRecord}
                     focused={focused}
                     isDraggingSomething={isDraggingSomething}
-                    key={cardEntity.id()}
+                    key={cardRecord.id()}
                     left={cardLeft}
                     onCardRest={this.onCardRest_}
                     onContextMenu={this.onCardContextMenu_}
@@ -216,8 +216,8 @@ class Board extends React.Component {
 
             if (!dragging) {
                 if (i === 0)
-                    top += cardEntity.getHeight() - cardDraggableAreaHeight;
-                else top += cardEntity.getHeight();
+                    top += cardRecord.getHeight() - cardDraggableAreaHeight;
+                else top += cardRecord.getHeight();
             }
 
             if (dropTargetIndex !== undefined && i === dropTargetIndex - 1) {
@@ -234,8 +234,8 @@ class Board extends React.Component {
 
         contents.push(
             <AddCard
-                key={`${columnEntity.id()}-add-card`}
-                columnEntity={columnEntity}
+                key={`${columnRecord.id()}-add-card`}
+                columnRecord={columnRecord}
                 top={top}
                 left={left}
                 columnSelected={columnSelected}
@@ -284,14 +284,14 @@ class Board extends React.Component {
         });
     };
 
-    setFocusedCard = cardEntity => {
+    setFocusedCard = cardRecord => {
         this.setState({
-            focusedCard: cardEntity,
+            focusedCard: cardRecord,
             selectedCard: null,
         });
     };
 
-    onCardContextMenu_ = (e, cardEntity) => {
+    onCardContextMenu_ = (e, cardRecord) => {
         e.preventDefault();
         e.stopPropagation();
         if (this.state.contextMenuCard) {
@@ -300,26 +300,26 @@ class Board extends React.Component {
         this.setState({
             focusedCard: null,
             selectedCard: null,
-            contextMenuCard: cardEntity,
+            contextMenuCard: cardRecord,
         });
-        showCardContextMenu(e.currentTarget, cardEntity, () => {
+        showCardContextMenu(e.currentTarget, cardRecord, () => {
             this.setState({
                 contextMenuCard: null,
             });
         });
     };
 
-    onCardMouseDown_ = (e, cardEntity) => {
-        this.isDraggingSomethingCard = cardEntity;
+    onCardMouseDown_ = (e, cardRecord) => {
+        this.isDraggingSomethingCard = cardRecord;
         this.setState({
-            draggingCard: cardEntity,
+            draggingCard: cardRecord,
             dragStartX: e.pageX,
             dragStartY: e.pageY,
             dragCurrentX: e.pageX,
             dragCurrentY: e.pageY,
             focusedCard: null,
             isDraggingSomething: true,
-            selectedCard: cardEntity,
+            selectedCard: cardRecord,
         });
     };
 
@@ -367,20 +367,20 @@ class Board extends React.Component {
             } else if (cardDropTargetIndex !== undefined) {
                 const columns = this.props.entity.getColumns();
                 for (
-                    let i = 0, columnEntity;
-                    (columnEntity = columns[i]);
+                    let i = 0, columnRecord;
+                    (columnRecord = columns[i]);
                     i++
                 ) {
-                    if (cardDropTargetColumnId === columnEntity.id()) {
+                    if (cardDropTargetColumnId === columnRecord.id()) {
                         if (
-                            columnEntity.id() === draggingCard.getColumn().id()
+                            columnRecord.id() === draggingCard.getColumn().id()
                         ) {
-                            columnEntity.moveCard(
+                            columnRecord.moveCard(
                                 draggingCard,
                                 cardDropTargetIndex,
                             );
                         } else {
-                            columnEntity.insertCard(
+                            columnRecord.insertCard(
                                 draggingCard,
                                 cardDropTargetIndex,
                             );
@@ -462,27 +462,27 @@ class Board extends React.Component {
         }
     }
 
-    computeCardPosition_(cardEntity) {
-        const columnEntity = cardEntity.getColumn();
+    computeCardPosition_(cardRecord) {
+        const columnRecord = cardRecord.getColumn();
         let left = 0;
         const columns = this.props.entity.getColumns();
         for (let i = 0, column; (column = columns[i]); i++) {
-            if (column.id() === columnEntity.id()) {
+            if (column.id() === columnRecord.id()) {
                 break;
             }
             left += kColumnWidth;
         }
         let top = 0;
-        const cards = columnEntity.getCards();
+        const cards = columnRecord.getCards();
         for (let i = 0, card; (card = cards[i]); i++) {
-            if (card.id() === cardEntity.id()) {
+            if (card.id() === cardRecord.id()) {
                 break;
             }
             top += card.getHeight();
         }
         return {
             centerX: left + kColumnWidth / 2,
-            centerY: top + cardEntity.getHeight() / 2,
+            centerY: top + cardRecord.getHeight() / 2,
         };
     }
 

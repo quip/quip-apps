@@ -403,13 +403,8 @@ class Calendar extends React.Component<Props, null> {
                     );
                     movingEvent.setIndex(movingEventOrder.index);
                 }
-
-                // Prevents repaint jank where we render the calendar event in its
-                // original place before rendering it in the new place.
-                setTimeout(() => {
-                    this.props.setSelectedEvent(null);
-                    this.props.setMovingEvent(null);
-                }, 0);
+                this.props.setMovingEvent(null);
+                this.props.setSelectedEvent(null);
             }
         } else {
             this.props.setSelectedEvent(null);
