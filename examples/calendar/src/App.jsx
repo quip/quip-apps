@@ -29,7 +29,7 @@ export default class App extends React.Component<Props, null> {
             displayMonth,
             events: props.rootRecord.getEvents(),
             isSmallScreen: getIsSmallScreen(),
-            isMobileApp: quip.elements.isMobile(),
+            isMobileApp: quip.apps.isMobile(),
             rootNode: props.rootNode,
             rootRecord: props.rootRecord,
             selectedEvent: undefined,

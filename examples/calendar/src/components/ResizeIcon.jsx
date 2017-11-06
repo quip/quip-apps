@@ -8,7 +8,7 @@ type Props = {
     fill: string,
 };
 
-class ResizeIcon extends React.Component<Props, null> {
+export default class ResizeIcon extends React.Component<Props, null> {
     render() {
         const { fill } = this.props;
         return (
@@ -23,5 +23,3 @@ class ResizeIcon extends React.Component<Props, null> {
         );
     }
 }
-
-export default ResizeIcon;

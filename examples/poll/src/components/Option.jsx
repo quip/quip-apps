@@ -9,7 +9,7 @@ import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-ke
 import Chevron from "quip-apps-chevron";
 import Styles from "./Option.less";
 
-const { RichTextBox, CommentsTrigger } = quip.elements.ui;
+const { RichTextBox, CommentsTrigger } = quip.apps.ui;
 
 const RETURN_KEY = 13;
 
@@ -35,9 +35,9 @@ export default class Option extends React.Component {
         multiple: React.PropTypes.bool,
         onDelete: React.PropTypes.func.isRequired,
         onSelect: React.PropTypes.func.isRequired,
-        record: React.PropTypes.instanceOf(quip.elements.Record).isRequired,
+        record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,
         selected: React.PropTypes.bool,
-        textRecord: React.PropTypes.instanceOf(quip.elements.RichTextEntity)
+        textRecord: React.PropTypes.instanceOf(quip.apps.RichTextRecord)
             .isRequired,
         totalVotes: React.PropTypes.number,
         votesCount: React.PropTypes.number,
@@ -66,7 +66,7 @@ export default class Option extends React.Component {
             delete: this.deleteOption,
             record: this.props.record,
         };
-        quip.elements.showContextMenuFromButton(
+        quip.apps.showContextMenuFromButton(
             e.currentTarget,
             ["comment", "delete"],
             [],
@@ -102,7 +102,7 @@ export default class Option extends React.Component {
             multiple,
         } = this.props;
 
-        const user = quip.elements.getViewingUser();
+        const user = quip.apps.getViewingUser();
         const progressPct = totalVotes ? votesCount / totalVotes * 100 : 0;
         return (
             <div className={Styles.root} ref={node => record.setDom(node)}>
@@ -114,7 +114,7 @@ export default class Option extends React.Component {
                         onClick={() => this.selectOption(!selected)}
                         style={{
                             backgroundColor: selected
-                                ? quip.elements.ui.ColorMap[color].VALUE
+                                ? quip.apps.ui.ColorMap[color].VALUE
                                 : "",
                         }}
                     >
@@ -130,7 +130,7 @@ export default class Option extends React.Component {
                         onClick={() => this.selectOption(!selected)}
                         style={{
                             backgroundColor: selected
-                                ? quip.elements.ui.ColorMap[color].VALUE
+                                ? quip.apps.ui.ColorMap[color].VALUE
                                 : "",
                         }}
                     />
@@ -141,7 +141,7 @@ export default class Option extends React.Component {
                         className={Styles.optionBorder}
                         style={{
                             borderColor:
-                                quip.elements.ui.ColorMap[color].VALUE_STROKE,
+                                quip.apps.ui.ColorMap[color].VALUE_STROKE,
                         }}
                     />
                     <div className={Styles.option}>
@@ -156,7 +156,7 @@ export default class Option extends React.Component {
                                     scrollable={false}
                                     useDocumentTheme={false}
                                     allowedStyles={[
-                                        quip.elements.RichTextRecord.Style
+                                        quip.apps.RichTextRecord.Style
                                             .TEXT_PLAIN,
                                     ]}
                                     handleKeyEvent={this.handleKeyEvent}
@@ -182,7 +182,7 @@ export default class Option extends React.Component {
                                 })}
                                 style={{
                                     color:
-                                        quip.elements.ui.ColorMap[color].VALUE,
+                                        quip.apps.ui.ColorMap[color].VALUE,
                                 }}
                             >
                                 {`${votesCount} ${votesCount === 1
@@ -197,7 +197,7 @@ export default class Option extends React.Component {
                         onClick={this.showContextMenu}
                     >
                         <Chevron
-                            color={quip.elements.ui.ColorMap[color].VALUE}
+                            color={quip.apps.ui.ColorMap[color].VALUE}
                         />
                     </div>
 
@@ -208,13 +208,13 @@ export default class Option extends React.Component {
                         })}
                         style={{
                             backgroundColor:
-                                quip.elements.ui.ColorMap[color].VALUE_LIGHT,
-                            boxShadow: `-1px 0 0 ${quip.elements.ui.ColorMap[
+                                quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+                            boxShadow: `-1px 0 0 ${quip.apps.ui.ColorMap[
                                 color
                             ].VALUE_LIGHT} inset`,
                             right: `${100 - progressPct}%`,
                             borderColor:
-                                quip.elements.ui.ColorMap[color].VALUE_STROKE,
+                                quip.apps.ui.ColorMap[color].VALUE_STROKE,
                         }}
                     />
                 </div>

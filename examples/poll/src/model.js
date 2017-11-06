@@ -1,7 +1,6 @@
 // Copyright 2017 Quip
 
 import quip from "quip";
-quip.elements.enableDataModelV2();
 
 import ListenerRecord from "./listenerRecord";
 
@@ -9,18 +8,18 @@ const defaultOptionText = index =>
     `Option${typeof index === "number" ? ` ${index + 1}` : ""}`;
 const matchDefaultOptionText = text => (text.match(/^Option (\d+)$/) || [])[1];
 
-class Root extends quip.elements.RootRecord {
+class Root extends quip.apps.RootRecord {
     static CONSTRUCTOR_KEY = "Root";
     static DATA_VERSION = 2;
 
     static getProperties = () => ({
         color: "string",
         allowMultiple: "boolean",
-        options: quip.elements.RecordList.Type(Option),
+        options: quip.apps.RecordList.Type(Option),
     });
 
     static getDefaultProperties = () => ({
-        color: quip.elements.ui.ColorMap.BLUE.KEY,
+        color: quip.apps.ui.ColorMap.BLUE.KEY,
         allowMultiple: false,
         options: [...Array(3)].map((__, index) =>
             Option.getDefaultProperties(index),
@@ -55,8 +54,8 @@ class Root extends quip.elements.RootRecord {
         const lastIndex = isMatch ? parseInt(isMatch) : options.length;
 
         this.get("options").add(Option.getDefaultProperties(lastIndex));
-        quip.elements.recordQuipMetric("add_option");
-        //quip.elements.sendMessage("added an option");
+        quip.apps.recordQuipMetric("add_option");
+        //quip.apps.sendMessage("added an option");
     }
 
     getOptions() {
@@ -68,7 +67,7 @@ class Root extends quip.elements.RootRecord {
     }
 
     currentUserHasVoted() {
-        const user = quip.elements.getViewingUser();
+        const user = quip.apps.getViewingUser();
         if (!user) {
             return false;
         }
@@ -96,8 +95,8 @@ class Option extends ListenerRecord {
     static DATA_VERSION = 2;
 
     static getProperties = () => ({
-        votes: quip.elements.RecordList.Type(Vote),
-        text: quip.elements.RichTextRecord,
+        votes: quip.apps.RecordList.Type(Vote),
+        text: quip.apps.RichTextRecord,
         createdAt: "number",
     });
 
@@ -128,11 +127,11 @@ class Option extends ListenerRecord {
     delete() {
         const text = this.getRichTextRecord().getTextContent();
         super.delete();
-        //quip.elements.sendMessage(`removed an option: ${text}`);
+        //quip.apps.sendMessage(`removed an option: ${text}`);
     }
 
     vote(value, sendMessage = true) {
-        const user = quip.elements.getViewingUser();
+        const user = quip.apps.getViewingUser();
         if (!user) {
             return;
         }
@@ -156,17 +155,17 @@ class Option extends ListenerRecord {
 
         if (!rtr.empty() && sendMessage) {
             if (allowMultiple) {
-                quip.elements.sendMessage(`voted for ${text}`);
+                quip.apps.sendMessage(`voted for ${text}`);
             } else {
                 const hasVoted = parent.currentUserHasVoted();
                 if (hasVoted) {
-                    quip.elements.sendMessage(`changed their vote to ${text}`);
+                    quip.apps.sendMessage(`changed their vote to ${text}`);
                 } else {
-                    quip.elements.sendMessage(`voted for ${text}`);
+                    quip.apps.sendMessage(`voted for ${text}`);
                 }
             }
         }
-        quip.elements.recordQuipMetric("voted");
+        quip.apps.recordQuipMetric("voted");
     }
 
     removeOtherOptionVotes() {
@@ -202,7 +201,7 @@ class Option extends ListenerRecord {
     }
 
     getCurrentVote() {
-        const user = quip.elements.getViewingUser();
+        const user = quip.apps.getViewingUser();
         if (!user) {
             return null;
         }
@@ -229,5 +228,5 @@ class Vote extends ListenerRecord {
 
 export default () => {
     const classes = [Root, Option, Vote];
-    classes.forEach(c => quip.elements.registerClass(c, c.CONSTRUCTOR_KEY));
+    classes.forEach(c => quip.apps.registerClass(c, c.CONSTRUCTOR_KEY));
 };

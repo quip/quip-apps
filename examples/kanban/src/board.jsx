@@ -46,8 +46,8 @@ class Board extends React.Component {
         window.addEventListener("mouseup", this.onMouseUp_);
         window.addEventListener("click", this.onClick_);
         window.addEventListener("keyup", this.onKeyUp_);
-        quip.elements.addEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.onBlur_,
         );
         //this.onCardFocus_();
@@ -59,8 +59,8 @@ class Board extends React.Component {
         window.removeEventListener("mouseup", this.onMouseUp_);
         window.removeEventListener("click", this.onClick_);
         window.removeEventListener("keyup", this.onKeyUp_);
-        quip.elements.removeEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.removeEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.onBlur_,
         );
         //unlistenForCardFocus(this.onCardFocus_);
@@ -365,7 +365,12 @@ class Board extends React.Component {
                     columnDropTargetIndex,
                 );
             } else if (cardDropTargetIndex !== undefined) {
-                for (const columnEntity of this.props.entity.getColumns()) {
+                const columns = this.props.entity.getColumns();
+                for (
+                    let i = 0, columnEntity;
+                    (columnEntity = columns[i]);
+                    i++
+                ) {
                     if (cardDropTargetColumnId === columnEntity.id()) {
                         if (
                             columnEntity.id() === draggingCard.getColumn().id()
@@ -460,14 +465,16 @@ class Board extends React.Component {
     computeCardPosition_(cardEntity) {
         const columnEntity = cardEntity.getColumn();
         let left = 0;
-        for (const column of this.props.entity.getColumns()) {
+        const columns = this.props.entity.getColumns();
+        for (let i = 0, column; (column = columns[i]); i++) {
             if (column.id() === columnEntity.id()) {
                 break;
             }
             left += kColumnWidth;
         }
         let top = 0;
-        for (const card of columnEntity.getCards()) {
+        const cards = columnEntity.getCards();
+        for (let i = 0, card; (card = cards[i]); i++) {
             if (card.id() === cardEntity.id()) {
                 break;
             }

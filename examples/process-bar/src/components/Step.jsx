@@ -7,7 +7,7 @@ import cx from "classnames";
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 import { setFocusedStep } from "../menus";
 
-import Styles from "./step.less";
+import Styles from "./Step.less";
 import Chevron from "quip-apps-chevron";
 
 const VERTICAL_PADDING = 12;
@@ -15,8 +15,7 @@ const INPUT_HEIGHT = 19;
 
 export default class Step extends React.Component {
     static propTypes = {
-        record: React.PropTypes.instanceOf(quip.elements.RichTextEntity)
-            .isRequired,
+        record: React.PropTypes.instanceOf(quip.apps.RichTextRecord).isRequired,
         color: React.PropTypes.string.isRequired,
         onSelected: React.PropTypes.func.isRequired,
         onDelete: React.PropTypes.func.isRequired,
@@ -49,11 +48,11 @@ export default class Step extends React.Component {
         if (!this.props.selected) {
             menuCommandIds = [
                 "selectStepFromMenu",
-                quip.elements.DocumentMenuCommands.SEPARATOR,
+                quip.apps.DocumentMenuCommands.SEPARATOR,
                 ...menuCommandIds,
             ];
         }
-        quip.elements.showContextMenuFromButton(
+        quip.apps.showContextMenuFromButton(
             e.currentTarget,
             menuCommandIds,
             [], // highlighted
@@ -103,22 +102,22 @@ export default class Step extends React.Component {
                 }}
                 style={{
                     backgroundColor: selected
-                        ? quip.elements.ui.ColorMap[color].VALUE
-                        : quip.elements.ui.ColorMap[color].VALUE_LIGHT,
-                    borderColor: quip.elements.ui.ColorMap[color].VALUE_STROKE,
+                        ? quip.apps.ui.ColorMap[color].VALUE
+                        : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+                    borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
                     paddingTop: VERTICAL_PADDING,
                     paddingBottom: VERTICAL_PADDING,
                 }}
             >
                 <div className={Styles.contents}>
                     <div className={Styles.label}>
-                        <quip.elements.ui.RichTextBox
+                        <quip.apps.ui.RichTextBox
                             allowedStyles={[
-                                quip.elements.RichTextRecord.Style.TEXT_PLAIN,
+                                quip.apps.RichTextRecord.Style.TEXT_PLAIN,
                             ]}
                             color={
                                 selected
-                                    ? quip.elements.ui.ColorMap.WHITE.KEY
+                                    ? quip.apps.ui.ColorMap.WHITE.KEY
                                     : color
                             }
                             handleKeyEvent={this.handleKeyEvent}
@@ -135,7 +134,7 @@ export default class Step extends React.Component {
                             [Styles.commented]: record.getCommentCount() > 0,
                         })}
                     >
-                        <quip.elements.ui.CommentsTrigger
+                        <quip.apps.ui.CommentsTrigger
                             color={color}
                             invertColor={selected}
                             record={record}
@@ -149,8 +148,8 @@ export default class Step extends React.Component {
                         <Chevron
                             color={
                                 selected
-                                    ? quip.elements.ui.ColorMap.WHITE.VALUE
-                                    : quip.elements.ui.ColorMap[color].VALUE
+                                    ? quip.apps.ui.ColorMap.WHITE.VALUE
+                                    : quip.apps.ui.ColorMap[color].VALUE
                             }
                         />
                     </div>

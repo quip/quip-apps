@@ -85,7 +85,7 @@ class EventLegend extends React.Component<Props, null> {
                 {events.map(event => {
                     const { start, end } = event.getDateRange();
                     const color = event.getColor();
-                    const colorValue = quip.elements.ui.ColorMap[color].VALUE;
+                    const colorValue = quip.apps.ui.ColorMap[color].VALUE;
                     const hasComments = event.getCommentCount() > 0;
                     return (
                         <li
@@ -116,7 +116,7 @@ class EventLegend extends React.Component<Props, null> {
                                 </div>
                                 {hasComments && (
                                     <div className={Styles.colComments}>
-                                        <quip.elements.ui.CommentsTrigger
+                                        <quip.apps.ui.CommentsTrigger
                                             record={event}
                                             showEmpty
                                         />

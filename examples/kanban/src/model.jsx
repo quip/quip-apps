@@ -2,12 +2,12 @@
 //import quip from "quip";
 
 export const kDefaultColumnColors = [
-    quip.elements.ui.ColorMap.RED.KEY,
-    quip.elements.ui.ColorMap.YELLOW.KEY,
-    quip.elements.ui.ColorMap.BLUE.KEY,
-    quip.elements.ui.ColorMap.GREEN.KEY,
-    quip.elements.ui.ColorMap.ORANGE.KEY,
-    quip.elements.ui.ColorMap.VIOLET.KEY,
+    quip.apps.ui.ColorMap.RED.KEY,
+    quip.apps.ui.ColorMap.YELLOW.KEY,
+    quip.apps.ui.ColorMap.BLUE.KEY,
+    quip.apps.ui.ColorMap.GREEN.KEY,
+    quip.apps.ui.ColorMap.ORANGE.KEY,
+    quip.apps.ui.ColorMap.VIOLET.KEY,
 ];
 
 const ACTIVITY_LOG_MESSAGES = {
@@ -28,10 +28,10 @@ const ACTIVITY_LOG_MESSAGES = {
     },
 };
 
-export class BoardEntity extends quip.elements.RootEntity {
+export class BoardEntity extends quip.apps.RootEntity {
     static getProperties() {
         return {
-            columns: quip.elements.RecordList.Type(ColumnEntity),
+            columns: quip.apps.RecordList.Type(ColumnEntity),
             // TODO(elsigh): why not just compute this?
             nextColumnColor: "string",
         };
@@ -57,14 +57,14 @@ export class BoardEntity extends quip.elements.RootEntity {
         let newColumn = this.get("columns").add({ color }, index);
         newColumn.addCard(true, headerText, 0);
         newColumn.addCard(false, "", 1);
-        //quip.elements.sendMessage(ACTIVITY_LOG_MESSAGES.ADD_COLUMN());
-        quip.elements.recordQuipMetric("add_column");
+        //quip.apps.sendMessage(ACTIVITY_LOG_MESSAGES.ADD_COLUMN());
+        quip.apps.recordQuipMetric("add_column");
         return newColumn;
     }
 
     moveColumn(columnEntity, index) {
         this.get("columns").move(columnEntity, index);
-        quip.elements.recordQuipMetric("move_column");
+        quip.apps.recordQuipMetric("move_column");
     }
 
     calculateHeight() {
@@ -77,22 +77,22 @@ export class BoardEntity extends quip.elements.RootEntity {
 
     getNextColumnColor_() {
         const color =
-            this.getProperty("nextColumnColor") || kDefaultColumnColors[0];
+            this.get("nextColumnColor") || kDefaultColumnColors[0];
         const index = kDefaultColumnColors.indexOf(color);
         const nextColor =
             index === kDefaultColumnColors.length - 1
                 ? kDefaultColumnColors[0]
                 : kDefaultColumnColors[index + 1];
-        this.setProperty("nextColumnColor", nextColor);
+        this.set("nextColumnColor", nextColor);
         return color;
     }
 }
 
-export class ColumnEntity extends quip.elements.Record {
+export class ColumnEntity extends quip.apps.Record {
     static getProperties() {
         return {
             color: "string",
-            cards: quip.elements.RecordList.Type(CardEntity),
+            cards: quip.apps.RecordList.Type(CardEntity),
         };
     }
 
@@ -101,20 +101,20 @@ export class ColumnEntity extends quip.elements.Record {
     }
 
     initialize() {
-        const listener = quip.elements
-            .getRootEntity()
-            .notifyListeners.bind(quip.elements.getRootEntity());
+        const listener = quip.apps
+            .getRootRecord()
+            .notifyListeners.bind(quip.apps.getRootRecord());
         this.listen(listener);
         this.get("cards").listen(listener);
     }
 
     getColor() {
-        return this.getProperty("color");
+        return this.get("color");
     }
 
     setColor(color) {
-        quip.elements.recordQuipMetric("set_color");
-        this.setProperty("color", color);
+        quip.apps.recordQuipMetric("set_color");
+        this.set("color", color);
     }
 
     getCards() {
@@ -138,7 +138,7 @@ export class ColumnEntity extends quip.elements.Record {
 
     addCard(isHeader, defaultText, index) {
         let defaultPlaceholderText = isHeader ? "New Title" : "New Card";
-        quip.elements.recordQuipMetric("add_card");
+        quip.apps.recordQuipMetric("add_card");
         return this.get("cards").add(
             {
                 isHeader,
@@ -164,10 +164,10 @@ export class ColumnEntity extends quip.elements.Record {
             .getHeader()
             .getTextContent()
             .trim();
-        //quip.elements.sendMessage(
+        //quip.apps.sendMessage(
         //    ACTIVITY_LOG_MESSAGES.MOVE_CARD(prevColumnName, nextColumnName),
         //);
-        quip.elements.recordQuipMetric("move_card");
+        quip.apps.recordQuipMetric("move_card");
     }
 
     moveCard(cardEntity, index) {
@@ -183,7 +183,7 @@ export class ColumnEntity extends quip.elements.Record {
     }
 
     deleteColumn() {
-        /*quip.elements.sendMessage(
+        /*quip.apps.sendMessage(
             ACTIVITY_LOG_MESSAGES.REMOVE_COLUMN(
                 this.getHeader()
                     .getTextContent()
@@ -191,7 +191,7 @@ export class ColumnEntity extends quip.elements.Record {
             ),
         );*/
         super.delete();
-        quip.elements.recordQuipMetric("delete_column");
+        quip.apps.recordQuipMetric("delete_column");
     }
 
     getNextColumn() {
@@ -204,7 +204,7 @@ export class ColumnEntity extends quip.elements.Record {
 }
 ColumnEntity.CONSTRUCTOR_KEY = "kanban-column";
 
-export class CardEntity extends quip.elements.RichTextEntity {
+export class CardEntity extends quip.apps.RichTextRecord {
     static getProperties() {
         return {
             isHeader: "boolean",
@@ -227,7 +227,7 @@ export class CardEntity extends quip.elements.RichTextEntity {
     }
 
     isHeader() {
-        return this.getProperty("isHeader");
+        return this.get("isHeader");
     }
 
     getColor() {
@@ -237,12 +237,12 @@ export class CardEntity extends quip.elements.RichTextEntity {
     }
 
     getIntrinsicColor() {
-        return this.getProperty("color");
+        return this.get("color");
     }
 
     setColor(color) {
         if (!this.isHeader()) {
-            this.setProperty("color", color);
+            this.set("color", color);
         }
     }
 
@@ -257,8 +257,8 @@ export class CardEntity extends quip.elements.RichTextEntity {
     getHeight() {
         if (this.isHeader()) {
             // All headers should match the height of the tallest header.
-            const headers = quip.elements
-                .getRootEntity()
+            const headers = quip.apps
+                .getRootRecord()
                 .getColumns()
                 .map(column => column.getHeader());
             return headers
@@ -274,11 +274,11 @@ export class CardEntity extends quip.elements.RichTextEntity {
     }
 
     deleteCard() {
-        /*quip.elements.sendMessage(
+        /*quip.apps.sendMessage(
             ACTIVITY_LOG_MESSAGES.REMOVE_CARD(this.getTextContent().trim()),
         );*/
         super.delete();
-        quip.elements.recordQuipMetric("delete_card");
+        quip.apps.recordQuipMetric("delete_card");
     }
 
     getPreviousSibling() {
@@ -326,7 +326,7 @@ CardEntity.CONSTRUCTOR_KEY = "kanban-card";
 export function entityListener(WrappedComponent) {
     return class EntityListenerComponent extends React.Component {
         static propTypes = {
-            entity: React.PropTypes.instanceOf(quip.elements.Entity),
+            entity: React.PropTypes.instanceOf(quip.apps.Entity),
         };
 
         componentDidMount() {

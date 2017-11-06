@@ -4,12 +4,12 @@
 import quip from "quip";
 
 const colors = [
-    quip.elements.ui.ColorMap.RED.KEY,
-    quip.elements.ui.ColorMap.ORANGE.KEY,
-    quip.elements.ui.ColorMap.YELLOW.KEY,
-    quip.elements.ui.ColorMap.GREEN.KEY,
-    quip.elements.ui.ColorMap.BLUE.KEY,
-    quip.elements.ui.ColorMap.VIOLET.KEY,
+    quip.apps.ui.ColorMap.RED.KEY,
+    quip.apps.ui.ColorMap.ORANGE.KEY,
+    quip.apps.ui.ColorMap.YELLOW.KEY,
+    quip.apps.ui.ColorMap.GREEN.KEY,
+    quip.apps.ui.ColorMap.BLUE.KEY,
+    quip.apps.ui.ColorMap.VIOLET.KEY,
 ];
 
 let focusedStepId;
@@ -27,9 +27,9 @@ export function allMenuCommands() {
         },
         ...colors.map(color => ({
             id: color,
-            label: quip.elements.ui.ColorMap[color].LABEL,
+            label: quip.apps.ui.ColorMap[color].LABEL,
             handler: () => {
-                quip.elements.getRootEntity().set("color", color);
+                quip.apps.getRootRecord().set("color", color);
                 refreshToolbar();
             },
             isHeader: false,
@@ -38,38 +38,38 @@ export function allMenuCommands() {
             id: "addStep",
             label: "Add Step",
             handler: () => {
-                quip.elements
-                    .getRootEntity()
+                quip.apps
+                    .getRootRecord()
                     .get("steps")
                     .add({});
-                quip.elements.recordQuipMetric("add_step");
+                quip.apps.recordQuipMetric("add_step");
             }
         },
         {
             id: "selectStep",
             label: "Select Step",
             handler: () => {
-                quip.elements.getRootEntity().set("selected", focusedStepId);
+                quip.apps.getRootRecord().set("selected", focusedStepId);
                 refreshToolbar();
-                quip.elements.recordQuipMetric("set_selected_step");
+                quip.apps.recordQuipMetric("set_selected_step");
             },
         },
         {
             id: "selectStepFromMenu",
             label: "Select Step",
             handler: (name, context) => {
-                quip.elements
-                    .getRootEntity()
+                quip.apps
+                    .getRootRecord()
                     .set("selected", context["record"].getId());
                 refreshToolbar();
-                quip.elements.recordQuipMetric("set_selected_step");
+                quip.apps.recordQuipMetric("set_selected_step");
             },
         },
         {
             id: "comment",
             label: "Comment",
             handler: (name, context) => {
-                quip.elements.showComments(context["record"].getId());
+                quip.apps.showComments(context["record"].getId());
             },
         },
         {
@@ -89,11 +89,11 @@ export function getToolbarCommandIds() {
 }
 
 function getHighlightedCommandIds() {
-    return [quip.elements.getRootRecord().get("color")];
+    return [quip.apps.getRootRecord().get("color")];
 }
 
 function refreshToolbar() {
-    quip.elements.updateToolbar({
+    quip.apps.updateToolbar({
         menuCommands: allMenuCommands(),
         toolbarCommandIds: getToolbarCommandIds(),
         highlightedCommandIds: getHighlightedCommandIds(),

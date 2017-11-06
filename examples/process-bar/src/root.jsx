@@ -13,15 +13,15 @@ import registerModels from "./model";
 
 registerModels();
 
-quip.elements.initialize({
+quip.apps.initialize({
     initializationCallback: function(rootNode, { isCreation }) {
-        const rootRecord = quip.elements.getRootRecord();
+        const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
-            //quip.elements.sendMessage("added a Process Bar");
+            //quip.apps.sendMessage("added a Process Bar");
         }
 
-        quip.elements.updateToolbarCommandsState([], [rootRecord.get("color")]);
+        quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);
         const ConnectedApp = connectEntity(rootRecord, App);
         ReactDOM.render(<ConnectedApp />, rootNode, () => {
             isCreation &&

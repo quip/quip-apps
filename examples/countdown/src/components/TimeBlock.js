@@ -15,29 +15,29 @@ class TimeBlock extends Component {
 
     render() {
         const { number, unit, color } = this.props;
-        const showFocusedState = quip.elements.isElementFocused() &&
-            !quip.elements.isMobile();
+        const showFocusedState = quip.apps.isElementFocused() &&
+            !quip.apps.isMobile();
         const makeNumberStyles = () => {
             const backgroundColor = showFocusedState
-                ? quip.elements.ui.ColorMap[color].VALUE
-                : quip.elements.ui.ColorMap[color].VALUE_LIGHT;
+                ? quip.apps.ui.ColorMap[color].VALUE
+                : quip.apps.ui.ColorMap[color].VALUE_LIGHT;
             const numberColor = showFocusedState
                 ? "#fff"
-                : quip.elements.ui.ColorMap[color].VALUE;
+                : quip.apps.ui.ColorMap[color].VALUE;
 
             return {
                 color: numberColor,
                 backgroundColor: backgroundColor,
                 borderStyle: "solid",
                 borderWidth: 1,
-                borderColor: quip.elements.ui.ColorMap[color].VALUE_STROKE,
+                borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
             };
         };
 
         return (
             <div
                 className={Styles.wrapper}
-                style={{ color: quip.elements.ui.ColorMap[color].VALUE }}
+                style={{ color: quip.apps.ui.ColorMap[color].VALUE }}
             >
                 <div
                     style={makeNumberStyles()}

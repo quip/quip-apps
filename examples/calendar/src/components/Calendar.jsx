@@ -53,7 +53,7 @@ import type {
     MovingEventOrder,
 } from "../types";
 
-const { CONTAINER_SIZE_UPDATE, ELEMENT_BLUR } = quip.elements.EventType;
+const { CONTAINER_SIZE_UPDATE, ELEMENT_BLUR } = quip.apps.EventType;
 
 const LONG_WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SHORT_WEEK_DAYS = LONG_WEEK_DAYS.map(d => d[0]);
@@ -93,11 +93,11 @@ type Props = {
 
 class Calendar extends React.Component<Props, null> {
     componentWillMount() {
-        quip.elements.addEventListener(
+        quip.apps.addEventListener(
             CONTAINER_SIZE_UPDATE,
             this.handleContainerResize,
         );
-        quip.elements.addEventListener(ELEMENT_BLUR, this.onElementBlur);
+        quip.apps.addEventListener(ELEMENT_BLUR, this.onElementBlur);
         window.addEventListener("keydown", this.onKeyDown);
         window.document.body.addEventListener("mouseout", this.onBodyMouseOut);
     }
@@ -107,11 +107,11 @@ class Calendar extends React.Component<Props, null> {
     }
 
     componentWillUnmount() {
-        quip.elements.removeEventListener(
+        quip.apps.removeEventListener(
             CONTAINER_SIZE_UPDATE,
             this.handleContainerResize,
         );
-        quip.elements.removeEventListener(ELEMENT_BLUR, this.onElementBlur);
+        quip.apps.removeEventListener(ELEMENT_BLUR, this.onElementBlur);
         window.removeEventListener("keydown", this.onKeyDown);
         window.document.body.removeEventListener(
             "mouseout",

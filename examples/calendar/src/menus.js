@@ -21,7 +21,7 @@ export function allMenuCommands() {
             id: "set-display-month",
             label: "Set Default Month",
             handler: () => {
-                quip.elements.getRootRecord().setDisplayMonth(displayMonth);
+                quip.apps.getRootRecord().setDisplayMonth(displayMonth);
                 refreshToolbar();
             },
         },
@@ -36,7 +36,7 @@ export function allMenuCommands() {
             id: "comment",
             label: "Comment",
             handler: () => {
-                quip.elements.showComments(selectedEvent.id());
+                quip.apps.showComments(selectedEvent.id());
             },
         },
         ...colors.map(color => ({
@@ -51,7 +51,7 @@ export function allMenuCommands() {
 }
 
 export function refreshToolbar() {
-    quip.elements.updateToolbar({
+    quip.apps.updateToolbar({
         menuCommands: allMenuCommands(),
         toolbarCommandIds: getToolbarComandIds(),
         disabledCommands: getDisabledCommands(),
@@ -68,12 +68,12 @@ export function showEventContextMenu(
 
     const commands = [
         ...colors,
-        quip.elements.DocumentMenuCommands.SEPARATOR,
+        quip.apps.DocumentMenuCommands.SEPARATOR,
         "comment",
         "delete-event",
     ];
 
-    quip.elements.showContextMenuFromButton(
+    quip.apps.showContextMenuFromButton(
         e,
         commands,
         getHighlightedCommands(),
@@ -98,7 +98,7 @@ function getDisabledCommands() {
 function getToolbarComandIds() {
     let toolbarCommandIds = [];
     if (
-        !isEqual(displayMonth, quip.elements.getRootRecord().getDisplayMonth())
+        !isEqual(displayMonth, quip.apps.getRootRecord().getDisplayMonth())
     ) {
         toolbarCommandIds.push("set-display-month");
     }

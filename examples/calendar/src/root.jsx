@@ -8,23 +8,16 @@ import { allMenuCommands } from "./menus";
 
 import "./root.less";
 
-if (quip.elements.enableDataModelV2) {
-    quip.elements.enableDataModelV2();
-}
-if (quip.elements.enableSizingV2) {
-    quip.elements.enableSizingV2();
-}
-
-quip.elements.initialize({
+quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["set-display-month"],
 
     initializationCallback: function(root, { isCreation }) {
-        const rootRecord = quip.elements.getRootRecord();
+        const rootRecord = quip.apps.getRootRecord();
 
         if (isCreation) {
             rootRecord.setDisplayMonth(new Date());
-            //quip.elements.sendMessage("created a Calendar");
+            //quip.apps.sendMessage("created a Calendar");
         }
 
         ReactDOM.render(<App rootNode={root} rootRecord={rootRecord} />, root);

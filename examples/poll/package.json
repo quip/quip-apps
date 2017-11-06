@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "classnames": "2.2.5",
+    "create-quip-app": "^0.0.7",
     "quip-apps-chevron": "^0.0.8",
     "quip-apps-webpack-config": ">=0.0.7",
     "quip-apps-handle-richtextbox-key-event-navigation": ">=0.0.11"

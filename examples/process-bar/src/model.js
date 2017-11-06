@@ -2,13 +2,12 @@
 /* @flow */
 
 import quip from "quip";
-quip.elements.enableDataModelV2();
 
-class RootRecord extends quip.elements.RootRecord {
+class RootRecord extends quip.apps.RootRecord {
     static CONSTRUCTOR_KEY = "Root";
 
     static getProperties = () => ({
-        steps: quip.elements.RecordList.Type(StepRecord),
+        steps: quip.apps.RecordList.Type(StepRecord),
         selected: "string",
         color: "string",
     });
@@ -16,7 +15,7 @@ class RootRecord extends quip.elements.RootRecord {
     static getDefaultProperties = () => ({
         steps: [],
         selected: "",
-        color: quip.elements.ui.ColorMap.VIOLET.KEY,
+        color: quip.apps.ui.ColorMap.VIOLET.KEY,
     });
 
     seed() {
@@ -36,7 +35,7 @@ class RootRecord extends quip.elements.RootRecord {
     }
 }
 
-class StepRecord extends quip.elements.RichTextRecord {
+class StepRecord extends quip.apps.RichTextRecord {
     domNode: ?HTMLElement;
     static CONSTRUCTOR_KEY = "Step";
 
@@ -93,5 +92,5 @@ class StepRecord extends quip.elements.RichTextRecord {
 
 export default () => {
     const classes = [RootRecord, StepRecord];
-    classes.forEach(c => quip.elements.registerClass(c, c.CONSTRUCTOR_KEY));
+    classes.forEach(c => quip.apps.registerClass(c, c.CONSTRUCTOR_KEY));
 };

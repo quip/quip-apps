@@ -5,7 +5,7 @@ import quip from "quip";
 import React from "react";
 
 export default (
-    rootRecord: quip.elements.RootRecord,
+    rootRecord: quip.apps.RootRecord,
     WrappedComponent: React.Component,
 ) => {
     class RecordComponent extends React.Component {

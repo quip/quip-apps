@@ -1,4 +1,4 @@
-export default class ListenerRecord extends quip.elements.Record {
+export default class ListenerRecord extends quip.apps.Record {
     initialize(...args) {
         super.initialize(...args);
         this.notifyParent();

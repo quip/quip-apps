@@ -71,7 +71,7 @@ class CalendarEventWrapper extends React.Component<Props, null> {
                         })}
                         style={{
                             background:
-                                quip.elements.ui.ColorMap[
+                                quip.apps.ui.ColorMap[
                                     showMovingEventGuideColor
                                 ].VALUE,
                         }}
