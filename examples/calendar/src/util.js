@@ -61,7 +61,7 @@ export const dayInMonth = (date: Date, month: Date) =>
 
 export const getIsSmallScreen = (): boolean =>
     // $FlowIssueQuipModule
-    quip.elements.getContainerWidth() <= 600;
+    quip.apps.getContainerWidth() <= 600;
 
 export const isElAtPoint = (
     xy: MouseCoordinates,

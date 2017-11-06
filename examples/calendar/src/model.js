@@ -11,12 +11,12 @@ import startOfWeek from "date-fns/start_of_week";
 import type { DateRange } from "./types";
 
 export const colors = [
-    quip.elements.ui.ColorMap.RED.KEY,
-    quip.elements.ui.ColorMap.ORANGE.KEY,
-    quip.elements.ui.ColorMap.YELLOW.KEY,
-    quip.elements.ui.ColorMap.GREEN.KEY,
-    quip.elements.ui.ColorMap.BLUE.KEY,
-    quip.elements.ui.ColorMap.VIOLET.KEY,
+    quip.apps.ui.ColorMap.RED.KEY,
+    quip.apps.ui.ColorMap.ORANGE.KEY,
+    quip.apps.ui.ColorMap.YELLOW.KEY,
+    quip.apps.ui.ColorMap.GREEN.KEY,
+    quip.apps.ui.ColorMap.BLUE.KEY,
+    quip.apps.ui.ColorMap.VIOLET.KEY,
 ];
 
 const formatDateForAllDayEvent = (d: Date): string => {
@@ -37,10 +37,10 @@ const parseAllDayStringToDate = (s: string): Date => {
     }
 };
 
-export class RootRecord extends quip.elements.RootRecord {
+export class RootRecord extends quip.apps.RootRecord {
     static getProperties() {
         return {
-            events: quip.elements.RecordList.Type(EventRecord),
+            events: quip.apps.RecordList.Type(EventRecord),
             displayMonth: "string",
         };
     }
@@ -73,7 +73,7 @@ export class RootRecord extends quip.elements.RootRecord {
     }
 
     addEvent(start: Date, end: Date): EventRecord {
-        let color = quip.elements.ui.ColorMap.RED.KEY;
+        let color = quip.apps.ui.ColorMap.RED.KEY;
         const lastEvent = this.getLastEvent();
         if (lastEvent) {
             const lastColor = lastEvent.getColor();
@@ -94,8 +94,8 @@ export class RootRecord extends quip.elements.RootRecord {
             },
             this.getNextIndexForStartDate(start),
         );
-        //quip.elements.sendMessage("added an event");
-        quip.elements.recordQuipMetric("add_event", {
+        //quip.apps.sendMessage("added an event");
+        quip.apps.recordQuipMetric("add_event", {
             event_id: newEvent.id(),
         });
         return newEvent;
@@ -132,11 +132,11 @@ export class RootRecord extends quip.elements.RootRecord {
 
     setDisplayMonth(date: Date) {
         this.set("displayMonth", String(date));
-        quip.elements.recordQuipMetric("set_display_month");
+        quip.apps.recordQuipMetric("set_display_month");
     }
 }
 
-export class EventRecord extends quip.elements.Record {
+export class EventRecord extends quip.apps.Record {
     domNode: ?Element;
     // An array of startOfWeek time -> el on that week.
     domNodesEvent: { [number]: Element };
@@ -146,13 +146,13 @@ export class EventRecord extends quip.elements.Record {
             color: "string",
             created: "number",
             dateRange: "string",
-            title: quip.elements.RichTextRecord,
+            title: quip.apps.RichTextRecord,
         };
     }
 
     static getDefaultProperties() {
         return {
-            color: quip.elements.ui.ColorMap.RED.KEY,
+            color: quip.apps.ui.ColorMap.RED.KEY,
             created: Date.now(),
             title: {
                 RichText_placeholderText: "New Event",
@@ -168,14 +168,14 @@ export class EventRecord extends quip.elements.Record {
     }
 
     delete() {
-        //quip.elements.sendMessage("deleted an event");
+        //quip.apps.sendMessage("deleted an event");
         if (this.listener) {
             this.unlisten(this.notifyParent);
         }
         if (this.commentsListener) {
             this.unlistenToComments(this.notifyParent);
         }
-        quip.elements.recordQuipMetric("delete_event", {
+        quip.apps.recordQuipMetric("delete_event", {
             event_id: this.id(),
         });
         super.delete();
@@ -256,8 +256,8 @@ export class EventRecord extends quip.elements.Record {
                 end: formatDateForAllDayEvent(end),
             }),
         );
-        //quip.elements.sendMessage("moved an event");
-        quip.elements.recordQuipMetric("move_event", {
+        //quip.apps.sendMessage("moved an event");
+        quip.apps.recordQuipMetric("move_event", {
             event_id: this.id(),
         });
     }
@@ -271,5 +271,5 @@ export class EventRecord extends quip.elements.Record {
     }
 }
 
-quip.elements.registerClass(RootRecord, "Root");
-quip.elements.registerClass(EventRecord, "project-calendar-event");
+quip.apps.registerClass(RootRecord, "Root");
+quip.apps.registerClass(EventRecord, "project-calendar-event");

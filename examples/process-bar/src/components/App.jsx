@@ -10,9 +10,9 @@ import Step from "./Step.jsx";
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.elements.RootRecord)
+        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord)
             .isRequired,
-        steps: React.PropTypes.instanceOf(quip.elements.RecordList).isRequired,
+        steps: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
         color: React.PropTypes.string.isRequired,
         selected: React.PropTypes.string,
     };
@@ -32,8 +32,8 @@ export default class App extends React.Component {
             this.setSelected(next);
         }
 
-        quip.elements.recordQuipMetric("delete_step");
-        //quip.elements.sendMessage("deleted a step");
+        quip.apps.recordQuipMetric("delete_step");
+        //quip.apps.sendMessage("deleted a step");
     };
 
     render() {

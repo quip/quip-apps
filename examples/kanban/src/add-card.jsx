@@ -50,6 +50,9 @@ export default class AddCard extends React.Component {
                     const elementStyle = {
                         width: kColumnWidth - kHorizontalMargin * 2,
                         height: kAddCardHeight,
+                        // Yosemite fix
+                        WebkitTransform: `translate3d(${translateX}px,
+                            ${translateY}px, 0)`,
                         transform: `translate3d(${translateX}px,
                         ${translateY}px, 0)`,
                         zIndex: zIndex,

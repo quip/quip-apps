@@ -60,12 +60,12 @@ class Card extends React.Component {
     componentDidMount() {
         this.onCardFocus_();
         listenForCardFocus(this.onCardFocus_);
-        quip.elements.addEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.stopEditing_,
         );
         if (this.props.dragging) {
-            quip.elements.addDetachedNode(ReactDOM.findDOMNode(this));
+            quip.apps.addDetachedNode(ReactDOM.findDOMNode(this));
         }
         if (!this.props.entity.isHeader())
             this.props.entity.supportsComments = () => true;
@@ -73,22 +73,22 @@ class Card extends React.Component {
 
     componentWillUnmount() {
         unlistenForCardFocus(this.onCardFocus_);
-        quip.elements.removeEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.removeEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.stopEditing_,
         );
         if (this.props.dragging) {
-            quip.elements.removeDetachedNode(ReactDOM.findDOMNode(this));
+            quip.apps.removeDetachedNode(ReactDOM.findDOMNode(this));
         }
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.dragging != nextProps.dragging) {
             if (this.props.dragging) {
-                quip.elements.removeDetachedNode(ReactDOM.findDOMNode(this));
+                quip.apps.removeDetachedNode(ReactDOM.findDOMNode(this));
             }
             if (nextProps.dragging) {
-                quip.elements.addDetachedNode(ReactDOM.findDOMNode(this));
+                quip.apps.addDetachedNode(ReactDOM.findDOMNode(this));
             }
         }
     }
@@ -105,7 +105,7 @@ class Card extends React.Component {
             isDraggingSomething,
         } = this.props;
 
-        const isMobile = quip.elements.isMobile();
+        const isMobile = quip.apps.isMobile();
 
         const isHeader = entity.isHeader();
         const showComments =
@@ -118,11 +118,11 @@ class Card extends React.Component {
         let richTextBoxColor = null;
         if (entityColor) {
             if (entityColor === "PURPLE") {
-                entityColor = quip.elements.ui.ColorMap.VIOLET.KEY;
+                entityColor = quip.apps.ui.ColorMap.VIOLET.KEY;
             }
             richTextBoxColor = selected
-                ? quip.elements.ui.ColorMap.WHITE.KEY
-                : quip.elements.ui.ColorMap[entityColor].KEY;
+                ? quip.apps.ui.ColorMap.WHITE.KEY
+                : quip.apps.ui.ColorMap[entityColor].KEY;
         }
 
         const style = {
@@ -163,6 +163,9 @@ class Card extends React.Component {
                 }) => {
                     let style = {
                         width: kColumnWidth - kHorizontalMargin * 2,
+                        // Yosemite fix
+                        WebkitTransform: `translate3d(${translateX}px,
+                            ${translateY}px, 0) scale(${scale})`,
                         transform: `translate3d(${translateX}px,
                         ${translateY}px, 0) scale(${scale})`,
                         boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
@@ -173,8 +176,8 @@ class Card extends React.Component {
                         style.boxShadow += `, inset 0px 0px 0px 1px ${quip
                             .elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
                         style.backgroundColor = selected
-                            ? quip.elements.ui.ColorMap[entityColor].VALUE
-                            : quip.elements.ui.ColorMap[entityColor]
+                            ? quip.apps.ui.ColorMap[entityColor].VALUE
+                            : quip.apps.ui.ColorMap[entityColor]
                                   .VALUE_LIGHT;
                     }
 
@@ -213,9 +216,9 @@ class Card extends React.Component {
                                     </div>
                                 )}
                                 <div className={styles.remoteEditor}>
-                                    <quip.elements.ui.RichTextBox
+                                    <quip.apps.ui.RichTextBox
                                         allowedStyles={[
-                                            quip.elements.RichTextRecord.Style
+                                            quip.apps.RichTextRecord.Style
                                                 .TEXT_PLAIN,
                                         ]}
                                         color={richTextBoxColor}
@@ -239,7 +242,7 @@ class Card extends React.Component {
                                     <Chevron
                                         color={
                                             richTextBoxColor &&
-                                            quip.elements.ui.ColorMap[
+                                            quip.apps.ui.ColorMap[
                                                 richTextBoxColor
                                             ].VALUE
                                         }
@@ -264,7 +267,7 @@ class Card extends React.Component {
                                             },
                                         )}
                                     >
-                                        <quip.elements.ui.CommentsTrigger
+                                        <quip.apps.ui.CommentsTrigger
                                             className={styles.commentsTrigger}
                                             color={entityColor}
                                             invertColor={selected}

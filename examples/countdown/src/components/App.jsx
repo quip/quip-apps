@@ -2,8 +2,11 @@
 
 import quip from "quip";
 import React from "react";
+import moment from "moment";
+import "moment-timezone";
 import classNames from "classnames";
 
+import { updateToolbar } from "../root.jsx";
 import humanTime from "../humanTime";
 
 import Styles from "./App.less";
@@ -15,34 +18,11 @@ const BACKSPACE_KEY = 8;
 const isDeleteAction = keyCode =>
     keyCode === DELETE_KEY || keyCode === BACKSPACE_KEY;
 
-function formatDate(date) {
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-
-    const day = date.getDate();
-    const monthIndex = date.getMonth();
-    const year = date.getFullYear();
-
-    return `${monthNames[monthIndex]} ${day}, ${year}`;
-}
-
 const INTERVAL_MS = 200;
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.elements.RootRecord)
+        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord)
             .isRequired,
         deadline: React.PropTypes.number,
         color: React.PropTypes.string.isRequired,
@@ -84,24 +64,24 @@ export default class App extends React.Component {
 
         this.setUpdateInterval(deadline);
 
-        quip.elements.addEventListener(
-            quip.elements.EventType.ELEMENT_FOCUS,
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_FOCUS,
             this.setElementFocus,
         );
-        quip.elements.addEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.setElementFocus,
         );
         window.addEventListener("keydown", this.onKeyDown);
     }
 
     componentWillUnmount() {
-        quip.elements.removeEventListener(
-            quip.elements.EventType.ELEMENT_FOCUS,
+        quip.apps.removeEventListener(
+            quip.apps.EventType.ELEMENT_FOCUS,
             this.setElementFocus,
         );
-        quip.elements.removeEventListener(
-            quip.elements.EventType.ELEMENT_BLUR,
+        quip.apps.removeEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
             this.setElementFocus,
         );
         window.removeEventListener("keydown", this.onKeyDown);
@@ -114,10 +94,11 @@ export default class App extends React.Component {
             !this.props.deadline !== nextProps.deadline
         ) {
             if (this.interval) clearInterval(this.interval);
-            console.log(
+            /*console.log(
                 "updating time",
                 humanTime(nextProps.deadline - Date.now()),
             );
+            */
             this.interval = setInterval(
                 () =>
                     this.setState({
@@ -130,15 +111,15 @@ export default class App extends React.Component {
 
     onKeyDown = e => {
         isDeleteAction(e.keyCode) &&
-            quip.elements.isElementFocused() &&
-            quip.elements.deleteElement();
+            quip.apps.isElementFocused() &&
+            quip.apps.deleteElement();
     };
 
     setElementFocus = () => {
-        if (!quip.elements.isElementFocused()) {
+        if (!quip.apps.isElementFocused()) {
             this.toggleCalendar(false);
         }
-        this.setState({ focused: quip.elements.isElementFocused() });
+        this.setState({ focused: quip.apps.isElementFocused() });
     };
 
     toggleCalendar = show => {
@@ -148,22 +129,23 @@ export default class App extends React.Component {
             }),
             () => {
                 if (this.state.showCalendar) {
-                    quip.elements.addDetachedNode(this.calendar);
+                    quip.apps.addDetachedNode(this.calendar);
                 } else {
-                    quip.elements.removeDetachedNode(this.calendar);
+                    quip.apps.removeDetachedNode(this.calendar);
                 }
             },
         );
     };
 
     setDeadline = ms => {
-        console.log("setDeadline", ms);
+        //console.log("setDeadline", ms);
         const { rootRecord } = this.props;
 
-        rootRecord.setProperty("deadline", ms);
+        rootRecord.set("deadline", ms);
         this.toggleCalendar(false);
-        quip.elements.recordQuipMetric("set_deadline");
-        //quip.elements.sendMessage(
+        quip.apps.recordQuipMetric("set_deadline");
+        updateToolbar();
+        //quip.apps.sendMessage(
         //    `set the date to ${formatDate(new Date(ms))}`,
         //);
     };
@@ -186,11 +168,12 @@ export default class App extends React.Component {
 
     render() {
         const { deadline } = this.props;
+        const deadlineDate = new Date(deadline);
         const times = Object.keys(this.state.time);
         return (
             <div
                 className={classNames(Styles.App, {
-                    [Styles.resting]: !quip.elements.isElementFocused(),
+                    [Styles.resting]: !quip.apps.isElementFocused(),
                 })}
                 onClick={() => this.toggleCalendar(false)}
             >
@@ -210,10 +193,16 @@ export default class App extends React.Component {
                         }}
                         onClick={this.handleWrapperClick}
                     >
-                        <quip.elements.ui.CalendarPicker
+                        <quip.apps.ui.CalendarPicker
                             initialSelectedDateMs={deadline}
                             onChangeSelectedDateMs={this.setDeadline}
                         />
+                        <p className={Styles.calendarDateDesc}>
+                            Counting down to {deadlineDate.toLocaleDateString()}{" "}
+                            {moment(deadline)
+                                .tz(moment.tz.guess())
+                                .format("ha z")}
+                        </p>
                     </div>
                 )}
             </div>

@@ -41,9 +41,7 @@ export function getCardToFocus() {
 }
 export function focusCard(cardEntity) {
     cardToFocus = cardEntity;
-    for (const listener of cardFocusListeners) {
-        listener();
-    }
+    cardFocusListeners.forEach(listener => listener());
 }
 export function listenForCardFocus(listener) {
     cardFocusListeners.push(listener);
@@ -56,30 +54,27 @@ export function unlistenForCardFocus(listener) {
 }
 
 function ensureBoardPopulated(boardEntity) {
-    for (let column of kInitialColumns) {
+    kInitialColumns.forEach(column => {
         const columnEntity = boardEntity.addColumn(column.headerText);
         while (columnEntity.getCards().length - 1 < column.numCards) {
             focusCard(columnEntity.addCard(false));
         }
-    }
+    });
 }
 
-quip.elements.enableDataModelV2();
-quip.elements.registerClass(BoardEntity, "Root");
-quip.elements.registerClass(ColumnEntity, ColumnEntity.CONSTRUCTOR_KEY);
-quip.elements.registerClass(CardEntity, CardEntity.CONSTRUCTOR_KEY);
+quip.apps.registerClass(BoardEntity, "Root");
+quip.apps.registerClass(ColumnEntity, ColumnEntity.CONSTRUCTOR_KEY);
+quip.apps.registerClass(CardEntity, CardEntity.CONSTRUCTOR_KEY);
 
-quip.elements.enableSizingV2();
-
-quip.elements.initialize({
+quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["insert-column"],
     initializationCallback: (root, params) => {
-        const boardEntity = quip.elements.getRootEntity();
+        const boardEntity = quip.apps.getRootRecord();
         const justCreated = params.isCreation;
         if (justCreated) {
             ensureBoardPopulated(boardEntity);
-            //quip.elements.sendMessage("created a Kanban Board");
+            //quip.apps.sendMessage("created a Kanban Board");
         }
         ReactDOM.render(
             <Board

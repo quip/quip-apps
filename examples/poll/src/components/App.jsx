@@ -11,7 +11,7 @@ export default class App extends React.Component {
         color: React.PropTypes.string.isRequired,
         // TODO(elsigh): type for RecordList?
         options: React.PropTypes.any.isRequired,
-        rootRecord: React.PropTypes.instanceOf(quip.elements.RootRecord)
+        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord)
             .isRequired,
     };
 
@@ -20,7 +20,7 @@ export default class App extends React.Component {
             ? "allowMultiple"
             : "allowSingle";
         const color = this.props.rootRecord.get("color");
-        quip.elements.updateToolbarCommandsState([], [color, itemId]);
+        quip.apps.updateToolbarCommandsState([], [color, itemId]);
     }
 
     deleteOption = ({ option }) => {

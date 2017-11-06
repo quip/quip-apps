@@ -27,3 +27,13 @@ export default ms => {
 
     return obj;
 };
+
+export function formatDate(date) {
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    if (date.toLocaleDateString) {
+        return date.toLocaleDateString();
+    }
+    return `${monthIndex + 1}-${day}-${year}`;
+}

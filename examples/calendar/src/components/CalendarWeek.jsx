@@ -128,7 +128,7 @@ const CalendarDayBackground = ({
         )
     ) {
         const { start, end } = draggingEventDateRange;
-        const color = quip.elements.ui.ColorMap[draggingEvent.getColor()].VALUE;
+        const color = quip.apps.ui.ColorMap[draggingEvent.getColor()].VALUE;
         let boxShadows = [
             `inset 0 1px 0 0 ${color}`, // TOP
             `inset 0 -1px 0 0 ${color}`, // BOTTOM

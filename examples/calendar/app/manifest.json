@@ -4,6 +4,7 @@
     "name": "Calendar",
     "version_name": "1.0",
     "version_number": 1,
+    "min_api_version": "0.1.022",
     "disable_app_level_comments": true,
     "sizing_mode": "fill_container",
     "initial_width": 800,

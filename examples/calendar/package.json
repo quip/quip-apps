@@ -1,24 +1,22 @@
 {
-    "name": "quip-apps-calendar",
+    "name": "quip-calendar",
     "version": "1.0.0",
     "description": "Quip Calendar Live App",
     "license": "Apache-2.0",
-    "repository": "quip/quip-apps",
-    "private": true,
-    "bugs": {
-        "url": "https://github.com/quip/quip-apps/issues"
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:quip/quip.git"
     },
     "scripts": {
         "test": "jest",
-        "dev": "NODE_ENV=development webpack -d --watch",
-        "dev-prod": "NODE_ENV=production webpack -d --watch",
-        "dev-server": "NODE_ENV=development webpack-dev-server --https",
-        "dev-server-prod": "NODE_ENV=production webpack-dev-server --https -p",
-        "build": "NODE_ENV=production webpack -p"
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
     },
     "author": "Quip",
     "devDependencies": {
+        "babel-preset-env": "^1.6.0",
         "babel-preset-flow": "^6.23.0",
+        "babel-preset-react": "^6.24.1",
         "empty": "^0.10.1",
         "eslint": "^4.6.1",
         "eslint-config-prettier": "^2.4.0",
@@ -50,7 +48,8 @@
         "lodash.range": "^3.2.0",
         "lodash.throttle": "^4.1.1",
         "svg-react-loader": "^0.4.4",
-        "quip-apps-chevron": "^0.0.4",
-        "quip-apps-webpack-config": "^0.0.6"
+        "create-quip-app": "^0.0.7",
+        "quip-apps-chevron": "^0.0.8",
+        "quip-apps-webpack-config": ">=0.0.7"
     }
 }

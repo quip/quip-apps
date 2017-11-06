@@ -7,12 +7,12 @@ const colors = kDefaultColumnColors;
 let selectedCard;
 export function onSelectedCardChanged(newSelectedCard) {
     selectedCard = newSelectedCard;
-    quip.elements.setSelectedRecord(newSelectedCard);
+    quip.apps.setSelectedRecord(newSelectedCard);
     refreshToolbar();
 }
 
 export function refreshToolbar() {
-    quip.elements.updateToolbarCommandsState(
+    quip.apps.updateToolbarCommandsState(
         getDisabledCommands(selectedCard),
         getHighlightedCommands(selectedCard),
     );
@@ -24,7 +24,7 @@ export function allMenuCommands() {
             id: "insert-column",
             label: "Add Column",
             handler: () => {
-                quip.elements.getRootEntity().addColumn();
+                quip.apps.getRootRecord().addColumn();
             },
         },
         {
@@ -45,7 +45,7 @@ export function allMenuCommands() {
             id: "comment",
             label: "Comment",
             handler: (name, context) => {
-                quip.elements.showComments(context.cardEntity.id());
+                quip.apps.showComments(context.cardEntity.id());
             },
         },
         {
@@ -77,19 +77,19 @@ export function showCardContextMenu(e, cardEntity, onDismiss) {
     if (cardEntity.isHeader()) {
         commands = [
             ...colors,
-            quip.elements.DocumentMenuCommands.SEPARATOR,
+            quip.apps.DocumentMenuCommands.SEPARATOR,
             "delete-column",
         ];
     } else {
         commands = [
             "automatic-color",
             ...colors,
-            quip.elements.DocumentMenuCommands.SEPARATOR,
+            quip.apps.DocumentMenuCommands.SEPARATOR,
             "comment",
             "delete-card",
         ];
     }
-    quip.elements.showContextMenuFromButton(
+    quip.apps.showContextMenuFromButton(
         e,
         commands,
         getHighlightedCommands(cardEntity),

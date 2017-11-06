@@ -74,10 +74,10 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
 
         const color = eventRecord.getColor();
         const eventHandleFillColor = isSelected
-            ? quip.elements.ui.ColorMap.WHITE.VALUE
-            : quip.elements.ui.ColorMap[color].VALUE;
+            ? quip.apps.ui.ColorMap.WHITE.VALUE
+            : quip.apps.ui.ColorMap[color].VALUE;
         const textColor = isSelected
-            ? quip.elements.ui.ColorMap.WHITE.KEY
+            ? quip.apps.ui.ColorMap.WHITE.KEY
             : eventRecord.getColor();
 
         return (
@@ -106,9 +106,9 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                 }}
                 style={{
                     backgroundColor: isSelected
-                        ? quip.elements.ui.ColorMap[color].VALUE
-                        : quip.elements.ui.ColorMap[color].VALUE_LIGHT,
-                    borderColor: quip.elements.ui.ColorMap[color].VALUE_STROKE,
+                        ? quip.apps.ui.ColorMap[color].VALUE
+                        : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+                    borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
                     opacity: isInMovingEventWrapper ? 0.7 : null,
                 }}
             >
@@ -129,7 +129,7 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                             <EventDropdown
                                 color={
                                     isSelected
-                                        ? quip.elements.ui.ColorMap.WHITE.KEY
+                                        ? quip.apps.ui.ColorMap.WHITE.KEY
                                         : eventRecord.getColor()
                                 }
                                 eventRecord={eventRecord}
@@ -152,7 +152,7 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                     >
                         {!isSmallScreen &&
                             isStartDateWithinThisWeek && (
-                                <quip.elements.ui.CommentsTrigger
+                                <quip.apps.ui.CommentsTrigger
                                     color={color}
                                     invertColor={isSelected}
                                     record={eventRecord}
@@ -176,7 +176,7 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                         className={Styles.continueCircleStart}
                         style={{
                             background:
-                                quip.elements.ui.ColorMap[textColor].VALUE,
+                                quip.apps.ui.ColorMap[textColor].VALUE,
                         }}
                     />
                 )}
@@ -185,7 +185,7 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                         className={Styles.continueCircleEnd}
                         style={{
                             background:
-                                quip.elements.ui.ColorMap[textColor].VALUE,
+                                quip.apps.ui.ColorMap[textColor].VALUE,
                         }}
                     />
                 )}

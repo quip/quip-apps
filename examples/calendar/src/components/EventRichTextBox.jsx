@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import { setFocusedEvent, setSelectedEvent } from "../actions";
 import { EventRecord } from "../model";
 
-const { RichTextBox } = quip.elements.ui;
+const { RichTextBox } = quip.apps.ui;
 
 type Props = {
     eventRecord: EventRecord,
@@ -17,7 +17,7 @@ type Props = {
     color: string,
     setFocusedEvent: Function,
     setSelectedEvent: Function,
-    titleRecord: quip.elements.RichTextRecord,
+    titleRecord: quip.apps.RichTextRecord,
     week: ?Array<Date>,
 };
 
@@ -86,7 +86,7 @@ class EventRichTextBox extends React.Component<Props, null> {
             >
                 <RichTextBox
                     allowedStyles={[
-                        quip.elements.RichTextRecord.Style.TEXT_PLAIN,
+                        quip.apps.RichTextRecord.Style.TEXT_PLAIN,
                     ]}
                     color={color}
                     onBlur={this.onBlur}

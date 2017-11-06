@@ -6,7 +6,6 @@ import quip from "quip";
 import React from "react";
 import { connect } from "react-redux";
 
-// $FlowIssueQuipModule
 import Chevron from "quip-apps-chevron";
 
 import Styles from "./EventDropdown.less";
@@ -45,7 +44,7 @@ class EventDropdown extends React.Component<Props, null> {
                 onMouseDown={this.handleMouseDown}
             >
                 <Chevron
-                    color={quip.elements.ui.ColorMap[color].VALUE}
+                    color={quip.apps.ui.ColorMap[color].VALUE}
                     style={style}
                 />
             </div>
