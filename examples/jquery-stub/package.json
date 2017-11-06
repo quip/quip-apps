@@ -1,0 +1,17 @@
+{
+    "name": "jquery-stub",
+    "version": "0.0.1",
+    "description": "jquery-stub Quip App",
+    "license": "Apache-2.0",
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
+    },
+    "author": "",
+    "devDependencies": {
+        "quip-apps-webpack-config": ">=0.0.6"
+    },
+    "dependencies": {
+        "jquery": "^3.2.1"
+    }
+}
