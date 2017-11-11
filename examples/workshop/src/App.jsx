@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 
 import Styles from "./App.less";
 
+import Glossary from "./components/Glossary.jsx";
+
 class App extends React.Component {
     static propTypes = {
         loggedIn: React.PropTypes.bool.isRequired,
@@ -10,7 +12,7 @@ class App extends React.Component {
 
     render() {
         const { loggedIn } = this.props;
-        return <div>HI loggedIn? {loggedIn ? "YES" : "NO"}</div>;
+        return <div>{loggedIn ? <Glossary /> : <div>Login!</div>}</div>;
     }
 }
 

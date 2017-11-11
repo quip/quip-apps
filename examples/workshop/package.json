@@ -9,11 +9,15 @@
     },
     "author": "",
     "devDependencies": {
+        "classnames": "^2.2.5",
         "eslint": "^4.10.0",
         "jest": "^21.2.1",
+        "lodash.debounce": "^4.0.8",
         "prettier": "^1.8.2",
         "quip-apps-webpack-config": ">=0.0.6",
         "react-redux": "^5.0.6",
-        "redux": "^3.7.2"
+        "redux": "^3.7.2",
+        "redux-devtools-extension": "^2.13.2",
+        "redux-thunk": "^2.2.0"
     }
 }
