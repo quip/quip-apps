@@ -1,15 +1,19 @@
 import debounce from "lodash.debounce";
 
 const Actions = {
-    GLOSSARY_ADD_PHRASE: "GLOSSARY_ADD_PHRASE",
+    ERROR: "ERROR",
     GLOSSARY_ADD_PHRASE_REMOTE: "GLOSSARY_ADD_PHRASE_REMOTE",
+    GLOSSARY_ADD_PHRASE: "GLOSSARY_ADD_PHRASE",
     GLOSSARY_LOADED: "GLOSSARY_LOADED",
     GLOSSARY_LOADING: "GLOSSARY_LOADING",
-    GLOSSARY_UPDATING: "GLOSSARY_UPDATING",
-    GLOSSARY_UPDATED: "GLOSSARY_UPDATED",
     GLOSSARY_UPDATED_REMOTE: "GLOSSARY_UPDATED_REMOTE",
+    GLOSSARY_UPDATED: "GLOSSARY_UPDATED",
     GLOSSARY_UPDATING_REMOTE: "GLOSSARY_UPDATING_REMOTE",
-    ERROR: "ERROR",
+    GLOSSARY_UPDATING: "GLOSSARY_UPDATING",
+    SET_CHOSEN_PHRASE: "SET_CHOSEN_PHRASE",
+    SET_FOCUSED: "SET_FOCUSED",
+    SET_INPUT_VALUE: "SET_INPUT_VALUE",
+    SET_TAB_SELECTED: "SET_TAB_SELECTED",
 };
 export default Actions;
 
@@ -100,3 +104,28 @@ export const addPhrase = phrase => async dispatch => {
     });
     updateGlossaryRemote({ phrase, definition }, dispatch);
 };
+
+export const Tabs = {
+    INSERT: "Insert",
+    EDITOR: "Editor",
+};
+
+export const setTabSelected = payload => ({
+    type: Actions.SET_TAB_SELECTED,
+    payload,
+});
+
+export const setInputValue = payload => ({
+    type: Actions.SET_INPUT_VALUE,
+    payload,
+});
+
+export const setChosenPhrase = payload => ({
+    type: Actions.SET_CHOSEN_PHRASE,
+    payload,
+});
+
+export const setFocused = payload => ({
+    type: Actions.SET_FOCUSED,
+    payload,
+});

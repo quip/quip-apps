@@ -10,15 +10,17 @@ class Glossary extends React.Component {
     static propTypes = {
         addPhrase: React.PropTypes.func.isRequired,
         error: React.PropTypes.any,
-        loadGlossary: React.PropTypes.func.isRequired,
         glossary: React.PropTypes.object.isRequired,
         glossaryLoading: React.PropTypes.bool.isRequired,
         glossaryUpdatingRemote: React.PropTypes.bool.isRequired,
+        loadGlossary: React.PropTypes.func.isRequired,
         updateGlossary: React.PropTypes.func.isRequired,
     };
 
     componentDidMount() {
-        this.props.loadGlossary();
+        // if (!this.props.glossary) {
+        //     this.props.loadGlossary();
+        // }
     }
 
     addPhrase = e => {
@@ -44,9 +46,8 @@ class Glossary extends React.Component {
             return <h1>Loading!</h1>;
         }
         return (
-            <div>
+            <div className={Styles.glossaryEditor}>
                 <h1>Glossary</h1>
-                {error && <h2>ERROR! {error}</h2>}
                 <div style={{ display: "flex" }}>
                     <dl style={{ flex: 1 }}>
                         {glossary
@@ -61,7 +62,8 @@ class Glossary extends React.Component {
                             .map(data => (
                                 <Term
                                     key={data.phrase}
-                                    data={data}
+                                    phrase={data.phrase}
+                                    definition={data.definition}
                                     updateGlossary={this.props.updateGlossary}
                                 />
                             ))}
@@ -101,25 +103,40 @@ export default connect(mapStateToProps, {
     updateGlossary,
 })(Glossary);
 
-class Term extends React.Component {
+export class Term extends React.Component {
     onChange = e => {
-        const { data, updateGlossary } = this.props;
-        const { definition, phrase } = data;
+        const { definition, phrase, updateGlossary } = this.props;
         updateGlossary({ phrase, definition: e.currentTarget.value });
     };
 
     render() {
-        const { data } = this.props;
-        const { definition, phrase } = data;
+        const { definition, phrase, updateGlossary } = this.props;
         return (
-            <div>
+            <div className={Styles.term}>
                 <dt>{phrase}</dt>
                 <dd>
-                    <textarea
-                        onChange={this.onChange}
-                        value={definition}
-                        style={{ resize: "both" }}
-                    />
+                    {updateGlossary ? (
+                        <textarea
+                            onChange={this.onChange}
+                            value={definition}
+                            style={{
+                                fontSize: "1.5em",
+                                fontStyle: "italic",
+                                resize: "both",
+                            }}
+                        />
+                    ) : (
+                        <p
+                            style={{
+                                fontSize: "2em",
+                                fontStyle: "italic",
+                                margin: 0,
+                                marginTop: 5,
+                            }}
+                        >
+                            {definition}
+                        </p>
+                    )}
                 </dd>
             </div>
         );

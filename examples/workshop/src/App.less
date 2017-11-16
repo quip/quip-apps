@@ -1,6 +1,21 @@
-.hello {
+.app {
+    min-width: 500px;
+    position: relative;
+}
+
+.tabs {
+    cursor: pointer;
     display: flex;
-    justify-content: center;
-    width: 100px;
-    height: 100px;
+    margin-bottom: 1.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
+    > div {
+        border: 1px solid #ccc;
+        padding: 7px 20px;
+        margin-right: 10px;
+        &.selected {
+            font-weight: 600;
+        }
+    }
 }

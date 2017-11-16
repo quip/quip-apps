@@ -1,11 +1,16 @@
-import Actions from "./actions";
+import Actions, { Tabs } from "./actions";
 
 const DEFAULT_STATE = {
+    chosenPhrase: null,
     error: null,
-    loggedIn: true,
+    isFocused: false,
     glossary: [],
     glossaryLoading: false,
     glossaryUpdatingRemote: false,
+    inputValue: "",
+    loggedIn: true,
+    rootRecord: null,
+    tabSelected: Tabs.INSERT,
 };
 
 export default function reducer(state = DEFAULT_STATE, action) {
@@ -55,7 +60,35 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 glossaryUpdatingRemote: false,
                 error: action.payload,
             };
+        case Actions.SET_TAB_SELECTED:
+            return {
+                ...state,
+                tabSelected: action.payload,
+            };
+        case Actions.SET_INPUT_VALUE:
+            return {
+                ...state,
+                inputValue: action.payload,
+            };
+        case Actions.SET_CHOSEN_PHRASE:
+            return {
+                ...state,
+                chosenPhrase: action.payload,
+            };
+
+        case Actions.SET_FOCUSED:
+            return {
+                ...state,
+                isFocused: action.payload,
+            };
         default:
             return { ...state };
     }
 }
+
+export const getInitialState = rootRecord => {
+    return {
+        ...DEFAULT_STATE,
+        rootRecord,
+    };
+};
