@@ -18,9 +18,9 @@ class Glossary extends React.Component {
     };
 
     componentDidMount() {
-        // if (!this.props.glossary) {
-        //     this.props.loadGlossary();
-        // }
+        if (!this.props.glossary.length) {
+            this.props.loadGlossary();
+        }
     }
 
     addPhrase = e => {

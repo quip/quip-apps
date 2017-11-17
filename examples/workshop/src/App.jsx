@@ -3,6 +3,8 @@ import React from "react";
 import { connect } from "react-redux";
 import classNames from "classnames";
 
+import { RootRecord } from "./model";
+
 import Styles from "./App.less";
 
 import {
@@ -17,10 +19,10 @@ import Insert from "./components/Insert.jsx";
 
 class App extends React.Component {
     static propTypes = {
-        chosenPhrase: React.PropTypes.string,
-        chosenPhraseDefinition: React.PropTypes.string,
+        chosenEntry: React.PropTypes.object,
         isFocused: React.PropTypes.bool.isRequired,
         loggedIn: React.PropTypes.bool.isRequired,
+        setFocused: React.PropTypes.func.isRequired,
     };
 
     componentDidMount() {
@@ -38,12 +40,7 @@ class App extends React.Component {
     onBlur = () => this.props.setFocused(false);
 
     render() {
-        const {
-            chosenPhrase,
-            chosenPhraseDefinition,
-            isFocused,
-            loggedIn,
-        } = this.props;
+        const { chosenEntry, isFocused, loggedIn } = this.props;
         return (
             <div
                 className={classNames(Styles.app, {
@@ -51,12 +48,12 @@ class App extends React.Component {
                 })}
             >
                 {loggedIn ? (
-                    isFocused || !chosenPhrase ? (
+                    isFocused || !chosenEntry ? (
                         <TabSwitcher />
                     ) : (
                         <Term
-                            definition={chosenPhraseDefinition}
-                            phrase={chosenPhrase}
+                            definition={chosenEntry.definition}
+                            phrase={chosenEntry.phrase}
                         />
                     )
                 ) : (
@@ -68,16 +65,8 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => {
-    const chosenPhrase = state.chosenPhrase;
-    let chosenPhraseDefinition;
-    if (chosenPhrase) {
-        chosenPhraseDefinition = state.glossary.find(
-            row => row.phrase === chosenPhrase,
-        ).definition;
-    }
     return {
-        chosenPhrase,
-        chosenPhraseDefinition,
+        chosenEntry: state.chosenEntry,
         isFocused: state.isFocused,
         loggedIn: state.loggedIn,
     };

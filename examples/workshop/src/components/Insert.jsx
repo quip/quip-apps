@@ -3,42 +3,46 @@ import { connect } from "react-redux";
 
 import Styles from "./Insert.less";
 
-import { loadGlossary, setChosenPhrase, setInputValue } from "../redux/actions";
+import { loadGlossary, setChosenEntry, setInputValue } from "../redux/actions";
 
 class Insert extends React.Component {
     static propTypes = {
-        chosenPhrase: React.PropTypes.string,
-        chosenPhraseDefinition: React.PropTypes.string,
+        chosenEntry: React.PropTypes.string,
+        chosenEntryDefinition: React.PropTypes.string,
         terms: React.PropTypes.array.isRequired,
+        glossary: React.PropTypes.array.isRequired,
         inputValue: React.PropTypes.string.isRequired,
         loadGlossary: React.PropTypes.func.isRequired,
-        setChosenPhrase: React.PropTypes.func.isRequired,
+        setChosenEntry: React.PropTypes.func.isRequired,
         setInputValue: React.PropTypes.func.isRequired,
     };
 
     componentDidMount() {
-        if (!this.props.glossary) {
+        if (!this.props.glossary.length) {
             this.props.loadGlossary();
         }
     }
 
     handleChange = e => {
-        const { setChosenPhrase, setInputValue, terms } = this.props;
-        const value = e.currentTarget.value;
-        setInputValue(e.currentTarget.value);
-        console.NOCOMMIT("handleChange", value, terms.indexOf(value));
-        if (terms.indexOf(value) !== -1) {
+        const { glossary, setChosenEntry, setInputValue, terms } = this.props;
+        const phrase = e.currentTarget.value;
+        setInputValue(phrase);
+        console.NOCOMMIT("handleChange", phrase, terms.indexOf(phrase));
+        if (terms.indexOf(phrase) !== -1) {
             console.NOCOMMIT("SET CHOSEN");
-            setChosenPhrase(value);
+            const definition = glossary.find(row => row.phrase === phrase)
+                .definition;
+            setChosenEntry({ phrase, definition });
         }
     };
 
     render() {
-        const { chosenPhraseDefinition, inputValue, terms } = this.props;
+        const { chosenEntry, inputValue, terms } = this.props;
         return (
             <div>
                 <input
                     list="terms"
+                    onChange={this.handleChange}
                     onInput={this.handleChange}
                     value={inputValue}
                     style={{
@@ -62,7 +66,7 @@ class Insert extends React.Component {
                         marginTop: 5,
                     }}
                 >
-                    {chosenPhraseDefinition}
+                    {chosenEntry && chosenEntry.definition}
                 </p>
             </div>
         );
@@ -70,7 +74,8 @@ class Insert extends React.Component {
 }
 
 const mapStateToProps = state => {
-    const terms = state.glossary
+    const glossary = state.glossary;
+    const terms = glossary
         .sort((a, b) => {
             if (a.phrase < b.phrase) {
                 return -1;
@@ -80,16 +85,9 @@ const mapStateToProps = state => {
             return 0;
         })
         .map(data => data.phrase);
-    const chosenPhrase = state.chosenPhrase;
-    let chosenPhraseDefinition;
-    if (chosenPhrase) {
-        chosenPhraseDefinition = state.glossary.find(
-            row => row.phrase === chosenPhrase,
-        ).definition;
-    }
     return {
-        chosenPhrase,
-        chosenPhraseDefinition,
+        chosenEntry: state.chosenEntry,
+        glossary,
         inputValue: state.inputValue,
         terms,
     };
@@ -97,6 +95,6 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
     loadGlossary,
-    setChosenPhrase,
+    setChosenEntry,
     setInputValue,
 })(Insert);

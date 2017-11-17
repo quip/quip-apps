@@ -1,4 +1,7 @@
+import quip from "quip";
 import debounce from "lodash.debounce";
+
+import { ChosenPhraseRecord } from "../model";
 
 const Actions = {
     ERROR: "ERROR",
@@ -10,7 +13,7 @@ const Actions = {
     GLOSSARY_UPDATED: "GLOSSARY_UPDATED",
     GLOSSARY_UPDATING_REMOTE: "GLOSSARY_UPDATING_REMOTE",
     GLOSSARY_UPDATING: "GLOSSARY_UPDATING",
-    SET_CHOSEN_PHRASE: "SET_CHOSEN_PHRASE",
+    SET_CHOSEN_ENTRY: "SET_CHOSEN_ENTRY",
     SET_FOCUSED: "SET_FOCUSED",
     SET_INPUT_VALUE: "SET_INPUT_VALUE",
     SET_TAB_SELECTED: "SET_TAB_SELECTED",
@@ -22,10 +25,24 @@ export const loadGlossary = () => async dispatch => {
         type: Actions.GLOSSARY_LOADING,
     });
     try {
-        const payload = await fetchGlossary();
+        const fetched = await fetchGlossary();
+        const glossary = fetched.results;
+
+        const rootRecord = quip.apps.getRootRecord();
+        const chosenEntry = rootRecord.get("chosenEntry");
+        if (chosenEntry) {
+            const phrase = chosenEntry.get("phrase");
+            chosenEntry.set(
+                "definition",
+                glossary.find(row => row.phrase === phrase).definition,
+            );
+        }
         return dispatch({
             type: Actions.GLOSSARY_LOADED,
-            payload,
+            payload: {
+                chosenEntry: chosenEntry.spread(),
+                glossary,
+            },
         });
     } catch (e) {
         return dispatch({
@@ -36,27 +53,6 @@ export const loadGlossary = () => async dispatch => {
 };
 
 const SERVER = "https://quipworkshop.herokuapp.com";
-
-const fetchMockGlossary = () => {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve({
-                results: [
-                    {
-                        id: 1,
-                        phrase: "Foo",
-                        definition: "Thing that programmers say",
-                    },
-                    {
-                        id: 2,
-                        phrase: "Bar",
-                        definition: "Another thing that programmers say",
-                    },
-                ],
-            });
-        }, 1000);
-    });
-};
 
 const fetchGlossary = async () => await (await fetch(`${SERVER}/all`)).json();
 
@@ -120,10 +116,22 @@ export const setInputValue = payload => ({
     payload,
 });
 
-export const setChosenPhrase = payload => ({
-    type: Actions.SET_CHOSEN_PHRASE,
-    payload,
-});
+export const setChosenEntry = payload => dispatch => {
+    const rootRecord = quip.apps.getRootRecord();
+    const currentChosenPhrase = rootRecord.get("chosenEntry");
+    if (currentChosenPhrase) {
+        rootRecord.clear("chosenEntry");
+    }
+
+    rootRecord.set("chosenEntry", {
+        phrase: payload.phrase,
+        definition: payload.definition,
+    });
+    return dispatch({
+        type: Actions.SET_CHOSEN_ENTRY,
+        payload,
+    });
+};
 
 export const setFocused = payload => ({
     type: Actions.SET_FOCUSED,

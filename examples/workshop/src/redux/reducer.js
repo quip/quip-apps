@@ -1,7 +1,7 @@
 import Actions, { Tabs } from "./actions";
 
 const DEFAULT_STATE = {
-    chosenPhrase: null,
+    chosenEntry: null,
     error: null,
     isFocused: false,
     glossary: [],
@@ -14,7 +14,7 @@ const DEFAULT_STATE = {
 };
 
 export default function reducer(state = DEFAULT_STATE, action) {
-    //console.error("-> reducer", action);
+    console.error("-> reducer", action);
     switch (action.type) {
         case Actions.GLOSSARY_LOADING:
             return {
@@ -24,7 +24,7 @@ export default function reducer(state = DEFAULT_STATE, action) {
         case Actions.GLOSSARY_LOADED:
             return {
                 ...state,
-                glossary: action.payload.results,
+                ...action.payload,
                 glossaryLoading: false,
             };
         case Actions.GLOSSARY_UPDATED:
@@ -70,10 +70,10 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 ...state,
                 inputValue: action.payload,
             };
-        case Actions.SET_CHOSEN_PHRASE:
+        case Actions.SET_CHOSEN_ENTRY:
             return {
                 ...state,
-                chosenPhrase: action.payload,
+                chosenEntry: action.payload,
             };
 
         case Actions.SET_FOCUSED:
@@ -87,8 +87,11 @@ export default function reducer(state = DEFAULT_STATE, action) {
 }
 
 export const getInitialState = rootRecord => {
+    const chosenEntryRecord = rootRecord.get("chosenEntry");
+    const chosenEntry = chosenEntryRecord ? chosenEntryRecord.spread() : {};
     return {
         ...DEFAULT_STATE,
-        rootRecord,
+        chosenEntry,
+        inputValue: chosenEntry.phrase || null,
     };
 };
