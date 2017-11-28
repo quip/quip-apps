@@ -1,4 +1,4 @@
-import Actions, { Tabs } from "./actions";
+import Actions from "./actions";
 
 const DEFAULT_STATE = {
     chosenEntry: null,
@@ -10,7 +10,6 @@ const DEFAULT_STATE = {
     inputValue: "",
     loggedIn: true,
     rootRecord: null,
-    tabSelected: Tabs.INSERT,
 };
 
 export default function reducer(state = DEFAULT_STATE, action) {
