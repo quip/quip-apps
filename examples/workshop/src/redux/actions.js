@@ -30,17 +30,19 @@ export const loadGlossary = () => async dispatch => {
 
         const rootRecord = quip.apps.getRootRecord();
         const chosenEntry = rootRecord.get("chosenEntry");
+        let chosenEntrySpread;
         if (chosenEntry) {
             const phrase = chosenEntry.get("phrase");
             chosenEntry.set(
                 "definition",
                 glossary.find(row => row.phrase === phrase).definition,
             );
+            chosenEntrySpread = chosenEntry.spread();
         }
         return dispatch({
             type: Actions.GLOSSARY_LOADED,
             payload: {
-                chosenEntry: chosenEntry.spread(),
+                chosenEntry: chosenEntrySpread,
                 glossary,
             },
         });

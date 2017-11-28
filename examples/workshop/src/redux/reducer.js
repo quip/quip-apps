@@ -15,6 +15,9 @@ const DEFAULT_STATE = {
 
 export default function reducer(state = DEFAULT_STATE, action) {
     console.error("-> reducer", action);
+    if (!action) {
+        debugger;
+    }
     switch (action.type) {
         case Actions.GLOSSARY_LOADING:
             return {
