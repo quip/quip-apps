@@ -1,11 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import Styles from "./Insert.less";
+import Styles from "./Term.less";
 
 import { loadGlossary, setChosenEntry, setInputValue } from "../redux/actions";
 
-class Insert extends React.Component {
+class Term extends React.Component {
     static propTypes = {
         chosenEntry: React.PropTypes.string,
         chosenEntryDefinition: React.PropTypes.string,
@@ -27,9 +27,9 @@ class Insert extends React.Component {
         const { glossary, setChosenEntry, setInputValue, terms } = this.props;
         const phrase = e.currentTarget.value;
         setInputValue(phrase);
-        console.NOCOMMIT("handleChange", phrase, terms.indexOf(phrase));
+        console.warn("handleChange", phrase, terms.indexOf(phrase));
         if (terms.indexOf(phrase) !== -1) {
-            console.NOCOMMIT("SET CHOSEN");
+            console.warn("SET CHOSEN");
             const definition = glossary.find(row => row.phrase === phrase)
                 .definition;
             setChosenEntry({ phrase, definition });
@@ -97,4 +97,4 @@ export default connect(mapStateToProps, {
     loadGlossary,
     setChosenEntry,
     setInputValue,
-})(Insert);
+})(Term);

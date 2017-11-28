@@ -14,9 +14,9 @@ const DEFAULT_STATE = {
 };
 
 export default function reducer(state = DEFAULT_STATE, action) {
-    console.error("-> reducer", action);
+    console.warn("-> reducer", action);
     if (!action) {
-        debugger;
+        throw new Error("Unexpected action.");
     }
     switch (action.type) {
         case Actions.GLOSSARY_LOADING:
@@ -62,11 +62,6 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 glossaryLoading: false,
                 glossaryUpdatingRemote: false,
                 error: action.payload,
-            };
-        case Actions.SET_TAB_SELECTED:
-            return {
-                ...state,
-                tabSelected: action.payload,
             };
         case Actions.SET_INPUT_VALUE:
             return {
