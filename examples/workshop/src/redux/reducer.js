@@ -29,6 +29,13 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 ...state,
                 ...action.payload,
                 glossaryLoading: false,
+                chosenEntry: action.payload.chosenEntry,
+                definitionValue: action.payload.chosenEntry
+                    ? action.payload.chosenEntry.definition
+                    : undefined,
+                inputValue: action.payload.chosenEntry
+                    ? action.payload.chosenEntry.phrase
+                    : undefined,
             };
         case Actions.GLOSSARY_UPDATED:
             // TODO(elsigh): use a map and emit an array from it
@@ -77,8 +84,10 @@ export default function reducer(state = DEFAULT_STATE, action) {
             return {
                 ...state,
                 chosenEntry: action.payload,
-                definitionValue: action.payload.definition,
-                inputValue: action.payload.phrase,
+                definitionValue: action.payload
+                    ? action.payload.definition
+                    : null,
+                inputValue: action.payload ? action.payload.phrase : null,
             };
 
         case Actions.SET_FOCUSED:
