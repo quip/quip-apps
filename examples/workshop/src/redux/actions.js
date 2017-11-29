@@ -14,6 +14,7 @@ const Actions = {
     SET_CHOSEN_ENTRY: "SET_CHOSEN_ENTRY",
     SET_FOCUSED: "SET_FOCUSED",
     SET_INPUT_VALUE: "SET_INPUT_VALUE",
+    SET_DEFINITION_VALUE: "SET_DEFINITION_VALUE",
 };
 export default Actions;
 
@@ -102,6 +103,11 @@ export const addPhrase = phrase => async dispatch => {
 
 export const setInputValue = payload => ({
     type: Actions.SET_INPUT_VALUE,
+    payload,
+});
+
+export const setDefinitionValue = payload => ({
+    type: Actions.SET_DEFINITION_VALUE,
     payload,
 });
 

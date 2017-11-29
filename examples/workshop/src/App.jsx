@@ -5,19 +5,54 @@ import classNames from "classnames";
 
 import Styles from "./App.less";
 
-import { setFocused } from "./redux/actions";
+import { setFocused, setChosenEntry, updateGlossary } from "./redux/actions";
 
 import Term from "./components/Term.jsx";
+import { ChosenEntryRecord } from "./model";
+import { updateAppToolbar } from "./menus";
 
 class App extends React.Component {
     static propTypes = {
+        chosenEntry: React.PropTypes.instanceOf(ChosenEntryRecord),
+        definitionValue: React.PropTypes.string.isRequired,
+        inputValue: React.PropTypes.string.isRequired,
         loggedIn: React.PropTypes.bool.isRequired,
+        setChosenEntry: React.PropTypes.func.isRequired,
         setFocused: React.PropTypes.func.isRequired,
+        updateGlossary: React.PropTypes.func.isRequired,
     };
 
     componentDidMount() {
         quip.apps.addEventListener(quip.apps.EventType.FOCUS, this.onFocus);
         quip.apps.addEventListener(quip.apps.EventType.BLUR, this.onBlur);
+    }
+
+    componentDidUpdate() {
+        this.updateToolbar_();
+    }
+
+    updateToolbar_() {
+        const {
+            chosenEntry,
+            definitionValue,
+            inputValue,
+            setChosenEntry,
+            updateGlossary,
+        } = this.props;
+        const saveHandler = () => {
+            const payload = { phrase: inputValue, definition: definitionValue };
+            setChosenEntry(payload);
+            updateGlossary(payload);
+            this.updateToolbar_();
+        };
+        const saveEnabled =
+            inputValue &&
+            definitionValue &&
+            (!chosenEntry ||
+                (chosenEntry.phrase != inputValue ||
+                    chosenEntry.definition != definitionValue));
+        console.warn("Updating app toolbar", saveEnabled);
+        updateAppToolbar(saveEnabled ? saveHandler : null);
     }
 
     componentWillUnmount() {
@@ -41,8 +76,15 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
     return {
+        definitionValue: state.definitionValue,
+        inputValue: state.inputValue,
         loggedIn: state.loggedIn,
+        chosenEntry: state.chosenEntry,
     };
 };
 
-export default connect(mapStateToProps, { setFocused })(App);
+export default connect(mapStateToProps, {
+    setChosenEntry,
+    setFocused,
+    updateGlossary,
+})(App);

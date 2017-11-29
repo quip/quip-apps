@@ -3,18 +3,23 @@ import { connect } from "react-redux";
 
 import Styles from "./Term.less";
 
-import { loadGlossary, setChosenEntry, setInputValue } from "../redux/actions";
+import {
+    loadGlossary,
+    setChosenEntry,
+    setDefinitionValue,
+    setInputValue,
+} from "../redux/actions";
 
 class Term extends React.Component {
     static propTypes = {
-        chosenEntry: React.PropTypes.string,
-        chosenEntryDefinition: React.PropTypes.string,
-        terms: React.PropTypes.array.isRequired,
+        definitionValue: React.PropTypes.string,
         glossary: React.PropTypes.array.isRequired,
         inputValue: React.PropTypes.string.isRequired,
         loadGlossary: React.PropTypes.func.isRequired,
         setChosenEntry: React.PropTypes.func.isRequired,
+        setDefinitionValue: React.PropTypes.func.isRequired,
         setInputValue: React.PropTypes.func.isRequired,
+        terms: React.PropTypes.array.isRequired,
     };
 
     componentDidMount() {
@@ -23,27 +28,40 @@ class Term extends React.Component {
         }
     }
 
-    handleChange = e => {
-        const { glossary, setChosenEntry, setInputValue, terms } = this.props;
+    handlePhraseChange = e => {
+        const {
+            glossary,
+            setInputValue,
+            setDefinitionValue,
+            terms,
+        } = this.props;
         const phrase = e.currentTarget.value;
         setInputValue(phrase);
-        console.warn("handleChange", phrase, terms.indexOf(phrase));
+        console.warn("handlePhraseChange", phrase, terms.indexOf(phrase));
         if (terms.indexOf(phrase) !== -1) {
-            console.warn("SET CHOSEN");
             const definition = glossary.find(row => row.phrase === phrase)
                 .definition;
-            setChosenEntry({ phrase, definition });
+            setDefinitionValue(definition);
+        } else {
+            setDefinitionValue(null);
         }
     };
 
+    handleDefinitionChange = e => {
+        const { setDefinitionValue } = this.props;
+        const definition = e.currentTarget.value;
+        setDefinitionValue(definition);
+        console.warn("handleDefinitionChange", definition);
+    };
+
     render() {
-        const { chosenEntry, inputValue, terms } = this.props;
+        const { inputValue, definitionValue, terms } = this.props;
         return (
             <div>
                 <input
                     list="terms"
-                    onChange={this.handleChange}
-                    onInput={this.handleChange}
+                    onChange={this.handlePhraseChange}
+                    onInput={this.handlePhraseChange}
                     value={inputValue}
                     style={{
                         fontSize: "1.5em",
@@ -58,16 +76,16 @@ class Term extends React.Component {
                 <datalist id="terms">
                     {terms.map(term => <option key={term} value={term} />)}
                 </datalist>
-                <p
+                <textarea
+                    onChange={this.handleDefinitionChange}
+                    value={definitionValue}
                     style={{
                         fontSize: "2em",
                         fontStyle: "italic",
                         margin: 0,
                         marginTop: 5,
                     }}
-                >
-                    {chosenEntry && chosenEntry.definition}
-                </p>
+                />
             </div>
         );
     }
@@ -86,7 +104,7 @@ const mapStateToProps = state => {
         })
         .map(data => data.phrase);
     return {
-        chosenEntry: state.chosenEntry,
+        definitionValue: state.definitionValue,
         glossary,
         inputValue: state.inputValue,
         terms,
@@ -96,5 +114,6 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
     loadGlossary,
     setChosenEntry,
+    setDefinitionValue,
     setInputValue,
 })(Term);
