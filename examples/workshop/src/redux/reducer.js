@@ -7,7 +7,7 @@ const DEFAULT_STATE = {
     glossary: [],
     glossaryLoading: false,
     glossaryUpdatingRemote: false,
-    inputValue: "",
+    phraseValue: "",
     definitionValue: null,
     loggedIn: true,
     rootRecord: null,
@@ -33,7 +33,7 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 definitionValue: action.payload.chosenEntry
                     ? action.payload.chosenEntry.definition
                     : undefined,
-                inputValue: action.payload.chosenEntry
+                phraseValue: action.payload.chosenEntry
                     ? action.payload.chosenEntry.phrase
                     : undefined,
             };
@@ -70,10 +70,10 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 glossaryUpdatingRemote: false,
                 error: action.payload,
             };
-        case Actions.SET_INPUT_VALUE:
+        case Actions.SET_PHRASE_VALUE:
             return {
                 ...state,
-                inputValue: action.payload,
+                phraseValue: action.payload,
             };
         case Actions.SET_DEFINITION_VALUE:
             return {
@@ -87,7 +87,7 @@ export default function reducer(state = DEFAULT_STATE, action) {
                 definitionValue: action.payload
                     ? action.payload.definition
                     : null,
-                inputValue: action.payload ? action.payload.phrase : null,
+                phraseValue: action.payload ? action.payload.phrase : null,
             };
 
         case Actions.SET_FOCUSED:
@@ -106,7 +106,7 @@ export const getInitialState = rootRecord => {
     return {
         ...DEFAULT_STATE,
         chosenEntry,
-        inputValue: chosenEntry.phrase || null,
+        phraseValue: chosenEntry.phrase || null,
         definitionValue: chosenEntry.definition || null,
     };
 };

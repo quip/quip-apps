@@ -7,18 +7,18 @@ import {
     loadGlossary,
     setChosenEntry,
     setDefinitionValue,
-    setInputValue,
+    setPhraseValue,
 } from "../redux/actions";
 
 class Term extends React.Component {
     static propTypes = {
         definitionValue: React.PropTypes.string,
         glossary: React.PropTypes.array.isRequired,
-        inputValue: React.PropTypes.string.isRequired,
+        phraseValue: React.PropTypes.string.isRequired,
         loadGlossary: React.PropTypes.func.isRequired,
         setChosenEntry: React.PropTypes.func.isRequired,
         setDefinitionValue: React.PropTypes.func.isRequired,
-        setInputValue: React.PropTypes.func.isRequired,
+        setPhraseValue: React.PropTypes.func.isRequired,
         terms: React.PropTypes.array.isRequired,
     };
 
@@ -31,12 +31,12 @@ class Term extends React.Component {
     handlePhraseChange = e => {
         const {
             glossary,
-            setInputValue,
+            setPhraseValue,
             setDefinitionValue,
             terms,
         } = this.props;
         const phrase = e.currentTarget.value;
-        setInputValue(phrase);
+        setPhraseValue(phrase);
         console.warn("handlePhraseChange", phrase, terms.indexOf(phrase));
         if (terms.indexOf(phrase) !== -1) {
             const definition = glossary.find(row => row.phrase === phrase)
@@ -55,14 +55,14 @@ class Term extends React.Component {
     };
 
     render() {
-        const { inputValue, definitionValue, terms } = this.props;
+        const { phraseValue, definitionValue, terms } = this.props;
         return (
             <div>
                 <input
                     list="terms"
                     onChange={this.handlePhraseChange}
                     onInput={this.handlePhraseChange}
-                    value={inputValue}
+                    value={phraseValue}
                     style={{
                         fontSize: "1.5em",
                         fontWeight: 600,
@@ -106,7 +106,7 @@ const mapStateToProps = state => {
     return {
         definitionValue: state.definitionValue,
         glossary,
-        inputValue: state.inputValue,
+        phraseValue: state.phraseValue,
         terms,
     };
 };
@@ -115,5 +115,5 @@ export default connect(mapStateToProps, {
     loadGlossary,
     setChosenEntry,
     setDefinitionValue,
-    setInputValue,
+    setPhraseValue,
 })(Term);

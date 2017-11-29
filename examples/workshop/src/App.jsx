@@ -15,7 +15,7 @@ class App extends React.Component {
     static propTypes = {
         chosenEntry: React.PropTypes.instanceOf(ChosenEntryRecord),
         definitionValue: React.PropTypes.string.isRequired,
-        inputValue: React.PropTypes.string.isRequired,
+        phraseValue: React.PropTypes.string.isRequired,
         loggedIn: React.PropTypes.bool.isRequired,
         setChosenEntry: React.PropTypes.func.isRequired,
         setFocused: React.PropTypes.func.isRequired,
@@ -35,21 +35,21 @@ class App extends React.Component {
         const {
             chosenEntry,
             definitionValue,
-            inputValue,
+            phraseValue,
             setChosenEntry,
             updateGlossary,
         } = this.props;
         const saveHandler = () => {
-            const payload = { phrase: inputValue, definition: definitionValue };
+            const payload = { phrase: phraseValue, definition: definitionValue };
             setChosenEntry(payload);
             updateGlossary(payload);
             this.updateToolbar_();
         };
         const saveEnabled =
-            inputValue &&
+            phraseValue &&
             definitionValue &&
             (!chosenEntry ||
-                (chosenEntry.phrase != inputValue ||
+                (chosenEntry.phrase != phraseValue ||
                     chosenEntry.definition != definitionValue));
         console.warn("Updating app toolbar", saveEnabled);
         updateAppToolbar(saveEnabled ? saveHandler : null);
@@ -77,7 +77,7 @@ class App extends React.Component {
 const mapStateToProps = state => {
     return {
         definitionValue: state.definitionValue,
-        inputValue: state.inputValue,
+        phraseValue: state.phraseValue,
         loggedIn: state.loggedIn,
         chosenEntry: state.chosenEntry,
     };

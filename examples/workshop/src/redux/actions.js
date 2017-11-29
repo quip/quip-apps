@@ -13,7 +13,7 @@ const Actions = {
     GLOSSARY_UPDATING: "GLOSSARY_UPDATING",
     SET_CHOSEN_ENTRY: "SET_CHOSEN_ENTRY",
     SET_FOCUSED: "SET_FOCUSED",
-    SET_INPUT_VALUE: "SET_INPUT_VALUE",
+    SET_PHRASE_VALUE: "SET_PHRASE_VALUE",
     SET_DEFINITION_VALUE: "SET_DEFINITION_VALUE",
 };
 export default Actions;
@@ -101,8 +101,8 @@ export const addPhrase = phrase => async dispatch => {
     updateGlossaryRemote({ phrase, definition }, dispatch);
 };
 
-export const setInputValue = payload => ({
-    type: Actions.SET_INPUT_VALUE,
+export const setPhraseValue = payload => ({
+    type: Actions.SET_PHRASE_VALUE,
     payload,
 });
 
