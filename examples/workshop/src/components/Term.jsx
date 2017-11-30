@@ -43,7 +43,7 @@ class Term extends React.Component {
                 .definition;
             setDefinitionValue(definition);
         } else {
-            setDefinitionValue(null);
+            setDefinitionValue("(none)");
         }
     };
 
