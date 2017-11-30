@@ -19,9 +19,7 @@ const Actions = {
 export default Actions;
 
 export const loadGlossary = () => async dispatch => {
-    dispatch({
-        type: Actions.GLOSSARY_LOADING,
-    });
+    dispatch({ type: Actions.GLOSSARY_LOADING });
     try {
         const fetched = await fetchGlossary();
         const glossary = fetched.results;
