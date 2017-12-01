@@ -14,6 +14,7 @@ class Term extends React.Component {
     static propTypes = {
         definitionValue: React.PropTypes.string,
         glossary: React.PropTypes.array.isRequired,
+        isFocused: React.PropTypes.bool.isRequired,
         phraseValue: React.PropTypes.string.isRequired,
         loadGlossary: React.PropTypes.func.isRequired,
         setChosenEntry: React.PropTypes.func.isRequired,
@@ -55,36 +56,25 @@ class Term extends React.Component {
     };
 
     render() {
-        const { phraseValue, definitionValue, terms } = this.props;
+        const { isFocused, phraseValue, definitionValue, terms } = this.props;
         return (
-            <div>
+            <div className={Styles.term}>
                 <input
+                    className={Styles.phrase}
                     list="terms"
                     onChange={this.handlePhraseChange}
                     onInput={this.handlePhraseChange}
+                    readOnly={!isFocused}
                     value={phraseValue}
-                    style={{
-                        fontSize: "1.5em",
-                        fontWeight: 600,
-                        margin: 0,
-                        padding: 0,
-                        border: 0,
-                        borderBottom: "1px solid #ccc",
-                        outline: "none",
-                    }}
                 />
                 <datalist id="terms">
                     {terms.map(term => <option key={term} value={term} />)}
                 </datalist>
                 <textarea
+                    className={Styles.definition}
                     onChange={this.handleDefinitionChange}
+                    readOnly={!isFocused}
                     value={definitionValue}
-                    style={{
-                        fontSize: "2em",
-                        fontStyle: "italic",
-                        margin: 0,
-                        marginTop: 5,
-                    }}
                 />
             </div>
         );
@@ -106,6 +96,7 @@ const mapStateToProps = state => {
     return {
         definitionValue: state.definitionValue,
         glossary,
+        isFocused: state.isFocused,
         phraseValue: state.phraseValue,
         terms,
     };
