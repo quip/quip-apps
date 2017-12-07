@@ -47,6 +47,12 @@ const main = () => {
         }
     });
 
+    $definition.on("input change", e => {
+        const phrase = e.target.value;
+        console.log("definition change", phrase, glossary);
+        updateMenu();
+    });
+
     $save.on("click", e => {
         const phrase = $phrase.val();
         const definition = $definition.val();
