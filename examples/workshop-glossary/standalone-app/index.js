@@ -48,8 +48,8 @@ const main = () => {
     });
 
     $definition.on("input change", e => {
-        const phrase = e.target.value;
-        console.log("definition change", phrase, glossary);
+        const definition = e.target.value;
+        console.log("definition change", definition, glossary);
         updateMenu();
     });
 
