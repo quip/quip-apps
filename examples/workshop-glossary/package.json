@@ -10,5 +10,8 @@
     "author": "",
     "devDependencies": {
         "quip-apps-webpack-config": ">=0.0.6"
+    },
+    "dependencies": {
+        "jquery": "^3.2.1"
     }
 }

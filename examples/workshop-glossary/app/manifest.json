@@ -8,5 +8,8 @@
     "initial_height": 300,
     "initial_width": 300,
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"]
+    "css_files": ["dist/app.css"],
+    "csp_sources": {
+        "connect_srcs": ["https://quipworkshop.herokuapp.com/"]
+    }
 }
