@@ -2,22 +2,26 @@ body {
     padding: 30px;
 }
 
-.term {
-    .phrase {
-        border: 0;
-        border-radius: 0;
-        border-bottom: 1px solid #ccc;
-        font-size: 1.5em;
-        font-weight: 600;
-        margin: 0;
-        padding: 0;
-        outline: none;
-    }
+input[type="text"].phrase {
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    border: none;
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0;
+    outline: none;
+    padding: 0;
+}
 
-    .definition {
-        font-size: 2em;
-        font-style: italic;
-        margin: 0;
-        margin-top: 5px;
-    }
+.definition {
+    border-radius: 0px;
+    border: 1px solid #ddd;
+    color: #888;
+    font-size: 2em;
+    font-style: italic;
+    margin-top: 5px;
+    margin: 0;
+    outline: none;
+    padding: 4px 8px;
+    resize: none;
 }
