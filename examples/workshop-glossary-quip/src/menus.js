@@ -46,7 +46,6 @@ export class Menu extends Component {
       commands.push("save");
       commands.push("discard");
     }
-    console.error("updateMenu commands", commands);
     quip.apps.updateToolbar({
       toolbarCommandIds: commands,
       menuCommands: [

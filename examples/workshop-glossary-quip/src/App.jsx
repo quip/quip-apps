@@ -20,6 +20,8 @@ class App extends Component {
 
   componentDidMount() {
     this.loadGlossary();
+    quip.apps.addEventListener(quip.apps.EventType.FOCUS, this.onFocus);
+    quip.apps.addEventListener(quip.apps.EventType.BLUR, this.onBlur);
   }
 
   loadGlossary = () => {
