@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { API, Storage } from "./model";
 import { Menu } from "./menus";
 
-import "./App.css";
+import "./App.less";
 
 class App extends Component {
   constructor() {
@@ -74,17 +74,17 @@ class App extends Component {
   };
 
   onFocus = () => {
-    this.setState({focused: true});
-  }
+    this.setState({ focused: true });
+  };
 
   onBlur = () => {
-    this.setState({focused: false});
-  }
+    this.setState({ focused: false });
+  };
 
   render() {
     const { definition, focused, loading, phrase, phrases } = this.state;
     const appClassName = focused ? "app focused" : "app";
-    console.log("appClassName", appClassName, focused)
+    console.log("appClassName", appClassName, focused);
     return (
       <div className={appClassName}>
         {loading ? <div className="loading">Loading ...</div> : null}

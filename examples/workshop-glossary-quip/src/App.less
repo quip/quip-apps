@@ -1,0 +1,45 @@
+/* :global needed because quip uses css modules by default */
+:global {
+  .loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: yellow;
+    color: #000;
+    padding: 10px;
+    font-size: 5px 10px;
+  }
+
+  .buttons {
+    margin-bottom: 15px;
+  }
+
+  /* had to add more specificity to override quip */
+  .app input.phrase {
+    border: 1px solid transparent;
+    border-radius: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0;
+    outline: none;
+    padding: 0;
+  }
+
+  .definition {
+    border-radius: 0px;
+    border: 1px solid transparent;
+    color: #888;
+    font-size: 2em;
+    font-style: italic;
+    margin: 5px 0 0 0;
+    outline: none;
+    padding: 4px 8px;
+    resize: none;
+  }
+
+  /* had to add more specificity to override quip */
+  .app.focused .phrase,
+  .app.focused .definition {
+    border-color: #ddd;
+  }
+}

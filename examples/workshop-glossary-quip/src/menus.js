@@ -35,8 +35,43 @@ export class Menu extends Component {
     return { refreshEnabled, saveEnabled };
   }
 
-  updateDOMMenu() {
+  updateQuipMenu() {
     const { discardChanges, loadGlossary } = this.props;
+    const { refreshEnabled, saveEnabled } = this.getButtonsEnabled();
+    let commands = [];
+    if (refreshEnabled) {
+      commands.push("refresh");
+    }
+    if (saveEnabled) {
+      commands.push("save");
+      commands.push("discard");
+    }
+    console.error("updateMenu commands", commands);
+    quip.apps.updateToolbar({
+      toolbarCommandIds: commands,
+      menuCommands: [
+        {
+          id: "save",
+          label: "Save",
+          handler: this.onClickSave,
+        },
+        {
+          id: "refresh",
+          label: "Refresh",
+          handler: loadGlossary,
+        },
+        {
+          id: "discard",
+          label: "Discard",
+          handler: discardChanges,
+        },
+      ],
+    });
+    return null;
+  }
+
+  updateDOMMenu() {
+    const { definition, discardChanges, loadGlossary, phrase } = this.props;
     const { refreshEnabled, saveEnabled } = this.getButtonsEnabled();
 
     return (
@@ -63,6 +98,8 @@ export class Menu extends Component {
   }
 
   render() {
-    return this.updateDOMMenu();
+    return typeof quip !== "undefined"
+      ? this.updateQuipMenu()
+      : this.updateDOMMenu();
   }
 }

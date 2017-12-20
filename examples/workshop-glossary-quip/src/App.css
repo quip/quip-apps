@@ -1,5 +1,18 @@
+.app {
+  padding: 50px;
+}
+
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: yellow;
+  color: #000;
+  padding: 10px;
+  font-size: 5px 10px;
+}
+
 .buttons {
-  border: 1px solid grey;
   margin-bottom: 15px;
 }
 
@@ -25,7 +38,8 @@
   outline: none;
   padding: 4px 8px;
   resize: none;
-  &.definitionFocused {
-    border-color: #ddd;
-  }
+}
+
+.definition.definitionFocused {
+  border-color: #ddd;
 }
