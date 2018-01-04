@@ -89,7 +89,9 @@ module.exports = {
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
-        quip: "quip"
+        quip: "quip",
+        _: "_",
+        quiptext: "quiptext"
     },
     devServer: {
         contentBase: path.resolve(cwd, "app/dist"),
