@@ -1,6 +1,7 @@
 // Copyright 2017 Quip
 
 const path = require("path");
+const webpack = require("webpack");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
 const Autoprefixer = require('autoprefixer');
@@ -83,6 +84,9 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            mangle: { except: ["_", "quiptext"] }
+        }),
         new ExtractTextPlugin("app.css"),
         new WriteFilePlugin()
     ],
