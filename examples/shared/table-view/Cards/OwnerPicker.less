@@ -1,0 +1,43 @@
+@import '../lib/base';
+
+.input {
+    width: 100%;
+}
+
+.inputAutoCompleteWrapper {
+    width: 100%;
+}
+
+.inputAutoCompleteInput {
+    padding: 10px;
+    input {
+        &:focus {
+            outline-style: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.autoCompleteItem {
+    cursor: pointer;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    &.autoCompleteItemFocused {
+        background-color: @gray;
+    }
+}
+
+.userItem {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    .deleteUser {
+        .removeX();
+    }
+}
+
+.userItemName {
+    padding-left: 10px;
+    width: 100%;
+}

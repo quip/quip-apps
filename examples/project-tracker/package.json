@@ -1,0 +1,37 @@
+{
+    "name": "quip-project-tracker",
+    "version": "1.0.0",
+    "description": "Quip project-tracker Element",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:quip/quip.git"
+    },
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
+    },
+    "author": "Quip",
+    "devDependencies": {
+        "eslint": "^4.7.1",
+        "eslint-config-prettier": "^2.5.0",
+        "eslint-plugin-prettier": "^2.3.1",
+        "eslint-plugin-react": "^7.3.0",
+        "prettier": "^1.7.0"
+    },
+    "dependencies": {
+        "classnames": "^2.2.5",
+        "create-quip-app": "^0.0.7",
+        "lodash-move": "^1.1.1",
+        "lodash.debounce": "^4.0.8",
+        "lodash.isequal": "^4.5.0",
+        "lodash.omit": "^4.5.0",
+        "quip-apps-webpack-config": ">=0.0.7",
+        "react-modal": "^2.3.2",
+        "react-motion": "^0.5.0",
+        "reline": "^1.0.0-beta.3",
+        "shallowequal": "^1.0.2",
+        "webpack": "^3.8.1",
+        "webpack-dev-server": "^2.9.4"
+    }
+}

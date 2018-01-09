@@ -1,0 +1,45 @@
+/* Copyright 2017 Quip */
+
+@import "common";
+
+.popover {
+    position: absolute;
+    left: 5px;
+    margin-top: 5px;
+    width: 300px;
+    background-color: white;
+    border: 1px solid @lighGreyColor;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.2);
+}
+
+.result {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.row {
+    display: flex;
+    text-overflow: ellipsis;
+    padding: 3px 5px;
+}
+
+.highlighted {
+    background-color: @blueColor;
+    color: white;
+    .checkmarkIcon {
+        svg {
+            fill: white;
+        }
+    }
+}
+
+.label {
+    padding: 3px 5px;
+}

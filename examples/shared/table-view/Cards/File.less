@@ -1,0 +1,22 @@
+@import '../lib/base.less';
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    user-select: none;
+}
+
+.file {
+    cursor: pointer;
+    color: @secondary-text;
+    font-style: oblique;
+    .ellipsis();
+}
+
+.fileSetWrapper {
+    color: @blue;
+}
+
+.removeFile {
+    .removeX();
+}
