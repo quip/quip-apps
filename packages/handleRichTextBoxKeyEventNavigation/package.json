@@ -10,6 +10,6 @@
         "build": "NODE_ENV=production webpack -p  --output-library-target umd"
     },
     "dependencies": {
-        "quip-apps-webpack-config": "^0.0.13"
+        "quip-apps-webpack-config": "^0.0.14"
     }
 }
