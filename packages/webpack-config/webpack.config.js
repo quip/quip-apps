@@ -9,7 +9,7 @@ const cwd = process.cwd();
 
 module.exports = {
     devtool: "source-map",
-    entry: ["babel-polyfill", path.resolve(cwd, "./src/root.jsx")],
+    entry: ["babel-polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
     output: {
         path: path.resolve(cwd, "./app/dist"),
         filename: "app.js",
