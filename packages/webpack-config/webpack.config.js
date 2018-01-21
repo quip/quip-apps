@@ -85,7 +85,7 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
-            mangle: { except: ["_", "quiptext"] }
+            mangle: { except: ["quiptext"] }
         }),
         new ExtractTextPlugin("app.css"),
         new WriteFilePlugin()
@@ -94,7 +94,6 @@ module.exports = {
         react: "React",
         "react-dom": "ReactDOM",
         quip: "quip",
-        _: "_",
         quiptext: "quiptext"
     },
     devServer: {
