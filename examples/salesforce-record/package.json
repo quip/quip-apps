@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --https",
-    "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app",
+    "build": "NODE_ENV=production webpack; create-quip-app pack ./app",
     "lint": "eslint --ext .jsx --ext .js ./src/"
   },
   "author": "Quip",
@@ -24,6 +24,6 @@
     "react-sortable-hoc": "0.6.1",
     "whatwg-fetch": "^2.0.3",
     "create-quip-app": "^0.0.7",
-    "quip-apps-webpack-config": ">=0.0.7"
+    "quip-apps-webpack-config": ">=0.0.18"
   }
 }

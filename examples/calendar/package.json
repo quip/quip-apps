@@ -10,7 +10,7 @@
     "scripts": {
         "test": "jest",
         "start": "NODE_ENV=development webpack-dev-server --https",
-        "build": "NODE_ENV=production webpack -p; create-quip-app pack ./app"
+        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
     },
     "author": "Quip",
     "devDependencies": {
@@ -50,6 +50,6 @@
         "svg-react-loader": "^0.4.4",
         "create-quip-app": "^0.0.7",
         "quip-apps-chevron": "^0.0.8",
-        "quip-apps-webpack-config": ">=0.0.7"
+        "quip-apps-webpack-config": ">=0.0.18"
     }
 }
