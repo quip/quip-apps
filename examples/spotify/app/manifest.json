@@ -9,7 +9,6 @@
     "initial_width": 300,
     "toolbar_color": "green",
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"],
     "csp_sources": {
         "frame_srcs": [
             "https://open.spotify.com",
