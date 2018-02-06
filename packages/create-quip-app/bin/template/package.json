@@ -9,6 +9,6 @@
     },
     "author": "",
     "devDependencies": {
-        "quip-apps-webpack-config": ">=0.0.18"
+        "quip-apps-webpack-config": ">=0.0.19"
     }
 }

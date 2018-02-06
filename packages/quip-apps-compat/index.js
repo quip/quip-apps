@@ -5,6 +5,8 @@
     if (!("window" in global)) {
         return
     }
+    var exports = module.exports = {};
+
     // For quiptext, introduced in 0.1.044
     var translationShim = function(text, placeholders) {
         if (text[text.length - 1] == "]" && text.lastIndexOf(" [") != -1) {
@@ -69,5 +71,24 @@
     // Shims
     if (!window["quiptext"]) {
         window.quiptext = translationShim;
+    }
+
+    // Translated color label, until API implements these by default.
+    var COLORS_TO_LABEL = {
+        "RED": quiptext("Red"),
+        "ORANGE": quiptext("Orange"),
+        "YELLOW": quiptext("Yellow"),
+        "GREEN": quiptext("Green"),
+        "BLUE": quiptext("Blue"),
+        "VIOLET": quiptext("Violet"),
+    };
+
+    exports.localizedColorLabel = function(colorKey)  {
+        // Manually localize the color labels until the Quip Client API
+        // translates its own strings as well.
+        if (colorKey in COLORS_TO_LABEL) {
+            return COLORS_TO_LABEL[colorKey];
+        }
+        return colorKey.charAt(0).toUpperCase() + colorKey.slice(1).toLowerCase()
     }
 })(self);
