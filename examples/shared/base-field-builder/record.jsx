@@ -64,7 +64,7 @@ class Record extends React.Component {
             quip.apps.EventType.ELEMENT_BLUR,
             this.hideFieldPicker);
         if (this.props.entity.isLoggedIn() &&
-            this.props.entity.getClient().onSourceInstance()) {
+            this.props.entity.getClient().getInstanceUrl()) {
             this.props.entity
                 .fetchData()
                 .then(() => {
