@@ -7,6 +7,21 @@ const WriteFilePlugin = require("write-file-webpack-plugin");
 const Autoprefixer = require('autoprefixer');
 const cwd = process.cwd();
 
+function plugins() {
+    let plugins = [
+        new ExtractTextPlugin("app.css"),
+        new WriteFilePlugin()
+    ];
+    if (process.env.NODE_ENV != "development") {
+        plugins.push(
+            new webpack.optimize.UglifyJsPlugin({
+                mangle: { except: ["quiptext"] }
+            })
+        )
+    }
+    return plugins;
+}
+
 module.exports = {
     devtool: "source-map",
     entry: ["babel-polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
@@ -83,13 +98,7 @@ module.exports = {
             path.resolve(__dirname, "node_modules")
         ]
     },
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            mangle: { except: ["quiptext"] }
-        }),
-        new ExtractTextPlugin("app.css"),
-        new WriteFilePlugin()
-    ],
+    plugins: plugins(),
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
@@ -103,3 +112,4 @@ module.exports = {
         inline: false
     }
 };
+
