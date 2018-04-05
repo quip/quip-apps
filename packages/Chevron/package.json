@@ -7,7 +7,7 @@
     "author": "Quip",
     "main": "dist/Chevron.js",
     "scripts": {
-        "build": "NODE_ENV=production webpack -p --output-library-target umd"
+        "build": "NODE_ENV=production webpack --output-library-target umd"
     },
     "dependencies": {
         "quip-apps-webpack-config": "^0.0.30"
