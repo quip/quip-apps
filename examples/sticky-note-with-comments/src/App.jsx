@@ -21,12 +21,7 @@ export default class App extends React.Component {
         };
         return (
             <div className={Styles.App} style={style}>
-                <quip.apps.ui.RichTextBox
-                    record={richTextRecord}
-                    width={280}
-                    minHeight={280}
-                    maxHeight={280}
-                />
+
                 <div style={{
                     bottom: 10,
                     color: "#aaa",
@@ -34,16 +29,36 @@ export default class App extends React.Component {
                     fontSize: 12,
                     position: "absolute",
                     right: 10,
+                    zIndex: 1,
                 }} onClick={this.onClickClear}>clear</div>
+
+                <quip.apps.ui.RichTextBox
+                    record={richTextRecord}
+                    width={280}
+                    minHeight={280}
+                    maxHeight={280}
+                />
                 <div
                     ref={el => {
                         richTextRecord.getDom = () => el;
+                    }}
+                    style={{
+                        position: "absolute",
+                        //top: 10,
+                        //right: 5,
+                        width: 20,
+                        height: 20,
+                        zIndex: 1,
+                        left: 10,
+                        bottom: 5,
+                        //border: "1px solid green",
                     }}>
                     <quip.apps.ui.CommentsTrigger
                         record={richTextRecord}
                         showEmpty={true}
                     />
                 </div>
+
             </div>
         );
     }
