@@ -1,6 +1,7 @@
 // Copyright 2017 Quip
 
 const TAB = 9;
+const ESCAPE = 27;
 
 export default function(e, record) {
     let next;
@@ -27,6 +28,17 @@ export default function(e, record) {
         }
         next.focus();
         return true;
+    }
+
+    if (e.keyCode === ESCAPE) {
+        for (var i = 0; i < e.path.length - 1; i++) {
+            const node = e.path[i];
+            const nextNode = e.path[i + 1];
+            if (nextNode.id === "quip-element-root") {
+                node.focus();
+                return true;
+            }
+        }
     }
     return false;
 }
