@@ -2,7 +2,7 @@
 /* @flow */
 
 import quip from "quip";
-import { localizedColorLabel } from "quip-apps-compat";
+import {localizedColorLabel} from "quip-apps-compat";
 
 const colors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -44,7 +44,7 @@ export function allMenuCommands() {
                     .get("steps")
                     .add({});
                 quip.apps.recordQuipMetric("add_step");
-            }
+            },
         },
         {
             id: "selectStep",

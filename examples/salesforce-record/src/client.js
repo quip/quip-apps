@@ -83,9 +83,10 @@ export class SalesforceClient {
     }
 
     onSourceInstance() {
-        return (!quip.apps.getRootEntity().getInstanceUrl() ||
-            quip.apps.getRootEntity().getInstanceUrl() ===
-            this.getInstanceUrl());
+        return (
+            !quip.apps.getRootEntity().getInstanceUrl() ||
+            quip.apps.getRootEntity().getInstanceUrl() === this.getInstanceUrl()
+        );
     }
 
     login(onAuthenticated, onMismatchedInstance, onAuthenticationFailed) {
@@ -158,8 +159,9 @@ export class SalesforceClient {
     }
 
     fetchPicklistOptions(recordType, recordTypeId, fieldName) {
-        const url = `${this
-            .apiUrl_}/${OBJECT_INFO_ENDPOINT}/${recordType}/picklist-values/${recordTypeId}/${fieldName}`;
+        const url = `${
+            this.apiUrl_
+        }/${OBJECT_INFO_ENDPOINT}/${recordType}/picklist-values/${recordTypeId}/${fieldName}`;
         return this.request("GET", url);
     }
 
@@ -170,22 +172,25 @@ export class SalesforceClient {
     }
 
     fetchObjectInfo(recordType) {
-        const objectInfoUrl = `${this
-            .apiUrl_}/${OBJECT_INFO_ENDPOINT}/${recordType}`;
+        const objectInfoUrl = `${
+            this.apiUrl_
+        }/${OBJECT_INFO_ENDPOINT}/${recordType}`;
         return this.request("GET", objectInfoUrl);
     }
 
     fetchRecord(recordId) {
         const params = {layoutTypes: "Full"};
-        const recordsUrl = `${this
-            .apiUrl_}/${RECORDS_SINGLE_ENDPOINT}/${recordId}`;
+        const recordsUrl = `${
+            this.apiUrl_
+        }/${RECORDS_SINGLE_ENDPOINT}/${recordId}`;
         return this.request("GET", recordsUrl, params);
     }
 
     fetchRecords(recordIds) {
         const params = {layoutTypes: "Full"};
-        const recordsUrl = `${this
-            .apiUrl_}/${RECORDS_BATCH_ENDPOINT}/${recordIds.join(",")}`;
+        const recordsUrl = `${
+            this.apiUrl_
+        }/${RECORDS_BATCH_ENDPOINT}/${recordIds.join(",")}`;
         return this.request("GET", recordsUrl, params);
     }
 

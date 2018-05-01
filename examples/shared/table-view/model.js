@@ -1,7 +1,7 @@
 // Copyright 2017 Quip
 
 import ListenerRecord from "./lib/listenerRecord";
-import { PropTypes } from "react";
+import {PropTypes} from "react";
 
 export const COLUMN_TYPE = {
     PERSON: "person",
@@ -152,8 +152,7 @@ export class RowRecord extends ListenerRecord {
         return this.get(column.get("type")).add(
             Object.assign({}, data, {
                 columnId: column.getId(),
-            }),
-        );
+            }));
     }
 }
 
@@ -175,7 +174,7 @@ export class CellRecord extends ListenerRecord {
     }
 
     getDom() {
-       return this.domNode;
+        return this.domNode;
     }
 }
 
@@ -216,7 +215,7 @@ export class PersonRecord extends CellRecord {
     });
 
     addUser(user) {
-        this.get("users").add({ user: user.getId() });
+        this.get("users").add({user: user.getId()});
     }
 
     removeUser(user) {

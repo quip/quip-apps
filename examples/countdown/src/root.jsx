@@ -2,10 +2,10 @@
 
 import quip from "quip";
 import ReactDOM from "react-dom";
-import { localizedColorLabel } from "quip-apps-compat";
+import {localizedColorLabel} from "quip-apps-compat";
 
 import connectRecord from "./connectRecord";
-import { formatDate } from "./humanTime";
+import {formatDate} from "./humanTime";
 
 import App from "./components/App.jsx";
 
@@ -75,8 +75,7 @@ quip.apps.initialize({
 
         const ConnectedApp = connectRecord(rootRecord, App);
         ReactDOM.render(
-            <ConnectedApp setRootInstance={setRootInstance} />,
-            rootNode,
-        );
+            <ConnectedApp setRootInstance={setRootInstance}/>,
+            rootNode);
     },
 });

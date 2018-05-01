@@ -1,9 +1,9 @@
 // Copyright 2017 Quip
 
-import AddCard, { kAddCardHeight } from "./add-card.jsx";
+import AddCard, {kAddCardHeight} from "./add-card.jsx";
 import Card from "./card.jsx";
-import { showCardContextMenu } from "./menus.js";
-import { BoardRecord, entityListener } from "./model.jsx";
+import {showCardContextMenu} from "./menus.js";
+import {BoardRecord, entityListener} from "./model.jsx";
 import getClosest from "./getClosest";
 
 import styles from "./board.less";
@@ -48,8 +48,7 @@ class Board extends React.Component {
         window.addEventListener("keyup", this.onKeyUp_);
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.onBlur_,
-        );
+            this.onBlur_);
         //this.onCardFocus_();
         //listenForCardFocus(this.onCardFocus_);
     }
@@ -61,8 +60,7 @@ class Board extends React.Component {
         window.removeEventListener("keyup", this.onKeyUp_);
         quip.apps.removeEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.onBlur_,
-        );
+            this.onBlur_);
         //unlistenForCardFocus(this.onCardFocus_);
     }
 
@@ -79,23 +77,21 @@ class Board extends React.Component {
             cardDropTargetColumnId,
             cardDropTargetIndex,
         } = this.getCurrentDragState_();
-        const { isDraggingSomething } = this.state;
+        const {isDraggingSomething} = this.state;
         let children = [];
         let left = 0;
         this.props.entity.getColumns().forEach((columnRecord, i) => {
             const columnDragging = Boolean(
                 draggingCard &&
                     draggingCard.isHeader() &&
-                    draggingCard.getColumn().id() === columnRecord.id(),
-            );
+                    draggingCard.getColumn().id() === columnRecord.id());
             const dropTargetIndex =
                 columnRecord.id() === cardDropTargetColumnId
                     ? cardDropTargetIndex
                     : undefined;
             if (columnDropTargetIndex === 0 && i === 0) {
                 children.push(
-                    <ColumnDropTarget key="column-drop-target" left={left} />,
-                );
+                    <ColumnDropTarget key="column-drop-target" left={left}/>);
                 left += kColumnWidth;
             }
             children = children.concat(
@@ -107,38 +103,30 @@ class Board extends React.Component {
                     columnDragging,
                     draggingCard,
                     dropTargetIndex,
-                    isDraggingSomething,
-                ),
-            );
+                    isDraggingSomething));
             if (!columnDragging) {
                 left += kColumnWidth;
             }
-            if (
-                columnDropTargetIndex !== undefined &&
-                i === columnDropTargetIndex - 1
-            ) {
+            if (columnDropTargetIndex !== undefined &&
+                i === columnDropTargetIndex - 1) {
                 children.push(
-                    <ColumnDropTarget key="column-drop-target" left={left} />,
-                );
+                    <ColumnDropTarget key="column-drop-target" left={left}/>);
                 left += kColumnWidth;
             }
         });
 
-        return (
-            <div
-                ref={ref => {
-                    this._ref = ref;
-                }}
-                onMouseDown={e => {
-                    if (e.target === this._ref) this.setFocusedCard(null);
-                }}
-                className={styles.board}
-                style={this.computeDimensions_()}
-                tabIndex="0"
-            >
-                {children}
-            </div>
-        );
+        return <div
+            ref={ref => {
+                this._ref = ref;
+            }}
+            onMouseDown={e => {
+                if (e.target === this._ref) this.setFocusedCard(null);
+            }}
+            className={styles.board}
+            style={this.computeDimensions_()}
+            tabIndex="0">
+            {children}
+        </div>;
     }
 
     getColumnContents_(
@@ -147,8 +135,7 @@ class Board extends React.Component {
         columnDragging,
         draggingCard,
         dropTargetIndex,
-        isDraggingSomething,
-    ) {
+        isDraggingSomething) {
         const {
             selectedCard,
             dragStartX,
@@ -159,8 +146,7 @@ class Board extends React.Component {
         const columnSelected = Boolean(
             selectedCard &&
                 selectedCard.isHeader() &&
-                selectedCard.getColumn().id() === columnRecord.id(),
-        );
+                selectedCard.getColumn().id() === columnRecord.id());
         let contents = [];
         let top = 0;
         if (columnDragging) {
@@ -172,17 +158,14 @@ class Board extends React.Component {
         columnRecord.getCards().forEach((cardRecord, i) => {
             const selected = Boolean(
                 this.state.selectedCard &&
-                    cardRecord.id() === this.state.selectedCard.id(),
-            );
+                    cardRecord.id() === this.state.selectedCard.id());
             const focused = Boolean(
                 this.state.focusedCard &&
-                    cardRecord.id() === this.state.focusedCard.id(),
-            );
+                    cardRecord.id() === this.state.focusedCard.id());
             const dragging = Boolean(
                 !columnDragging &&
                     draggingCard &&
-                    cardRecord.id() === draggingCard.id(),
-            );
+                    cardRecord.id() === draggingCard.id());
 
             let cardTop = top;
             let cardLeft = left;
@@ -210,9 +193,7 @@ class Board extends React.Component {
                     onMouseDown={this.onCardMouseDown_}
                     selected={selected}
                     setFocusedCard={this.setFocusedCard}
-                    top={cardTop}
-                />,
-            );
+                    top={cardTop}/>);
 
             if (!dragging) {
                 if (i === 0)
@@ -225,9 +206,7 @@ class Board extends React.Component {
                     <CardDropTarget
                         key="card-drop-target"
                         top={top}
-                        left={left}
-                    />,
-                );
+                        left={left}/>);
                 top += kCardDropTargetHeight;
             }
         });
@@ -242,9 +221,7 @@ class Board extends React.Component {
                 columnDragging={columnDragging}
                 cardDragging={!columnDragging && !!draggingCard}
                 isDraggingSomething={isDraggingSomething}
-                hidden={false}
-            />,
-        );
+                hidden={false}/>);
 
         return contents;
     }
@@ -270,7 +247,7 @@ class Board extends React.Component {
                     } else {
                         selectedCard.delete();
                     }
-                    this.setState({ focusedCard: null, selectedCard: null });
+                    this.setState({focusedCard: null, selectedCard: null});
                 }
                 break;
             }
@@ -350,20 +327,17 @@ class Board extends React.Component {
             this.setState({
                 draggingCard: undefined,
             });
-            if (
-                !(
+            if (!(
                     Math.abs(dragStartY - dragCurrentY) > minDragXYDiff ||
                     Math.abs(dragStartX - dragCurrentX) > minDragXYDiff
-                )
-            ) {
+                )) {
                 return;
             }
 
             if (columnDropTargetIndex !== undefined) {
                 this.props.entity.moveColumn(
                     draggingCard.getColumn(),
-                    columnDropTargetIndex,
-                );
+                    columnDropTargetIndex);
             } else if (cardDropTargetIndex !== undefined) {
                 const columns = this.props.entity.getColumns();
                 for (
@@ -372,18 +346,15 @@ class Board extends React.Component {
                     i++
                 ) {
                     if (cardDropTargetColumnId === columnRecord.id()) {
-                        if (
-                            columnRecord.id() === draggingCard.getColumn().id()
-                        ) {
+                        if (columnRecord.id() ===
+                            draggingCard.getColumn().id()) {
                             columnRecord.moveCard(
                                 draggingCard,
-                                cardDropTargetIndex,
-                            );
+                                cardDropTargetIndex);
                         } else {
                             columnRecord.insertCard(
                                 draggingCard,
-                                cardDropTargetIndex,
-                            );
+                                cardDropTargetIndex);
                         }
                         break;
                     }
@@ -393,14 +364,10 @@ class Board extends React.Component {
     };
 
     onCardRest_ = entityId => {
-        if (
-            this.isDraggingSomethingCard &&
-            entityId === this.isDraggingSomethingCard.id()
-        ) {
-            if (
-                this.state.draggingCard &&
-                this.state.draggingCard.id() === entityId
-            ) {
+        if (this.isDraggingSomethingCard &&
+            entityId === this.isDraggingSomethingCard.id()) {
+            if (this.state.draggingCard &&
+                this.state.draggingCard.id() === entityId) {
                 return;
             }
             this.isDraggingSomethingCard = null;
@@ -422,10 +389,8 @@ class Board extends React.Component {
             dragCurrentX,
             dragCurrentY,
         } = this.state;
-        if (
-            !draggingCard ||
-            (dragCurrentX === dragStartX && dragCurrentY === dragStartY)
-        ) {
+        if (!draggingCard ||
+            (dragCurrentX === dragStartX && dragCurrentY === dragStartY)) {
             return {
                 draggingCard: undefined,
                 columnDropTargetIndex: undefined,
@@ -434,7 +399,7 @@ class Board extends React.Component {
             };
         }
 
-        let { centerX, centerY } = this.computeCardPosition_(draggingCard);
+        let {centerX, centerY} = this.computeCardPosition_(draggingCard);
         centerX += dragCurrentX - dragStartX;
         centerY += dragCurrentY - dragStartY;
         if (draggingCard.isHeader()) {
@@ -442,17 +407,15 @@ class Board extends React.Component {
                 draggingCard: draggingCard,
                 columnDropTargetIndex: this.computeColumnDropTarget_(
                     draggingCard.getColumn(),
-                    centerX,
-                ),
+                    centerX),
                 cardDropTargetColumnId: undefined,
                 cardDropTargetIndex: undefined,
             };
         } else {
-            const { targetColumnId, targetIndex } = this.computeCardDropTarget_(
+            const {targetColumnId, targetIndex} = this.computeCardDropTarget_(
                 draggingCard,
                 centerX,
-                centerY,
-            );
+                centerY);
             return {
                 draggingCard: draggingCard,
                 columnDropTargetIndex: undefined,
@@ -543,7 +506,7 @@ class Board extends React.Component {
         if (height !== 0) {
             height = height + kAddCardHeight;
         }
-        return { width, height };
+        return {width, height};
     };
 }
 export default entityListener(Board);
@@ -554,12 +517,9 @@ class ColumnDropTarget extends React.Component {
     };
 
     render() {
-        return (
-            <div
-                className={styles.columnDropTarget}
-                style={{ left: this.props.left }}
-            />
-        );
+        return <div
+            className={styles.columnDropTarget}
+            style={{left: this.props.left}}/>;
     }
 }
 
@@ -570,15 +530,12 @@ class CardDropTarget extends React.Component {
     };
 
     render() {
-        return (
-            <div
-                className={styles.cardDropTarget}
-                style={{
-                    top: this.props.top,
-                    left: this.props.left + kCardDropTargetMargin,
-                    width: kColumnWidth - kCardDropTargetMargin * 2,
-                }}
-            />
-        );
+        return <div
+            className={styles.cardDropTarget}
+            style={{
+                top: this.props.top,
+                left: this.props.left + kCardDropTargetMargin,
+                width: kColumnWidth - kCardDropTargetMargin * 2,
+            }}/>;
     }
 }

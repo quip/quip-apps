@@ -1,8 +1,8 @@
 // Copyright 2017 Quip
 
-import { localizedColorLabel } from "quip-apps-compat";
+import {localizedColorLabel} from "quip-apps-compat";
 
-import { kDefaultColumnColors } from "./model.jsx";
+import {kDefaultColumnColors} from "./model.jsx";
 
 const colors = kDefaultColumnColors;
 
@@ -16,8 +16,7 @@ export function onSelectedCardChanged(newSelectedCard) {
 export function refreshToolbar() {
     quip.apps.updateToolbarCommandsState(
         getDisabledCommands(selectedCard),
-        getHighlightedCommands(selectedCard),
-    );
+        getHighlightedCommands(selectedCard));
 }
 
 export function allMenuCommands() {
@@ -99,8 +98,7 @@ export function showCardContextMenu(e, cardRecord, onDismiss) {
         onDismiss,
         {
             cardRecord: cardRecord,
-        },
-    );
+        });
 }
 
 function getHighlightedCommands(cardRecord) {

@@ -22,7 +22,7 @@ class Root extends quip.apps.RootRecord {
         color: quip.apps.ui.ColorMap.BLUE.KEY,
         allowMultiple: false,
         options: [...Array(3)].map((__, index) =>
-            Option.getDefaultProperties(index),
+            Option.getDefaultProperties(index)
         ),
     });
 
@@ -49,8 +49,7 @@ class Root extends quip.apps.RootRecord {
                 last
                     .getRichTextRecord()
                     .getTextContent()
-                    .trim(),
-            );
+                    .trim());
         const lastIndex = isMatch ? parseInt(isMatch) : options.length;
 
         this.get("options").add(Option.getDefaultProperties(lastIndex));
@@ -85,8 +84,7 @@ class Root extends quip.apps.RootRecord {
     getTotalVotes() {
         return this.getOptions().reduce(
             (acc, option) => acc + option.getVotesCount(),
-            0,
-        );
+            0);
     }
 }
 
@@ -155,22 +153,26 @@ class Option extends ListenerRecord {
 
         if (!rtr.empty() && sendMessage) {
             if (allowMultiple) {
-                quip.apps.sendMessage(quiptext(
-                        "voted for %(option)s [snippet for a person]", {
-                            "option": text
-                        }));
+                quip.apps.sendMessage(
+                    quiptext("voted for %(option)s [snippet for a person]", {
+                        "option": text,
+                    }));
             } else {
                 const hasVoted = parent.currentUserHasVoted();
                 if (hasVoted) {
-                    quip.apps.sendMessage(quiptext(
-                        "changed their vote to %(option)s [snippet for a person]", {
-                            "option": text
-                        }));
+                    quip.apps.sendMessage(
+                        quiptext(
+                            "changed their vote to %(option)s [snippet for a person]",
+                            {
+                                "option": text,
+                            }));
                 } else {
-                    quip.apps.sendMessage(quiptext(
-                        "voted for %(option)s [snippet for a person]", {
-                            "option": text
-                        }));
+                    quip.apps.sendMessage(
+                        quiptext(
+                            "voted for %(option)s [snippet for a person]",
+                            {
+                                "option": text,
+                            }));
                 }
             }
         }

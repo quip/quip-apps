@@ -4,7 +4,7 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import isAfter from "date-fns/is_after";
 import isBefore from "date-fns/is_before";
 import isSameMonth from "date-fns/is_same_month";
@@ -15,8 +15,8 @@ import classNames from "classnames";
 import Styles from "./EventLegend.less";
 import EventDropdown from "./EventDropdown.jsx";
 import EventRichTextBox from "./EventRichTextBox.jsx";
-import { EventRecord } from "../model";
-import { isSameDay, formatDate } from "../util";
+import {EventRecord} from "../model";
+import {isSameDay, formatDate} from "../util";
 
 const formatDateRange = (start, end) => {
     const startText = formatDate(start, "MMMM D");
@@ -42,7 +42,7 @@ const formatDateRange = (start, end) => {
 const eventsForMonth = (events, date) => {
     const sameMonth = d => isSameMonth(date, d) && isSameYear(date, d);
     const matchingEvents = events.filter(event => {
-        const { start, end } = event.getDateRange();
+        const {start, end} = event.getDateRange();
         /*
         console.log(
             "eventsForMonth",
@@ -78,61 +78,50 @@ type Props = {
 
 class EventLegend extends React.Component<Props, null> {
     render() {
-        const { events } = this.props;
-        return (
-            <ul className={Styles.container}>
-                {events.map(event => {
-                    const { start, end } = event.getDateRange();
-                    const color = event.getColor();
-                    const colorValue = quip.apps.ui.ColorMap[color].VALUE;
-                    const hasComments = event.getCommentCount() > 0;
-                    return (
-                        <li
-                            ref={el => {
-                                // Tells the quip comment UI to focus on this element.
-                                event.setDom(el);
-                            }}
-                            className={classNames(Styles.event)}
-                            key={event.id()}
-                            style={{ borderColor: colorValue }}
-                        >
-                            <div className={Styles.row}>
-                                <div className={Styles.colPrimary}>
-                                    <div style={{ color: colorValue }}>
-                                        {formatDateRange(start, end)}
-                                    </div>
-                                    <div
-                                        className={Styles.richTextBox}
-                                        style={{
-                                            fontWeight: "bold !important",
-                                        }}
-                                    >
-                                        <EventRichTextBox
-                                            color={event.getColor()}
-                                            eventRecord={event}
-                                        />
-                                    </div>
-                                </div>
-                                {hasComments && (
-                                    <div className={Styles.colComments}>
-                                        <quip.apps.ui.CommentsTrigger
-                                            record={event}
-                                            showEmpty
-                                        />
-                                    </div>
-                                )}
-                                <div className={Styles.colDropdown}>
-                                    <EventDropdown
-                                        color={event.getColor()}
-                                        eventRecord={event}
-                                    />
-                                </div>
+        const {events} = this.props;
+        return <ul className={Styles.container}>
+            {events.map(event => {
+                const {start, end} = event.getDateRange();
+                const color = event.getColor();
+                const colorValue = quip.apps.ui.ColorMap[color].VALUE;
+                const hasComments = event.getCommentCount() > 0;
+                return <li
+                    ref={el => {
+                        // Tells the quip comment UI to focus on this element.
+                        event.setDom(el);
+                    }}
+                    className={classNames(Styles.event)}
+                    key={event.id()}
+                    style={{borderColor: colorValue}}>
+                    <div className={Styles.row}>
+                        <div className={Styles.colPrimary}>
+                            <div style={{color: colorValue}}>
+                                {formatDateRange(start, end)}
                             </div>
-                        </li>
-                    );
-                })}
-            </ul>
-        );
+                            <div
+                                className={Styles.richTextBox}
+                                style={{
+                                    fontWeight: "bold !important",
+                                }}>
+                                <EventRichTextBox
+                                    color={event.getColor()}
+                                    eventRecord={event}/>
+                            </div>
+                        </div>
+                        {hasComments && <div className={Styles.colComments}>
+                            <quip.apps.ui.CommentsTrigger
+                                record={event}
+                                showEmpty/>
+                        </div>}
+                        <div className={Styles.colDropdown}>
+                            <EventDropdown
+                                color={event.getColor()}
+                                eventRecord={event}/>
+                        </div>
+                    </div>
+                </li>;
+            })}
+        </ul>;
     }
 }
 

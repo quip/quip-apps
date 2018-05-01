@@ -7,7 +7,7 @@
 
 import addDays from "date-fns/add_days";
 import differenceInDays from "date-fns/difference_in_days";
-import format from "date-fns/format"
+import format from "date-fns/format";
 import getDay from "date-fns/get_day";
 import getDaysInMonth from "date-fns/get_days_in_month";
 import isAfter from "date-fns/is_after";
@@ -18,29 +18,29 @@ import startOfMonth from "date-fns/start_of_month";
 import subDays from "date-fns/sub_days";
 import subMonths from "date-fns/sub_months";
 
-import de from "date-fns/locale/de"
-import es from "date-fns/locale/es"
-import fr from "date-fns/locale/fr"
-import it from "date-fns/locale/it"
-import ja from "date-fns/locale/ja"
-import ko from "date-fns/locale/ko"
-import nl from "date-fns/locale/nl"
-import pt from "date-fns/locale/pt"
-import ru from "date-fns/locale/ru"
-import tr from "date-fns/locale/tr"
-import zh_cn from "date-fns/locale/zh_cn"
+import de from "date-fns/locale/de";
+import es from "date-fns/locale/es";
+import fr from "date-fns/locale/fr";
+import it from "date-fns/locale/it";
+import ja from "date-fns/locale/ja";
+import ko from "date-fns/locale/ko";
+import nl from "date-fns/locale/nl";
+import pt from "date-fns/locale/pt";
+import ru from "date-fns/locale/ru";
+import tr from "date-fns/locale/tr";
+import zh_cn from "date-fns/locale/zh_cn";
 
 import range from "lodash.range";
 
 import polyfills from "./polyfills";
-import type { EventRecord } from "./model";
+import type {EventRecord} from "./model";
 
 import type {
     DateRange,
-        MouseCoordinates,
-        MouseStartCoordinates,
-        MovingEventRect,
-        MovingEventRectMap,
+    MouseCoordinates,
+    MouseStartCoordinates,
+    MovingEventRect,
+    MovingEventRectMap,
 } from "./types";
 
 const SUPPORTED_LANGUAGES = {
@@ -54,7 +54,7 @@ const SUPPORTED_LANGUAGES = {
     "pt": pt,
     "ru": ru,
     "tr": tr,
-    "zh_CN": zh_cn
+    "zh_CN": zh_cn,
 };
 
 const makeDateRange = (startDate: Date, numberOfDays: number) =>
@@ -67,14 +67,12 @@ export const getCalendarMonth = (monthDate: Date): Array<Date> => {
     const prevMonthDate = subMonths(monthDate, 1);
     const previousMonthDays = makeDateRange(
         subDays(lastDayOfMonth(prevMonthDate), firstDayOfWeek - 1),
-        firstDayOfWeek,
-    );
+        firstDayOfWeek);
 
     const lastDayOfMonthInWeek = getDay(lastDayOfMonth(monthDate));
     const nextMonthDays = makeDateRange(
         addDays(lastDayOfMonth(monthDate), 1),
-        6 - lastDayOfMonthInWeek,
-    );
+        6 - lastDayOfMonthInWeek);
 
     return [
         ...previousMonthDays,
@@ -88,7 +86,7 @@ export const formatDate = (date, dateFormat) => {
     let options;
     if (user && user.getLanguage && user.getLanguage() in SUPPORTED_LANGUAGES) {
         options = {
-            "locale": SUPPORTED_LANGUAGES[user.getLanguage()]
+            "locale": SUPPORTED_LANGUAGES[user.getLanguage()],
         };
     }
     return format(date, dateFormat, options);
@@ -98,9 +96,11 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
     // Simplified implementation of isSameDay from date-fns that does not call
     // setHours on the start/end dates before comparing them (setHours is
     // expensive on iOS, and we call this function a lot).
-    return date1.getDate() == date2.getDate() &&
+    return (
+        date1.getDate() == date2.getDate() &&
         date1.getMonth() == date2.getMonth() &&
-        date1.getFullYear() == date2.getFullYear();
+        date1.getFullYear() == date2.getFullYear()
+    );
 };
 
 const startOfDayCache = {};
@@ -142,9 +142,8 @@ export const getIsSmallScreen = (): boolean =>
 
 export const isElAtPoint = (
     xy: MouseCoordinates,
-    className: string,
-): boolean => {
-    const { x, y } = xy;
+    className: string): boolean => {
+    const {x, y} = xy;
     return !!polyfills
         .elementsFromPoint(x, y)
         .find(el => el.classList.contains(className));
@@ -152,9 +151,8 @@ export const isElAtPoint = (
 
 export const elAtPoint = (
     xy: MouseCoordinates,
-    className: string,
-): ?HTMLElement => {
-    const { x, y } = xy;
+    className: string): ?HTMLElement => {
+    const {x, y} = xy;
     return polyfills
         .elementsFromPoint(x, y)
         .find(el => el.classList.contains(className));
@@ -180,46 +178,40 @@ export const dateAtPoint = (xy: MouseCoordinates) => {
 export const getMovingEventDateRange = (
     movingEvent: EventRecord,
     mouseCoordinates: MouseCoordinates,
-    mouseStartCoordinates: MouseStartCoordinates,
-) => {
-    const { start, end } = movingEvent.getDateRange();
+    mouseStartCoordinates: MouseStartCoordinates) => {
+    const {start, end} = movingEvent.getDateRange();
     const endDragDate = dateAtPoint(mouseCoordinates);
     if (endDragDate) {
         const diffInDays = differenceInDays(
             mouseStartCoordinates.date,
-            endDragDate,
-        );
+            endDragDate);
         if (Math.abs(diffInDays) !== 0) {
             const newStartDate = subDays(start, diffInDays);
             const newEndDate = subDays(end, diffInDays);
-            return { start: newStartDate, end: newEndDate };
+            return {start: newStartDate, end: newEndDate};
         }
     }
-    return { start, end };
+    return {start, end};
 };
 
 export const getResizingEventDateRange = (
     resizingEvent: EventRecord,
-    mouseCoordinates: MouseCoordinates,
-) => {
-    const { start, end } = resizingEvent.getDateRange();
+    mouseCoordinates: MouseCoordinates) => {
+    const {start, end} = resizingEvent.getDateRange();
     const newEndDate = dateAtPoint(mouseCoordinates);
-    if (
-        newEndDate &&
-        (isAfter(newEndDate, start) || isEqual(newEndDate, start))
-    ) {
+    if (newEndDate &&
+        (isAfter(newEndDate, start) || isEqual(newEndDate, start))) {
         const diffInDays = differenceInDays(end, newEndDate);
         if (Math.abs(diffInDays) !== 0) {
-            return { start, end: newEndDate };
+            return {start, end: newEndDate};
         }
     }
-    return { start, end };
+    return {start, end};
 };
 
 export const areDateRangesEqual = function(
     a: DateRange,
-    b: DateRange,
-): boolean {
+    b: DateRange): boolean {
     if (a.start.getTime() !== b.start.getTime()) {
         return false;
     }
@@ -232,8 +224,7 @@ export const areDateRangesEqual = function(
 export function getMovingEventRectMap(
     movingEvent: EventRecord,
     mouseStartCoordinates: MouseStartCoordinates,
-    mouseCoordinates?: MouseCoordinates,
-): MovingEventRectMap {
+    mouseCoordinates?: MouseCoordinates): MovingEventRectMap {
     const movingEventElMap = movingEvent.getDomNodesForEvent();
     //console.log("getMovingEventRectMap movingEventElMap", movingEventElMap);
     let rectMap = {};
@@ -243,8 +234,7 @@ export function getMovingEventRectMap(
             rectMap[weekStartTime] = getMovingEventRect(
                 el,
                 mouseStartCoordinates,
-                mouseCoordinates,
-            );
+                mouseCoordinates);
             //console.log("weekStartTime", weekStartTime, rectMap[weekStartTime]);
         }
     });
@@ -254,8 +244,7 @@ export function getMovingEventRectMap(
 function getMovingEventRect(
     el: HTMLDivElement,
     mouseStartCoordinates: MouseStartCoordinates,
-    mouseCoordinates: ?MouseCoordinates,
-): MovingEventRect {
+    mouseCoordinates: ?MouseCoordinates): MovingEventRect {
     mouseCoordinates = mouseCoordinates || mouseStartCoordinates;
     const rect = el.getBoundingClientRect();
     const offsetX = mouseStartCoordinates.x - rect.left;

@@ -2,13 +2,13 @@
 
 /* eslint react/no-find-dom-node:0 */
 
-import { Motion } from "react-motion";
+import {Motion} from "react-motion";
 import cx from "classnames";
 
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 
-import { kColumnWidth } from "./board.jsx";
-import { CardRecord, entityListener } from "./model.jsx";
+import {kColumnWidth} from "./board.jsx";
+import {CardRecord, entityListener} from "./model.jsx";
 import {
     animateTo,
     getCardToFocus,
@@ -62,8 +62,7 @@ class Card extends React.Component {
         listenForCardFocus(this.onCardFocus_);
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.stopEditing_,
-        );
+            this.stopEditing_);
         if (this.props.dragging) {
             quip.apps.addDetachedNode(ReactDOM.findDOMNode(this));
         }
@@ -75,8 +74,7 @@ class Card extends React.Component {
         unlistenForCardFocus(this.onCardFocus_);
         quip.apps.removeEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.stopEditing_,
-        );
+            this.stopEditing_);
         if (this.props.dragging) {
             quip.apps.removeDetachedNode(ReactDOM.findDOMNode(this));
         }
@@ -149,151 +147,123 @@ class Card extends React.Component {
             this.renderedWithHeight_ = true;
         }
 
-        return (
-            <Motion
-                style={style}
-                onRest={() => {
-                    this.props.onCardRest(entity.id());
-                }}
-            >
-                {({
-                    translateX,
-                    translateY,
-                    scale,
-                    draggingBoxShadowOpacity,
-                    zIndex,
-                }) => {
-                    let style = {
-                        width: kColumnWidth - kHorizontalMargin * 2,
-                        // Yosemite fix
-                        WebkitTransform: `translate3d(${translateX}px,
+        return <Motion
+            style={style}
+            onRest={() => {
+                this.props.onCardRest(entity.id());
+            }}>
+            {({
+                translateX,
+                translateY,
+                scale,
+                draggingBoxShadowOpacity,
+                zIndex,
+            }) => {
+                let style = {
+                    width: kColumnWidth - kHorizontalMargin * 2,
+                    // Yosemite fix
+                    WebkitTransform: `translate3d(${translateX}px,
                             ${translateY}px, 0) scale(${scale})`,
-                        transform: `translate3d(${translateX}px,
+                    transform: `translate3d(${translateX}px,
                         ${translateY}px, 0) scale(${scale})`,
-                        boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
-                        zIndex: zIndex,
-                    };
+                    boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
+                    zIndex: zIndex,
+                };
 
-                    if (!isHeader) {
-                        style.boxShadow += `, inset 0px 0px 0px 1px ${quip
-                            .elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
-                        style.backgroundColor = selected
-                            ? quip.apps.ui.ColorMap[entityColor].VALUE
-                            : quip.apps.ui.ColorMap[entityColor].VALUE_LIGHT;
-                    }
-                    var extraRichTextBoxProps = {};
-                    if (quip.apps.isApiVersionAtLeast("0.1.039")) {
-                        extraRichTextBoxProps.allowedInlineStyles = [
-                            quip.apps.RichTextRecord.InlineStyle.ITALIC,
-                            quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
-                            quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
-                            quip.apps.RichTextRecord.InlineStyle.CODE,
-                        ];
-                    }
+                if (!isHeader) {
+                    style.boxShadow += `, inset 0px 0px 0px 1px ${
+                        quip.elements.ui.ColorMap[entityColor].VALUE_STROKE
+                    }`;
+                    style.backgroundColor = selected
+                        ? quip.apps.ui.ColorMap[entityColor].VALUE
+                        : quip.apps.ui.ColorMap[entityColor].VALUE_LIGHT;
+                }
+                var extraRichTextBoxProps = {};
+                if (quip.apps.isApiVersionAtLeast("0.1.039")) {
+                    extraRichTextBoxProps.allowedInlineStyles = [
+                        quip.apps.RichTextRecord.InlineStyle.ITALIC,
+                        quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
+                        quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
+                        quip.apps.RichTextRecord.InlineStyle.CODE,
+                    ];
+                }
 
-                    return (
-                        <div
-                            ref={node => (entity.domNode = node)}
-                            className={cx(styles.card, {
-                                [styles.header]: isHeader,
-                                [styles.selected]: selected,
-                                [styles.isFocused]: focused,
-                                [styles.dragging]: dragging,
-                            })}
-                            style={style}
-                            onMouseEnter={this.onMouseEnter_}
-                            onMouseLeave={this.onMouseLeave_}
-                        >
-                            <div className={styles.titleRow}>
-                                {isHeader && (
-                                    <div
-                                        ref={n => (this.commentWrapper = n)}
-                                        style={{
-                                            visibility: isMobile
-                                                ? "hidden"
-                                                : "",
-                                        }}
-                                        className={cx(
-                                            "quip-color-text-secondary",
-                                            styles.draggable,
-                                            styles.draggableHeader,
-                                        )}
-                                        onMouseDown={
-                                            isMobile ? null : this.onMouseDown_
-                                        }
-                                    >
-                                        <Grabber />
-                                    </div>
-                                )}
-                                <div className={styles.remoteEditor}>
-                                    <quip.apps.ui.RichTextBox
-                                        allowedStyles={[
-                                            quip.apps.RichTextRecord.Style
-                                                .TEXT_PLAIN,
-                                        ]}
-                                        color={richTextBoxColor}
-                                        scrollable={true}
-                                        width="100%"
-                                        onComponentHeightChanged={
-                                            this.onEditorHeightChanged_
-                                        }
-                                        entity={entity}
-                                        readOnly={readOnly}
-                                        disableSelection={readOnly}
-                                        onFocus={this.onEditorFocus}
-                                        onBlur={this.stopEditing_}
-                                        useDocumentTheme={false}
-                                        handleKeyEvent={this.handleKeyEvent_}
-                                        {...extraRichTextBoxProps}
-                                    />
-                                </div>
-                                <div
-                                    className={styles.chevron}
-                                    onClick={this.onClickChevron_}
-                                >
-                                    <Chevron
-                                        color={
-                                            richTextBoxColor &&
-                                            quip.apps.ui.ColorMap[
-                                                richTextBoxColor
-                                            ].VALUE
-                                        }
-                                    />
-                                </div>
-                            </div>
-                            {!isHeader && (
-                                <div
-                                    ref={n => (this.commentWrapper = n)}
-                                    className={cx(styles.commentWrapper, {
-                                        [styles.draggable]: !isMobile,
-                                    })}
-                                    onMouseDown={
-                                        isMobile ? null : this.onMouseDown_
-                                    }
-                                >
-                                    <div
-                                        className={cx(
-                                            styles.realCommentWrapper,
-                                            {
-                                                [styles.realCommentWrapperHide]: !showComments,
-                                            },
-                                        )}
-                                    >
-                                        <quip.apps.ui.CommentsTrigger
-                                            className={styles.commentsTrigger}
-                                            color={entityColor}
-                                            invertColor={selected}
-                                            entity={entity}
-                                            showEmpty={true}
-                                        />
-                                    </div>
-                                </div>
-                            )}
+                return <div
+                    ref={node => (entity.domNode = node)}
+                    className={cx(styles.card, {
+                        [styles.header]: isHeader,
+                        [styles.selected]: selected,
+                        [styles.isFocused]: focused,
+                        [styles.dragging]: dragging,
+                    })}
+                    style={style}
+                    onMouseEnter={this.onMouseEnter_}
+                    onMouseLeave={this.onMouseLeave_}>
+                    <div className={styles.titleRow}>
+                        {isHeader && <div
+                            ref={n => (this.commentWrapper = n)}
+                            style={{
+                                visibility: isMobile ? "hidden" : "",
+                            }}
+                            className={cx(
+                                "quip-color-text-secondary",
+                                styles.draggable,
+                                styles.draggableHeader)}
+                            onMouseDown={isMobile ? null : this.onMouseDown_}>
+                            <Grabber/>
+                        </div>}
+                        <div className={styles.remoteEditor}>
+                            <quip.apps.ui.RichTextBox
+                                allowedStyles={[
+                                    quip.apps.RichTextRecord.Style.TEXT_PLAIN,
+                                ]}
+                                color={richTextBoxColor}
+                                scrollable={true}
+                                width="100%"
+                                onComponentHeightChanged={
+                                    this.onEditorHeightChanged_
+                                }
+                                entity={entity}
+                                readOnly={readOnly}
+                                disableSelection={readOnly}
+                                onFocus={this.onEditorFocus}
+                                onBlur={this.stopEditing_}
+                                useDocumentTheme={false}
+                                handleKeyEvent={this.handleKeyEvent_}
+                                {...extraRichTextBoxProps}/>
                         </div>
-                    );
-                }}
-            </Motion>
-        );
+                        <div
+                            className={styles.chevron}
+                            onClick={this.onClickChevron_}>
+                            <Chevron
+                                color={
+                                    richTextBoxColor &&
+                                    quip.apps.ui.ColorMap[richTextBoxColor]
+                                        .VALUE
+                                }/>
+                        </div>
+                    </div>
+                    {!isHeader && <div
+                        ref={n => (this.commentWrapper = n)}
+                        className={cx(styles.commentWrapper, {
+                            [styles.draggable]: !isMobile,
+                        })}
+                        onMouseDown={isMobile ? null : this.onMouseDown_}>
+                        <div
+                            className={cx(styles.realCommentWrapper, {
+                                [styles.realCommentWrapperHide]: !showComments,
+                            })}>
+                            <quip.apps.ui.CommentsTrigger
+                                className={styles.commentsTrigger}
+                                color={entityColor}
+                                invertColor={selected}
+                                entity={entity}
+                                showEmpty={true}/>
+                        </div>
+                    </div>}
+                </div>;
+            }}
+        </Motion>;
     }
 
     onEditorFocus = () => {
@@ -315,8 +285,8 @@ class Card extends React.Component {
         this.props.onMouseDown(e, this.props.entity);
     };
 
-    onMouseEnter_ = () => this.setState({ commentHover: true });
-    onMouseLeave_ = () => this.setState({ commentHover: false });
+    onMouseEnter_ = () => this.setState({commentHover: true});
+    onMouseLeave_ = () => this.setState({commentHover: false});
 
     onCardFocus_ = () => {
         const cardToFocus = getCardToFocus();
@@ -327,14 +297,13 @@ class Card extends React.Component {
 
     onEditorHeightChanged_ = height => {
         this.props.entity.setHeight(
-            height + kPaddingBetweenCards + this.commentWrapper.clientHeight,
-        );
+            height + kPaddingBetweenCards + this.commentWrapper.clientHeight);
         this.props.onHeightChanged();
     };
 
     startEditing_ = () => {
         if (!this.state.editing) {
-            this.setState({ editing: true }, () => this.props.entity.focus());
+            this.setState({editing: true}, () => this.props.entity.focus());
         }
     };
 
@@ -342,7 +311,7 @@ class Card extends React.Component {
         if (this.props.entity.isDeleted()) {
             return;
         }
-        this.setState({ editing: false });
+        this.setState({editing: false});
     };
 }
 export default entityListener(Card);

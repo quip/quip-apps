@@ -4,15 +4,15 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 
 import Chevron from "quip-apps-chevron";
 
 import Styles from "./EventDropdown.less";
-import { setMenuOpenRecord } from "../actions";
-import { EventRecord } from "../model";
+import {setMenuOpenRecord} from "../actions";
+import {EventRecord} from "../model";
 
-import { showEventContextMenu } from "../menus";
+import {showEventContextMenu} from "../menus";
 
 type Props = {
     color: string,
@@ -24,7 +24,7 @@ type Props = {
 
 class EventDropdown extends React.Component<Props, null> {
     handleMouseDown = e => {
-        const { eventRecord, isMenuOpen, setMenuOpenRecord } = this.props;
+        const {eventRecord, isMenuOpen, setMenuOpenRecord} = this.props;
         if (isMenuOpen) {
             return;
         }
@@ -37,18 +37,12 @@ class EventDropdown extends React.Component<Props, null> {
     };
 
     render() {
-        const { color, style } = this.props;
-        return (
-            <div
-                className={Styles.container}
-                onMouseDown={this.handleMouseDown}
-            >
-                <Chevron
-                    color={quip.apps.ui.ColorMap[color].VALUE}
-                    style={style}
-                />
-            </div>
-        );
+        const {color, style} = this.props;
+        return <div
+            className={Styles.container}
+            onMouseDown={this.handleMouseDown}>
+            <Chevron color={quip.apps.ui.ColorMap[color].VALUE} style={style}/>
+        </div>;
     }
 }
 

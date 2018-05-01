@@ -1,15 +1,15 @@
 import cx from "classnames";
-import React, { Component } from "react";
-import { toJSONPropTypeShape } from "./model.js";
-import { Motion } from "react-motion";
+import React, {Component} from "react";
+import {toJSONPropTypeShape} from "./model.js";
+import {Motion} from "react-motion";
 import isEqual from "lodash.isequal";
 import Card from "./Card";
-import { animateTo } from "./lib/animation";
+import {animateTo} from "./lib/animation";
 import ChevronDown from "./lib/components/icons/ChevronDown";
 import Grabber from "./lib/components/icons/Grabber";
-import { hashCode } from "./utils.js"
+import {hashCode} from "./utils.js";
 
-const { RichTextBox } = quip.apps.ui;
+const {RichTextBox} = quip.apps.ui;
 
 import styles from "./Column.less";
 
@@ -60,7 +60,7 @@ class Column extends Component {
             dragStartX: 0,
             dragCurrentX: 0,
             dragAnchorX: 0,
-            columnDropWidths: { prev: null, next: null },
+            columnDropWidths: {prev: null, next: null},
             columnDragMoved: 0,
             columnDropOffset: 0,
             columnDragOffset: 0,
@@ -79,9 +79,9 @@ class Column extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { index } = this.props;
-        const { index: nextIndex } = nextProps;
-        const { columnDragMoved, isDraggingColumn } = this.state;
+        const {index} = this.props;
+        const {index: nextIndex} = nextProps;
+        const {columnDragMoved, isDraggingColumn} = this.state;
 
         if (index !== nextIndex && isDraggingColumn) {
             const indexDiff = nextIndex - index;
@@ -97,8 +97,8 @@ class Column extends Component {
                 action: "column_drag",
             });
         }
-        const { column, columnDragInProgress } = this.props;
-        const { left } = this.columnDomMap_[column.id].getBoundingClientRect();
+        const {column, columnDragInProgress} = this.props;
+        const {left} = this.columnDomMap_[column.id].getBoundingClientRect();
         columnDragInProgress(true);
         this.setState({
             isDraggingColumn: true,
@@ -107,14 +107,14 @@ class Column extends Component {
             dragCurrentX: e.clientX,
         });
 
-        this.setColumnBounds(this.props, { moved: 0 });
+        this.setColumnBounds(this.props, {moved: 0});
     };
 
     columnDraggingDrop_ = () => {
-        const { isDraggingColumn } = this.state;
+        const {isDraggingColumn} = this.state;
         if (!isDraggingColumn) return;
 
-        const { index, column, columnDragInProgress } = this.props;
+        const {index, column, columnDragInProgress} = this.props;
         columnDragInProgress(false);
         this.props.onColumnDrop(column.id, index);
         this.setState({
@@ -122,15 +122,15 @@ class Column extends Component {
             dragStartX: 0,
             dragAnchorX: 0,
             dragCurrentX: 0,
-            columnDropWidths: { prev: null, next: null },
+            columnDropWidths: {prev: null, next: null},
             columnDragMoved: 0,
             columnDropOffset: 0,
             columnDragOffset: 0,
         });
     };
 
-    setColumnBounds = (props, { moved }) => {
-        const { widths, columns, index } = props;
+    setColumnBounds = (props, {moved}) => {
+        const {widths, columns, index} = props;
 
         const records = columns.data;
 
@@ -158,8 +158,7 @@ class Column extends Component {
         if (moved < 0) {
             // And cols that have been moved after the dragging index
             dragOffset = sum(
-                records.slice(index + 1, index + 1 + Math.abs(moved)),
-            );
+                records.slice(index + 1, index + 1 + Math.abs(moved)));
         } else if (moved > 0) {
             // cols that have been moved before the dragging index
             dragOffset =
@@ -175,7 +174,7 @@ class Column extends Component {
     };
 
     columnDrag_ = e => {
-        const { clientX } = e;
+        const {clientX} = e;
         const {
             isDraggingColumn,
             columnDropWidths,
@@ -209,8 +208,7 @@ class Column extends Component {
             if (Math.abs(movement) > drop) {
                 this.moveColumn(
                     this.props.column,
-                    updateIndex(this.props.index),
-                );
+                    updateIndex(this.props.index));
             }
         }
     };
@@ -243,12 +241,12 @@ class Column extends Component {
         const x =
             dragCurrentX - dragStartX + columnLeftOffset + columnDragOffset;
 
-        return { x: disableAnimate ? x : animateTo(x) };
+        return {x: disableAnimate ? x : animateTo(x)};
     };
 
     onMouseMove_ = e => {
-        const { isDraggingColumn } = this.state;
-        const { column, resizing } = this.props;
+        const {isDraggingColumn} = this.state;
+        const {column, resizing} = this.props;
         if (isDraggingColumn) {
             // Disable default behaviors like text selection
             e.preventDefault();
@@ -259,7 +257,7 @@ class Column extends Component {
     };
 
     showContextMenu = e => {
-        const { column, index } = this.props;
+        const {column, index} = this.props;
         const commands = ["addColumn", "deleteColumn"];
         const context = {
             deleteColumn: () => this.props.onColumnDelete(column.id),
@@ -273,8 +271,7 @@ class Column extends Component {
             [],
             [],
             () => {},
-            context,
-        );
+            context);
     };
 
     handleHeaderInputKey = e => {
@@ -285,17 +282,15 @@ class Column extends Component {
     };
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (
-            !isEqual(nextProps, this.props) ||
+        if (!isEqual(nextProps, this.props) ||
             !isEqual(nextState, this.state) ||
-            nextProps.resizing
-        )
+            nextProps.resizing)
             return true;
         return false;
     }
 
     onCardFocused_ = isFocused => {
-        this.setState({ cardFocused: isFocused });
+        this.setState({cardFocused: isFocused});
     };
 
     onColumnTitleFocus_ = () => {
@@ -304,8 +299,9 @@ class Column extends Component {
         // Trim is used here so we can detect emptiness and effectively use
         // getPlaceholderText in onColumnTitleBlur_.
         this.setState({
-            titleBeforeFocus:
-                this.props.column.contents.getTextContent().trim(),
+            titleBeforeFocus: this.props.column.contents
+                .getTextContent()
+                .trim(),
             titleFocused: true,
         });
     };
@@ -357,175 +353,130 @@ class Column extends Component {
             !resizing &&
             (titleHovered || titleFocused);
         const titleDraggable = !column.titleEditable && column.draggable;
-        return (
-            <Motion style={motionStyle}>
-                {({ x }) => {
-                    const translateStr = `translate(${x}px, 0px)`;
-                    return (
+        return <Motion style={motionStyle}>
+            {({x}) => {
+                const translateStr = `translate(${x}px, 0px)`;
+                return <div
+                    key={column.id}
+                    ref={el => (this.columnDomMap_[column.id] = el)}
+                    className={styles.columnWrapper}
+                    style={Object.assign({
+                        width,
+                        zIndex: isDraggingColumn || cardFocused ? 99 : index,
+                        transform: translateStr,
+                        // Yosemite fix
+                        WebkitTransform: translateStr,
+                    })}>
+                    <div className={styles.columnHeader}>
+                        {!column.draggable &&
+                            this.props.globalError && <div>
+                                {this.props.globalError}
+                            </div>}
+                        {column.draggable &&
+                            !quip.apps.isMobile() && <div
+                                onMouseDown={this.columnDraggingStart_}
+                                onMouseUp={this.columnDraggingDrop_}
+                                className={styles.dragHandle}>
+                                {!quip.apps.isMobile() && <Grabber/>}
+                            </div>}
                         <div
-                            key={column.id}
-                            ref={el => (this.columnDomMap_[column.id] = el)}
-                            className={styles.columnWrapper}
-                            style={Object.assign({
-                                width,
-                                zIndex:
-                                    isDraggingColumn || cardFocused
-                                        ? 99
-                                        : index,
-                                transform: translateStr,
-                                // Yosemite fix
-                                WebkitTransform: translateStr,
+                            className={cx(styles.columnTitle, {
+                                [styles.columnTitleEdit]: titleEdit,
+                                [styles.columnTitleDrag]: titleDraggable,
                             })}
-                        >
-                            <div className={styles.columnHeader}>
-                                {!column.draggable &&
-                                    this.props.globalError && (
-                                        <div>{this.props.globalError}</div>
-                                    )}
-                                {column.draggable &&
-                                    !quip.apps.isMobile() && (
-                                        <div
-                                            onMouseDown={
-                                                this.columnDraggingStart_
-                                            }
-                                            onMouseUp={this.columnDraggingDrop_}
-                                            className={styles.dragHandle}
-                                        >
-                                            {!quip.apps.isMobile() && (
-                                                <Grabber />
-                                            )}
-                                        </div>
-                                    )}
-                                <div
-                                    className={cx(styles.columnTitle, {
-                                        [styles.columnTitleEdit]: titleEdit,
-                                        [styles.columnTitleDrag]: titleDraggable,
-                                    })}
-                                    onMouseEnter={
-                                        columnDraggingInProgress
-                                            ? undefined
-                                            : () =>
-                                                  this.setState({
-                                                      titleHovered: true,
-                                                  })
-                                    }
-                                    onMouseLeave={() =>
-                                        this.setState({
-                                            titleHovered: false,
-                                        })
-                                    }
-                                    onMouseDown={
-                                        titleDraggable
-                                            ? this.columnDraggingStart_
-                                            : undefined
-                                    }
-                                    onMouseUp={
-                                        titleDraggable
-                                            ? this.columnDraggingDrop_
-                                            : undefined
-                                    }
-                                >
-                                    <RichTextBox
-                                        width="100%"
-                                        scrollable={false}
-                                        maxHeight={18}
-                                        record={column.contents}
-                                        handleKeyEvent={
-                                            this.handleHeaderInputKey
-                                        }
-                                        readOnly={
-                                            !column.titleEditable ||
-                                            columnDraggingInProgress
-                                        }
-                                        disableSelection={
-                                            columnDraggingInProgress
-                                        }
-                                        onFocus={this.onColumnTitleFocus_}
-                                        onBlur={this.onColumnTitleBlur_}
-                                        useDocumentTheme={false}
-                                    />
-                                </div>
-                                {column.deletable && !quip.apps.isMobile() && (
-                                    <div
-                                        className={styles.dropdown}
-                                        onClick={this.showContextMenu}
-                                    >
-                                        <ChevronDown />
-                                    </div>
-                                )}
-                                {!isDraggingColumn &&
-                                    !quip.apps.isMobile() && (
-                                        <div
-                                            onMouseDown={e =>
-                                                this.props.onResizeColumnStart(
-                                                    e,
-                                                    column,
-                                                )
-                                            }
-                                            onMouseUp={
-                                                this.props.onResizeColumnEnd
-                                            }
-                                            className={styles.resizeHandle}
-                                        />
-                                    )}
-                            </div>
-                            {rows.data.map((row, i) => {
-                                if (i === this.props.rowDraggingIndex) {
-                                    return (
-                                        <div
-                                            key={row.id}
-                                            style={{
-                                                position: "absolute",
-                                                width: "100%",
-                                            }}
-                                        />
-                                    );
+                            onMouseEnter={
+                                columnDraggingInProgress
+                                    ? undefined
+                                    : () =>
+                                          this.setState({
+                                              titleHovered: true,
+                                          })
+                            }
+                            onMouseLeave={() =>
+                                this.setState({
+                                    titleHovered: false,
+                                })
+                            }
+                            onMouseDown={
+                                titleDraggable
+                                    ? this.columnDraggingStart_
+                                    : undefined
+                            }
+                            onMouseUp={
+                                titleDraggable
+                                    ? this.columnDraggingDrop_
+                                    : undefined
+                            }>
+                            <RichTextBox
+                                width="100%"
+                                scrollable={false}
+                                maxHeight={18}
+                                record={column.contents}
+                                handleKeyEvent={this.handleHeaderInputKey}
+                                readOnly={
+                                    !column.titleEditable ||
+                                    columnDraggingInProgress
                                 }
-                                const isFirstRow = i === 0;
-                                const isLastRow = i === rows.data.length - 1;
-                                return (
-                                    <Card
-                                        key={hashCode(row.id)}
-                                        rowIndex={i}
-                                        width={width}
-                                        rootHeight={rootHeight}
-                                        heights={heights}
-                                        setRowHeight={this.props.setRowHeight}
-                                        row={row}
-                                        column={column}
-                                        rows={rows}
-                                        isFirstRow={isFirstRow}
-                                        isLastRow={isLastRow}
-                                        isFirstColumn={isFirstColumn}
-                                        isLastColumn={isLastColumn}
-                                        isDraggingColumn={isDraggingColumn}
-                                        onRowDrag={onRowDrag}
-                                        onRowDelete={onRowDelete}
-                                        onCardFocused={this.onCardFocused_}
-                                        type={column.type}
-                                        columnDraggingInProgress={
-                                            columnDraggingInProgress
-                                        }
-                                        rowDraggingInProgress={
-                                            rowDraggingInProgress
-                                        }
-                                        rowDraggingIndex={
-                                            this.props.rowDraggingIndex
-                                        }
-                                        customRenderer={
-                                            this.props.customRenderer
-                                        }
-                                        onCardClicked={this.props.onCardClicked}
-                                        onContextMenu={this.props.onContextMenu}
-                                        metricType={this.props.metricType}
-                                    />
-                                );
-                            })}
+                                disableSelection={columnDraggingInProgress}
+                                onFocus={this.onColumnTitleFocus_}
+                                onBlur={this.onColumnTitleBlur_}
+                                useDocumentTheme={false}/>
                         </div>
-                    );
-                }}
-            </Motion>
-        );
+                        {column.deletable &&
+                            !quip.apps.isMobile() && <div
+                                className={styles.dropdown}
+                                onClick={this.showContextMenu}>
+                                <ChevronDown/>
+                            </div>}
+                        {!isDraggingColumn &&
+                            !quip.apps.isMobile() && <div
+                                onMouseDown={e =>
+                                    this.props.onResizeColumnStart(e, column)
+                                }
+                                onMouseUp={this.props.onResizeColumnEnd}
+                                className={styles.resizeHandle}/>}
+                    </div>
+                    {rows.data.map((row, i) => {
+                        if (i === this.props.rowDraggingIndex) {
+                            return <div
+                                key={row.id}
+                                style={{
+                                    position: "absolute",
+                                    width: "100%",
+                                }}/>;
+                        }
+                        const isFirstRow = i === 0;
+                        const isLastRow = i === rows.data.length - 1;
+                        return <Card
+                            key={hashCode(row.id)}
+                            rowIndex={i}
+                            width={width}
+                            rootHeight={rootHeight}
+                            heights={heights}
+                            setRowHeight={this.props.setRowHeight}
+                            row={row}
+                            column={column}
+                            rows={rows}
+                            isFirstRow={isFirstRow}
+                            isLastRow={isLastRow}
+                            isFirstColumn={isFirstColumn}
+                            isLastColumn={isLastColumn}
+                            isDraggingColumn={isDraggingColumn}
+                            onRowDrag={onRowDrag}
+                            onRowDelete={onRowDelete}
+                            onCardFocused={this.onCardFocused_}
+                            type={column.type}
+                            columnDraggingInProgress={columnDraggingInProgress}
+                            rowDraggingInProgress={rowDraggingInProgress}
+                            rowDraggingIndex={this.props.rowDraggingIndex}
+                            customRenderer={this.props.customRenderer}
+                            onCardClicked={this.props.onCardClicked}
+                            onContextMenu={this.props.onContextMenu}
+                            metricType={this.props.metricType}/>;
+                    })}
+                </div>;
+            }}
+        </Motion>;
     }
 }
 

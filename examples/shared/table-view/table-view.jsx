@@ -1,8 +1,8 @@
 // Copyright 2017 Quip
 
-import { toJSONPropTypeShape } from "./model.js";
+import {toJSONPropTypeShape} from "./model.js";
 import Columns from "./Columns";
-import { hashCode } from "./utils.js";
+import {hashCode} from "./utils.js";
 import styles from "./table-view.less";
 import VirtualMove from "./lib/VirtualMove";
 
@@ -62,41 +62,35 @@ export class TableView extends React.Component {
             acc[rowId] = getRowHeight(heights[rowId]);
             return acc;
         }, {});
-        return (
-            <div
-                id="root-el"
-                style={{ width, height }}
-                className={styles.wrapper}
-            >
-                <VirtualMove items={rows.data}>
-                    {({ items, moveItem }) => (
-                        <Columns
-                            moveRow={moveItem}
-                            rows={{ id: hashCode(rows.id), data: items }}
-                            columns={columns}
-                            widths={widths}
-                            heights={rowHeights}
-                            rootHeight={height}
-                            headerHeight={HEADER_HEIGHT}
-                            setWidths={this.props.setWidths}
-                            getMinWidth={this.props.getMinWidth}
-                            setRowHeight={this.props.setRowHeight}
-                            onRowDrop={this.props.onRowDrop}
-                            onRowDelete={this.props.onRowDelete}
-                            onColumnDrop={this.props.onColumnDrop}
-                            onColumnAdd={this.props.onColumnAdd}
-                            onColumnDelete={this.props.onColumnDelete}
-                            onResizeEnd={this.props.onResizeEnd}
-                            customRenderer={this.props.customRenderer}
-                            onCardClicked={this.props.onCardClicked}
-                            onContextMenu={this.props.onContextMenu}
-                            globalError={this.props.globalError}
-                            errorStatus={this.props.errorStatus}
-                            metricType={this.props.metricType}
-                        />
-                    )}
-                </VirtualMove>
-            </div>
-        );
+        return <div
+            id="root-el"
+            style={{width, height}}
+            className={styles.wrapper}>
+            <VirtualMove items={rows.data}>
+                {({items, moveItem}) => <Columns
+                    moveRow={moveItem}
+                    rows={{id: hashCode(rows.id), data: items}}
+                    columns={columns}
+                    widths={widths}
+                    heights={rowHeights}
+                    rootHeight={height}
+                    headerHeight={HEADER_HEIGHT}
+                    setWidths={this.props.setWidths}
+                    getMinWidth={this.props.getMinWidth}
+                    setRowHeight={this.props.setRowHeight}
+                    onRowDrop={this.props.onRowDrop}
+                    onRowDelete={this.props.onRowDelete}
+                    onColumnDrop={this.props.onColumnDrop}
+                    onColumnAdd={this.props.onColumnAdd}
+                    onColumnDelete={this.props.onColumnDelete}
+                    onResizeEnd={this.props.onResizeEnd}
+                    customRenderer={this.props.customRenderer}
+                    onCardClicked={this.props.onCardClicked}
+                    onContextMenu={this.props.onContextMenu}
+                    globalError={this.props.globalError}
+                    errorStatus={this.props.errorStatus}
+                    metricType={this.props.metricType}/>}
+            </VirtualMove>
+        </div>;
     }
 }

@@ -8,18 +8,16 @@ const makeKeys = time => {
 
 export default ms => {
     if (isNaN(ms) || ms < 0)
-        return { days: "00", hours: "00", minutes: "00", seconds: "00" };
+        return {days: "00", hours: "00", minutes: "00", seconds: "00"};
 
     const msInDay = 86400000;
     const days = `${Math.floor(ms / msInDay)}`;
     const hours = `${Math.floor((ms % msInDay) / (60 * 60 * 1000))}`;
     const minutes = `${Math.floor(
-        ((ms % msInDay) % (60 * 60 * 1000)) / (60 * 1000),
-    )}`;
+        ((ms % msInDay) % (60 * 60 * 1000)) / (60 * 1000))}`;
     const seconds = `${Math.floor(
-        (((ms % msInDay) % (60 * 60 * 1000)) % (60 * 1000)) / 1000,
-    )}`;
-    const obj = makeKeys({ days, hours, minutes, seconds });
+        (((ms % msInDay) % (60 * 60 * 1000)) % (60 * 1000)) / 1000)}`;
+    const obj = makeKeys({days, hours, minutes, seconds});
 
     Object.keys(obj).forEach(key => {
         if (obj[key].length === 1) obj[key] = "0" + obj[key];

@@ -10,8 +10,7 @@ import Step from "./Step.jsx";
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord)
-            .isRequired,
+        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
         steps: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
         color: React.PropTypes.string.isRequired,
         selected: React.PropTypes.string,
@@ -22,7 +21,7 @@ export default class App extends React.Component {
     };
 
     deleteStep = record => {
-        const { steps, selected } = this.props;
+        const {steps, selected} = this.props;
         const next = record.getPreviousSibling() || record.getNextSibling();
         const isSelected = record.getId() === selected;
 
@@ -36,23 +35,18 @@ export default class App extends React.Component {
     };
 
     render() {
-        const { steps, selected, color } = this.props;
+        const {steps, selected, color} = this.props;
 
-        return (
-            <div tabIndex="0" className={Styles.container}>
-                {steps
-                    .getRecords()
-                    .map(step => (
-                        <Step
-                            color={color}
-                            selected={selected === step.getId()}
-                            key={step.getId()}
-                            record={step}
-                            onSelected={this.setSelected}
-                            onDelete={this.deleteStep}
-                        />
-                    ))}
-            </div>
-        );
+        return <div tabIndex="0" className={Styles.container}>
+            {steps
+                .getRecords()
+                .map(step => <Step
+                    color={color}
+                    selected={selected === step.getId()}
+                    key={step.getId()}
+                    record={step}
+                    onSelected={this.setSelected}
+                    onDelete={this.deleteStep}/>)}
+        </div>;
     }
 }

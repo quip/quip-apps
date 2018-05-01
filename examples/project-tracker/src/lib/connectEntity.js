@@ -1,5 +1,8 @@
 // TODO: replace isV2 parameter with record.getDataVersion() === 2 once that works
-export default (record, WrappedComponent, { isV2 = false, mapStateToProps = () => {} } = {}) => {
+export default (
+    record,
+    WrappedComponent,
+    {isV2 = false, mapStateToProps = () => {}} = {}) => {
     class RecordComponent extends React.Component {
         constructor(props) {
             super(props);
@@ -7,15 +10,20 @@ export default (record, WrappedComponent, { isV2 = false, mapStateToProps = () =
             this.state = Object.assign(
                 {},
                 record.getData(),
-                !isV2 && { childEntities: record.getChildren() }
-            );
+                !isV2 && {childEntities: record.getChildren()});
         }
 
         componentDidMount() {
-            this._recordListener = record.listen(() => this.setState(record.getData()));
+            this._recordListener = record.listen(() =>
+                this.setState(record.getData())
+            );
 
             if (!isV2) {
-                this._childrenListener = record.getChildrenIndex().listen(() => this.setState({ childEntities: record.getChildren() }));
+                this._childrenListener = record
+                    .getChildrenIndex()
+                    .listen(() =>
+                        this.setState({childEntities: record.getChildren()})
+                    );
             }
         }
 
@@ -30,14 +38,11 @@ export default (record, WrappedComponent, { isV2 = false, mapStateToProps = () =
         }
 
         render() {
-            return (
-                <WrappedComponent
-                    {...this.props}
-                    {...this.state}
-                    {...mapStateToProps(this.state)}
-                    {...({ [isV2 ? "record" : "entity"]: record })}
-                />
-            );
+            return <WrappedComponent
+                {...this.props}
+                {...this.state}
+                {...mapStateToProps(this.state)}
+                {...{[isV2 ? "record" : "entity"]: record}}/>;
         }
     }
 

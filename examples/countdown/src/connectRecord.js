@@ -22,13 +22,10 @@ export default (rootRecord, WrappedComponent) => {
         }
 
         render() {
-            return (
-                <WrappedComponent
-                    {...this.props}
-                    {...this.state}
-                    {...{ rootRecord }}
-                />
-            );
+            return <WrappedComponent
+                {...this.props}
+                {...this.state}
+                {...{rootRecord}}/>;
         }
     }
 

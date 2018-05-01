@@ -3,7 +3,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import quip from "quip";
-import { localizedColorLabel } from "quip-apps-compat"
+import {localizedColorLabel} from "quip-apps-compat";
 
 import Connect from "./connectRecord";
 import registerModels from "./model";
@@ -22,7 +22,7 @@ const colors = [
 ];
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, { isCreation }) {
+    initializationCallback: function(rootNode, {isCreation}) {
         const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
@@ -32,12 +32,11 @@ quip.apps.initialize({
             // objects in rootRecord
             rootRecord.set(
                 "color",
-                rootRecord.constructor.getDefaultProperties().color,
-            );
+                rootRecord.constructor.getDefaultProperties().color);
         }
 
         const ConnectedApp = Connect(rootRecord, App);
-        ReactDOM.render(<ConnectedApp />, rootNode, () => {
+        ReactDOM.render(<ConnectedApp/>, rootNode, () => {
             isCreation &&
                 rootRecord
                     .get("options")
@@ -49,10 +48,7 @@ quip.apps.initialize({
     menuCommands: [
         {
             id: quip.apps.DocumentMenuCommands.MENU_MAIN,
-            subCommands: [
-                "allowMultiple",
-                "allowSingle",
-            ],
+            subCommands: ["allowMultiple", "allowSingle"],
         },
         {
             id: "addOption",
@@ -106,6 +102,8 @@ quip.apps.initialize({
         })),
     ],
     toolbarCommandIds: [
-        quip.apps.DocumentMenuCommands.MENU_MAIN, "settings", "addOption"
+        quip.apps.DocumentMenuCommands.MENU_MAIN,
+        "settings",
+        "addOption",
     ],
 });

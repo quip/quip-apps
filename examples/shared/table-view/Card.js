@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Motion } from "react-motion";
+import React, {Component} from "react";
+import {Motion} from "react-motion";
 import cx from "classnames";
 import {
     toJSONPropTypeShape,
@@ -9,9 +9,9 @@ import {
 } from "../../shared/table-view/model.js";
 import ChevronDown from "./lib/components/icons/ChevronDown";
 import Grabber from "./lib/components/icons/Grabber";
-import { animateTo } from "./lib/animation";
+import {animateTo} from "./lib/animation";
 
-const { RichTextBox } = quip.apps.ui;
+const {RichTextBox} = quip.apps.ui;
 
 import styles from "./Card.less";
 
@@ -72,13 +72,13 @@ class Card extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { row, column } = nextProps;
+        const {row, column} = nextProps;
         this.cell = row[column.type].data.find(
             record => record.columnId === column.id);
     }
 
     moveCursorBetweenRows(direction) {
-        const { column, row, rows, onCardClicked } = this.props;
+        const {column, row, rows, onCardClicked} = this.props;
         const rowIndex = rows.data.findIndex(data => data.id === row.id);
         let moveTo;
         if (direction === "up") {
@@ -130,19 +130,14 @@ class Card extends Component {
             this.onCardFocused_,
             rowDraggingInProgress,
             columnDraggingInProgress,
-            this.props.metricType,
-        );
+            this.props.metricType);
     };
 
-    makePadding = (isFirstColumn) => {
+    makePadding = isFirstColumn => {
         if (isFirstColumn) {
-            return `${Y_PADDING}px ${CARD_HORIZONTAL_PADDING}px ${
-                Y_PADDING
-            }px 5px`;
+            return `${Y_PADDING}px ${CARD_HORIZONTAL_PADDING}px ${Y_PADDING}px 5px`;
         } else {
-            return `${Y_PADDING}px ${CARD_HORIZONTAL_PADDING}px ${
-                Y_PADDING
-            }px ${CARD_HORIZONTAL_PADDING}px`;
+            return `${Y_PADDING}px ${CARD_HORIZONTAL_PADDING}px ${Y_PADDING}px ${CARD_HORIZONTAL_PADDING}px`;
         }
     };
 
@@ -150,7 +145,7 @@ class Card extends Component {
         this.props.onRowDrag(e, this.props.row);
     };
 
-    onCardHovered_ = isHovered => this.setState({ cardHovered: isHovered });
+    onCardHovered_ = isHovered => this.setState({cardHovered: isHovered});
 
     calcStyle = () => {
         const {
@@ -166,12 +161,12 @@ class Card extends Component {
             (!rowDraggingInProgress && !columnDraggingInProgress);
         // No rows means the Card is being dragged by the row so we dont need
         // to calc the style
-        if (!rows) return { y: 0 };
+        if (!rows) return {y: 0};
 
         const rowsBefore = rows.data.slice(0, rowIndex);
         const y = rowsBefore.reduce((acc, row) => acc + heights[row.id], 0);
 
-        return { y: disableAnimate ? y : animateTo(y) };
+        return {y: disableAnimate ? y : animateTo(y)};
     };
 
     toggleRowMenu = (e, row) => {
@@ -198,8 +193,7 @@ class Card extends Component {
                 () => {
                     this.showRowMenu = false;
                 },
-                context,
-            );
+                context);
         } else {
             this.showRowMenu = false;
         }
@@ -228,8 +222,8 @@ class Card extends Component {
             isLastColumn,
             rowIndex,
         } = this.props;
-        const { cardHovered, cardFocused } = this.state;
-        const { cell } = this;
+        const {cardHovered, cardFocused} = this.state;
+        const {cell} = this;
 
         const rowHeight = heights[row.id];
 
@@ -248,104 +242,77 @@ class Card extends Component {
         };
 
         const cardComponent = this.makeCard(cell, cardHovered, isFirstColumn);
-        return (
-            <Motion style={this.calcStyle()}>
-                {({ y }) => {
-                    const translateStr =
-                        `translate(0px, ${y - 1 - rowIndex}px)`;
-                    const cardWrapStyle = {
-                        position: "absolute",
-                        width: width,
-                        transform: translateStr,
-                        // Yosemite fix
-                        WebkitTransform: translateStr,
-                        height:
-                            cardFocused && !quip.apps.isMobile()
-                                ? undefined
-                                : rowHeight,
-                        minHeight: cardFocused ? rowHeight : undefined,
-                        zIndex: cardFocused ? 100 : undefined,
-                    };
-                    const cardStyle = {
-                        position: "relative",
-                        height:
-                            cardFocused && !quip.apps.isMobile()
-                                ? undefined
-                                : rowHeight,
-                        minHeight: cardFocused ? rowHeight : undefined,
-                        width: isFirstColumn ? width : width + 1,
-                        left: isFirstColumn ? "0px" : "-1px",
-                        padding: this.makePadding(isFirstColumn),
-                    };
-                    return (
-                        <div
-                            style={cardWrapStyle}
-                            className={styles.wrapper}
-                            onClick={() =>
-                                this.props.onCardClicked &&
-                                this.props.onCardClicked(
-                                    cell.id,
-                                    this.props.column,
-                                )
-                            }
-                            onMouseEnter={() => this.onCardHovered_(true)}
-                            onMouseLeave={() => this.onCardHovered_(false)}
-                        >
-                            {DEBUG_ROW_ORDER &&
-                                isFirstColumn && (
-                                    <div className={styles.debugOrder}>
-                                        {rows && rows.data.findIndex(data =>
-                                            data.id === row.id)};
-                                    </div>
-                                )}
-                            <div
-                                style={cardStyle}
-                                className={cx(styles.card, {
-                                    [styles.cardFocused]: cardFocused,
-                                    [styles.cardClamped]:
-                                        !cardFocused && !quip.apps.isMobile(),
-                                    [styles.firstRow]: isFirstRow,
-                                    [styles.lastRow]: isLastRow,
-                                    [styles.firstColumn]: isFirstColumn,
-                                    [styles.lastColumn]: isLastColumn,
-                                })}
-                            >
-                                {isFirstColumn && (
-                                    <div
-                                        style={
-                                            cardFocused
-                                                ? grabberStyle
-                                                : undefined
-                                        }
-                                        className={styles.grabber}
-                                        onMouseDown={this.onMouseDown_}
-                                    >
-                                        {!quip.apps.isMobile() && <Grabber />}
-                                    </div>
-                                )}
-                                {cardComponent}
-                                {isFirstColumn && (
-                                    <div
-                                        key={row.id}
-                                        style={
-                                            cardFocused
-                                                ? rowChevronStyle
-                                                : undefined
-                                        }
-                                        className={styles.rowChevron}
-                                        onClick={e =>
-                                            this.toggleRowMenu(e, row)
-                                        }
-                                    >
-                                        <ChevronDown />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                }}
-            </Motion>
-        );
+        return <Motion style={this.calcStyle()}>
+            {({y}) => {
+                const translateStr = `translate(0px, ${y - 1 - rowIndex}px)`;
+                const cardWrapStyle = {
+                    position: "absolute",
+                    width: width,
+                    transform: translateStr,
+                    // Yosemite fix
+                    WebkitTransform: translateStr,
+                    height:
+                        cardFocused && !quip.apps.isMobile()
+                            ? undefined
+                            : rowHeight,
+                    minHeight: cardFocused ? rowHeight : undefined,
+                    zIndex: cardFocused ? 100 : undefined,
+                };
+                const cardStyle = {
+                    position: "relative",
+                    height:
+                        cardFocused && !quip.apps.isMobile()
+                            ? undefined
+                            : rowHeight,
+                    minHeight: cardFocused ? rowHeight : undefined,
+                    width: isFirstColumn ? width : width + 1,
+                    left: isFirstColumn ? "0px" : "-1px",
+                    padding: this.makePadding(isFirstColumn),
+                };
+                return <div
+                    style={cardWrapStyle}
+                    className={styles.wrapper}
+                    onClick={() =>
+                        this.props.onCardClicked &&
+                        this.props.onCardClicked(cell.id, this.props.column)
+                    }
+                    onMouseEnter={() => this.onCardHovered_(true)}
+                    onMouseLeave={() => this.onCardHovered_(false)}>
+                    {DEBUG_ROW_ORDER &&
+                        isFirstColumn && <div className={styles.debugOrder}>
+                            {rows &&
+                                rows.data.findIndex(
+                                    data => data.id === row.id)};
+                        </div>}
+                    <div
+                        style={cardStyle}
+                        className={cx(styles.card, {
+                            [styles.cardFocused]: cardFocused,
+                            [styles.cardClamped]:
+                                !cardFocused && !quip.apps.isMobile(),
+                            [styles.firstRow]: isFirstRow,
+                            [styles.lastRow]: isLastRow,
+                            [styles.firstColumn]: isFirstColumn,
+                            [styles.lastColumn]: isLastColumn,
+                        })}>
+                        {isFirstColumn && <div
+                            style={cardFocused ? grabberStyle : undefined}
+                            className={styles.grabber}
+                            onMouseDown={this.onMouseDown_}>
+                            {!quip.apps.isMobile() && <Grabber/>}
+                        </div>}
+                        {cardComponent}
+                        {isFirstColumn && <div
+                            key={row.id}
+                            style={cardFocused ? rowChevronStyle : undefined}
+                            className={styles.rowChevron}
+                            onClick={e => this.toggleRowMenu(e, row)}>
+                            <ChevronDown/>
+                        </div>}
+                    </div>
+                </div>;
+            }}
+        </Motion>;
     }
 }
 

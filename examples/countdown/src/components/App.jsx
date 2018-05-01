@@ -6,7 +6,7 @@ import moment from "moment";
 import "moment-timezone";
 import classNames from "classnames";
 
-import { updateToolbar } from "../root.jsx";
+import {updateToolbar} from "../root.jsx";
 import humanTime from "../humanTime";
 
 import Styles from "./App.less";
@@ -22,8 +22,7 @@ const INTERVAL_MS = 200;
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord)
-            .isRequired,
+        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
         deadline: React.PropTypes.number,
         color: React.PropTypes.string.isRequired,
         setRootInstance: React.PropTypes.func.isRequired,
@@ -51,7 +50,7 @@ export default class App extends React.Component {
         this.clearUpdateInterval();
 
         this.interval = window.setInterval(() => {
-            this.setState({ time: humanTime(deadline - Date.now()) });
+            this.setState({time: humanTime(deadline - Date.now())});
             if (Date.now() > deadline) {
                 console.log("we hit the future, clearing interval");
                 this.clearUpdateInterval();
@@ -60,39 +59,33 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        const { deadline } = this.props;
+        const {deadline} = this.props;
 
         this.setUpdateInterval(deadline);
 
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_FOCUS,
-            this.setElementFocus,
-        );
+            this.setElementFocus);
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.setElementFocus,
-        );
+            this.setElementFocus);
         window.addEventListener("keydown", this.onKeyDown);
     }
 
     componentWillUnmount() {
         quip.apps.removeEventListener(
             quip.apps.EventType.ELEMENT_FOCUS,
-            this.setElementFocus,
-        );
+            this.setElementFocus);
         quip.apps.removeEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.setElementFocus,
-        );
+            this.setElementFocus);
         window.removeEventListener("keydown", this.onKeyDown);
         this.clearUpdateInterval();
     }
 
     componentWillReceiveProps(nextProps) {
-        if (
-            (!this.props.deadline && nextProps.deadline) ||
-            !this.props.deadline !== nextProps.deadline
-        ) {
+        if ((!this.props.deadline && nextProps.deadline) ||
+            !this.props.deadline !== nextProps.deadline) {
             if (this.interval) clearInterval(this.interval);
             /*console.log(
                 "updating time",
@@ -104,8 +97,7 @@ export default class App extends React.Component {
                     this.setState({
                         time: humanTime(nextProps.deadline - Date.now()),
                     }),
-                200,
-            );
+                200);
         }
     }
 
@@ -119,7 +111,7 @@ export default class App extends React.Component {
         if (!quip.apps.isElementFocused()) {
             this.toggleCalendar(false);
         }
-        this.setState({ focused: quip.apps.isElementFocused() });
+        this.setState({focused: quip.apps.isElementFocused()});
     };
 
     toggleCalendar = show => {
@@ -133,13 +125,12 @@ export default class App extends React.Component {
                 } else {
                     quip.apps.removeDetachedNode(this.calendar);
                 }
-            },
-        );
+            });
     };
 
     setDeadline = ms => {
         //console.log("setDeadline", ms);
-        const { rootRecord } = this.props;
+        const {rootRecord} = this.props;
 
         rootRecord.set("deadline", ms);
         this.toggleCalendar(false);
@@ -151,14 +142,11 @@ export default class App extends React.Component {
     };
 
     timeBlock(time, i) {
-        return (
-            <TimeBlock
-                color={this.props.color}
-                key={i}
-                number={this.state.time[time]}
-                unit={time}
-            />
-        );
+        return <TimeBlock
+            color={this.props.color}
+            key={i}
+            number={this.state.time[time]}
+            unit={time}/>;
     }
 
     handleWrapperClick(e) {
@@ -167,48 +155,40 @@ export default class App extends React.Component {
     }
 
     render() {
-        const { deadline } = this.props;
+        const {deadline} = this.props;
         const deadlineDate = new Date(deadline);
         const times = Object.keys(this.state.time);
-        return (
-            <div
-                className={classNames(Styles.App, {
-                    [Styles.resting]: !quip.apps.isElementFocused(),
-                })}
-                onClick={() => this.toggleCalendar(false)}
-            >
-                <div className={Styles.timeBlocks}>
-                    {this.timeBlock(times[0], 0)}
-                    {this.timeBlock(times[1], 1)}
-                    {this.timeBlock(times[2], 2)}
-                    {this.timeBlock(times[3], 3)}
-                </div>
-
-                {this.state.showCalendar && (
-                    <div
-                        ref={el => (this.calendar = el)}
-                        className={Styles.calendarWrapper}
-                        style={{
-                            borderImageSource: `url(${require("./border.png")})`,
-                        }}
-                        onClick={this.handleWrapperClick}
-                    >
-                        <quip.apps.ui.CalendarPicker
-                            initialSelectedDateMs={deadline}
-                            onChangeSelectedDateMs={this.setDeadline}
-                        />
-                        <p className={Styles.calendarDateDesc}>
-                            {quiptext("Counting down to %(date)s", {
-                                "date": deadlineDate.toLocaleDateString()
-                            })}
-                            {" "}
-                            {moment(deadline)
-                                .tz(moment.tz.guess())
-                                .format("ha z")}
-                        </p>
-                    </div>
-                )}
+        return <div
+            className={classNames(Styles.App, {
+                [Styles.resting]: !quip.apps.isElementFocused(),
+            })}
+            onClick={() => this.toggleCalendar(false)}>
+            <div className={Styles.timeBlocks}>
+                {this.timeBlock(times[0], 0)}
+                {this.timeBlock(times[1], 1)}
+                {this.timeBlock(times[2], 2)}
+                {this.timeBlock(times[3], 3)}
             </div>
-        );
+
+            {this.state.showCalendar && <div
+                ref={el => (this.calendar = el)}
+                className={Styles.calendarWrapper}
+                style={{
+                    borderImageSource: `url(${require("./border.png")})`,
+                }}
+                onClick={this.handleWrapperClick}>
+                <quip.apps.ui.CalendarPicker
+                    initialSelectedDateMs={deadline}
+                    onChangeSelectedDateMs={this.setDeadline}/>
+                <p className={Styles.calendarDateDesc}>
+                    {quiptext("Counting down to %(date)s", {
+                        "date": deadlineDate.toLocaleDateString(),
+                    })}{" "}
+                    {moment(deadline)
+                        .tz(moment.tz.guess())
+                        .format("ha z")}
+                </p>
+            </div>}
+        </div>;
     }
 }

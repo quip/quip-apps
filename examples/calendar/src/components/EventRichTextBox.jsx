@@ -4,12 +4,12 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 
-import { setFocusedEvent, setSelectedEvent } from "../actions";
-import { EventRecord } from "../model";
+import {setFocusedEvent, setSelectedEvent} from "../actions";
+import {EventRecord} from "../model";
 
-const { RichTextBox } = quip.apps.ui;
+const {RichTextBox} = quip.apps.ui;
 
 type Props = {
     eventRecord: EventRecord,
@@ -54,7 +54,7 @@ class EventRichTextBox extends React.Component<Props, null> {
     }
 
     onMouseDown = e => {
-        const { eventRecord, setFocusedEvent, week } = this.props;
+        const {eventRecord, setFocusedEvent, week} = this.props;
         setFocusedEvent(eventRecord, week && week[0].getTime());
     };
 
@@ -74,7 +74,7 @@ class EventRichTextBox extends React.Component<Props, null> {
     };
 
     render() {
-        const { color, focused, titleRecord, week } = this.props;
+        const {color, focused, titleRecord, week} = this.props;
         let key = `rtb-${titleRecord.id()}`;
         if (week) {
             key = `-${key}-${color}-${week[0].getTime()}`;
@@ -88,25 +88,21 @@ class EventRichTextBox extends React.Component<Props, null> {
                 quip.apps.RichTextRecord.InlineStyle.CODE,
             ];
         }
-        return (
-            <div
-                onMouseDown={this.onMouseDown}
-                style={{ cursor: "text", wordBreak: "break-word" }}
-            >
-                <RichTextBox
-                    allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
-                    color={color}
-                    disableSelection={!focused}
-                    key={key}
-                    onBlur={this.onBlur}
-                    readOnly={!focused}
-                    record={titleRecord}
-                    useDocumentTheme={false}
-                    width="100%"
-                    {...extraRichTextBoxProps}
-                />
-            </div>
-        );
+        return <div
+            onMouseDown={this.onMouseDown}
+            style={{cursor: "text", wordBreak: "break-word"}}>
+            <RichTextBox
+                allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
+                color={color}
+                disableSelection={!focused}
+                key={key}
+                onBlur={this.onBlur}
+                readOnly={!focused}
+                record={titleRecord}
+                useDocumentTheme={false}
+                width="100%"
+                {...extraRichTextBoxProps}/>
+        </div>;
     }
 }
 

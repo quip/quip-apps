@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { toJSONPropTypeShape } from "./model.js";
+import React, {Component} from "react";
+import {toJSONPropTypeShape} from "./model.js";
 import Column from "./Column";
 import Card from "./Card";
-import { hashCode } from "./utils.js"
+import {hashCode} from "./utils.js";
 import VirtualMove from "./lib/VirtualMove";
 
 import styles from "./Columns.less";
@@ -39,7 +39,7 @@ class Columns extends Component {
             dragCurrentY: 0,
             dragStartY: 0,
             startingX: 0,
-            rowDrops: { prev: null, next: null },
+            rowDrops: {prev: null, next: null},
             rowDropOffset: 0,
             rowDragOffset: 0,
             draggingRowIndex: null,
@@ -60,7 +60,7 @@ class Columns extends Component {
     }
 
     columnDragInProgress = columnDraggingInProgress => {
-        this.setState({ columnDraggingInProgress });
+        this.setState({columnDraggingInProgress});
     };
 
     // Start Row Dragging Functions
@@ -71,9 +71,8 @@ class Columns extends Component {
             });
         }
         const index = this.props.rows.data.findIndex(
-            dataRow => dataRow.id === row.id,
-        );
-        this.setState({ rowDraggingInProgress: true });
+            dataRow => dataRow.id === row.id);
+        this.setState({rowDraggingInProgress: true});
         this.setRowDragBounds({
             e,
             rows: this.props.rows,
@@ -83,9 +82,9 @@ class Columns extends Component {
         });
     };
 
-    setRowDragBounds = ({ e, rows, index, moved, initial = false }, cb) => {
-        const { clientY } = e;
-        const { heights, headerHeight } = this.props;
+    setRowDragBounds = ({e, rows, index, moved, initial = false}, cb) => {
+        const {clientY} = e;
+        const {heights, headerHeight} = this.props;
 
         const row = rows.data[index];
         const rowHeight = heights[row.id];
@@ -148,24 +147,21 @@ class Columns extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        const { draggingRowIndex } = this.state;
+        const {draggingRowIndex} = this.state;
         if (draggingRowIndex !== null && this._nextBounds) {
-            const { rows } = this.props;
-            const { rows: nextRows } = nextProps;
-            if (
-                rows.data[draggingRowIndex].id !==
-                nextRows.data[draggingRowIndex].id
-            ) {
+            const {rows} = this.props;
+            const {rows: nextRows} = nextProps;
+            if (rows.data[draggingRowIndex].id !==
+                nextRows.data[draggingRowIndex].id) {
                 this.setRowDragBounds(
-                    Object.assign({ rows: nextRows }, this._nextBounds),
-                    () => delete this._nextBounds,
-                );
+                    Object.assign({rows: nextRows}, this._nextBounds),
+                    () => delete this._nextBounds);
             }
         }
     }
 
     stopRowDrag = () => {
-        const { draggingRowIndex } = this.state;
+        const {draggingRowIndex} = this.state;
         if (draggingRowIndex === null) return;
         const row = this.props.rows.data[draggingRowIndex];
         if (row) {
@@ -174,7 +170,7 @@ class Columns extends Component {
         this.setState({
             dragCurrentY: 0,
             dragStartY: 0,
-            rowDrops: { prev: null, next: null },
+            rowDrops: {prev: null, next: null},
             rowDropOffset: 0,
             rowDragOffset: 0,
             draggingRowIndex: null,
@@ -184,7 +180,7 @@ class Columns extends Component {
     };
 
     dragRow = e => {
-        const { clientY } = e;
+        const {clientY} = e;
         const {
             rowDrops,
             rowDropOffset,
@@ -214,13 +210,13 @@ class Columns extends Component {
         }
     };
 
-    moveRow = (row, { e, index, moved }) => {
-        this._nextBounds = { e, index, moved };
+    moveRow = (row, {e, index, moved}) => {
+        this._nextBounds = {e, index, moved};
         this.props.moveRow(row.id, index);
     };
 
     makeDraggingRow = () => {
-        const { heights, widths, columns, rows } = this.props;
+        const {heights, widths, columns, rows} = this.props;
         const {
             rowDragOffset,
             draggingRowIndex,
@@ -243,48 +239,41 @@ class Columns extends Component {
             display: "flex",
         };
 
-        return (
-            <div style={wrapperStyle}>
-                {columns.data.map((column, i) => {
-                    const id = column.id;
-                    const width = widths[id];
-                    const height = heights[row.id];
-                    return (
-                        <div key={id} style={{ width, height }}>
-                            <Card
-                                column={column}
-                                customRenderer={this.props.customRenderer}
-                                customMenuRenderer={
-                                    this.props.customMenuRenderer
-                                }
-                                onCardClicked={this.props.onCardClicked}
-                                heights={heights}
-                                isFirstColumn={i === 0}
-                                onRowDrag={this.onRowDrag}
-                                rowDraggingInProgress={rowDraggingInProgress}
-                                row={row}
-                                type={column.type}
-                                width={width}
-                                metricType={this.props.metricType}
-                            />
-                        </div>
-                    );
-                })}
-            </div>
-        );
+        return <div style={wrapperStyle}>
+            {columns.data.map((column, i) => {
+                const id = column.id;
+                const width = widths[id];
+                const height = heights[row.id];
+                return <div key={id} style={{width, height}}>
+                    <Card
+                        column={column}
+                        customRenderer={this.props.customRenderer}
+                        customMenuRenderer={this.props.customMenuRenderer}
+                        onCardClicked={this.props.onCardClicked}
+                        heights={heights}
+                        isFirstColumn={i === 0}
+                        onRowDrag={this.onRowDrag}
+                        rowDraggingInProgress={rowDraggingInProgress}
+                        row={row}
+                        type={column.type}
+                        width={width}
+                        metricType={this.props.metricType}/>
+                </div>;
+            })}
+        </div>;
     };
     // End Row Dragging Functions
 
     // Start Width Changing Functions
     onResizeColumn = e => {
-        const { resizing, startingX } = this.state;
+        const {resizing, startingX} = this.state;
 
         if (!resizing.length) return;
 
         // Prevent default behaviors if resizing
         e.preventDefault();
 
-        const { setWidths } = this.props;
+        const {setWidths} = this.props;
         const [owner] = resizing;
         const movement = startingX - e.clientX;
         const newOwnerWidth = owner.startingWidth - movement;
@@ -313,18 +302,18 @@ class Columns extends Component {
                 action: "column_resize",
             });
         }
-        const { widths } = this.props;
-        const { id } = col;
+        const {widths} = this.props;
+        const {id} = col;
         const ownerStartWidth = widths[id];
 
         this.setState({
             startingX: e.clientX,
-            resizing: [{ id: id, startingWidth: ownerStartWidth }],
+            resizing: [{id: id, startingWidth: ownerStartWidth}],
         });
     };
 
     onResizeColumnEnd = () => {
-        this.setState({ resizing: [] });
+        this.setState({resizing: []});
         this.props.onResizeEnd();
     };
     // End Width Changing Functions
@@ -335,18 +324,16 @@ class Columns extends Component {
             rowDraggingInProgress,
             resizing,
         } = this.state;
-        if (
-            columnDraggingInProgress ||
+        if (columnDraggingInProgress ||
             rowDraggingInProgress ||
-            resizing.length
-        ) {
+            resizing.length) {
             this.onResizeColumnEnd();
             this.stopRowDrag();
         }
     };
 
     render() {
-        const { rows, columns, widths, rootHeight, heights } = this.props;
+        const {rows, columns, widths, rootHeight, heights} = this.props;
         const {
             resizing,
             draggingRowIndex,
@@ -354,57 +341,44 @@ class Columns extends Component {
             rowDraggingInProgress,
         } = this.state;
 
-        return (
-            <div className={styles.wrapper}>
-                {draggingRowIndex !== null && this.makeDraggingRow()}
-                <VirtualMove items={columns.data}>
-                    {({ items, moveItem }) =>
-                        items.map((column, i) => (
-                            <Column
-                                moveColumn={moveItem}
-                                key={hashCode(column.id)}
-                                index={i}
-                                columns={
-                                    {id: hashCode(columns.id), data: items}
-                                }
-                                rows={rows}
-                                column={column}
-                                width={widths[column.id]}
-                                widths={widths}
-                                heights={heights}
-                                setRowHeight={this.props.setRowHeight}
-                                rootHeight={rootHeight}
-                                resizing={!!resizing.length}
-                                onResizeColumn={this.onResizeColumn}
-                                onResizeColumnStart={this.onResizeColumnStart}
-                                onResizeColumnEnd={this.onResizeColumnEnd}
-                                onRowDrag={this.onRowDrag}
-                                onRowDelete={this.props.onRowDelete}
-                                rowDraggingIndex={draggingRowIndex}
-                                onColumnDrop={this.props.onColumnDrop}
-                                columnDragInProgress={this.columnDragInProgress}
-                                columnDraggingInProgress={
-                                    columnDraggingInProgress
-                                }
-                                rowDraggingInProgress={rowDraggingInProgress}
-                                onColumnAdd={this.props.onColumnAdd}
-                                onColumnDelete={this.props.onColumnDelete}
-                                customRenderer={this.props.customRenderer}
-                                onCardClicked={this.props.onCardClicked}
-                                onContextMenu={this.props.onContextMenu}
-                                globalError={
-                                    i == 0 ? this.props.globalError : null
-                                }
-                                errorStatus={
-                                    i == 0 ? this.props.errorStatus : null
-                                }
-                                metricType={this.props.metricType}
-                            />
-                        ))
-                    }
-                </VirtualMove>
-            </div>
-        );
+        return <div className={styles.wrapper}>
+            {draggingRowIndex !== null && this.makeDraggingRow()}
+            <VirtualMove items={columns.data}>
+                {({items, moveItem}) =>
+                    items.map((column, i) => <Column
+                        moveColumn={moveItem}
+                        key={hashCode(column.id)}
+                        index={i}
+                        columns={{id: hashCode(columns.id), data: items}}
+                        rows={rows}
+                        column={column}
+                        width={widths[column.id]}
+                        widths={widths}
+                        heights={heights}
+                        setRowHeight={this.props.setRowHeight}
+                        rootHeight={rootHeight}
+                        resizing={!!resizing.length}
+                        onResizeColumn={this.onResizeColumn}
+                        onResizeColumnStart={this.onResizeColumnStart}
+                        onResizeColumnEnd={this.onResizeColumnEnd}
+                        onRowDrag={this.onRowDrag}
+                        onRowDelete={this.props.onRowDelete}
+                        rowDraggingIndex={draggingRowIndex}
+                        onColumnDrop={this.props.onColumnDrop}
+                        columnDragInProgress={this.columnDragInProgress}
+                        columnDraggingInProgress={columnDraggingInProgress}
+                        rowDraggingInProgress={rowDraggingInProgress}
+                        onColumnAdd={this.props.onColumnAdd}
+                        onColumnDelete={this.props.onColumnDelete}
+                        customRenderer={this.props.customRenderer}
+                        onCardClicked={this.props.onCardClicked}
+                        onContextMenu={this.props.onContextMenu}
+                        globalError={i == 0 ? this.props.globalError : null}
+                        errorStatus={i == 0 ? this.props.errorStatus : null}
+                        metricType={this.props.metricType}/>)
+                }
+            </VirtualMove>
+        </div>;
     }
 }
 

@@ -39,7 +39,7 @@ export class BoardRecord extends quip.apps.RootRecord {
     }
 
     static getDefaultProperties() {
-        return { columns: [] };
+        return {columns: []};
     }
 
     static DATA_VERSION = 2;
@@ -55,7 +55,7 @@ export class BoardRecord extends quip.apps.RootRecord {
     addColumn(headerText) {
         const color = this.getNextColumnColor_();
         let index = this.get("columns").count();
-        let newColumn = this.get("columns").add({ color }, index);
+        let newColumn = this.get("columns").add({color}, index);
         newColumn.addCard(true, headerText, 0);
         newColumn.addCard(false, "", 1);
         //quip.apps.sendMessage(ACTIVITY_LOG_MESSAGES.ADD_COLUMN());
@@ -77,8 +77,7 @@ export class BoardRecord extends quip.apps.RootRecord {
     }
 
     getNextColumnColor_() {
-        const color =
-            this.get("nextColumnColor") || kDefaultColumnColors[0];
+        const color = this.get("nextColumnColor") || kDefaultColumnColors[0];
         const index = kDefaultColumnColors.indexOf(color);
         const nextColor =
             index === kDefaultColumnColors.length - 1
@@ -98,7 +97,7 @@ export class ColumnRecord extends quip.apps.Record {
     }
 
     static getDefaultProperties() {
-        return { cards: [] };
+        return {cards: []};
     }
 
     initialize() {
@@ -138,8 +137,9 @@ export class ColumnRecord extends quip.apps.Record {
     }
 
     addCard(isHeader, defaultText, index) {
-        let defaultPlaceholderText = (
-            isHeader ? quiptext("New Title") : quiptext("New Card"));
+        let defaultPlaceholderText = isHeader
+            ? quiptext("New Title")
+            : quiptext("New Card");
         quip.apps.recordQuipMetric("add_card");
         return this.get("cards").add(
             {
@@ -150,8 +150,7 @@ export class ColumnRecord extends quip.apps.Record {
                     ? defaultPlaceholderText
                     : null,
             },
-            index,
-        );
+            index);
     }
 
     insertCard(cardRecord, index) {
@@ -340,7 +339,7 @@ export function entityListener(WrappedComponent) {
         }
 
         render() {
-            return <WrappedComponent {...this.props} />;
+            return <WrappedComponent {...this.props}/>;
         }
 
         onRecordChange_ = () => {

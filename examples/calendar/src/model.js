@@ -7,9 +7,9 @@ import quip from "quip";
 import isDate from "date-fns/is_date";
 import startOfWeek from "date-fns/start_of_week";
 
-import type { DateRange } from "./types";
+import type {DateRange} from "./types";
 
-import { isSameDay } from "./util";
+import {isSameDay} from "./util";
 
 export const colors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -33,8 +33,7 @@ const parseAllDayStringToDate = (s: string): Date => {
         return new Date(
             window.parseInt(year, 10),
             window.parseInt(monthIndex, 10),
-            window.parseInt(day, 10),
-        );
+            window.parseInt(day, 10));
     }
 };
 
@@ -59,7 +58,7 @@ export class RootRecord extends quip.apps.RootRecord {
 
     getEventsByStartDate(start: Date): Array<EventRecord> {
         return this.getEvents().filter(event =>
-            isSameDay(event.getDateRange().start, start),
+            isSameDay(event.getDateRange().start, start)
         );
     }
 
@@ -93,8 +92,7 @@ export class RootRecord extends quip.apps.RootRecord {
                 }),
                 color,
             },
-            this.getNextIndexForStartDate(start),
-        );
+            this.getNextIndexForStartDate(start));
         //quip.apps.sendMessage("added an event");
         quip.apps.recordQuipMetric("add_event", {
             event_id: newEvent.id(),
@@ -104,8 +102,7 @@ export class RootRecord extends quip.apps.RootRecord {
 
     getNextIndexForStartDate(
         startDate: Date,
-        excludeEvent: ?EventRecord,
-    ): number {
+        excludeEvent: ?EventRecord): number {
         let nextIndex = 0;
         let events = this.getEvents();
         if (excludeEvent) {
@@ -140,7 +137,7 @@ export class RootRecord extends quip.apps.RootRecord {
 export class EventRecord extends quip.apps.Record {
     domNode: ?Element;
     // An array of startOfWeek time -> el on that week.
-    domNodesEvent: { [number]: Element };
+    domNodesEvent: {[number]: Element};
 
     static getProperties() {
         return {
@@ -215,12 +212,12 @@ export class EventRecord extends quip.apps.Record {
         return this.domNodesEvent[weekStartTime];
     }
 
-    setDomEvent(eventForWeek?: { el: Element, weekStartTime: number }) {
+    setDomEvent(eventForWeek?: {el: Element, weekStartTime: number}) {
         if (!eventForWeek) {
             this.domNodesEvent = {};
             return;
         }
-        const { el, weekStartTime } = eventForWeek;
+        const {el, weekStartTime} = eventForWeek;
         this.domNodesEvent[weekStartTime] = el;
     }
 
@@ -236,7 +233,7 @@ export class EventRecord extends quip.apps.Record {
     }
 
     getDateRange(): DateRange {
-        const { start, end } = JSON.parse(this.get("dateRange"));
+        const {start, end} = JSON.parse(this.get("dateRange"));
         // TODO(elsigh): update when we support time
         return {
             start: parseAllDayStringToDate(start),
@@ -255,8 +252,7 @@ export class EventRecord extends quip.apps.Record {
             JSON.stringify({
                 start: formatDateForAllDayEvent(start),
                 end: formatDateForAllDayEvent(end),
-            }),
-        );
+            }));
         //quip.apps.sendMessage("moved an event");
         quip.apps.recordQuipMetric("move_event", {
             event_id: this.id(),

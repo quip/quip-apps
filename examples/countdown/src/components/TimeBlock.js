@@ -1,10 +1,10 @@
 // Copyright 2017 Quip
 
 import quip from "quip";
-import React, { Component } from "react";
+import React, {Component} from "react";
 import cx from "classnames";
 
-import { keyToLabel } from "../humanTime.js";
+import {keyToLabel} from "../humanTime.js";
 import Styles from "./TimeBlock.less";
 
 class TimeBlock extends Component {
@@ -15,9 +15,9 @@ class TimeBlock extends Component {
     };
 
     render() {
-        const { number, unit, color } = this.props;
-        const showFocusedState = quip.apps.isElementFocused() &&
-            !quip.apps.isMobile();
+        const {number, unit, color} = this.props;
+        const showFocusedState =
+            quip.apps.isElementFocused() && !quip.apps.isMobile();
         const makeNumberStyles = () => {
             const backgroundColor = showFocusedState
                 ? quip.apps.ui.ColorMap[color].VALUE
@@ -35,21 +35,17 @@ class TimeBlock extends Component {
             };
         };
 
-        return (
+        return <div
+            className={Styles.wrapper}
+            style={{color: quip.apps.ui.ColorMap[color].VALUE}}>
             <div
-                className={Styles.wrapper}
-                style={{ color: quip.apps.ui.ColorMap[color].VALUE }}
-            >
-                <div
-                    style={makeNumberStyles()}
-                    className={cx(Styles.numberWrapper, "quip-text-h1")}
-                >
-                    {number}
-                </div>
-
-                <div className={Styles.unitText}>{keyToLabel(unit)}</div>
+                style={makeNumberStyles()}
+                className={cx(Styles.numberWrapper, "quip-text-h1")}>
+                {number}
             </div>
-        );
+
+            <div className={Styles.unitText}>{keyToLabel(unit)}</div>
+        </div>;
     }
 }
 

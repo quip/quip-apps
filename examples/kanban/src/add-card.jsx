@@ -1,12 +1,12 @@
 // Copyright 2017 Quip
 
-import { Motion } from "react-motion";
+import {Motion} from "react-motion";
 import cx from "classnames";
 import AddCardIcon from "./icons/add-card.jsx";
-import { kColumnWidth } from "./board.jsx";
-import { kHorizontalMargin } from "./card.jsx";
-import { ColumnRecord } from "./model.jsx";
-import { animateTo, focusCard } from "./root.jsx";
+import {kColumnWidth} from "./board.jsx";
+import {kHorizontalMargin} from "./card.jsx";
+import {ColumnRecord} from "./model.jsx";
+import {animateTo, focusCard} from "./root.jsx";
 
 import styles from "./add-card.less";
 
@@ -44,32 +44,27 @@ export default class AddCard extends React.Component {
             zIndex: this.props.columnDragging ? 99 : animateTo(1),
         };
 
-        return (
-            <Motion style={motionStyle}>
-                {({ translateX, translateY, zIndex }) => {
-                    const elementStyle = {
-                        width: kColumnWidth - kHorizontalMargin * 2,
-                        height: kAddCardHeight,
-                        // Yosemite fix
-                        WebkitTransform: `translate3d(${translateX}px,
+        return <Motion style={motionStyle}>
+            {({translateX, translateY, zIndex}) => {
+                const elementStyle = {
+                    width: kColumnWidth - kHorizontalMargin * 2,
+                    height: kAddCardHeight,
+                    // Yosemite fix
+                    WebkitTransform: `translate3d(${translateX}px,
                             ${translateY}px, 0)`,
-                        transform: `translate3d(${translateX}px,
+                    transform: `translate3d(${translateX}px,
                         ${translateY}px, 0)`,
-                        zIndex: zIndex,
-                    };
+                    zIndex: zIndex,
+                };
 
-                    return (
-                        <div
-                            className={classNames}
-                            style={elementStyle}
-                            onClick={this.onClick_}
-                        >
-                            <AddCardIcon />
-                        </div>
-                    );
-                }}
-            </Motion>
-        );
+                return <div
+                    className={classNames}
+                    style={elementStyle}
+                    onClick={this.onClick_}>
+                    <AddCardIcon/>
+                </div>;
+            }}
+        </Motion>;
     }
 
     onClick_ = e => {

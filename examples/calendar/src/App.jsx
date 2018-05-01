@@ -4,15 +4,15 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { Provider } from "react-redux";
-import { createStore } from "redux";
+import {Provider} from "react-redux";
+import {createStore} from "redux";
 import appReducer from "./reducer";
 
 import Calendar from "./components/Calendar.jsx";
 
-import { setMenuDisplayMonth } from "./menus";
-import { RootRecord } from "./model";
-import { getIsSmallScreen } from "./util";
+import {setMenuDisplayMonth} from "./menus";
+import {RootRecord} from "./model";
+import {getIsSmallScreen} from "./util";
 
 type Props = {
     rootNode: Element,
@@ -40,10 +40,8 @@ export default class App extends React.Component<Props, null> {
     }
 
     render() {
-        return (
-            <Provider store={this.store}>
-                <Calendar />
-            </Provider>
-        );
+        return <Provider store={this.store}>
+            <Calendar/>
+        </Provider>;
     }
 }

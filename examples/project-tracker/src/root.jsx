@@ -5,16 +5,20 @@ import shallowEqual from "shallowequal";
 import connectEntity from "./lib/connectEntity";
 import registerModels from "./model";
 import timePerf from "./lib/timePerf";
-import { DefaultCardRenderer } from "../../shared/table-view/DefaultCardRenderer.js";
-import { toJSON, COLUMN_TYPE as TABLE_VIEW_COLUMN_TYPE, COLUMN_TYPE_LABELS } from "../../shared/table-view/model.js";
+import {DefaultCardRenderer} from "../../shared/table-view/DefaultCardRenderer.js";
+import {
+    toJSON,
+    COLUMN_TYPE as TABLE_VIEW_COLUMN_TYPE,
+    COLUMN_TYPE_LABELS,
+} from "../../shared/table-view/model.js";
 import {
     getHeights,
     getWidths,
     ROW_START_HEIGHT,
     ROW_PADDING,
 } from "../../shared/table-view/utils";
-import { COLUMN_TYPE, RootRecord } from "./model.js";
-import { TableView } from "../../shared/table-view/table-view.jsx";
+import {COLUMN_TYPE, RootRecord} from "./model.js";
+import {TableView} from "../../shared/table-view/table-view.jsx";
 
 class Root extends React.Component {
     static propTypes = {
@@ -33,7 +37,11 @@ class Root extends React.Component {
         // Widths are synced to the server, but get read from state in order to
         // update the UI while also allowing saves to be debounced
         this.state = {
-            widths: getWidths(props, props.widths, this.getDefaultWidth, this.getMinWidth),
+            widths: getWidths(
+                props,
+                props.widths,
+                this.getDefaultWidth,
+                this.getMinWidth),
             heights: getHeights(props),
         };
     }
@@ -44,8 +52,8 @@ class Root extends React.Component {
             columnCount: nextColumnCount,
             widths: nextWidths,
         } = nextProps;
-        const { rowCount, columnCount } = this.props;
-        const { heights, widths } = this.state;
+        const {rowCount, columnCount} = this.props;
+        const {heights, widths} = this.state;
         const newState = {};
 
         if (nextRowCount !== rowCount) {
@@ -65,8 +73,7 @@ class Root extends React.Component {
                 nextProps,
                 Object.assign({}, widths, nextWidths),
                 this.getDefaultWidth,
-                this.getMinWidth
-            );
+                this.getMinWidth);
         }
 
         if (newState.heights || newState.widths) {
@@ -89,7 +96,7 @@ class Root extends React.Component {
     };
 
     setWidths = newWidths => {
-        this.setState(({ widths }) => ({
+        this.setState(({widths}) => ({
             widths: Object.assign(widths, newWidths),
         }));
     };
@@ -172,7 +179,8 @@ class Root extends React.Component {
 
     onColumnDelete_ = id => {
         const column = quip.apps.getRecordById(id);
-        column.getParentRecord()
+        column
+            .getParentRecord()
             .getRows()
             .forEach(row => {
                 row.getCell(column).delete();
@@ -181,44 +189,42 @@ class Root extends React.Component {
     };
 
     render() {
-        const { record } = this.props;
-        const { rows, columns, statusTypes } = toJSON(record);
-        const { widths, heights } = this.state;
+        const {record} = this.props;
+        const {rows, columns, statusTypes} = toJSON(record);
+        const {widths, heights} = this.state;
 
-        return (
-            <TableView
-                ref={node => record.setDom(ReactDOM.findDOMNode(node))}
-                customRenderer={DefaultCardRenderer(statusTypes)}
-                columns={columns}
-                rows={rows}
-                heights={heights}
-                widths={widths}
-                setRowHeight={
-                    quip.apps.isMobile() ? this.setRowHeight_ : undefined
+        return <TableView
+            ref={node => record.setDom(ReactDOM.findDOMNode(node))}
+            customRenderer={DefaultCardRenderer(statusTypes)}
+            columns={columns}
+            rows={rows}
+            heights={heights}
+            widths={widths}
+            setRowHeight={quip.apps.isMobile() ? this.setRowHeight_ : undefined}
+            setWidths={this.setWidths}
+            getMinWidth={this.getMinWidth}
+            onColumnDrop={this.onColumnDrop_}
+            onColumnAdd={this.onColumnAdd_}
+            onColumnDelete={this.onColumnDelete_}
+            onRowDrop={this.onRowDrop_}
+            onRowDelete={this.onRowDelete_}
+            onResizeEnd={this.onResizeEnd_}
+            onCardClicked={(id, column) => {
+                if (column.type === COLUMN_TYPE.TEXT) {
+                    quip.apps
+                        .getRecordById(id)
+                        .get("contents")
+                        .focus();
                 }
-                setWidths={this.setWidths}
-                getMinWidth={this.getMinWidth}
-                onColumnDrop={this.onColumnDrop_}
-                onColumnAdd={this.onColumnAdd_}
-                onColumnDelete={this.onColumnDelete_}
-                onRowDrop={this.onRowDrop_}
-                onRowDelete={this.onRowDelete_}
-                onResizeEnd={this.onResizeEnd_}
-                onCardClicked={(id, column) => {
-                    if (column.type === COLUMN_TYPE.TEXT) {
-                        quip.apps.getRecordById(id).get("contents").focus();
-                    }
-                }}
-                metricType={"project_tracker"}
-            />
-        );
+            }}
+            metricType={"project_tracker"}/>;
     }
 }
 
 registerModels();
 
 quip.apps.initialize({
-    initializationCallback: (root, { isCreation }) => {
+    initializationCallback: (root, {isCreation}) => {
         const rootRecord = quip.apps.getRootRecord();
 
         // Render performance timer
@@ -236,7 +242,7 @@ quip.apps.initialize({
             }),
         });
 
-        ReactDOM.render(<Connected />, root);
+        ReactDOM.render(<Connected/>, root);
     },
     toolbarCommandIds: ["addRow"],
     menuCommands: [
@@ -244,8 +250,7 @@ quip.apps.initialize({
             id: "addColumn",
             label: quiptext("Add Column"),
             subCommands: Object.keys(COLUMN_TYPE).map(
-                type => type + "AddColumn",
-            ),
+                type => type + "AddColumn"),
         },
         {
             id: "addRow",

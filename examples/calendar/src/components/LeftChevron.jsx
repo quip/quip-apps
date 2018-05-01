@@ -8,16 +8,13 @@ type Props = {
 
 class LeftChevron extends React.Component<Props, null> {
     render() {
-        return (
-            <svg
-                className={this.props.className}
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-            >
-                <path d="M13,15.5L11.5,17l-8-8,8-8L13,2.5,6.533,9Z" />
-            </svg>
-        );
+        return <svg
+            className={this.props.className}
+            width="18"
+            height="18"
+            viewBox="0 0 18 18">
+            <path d="M13,15.5L11.5,17l-8-8,8-8L13,2.5,6.533,9Z"/>
+        </svg>;
     }
 }
 

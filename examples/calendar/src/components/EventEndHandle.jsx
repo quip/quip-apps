@@ -2,12 +2,12 @@
 // Copyright 2017 Quip
 
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 
 import Styles from "./EventEndHandle.less";
 import ResizeIcon from "./ResizeIcon.jsx";
-import { setResizingEvent } from "../actions";
-import { EventRecord } from "../model";
+import {setResizingEvent} from "../actions";
+import {EventRecord} from "../model";
 
 type Props = {
     eventRecord: EventRecord,
@@ -25,15 +25,13 @@ class EventEndHandle extends React.Component<Props, null> {
     };
 
     render() {
-        const { fill } = this.props;
-        return (
-            <div className={Styles.container} onMouseDown={this.onMouseDown}>
-                <div className={Styles.iconContainer}>
-                    <ResizeIcon fill={fill} />
-                </div>
+        const {fill} = this.props;
+        return <div className={Styles.container} onMouseDown={this.onMouseDown}>
+            <div className={Styles.iconContainer}>
+                <ResizeIcon fill={fill}/>
             </div>
-        );
+        </div>;
     }
 }
 
-export default connect(null, { setResizingEvent })(EventEndHandle);
+export default connect(null, {setResizingEvent})(EventEndHandle);

@@ -6,14 +6,15 @@ import areRangesOverlapping from "date-fns/are_ranges_overlapping";
 import max from "date-fns/max";
 import min from "date-fns/min";
 
-import { isSameDay, endOfDay } from "./util";
+import {isSameDay, endOfDay} from "./util";
 
-import type { EventRecord } from "./model";
+import type {EventRecord} from "./model";
 
 const agendaForWeek = (
     week: Array<Date>,
-    events: Array<EventRecord>,
-): Array<Array<{ event: ?EventRecord, start: Date, end: Date }>> => {
+    events: Array<EventRecord>): Array<
+    Array<{event: ?EventRecord, start: Date, end: Date}>
+> => {
     //console.log("EVENTS", events);
     return events
         .filter(event => isEventForWeek(event, week))
@@ -21,12 +22,11 @@ const agendaForWeek = (
         .reduce(
             (currentRows, eventWithLayout) =>
                 addEventToRows(eventWithLayout, currentRows),
-            [],
-        )
+            [])
         .map(agendaRow =>
             week
                 .map(eventOrDayPadForDay(agendaRow))
-                .reduce(collapseRowEventDays, []),
+                .reduce(collapseRowEventDays, [])
         )
         .filter(emptyRowFilter);
 };
@@ -50,13 +50,11 @@ const firstRowForEvent = (eventWithDays, eventRows) =>
                     {
                         start: existingSpan.start,
                         end: existingSpan.end,
-                    },
-                ),
-            ),
-    );
+                    })
+            ));
 
 const getItemForLayout = (event, week) => {
-    const { start, end } = event.getDateRange();
+    const {start, end} = event.getDateRange();
     return {
         end: min(end, week[6]),
         event,
@@ -75,21 +73,20 @@ const addEventToRows = (eventWithLayout, currentRows) => {
 };
 
 const eventOrDayPadForDay = agendaRow => dayOfWeek =>
-    agendaRow.find(({ start, end }) =>
+    agendaRow.find(({start, end}) =>
         rangesOverlap(
             {
                 start: dayOfWeek,
                 end: endOfDay(dayOfWeek),
             },
-            { start, end },
-        ),
+            {start, end})
     ) || {
         event: undefined,
         start: dayOfWeek,
         end: dayOfWeek,
     };
 
-const emptyRowFilter = curRow => curRow.find(({ event }) => event);
+const emptyRowFilter = curRow => curRow.find(({event}) => event);
 
 const collapseRowEventDays = (rowAcc, eventWithLayout) => {
     const existing = rowAcc.find(otherEvent => eventWithLayout === otherEvent);

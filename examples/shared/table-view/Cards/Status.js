@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import cx from "classnames";
-import { X } from "reline";
+import {X} from "reline";
 import {
     StatusRecord,
     X_DELETE_MARGIN,
@@ -11,7 +11,7 @@ import StatusPicker from "./StatusPicker";
 import Modal from "../lib/components/Modal";
 import styles from "./Status.less";
 
-const { getRootRecord } = quip.apps;
+const {getRootRecord} = quip.apps;
 
 class Status extends Component {
     static propTypes = {
@@ -54,19 +54,18 @@ class Status extends Component {
         quip.apps.showContextMenuFromButton(
             e,
             menuCommands.map(menuCommand => menuCommand.id),
-            ["status-" + this.props.record.getStatus()], // highlighted
-        );
+            ["status-" + this.props.record.getStatus()]); // highlighted
     };
 
     showPicker = e => {
         if (quip.apps.isMobile()) {
             this.showStatusContextMenu(e.currentTarget);
         } else {
-            this.setState({ showPicker: true });
+            this.setState({showPicker: true});
         }
     };
 
-    hidePicker = () => this.setState({ showPicker: false });
+    hidePicker = () => this.setState({showPicker: false});
 
     render() {
         const {
@@ -76,62 +75,57 @@ class Status extends Component {
             textWidth,
             statusTypes,
         } = this.props;
-        const { showPicker } = this.state;
+        const {showPicker} = this.state;
         const currentStatusId = record.getStatus();
         const currentStatus =
             currentStatusId && getRootRecord().getStatusById(currentStatusId);
-        const { text, color } = currentStatus
+        const {text, color} = currentStatus
             ? currentStatus.getData()
-            : { text: "", color: {} };
+            : {text: "", color: {}};
         const modalStyle = {
             content: {
                 width: 250,
             },
         };
 
-        return (
+        return <div
+            className={styles.wrapper}
+            ref={el => (this.wrapper = el)}
+            onClick={this.showPicker}>
             <div
-                className={styles.wrapper}
-                ref={el => (this.wrapper = el)}
-                onClick={this.showPicker}
-            >
-                <div
-                    className={cx(styles.textWrapper)}
-                    style={{ color: text && color.VALUE, width: textWidth }}
-                >
-                    {text ? (
-                        <div className={styles.statusSetWrapper}>
-                            <div
-                                style={{ marginRight: X_DELETE_MARGIN }}
-                                className={styles.removeStatus}
-                                onClick={this.clearStatus}
-                            >
-                                <X strokeWidth={2} size={X_SIZE} />
-                            </div>
-                            <div className={styles.withText}>{text}</div>
+                className={cx(styles.textWrapper)}
+                style={{color: text && color.VALUE, width: textWidth}}>
+                {text ? (
+                    <div className={styles.statusSetWrapper}>
+                        <div
+                            style={{marginRight: X_DELETE_MARGIN}}
+                            className={styles.removeStatus}
+                            onClick={this.clearStatus}>
+                            <X strokeWidth={2} size={X_SIZE}/>
                         </div>
-                    ) : (
-                        <div className={styles.withoutText}>{quiptext("Set Status...")}</div>
-                    )}
-                </div>
-                <Modal
-                    style={modalStyle}
-                    onRequestClose={this.hidePicker}
-                    rootHeight={rootHeight}
-                    topOffset={rowHeight / 2 + 20}
-                    isOpen={showPicker}
-                    onBlur={this.hidePicker}
-                    wrapperRef={this.wrapper}
-                >
-                    <StatusPicker
-                        statusTypes={statusTypes}
-                        hidePicker={this.hidePicker}
-                        record={record}
-                        metricType={this.props.metricType}
-                    />
-                </Modal>
+                        <div className={styles.withText}>{text}</div>
+                    </div>
+                ) : (
+                    <div className={styles.withoutText}>
+                        {quiptext("Set Status...")}
+                    </div>
+                )}
             </div>
-        );
+            <Modal
+                style={modalStyle}
+                onRequestClose={this.hidePicker}
+                rootHeight={rootHeight}
+                topOffset={rowHeight / 2 + 20}
+                isOpen={showPicker}
+                onBlur={this.hidePicker}
+                wrapperRef={this.wrapper}>
+                <StatusPicker
+                    statusTypes={statusTypes}
+                    hidePicker={this.hidePicker}
+                    record={record}
+                    metricType={this.props.metricType}/>
+            </Modal>
+        </div>;
     }
 }
 

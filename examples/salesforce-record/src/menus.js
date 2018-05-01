@@ -8,11 +8,18 @@ let isLogoutInProgress_ = false;
 
 export class FieldBuilderMenu extends BaseMenu {
     promptLogin_(onLoggedIn, onMismatchedInstance, onLoggedInFailed) {
-        if (quip.apps.getRootEntity().getClient().isLoggedIn() &&
-            quip.apps.getRootEntity().getClient().onSourceInstance()) {
+        if (quip.apps
+                .getRootEntity()
+                .getClient()
+                .isLoggedIn() &&
+            quip.apps
+                .getRootEntity()
+                .getClient()
+                .onSourceInstance()) {
             onLoggedIn();
         } else {
-            quip.apps.getRootEntity()
+            quip.apps
+                .getRootEntity()
                 .login(onLoggedIn, onMismatchedInstance, onLoggedInFailed);
         }
     }
@@ -23,36 +30,42 @@ export class FieldBuilderMenu extends BaseMenu {
                 id: "refresh-record",
                 label: quiptext("Refresh Now"),
                 handler: () => {
-                    this.promptLogin_(() => {
-                        this.refreshRecord_();
-                    }, () => {
-                        getRecordPickerComponent()
-                            .showMismatchedInstanceErrorDialog("refresh-record");
-                    });
+                    this.promptLogin_(
+                        () => {
+                            this.refreshRecord_();
+                        },
+                        () => {
+                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
+                                "refresh-record");
+                        });
                 },
             },
             {
                 id: "change-record",
                 label: quiptext("Change Record…"),
                 handler: () => {
-                    this.promptLogin_(() => {
-                        this.changeRecord_();
-                    }, () => {
-                        getRecordPickerComponent()
-                            .showMismatchedInstanceErrorDialog("change-record");
-                    });
+                    this.promptLogin_(
+                        () => {
+                            this.changeRecord_();
+                        },
+                        () => {
+                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
+                                "change-record");
+                        });
                 },
             },
             {
                 id: "add-field",
                 label: quiptext("Add Field"),
                 handler: () => {
-                    this.promptLogin_(() => {
-                        this.addField_();
-                    }, () => {
-                        getRecordPickerComponent()
-                            .showMismatchedInstanceErrorDialog("add-field");
-                    });
+                    this.promptLogin_(
+                        () => {
+                            this.addField_();
+                        },
+                        () => {
+                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
+                                "add-field");
+                        });
                 },
             },
             {
@@ -60,12 +73,14 @@ export class FieldBuilderMenu extends BaseMenu {
                 label: quiptext("Save to Salesforce"),
                 quipIcon: quip.apps.MenuIcons.SYNCING,
                 handler: () => {
-                    this.promptLogin_(() => {
-                        this.saveData_();
-                    }, () => {
-                        getRecordPickerComponent()
-                            .showMismatchedInstanceErrorDialog("save-data");
-                    });
+                    this.promptLogin_(
+                        () => {
+                            this.saveData_();
+                        },
+                        () => {
+                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
+                                "save-data");
+                        });
                 },
             },
             {
@@ -82,12 +97,14 @@ export class FieldBuilderMenu extends BaseMenu {
                 id: "reconnect-as-me",
                 label: quiptext("Take Over…"),
                 handler: () => {
-                    this.promptLogin_(() => {
-                        this.reconnectAsMe_();
-                    }, () => {
-                        getRecordPickerComponent()
-                            .showMismatchedInstanceErrorDialog("reconnect-as-me");
-                    });
+                    this.promptLogin_(
+                        () => {
+                            this.reconnectAsMe_();
+                        },
+                        () => {
+                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
+                                "reconnect-as-me");
+                        });
                 },
             },
             {
@@ -98,9 +115,7 @@ export class FieldBuilderMenu extends BaseMenu {
                     this.refreshToolbar();
                     quip.apps.getRootEntity().logout(() => {
                         isLogoutInProgress_ = false;
-                        quip.apps
-                            .getRootEntity()
-                            .clearCachedData();
+                        quip.apps.getRootEntity().clearCachedData();
                         this.updateToolbar(
                             quip.apps.getRootEntity().getSelectedRecord());
                         this.refreshToolbar();
@@ -157,8 +172,14 @@ export class FieldBuilderMenu extends BaseMenu {
         const selectedRecord = quip.apps.getRootEntity().getSelectedRecord();
         if (!selectedRecord ||
             (quip.apps.isExplorerTemplate && quip.apps.isExplorerTemplate()) ||
-            (quip.apps.getRootEntity().getClient().isLoggedIn() &&
-                !quip.apps.getRootEntity().getClient().onSourceInstance())) {
+            (quip.apps
+                .getRootEntity()
+                .getClient()
+                .isLoggedIn() &&
+                !quip.apps
+                    .getRootEntity()
+                    .getClient()
+                    .onSourceInstance())) {
             disabledCommands.push("refresh-record");
             disabledCommands.push("change-record");
             disabledCommands.push("add-field");
@@ -174,7 +195,10 @@ export class FieldBuilderMenu extends BaseMenu {
                 disabledCommands.push("save-data");
             }
         }
-        if (!quip.apps.getRootEntity().getClient().isLoggedIn() ||
+        if (!quip.apps
+                .getRootEntity()
+                .getClient()
+                .isLoggedIn() ||
             isLogoutInProgress_) {
             disabledCommands.push("logout");
         }
@@ -190,7 +214,10 @@ export class FieldBuilderMenu extends BaseMenu {
         if (recordEntity.isPlaceholder()) {
             const highlightedCommandIds = [];
             const mainMenuSubCommands = [];
-            if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
+            if (quip.apps
+                    .getRootEntity()
+                    .getClient()
+                    .isLoggedIn()) {
                 mainMenuSubCommands.push("current-instance");
                 mainMenuSubCommands.push("logout");
                 mainMenuSubCommands.push(
@@ -250,7 +277,10 @@ export class FieldBuilderMenu extends BaseMenu {
             "last-updated-time",
             "refresh-record",
         ];
-        if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
+        if (quip.apps
+                .getRootEntity()
+                .getClient()
+                .isLoggedIn()) {
             mainMenuSubCommands.push(quip.apps.DocumentMenuCommands.SEPARATOR);
             mainMenuSubCommands.push("current-instance");
             mainMenuSubCommands.push("logout");
@@ -259,9 +289,11 @@ export class FieldBuilderMenu extends BaseMenu {
         let lastUpdatedLabel = BaseMenu.getLastUpdatedString(recordEntity);
         const recordOwner = recordEntity.getOwner();
         if (recordOwner !== null) {
-            lastUpdatedLabel += " • " + quiptext("Connected as %(name)s", {
-                "name": recordOwner.getName()
-            });
+            lastUpdatedLabel +=
+                " • " +
+                quiptext("Connected as %(name)s", {
+                    "name": recordOwner.getName(),
+                });
         }
 
         const updatedMenuCommands = [
@@ -271,7 +303,9 @@ export class FieldBuilderMenu extends BaseMenu {
             },
             {
                 id: "record-header",
-                label: recordEntity.getHeaderName() + "\n" +
+                label:
+                    recordEntity.getHeaderName() +
+                    "\n" +
                     quip.apps.getRootEntity().getHostname(),
                 isHeader: true,
             },
@@ -282,10 +316,16 @@ export class FieldBuilderMenu extends BaseMenu {
             },
         ];
 
-        if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
+        if (quip.apps
+                .getRootEntity()
+                .getClient()
+                .isLoggedIn()) {
             updatedMenuCommands.push({
                 id: "current-instance",
-                label: quip.apps.getRootEntity().getClient().getHostname(),
+                label: quip.apps
+                    .getRootEntity()
+                    .getClient()
+                    .getHostname(),
                 isHeader: true,
             });
         }
@@ -294,9 +334,7 @@ export class FieldBuilderMenu extends BaseMenu {
     }
 
     refreshRecord_() {
-        const selectedRecord = quip.apps
-            .getRootEntity()
-            .getSelectedRecord();
+        const selectedRecord = quip.apps.getRootEntity().getSelectedRecord();
         if (selectedRecord) {
             this.promptLogin_(() => {
                 selectedRecord.reload();
@@ -310,8 +348,7 @@ export class FieldBuilderMenu extends BaseMenu {
             .getRootEntity()
             .getSelectedRecord()
             .fetchData()
-            .then(response => {
-            })
+            .then(response => {})
             .catch(error => {
                 getRecordComponent().errorHandling(error);
             });
@@ -319,25 +356,25 @@ export class FieldBuilderMenu extends BaseMenu {
             .getRootEntity()
             .getSelectedRecord()
             .updateOwnerIdWithCurrentViewerId();
-        this.updateToolbar(
-            quip.apps.getRootEntity().getSelectedRecord());
+        this.updateToolbar(quip.apps.getRootEntity().getSelectedRecord());
     }
 
     changeRecord_() {
         getRecordPickerComponent().restoreToDefaultState();
         getRecordPickerComponent().fetchData();
-        quip.apps.getRootEntity().getSelectedRecord().clearError();
+        quip.apps
+            .getRootEntity()
+            .getSelectedRecord()
+            .clearError();
         getRecordComponent().clearError();
-        this.updateToolbar(
-            quip.apps.getRootEntity().getSelectedRecord());
+        this.updateToolbar(quip.apps.getRootEntity().getSelectedRecord());
     }
 
     saveData_() {
         getRecordComponent().hideFieldPicker();
         getRecordComponent().saveRecord();
         quip.apps.getRootEntity().getSelectedRecord();
-        this.updateToolbar(
-            quip.apps.getRootEntity().getSelectedRecord());
+        this.updateToolbar(quip.apps.getRootEntity().getSelectedRecord());
     }
 
     reconnectAsMe_() {
@@ -346,22 +383,21 @@ export class FieldBuilderMenu extends BaseMenu {
             .getRootEntity()
             .getSelectedRecord()
             .updateOwnerIdWithCurrentViewerId();
-        this.updateToolbar(
-            quip.apps.getRootEntity().getSelectedRecord());
+        this.updateToolbar(quip.apps.getRootEntity().getSelectedRecord());
     }
 
     executeMenuOption(menuCommand) {
-        switch(menuCommand) {
-            case 'add-field':
+        switch (menuCommand) {
+            case "add-field":
                 this.addField_();
                 break;
-            case 'change-record':
+            case "change-record":
                 this.changeRecord_();
                 break;
-            case 'save-data':
+            case "save-data":
                 this.saveData_();
                 break;
-            case 'reconnect-as-me':
+            case "reconnect-as-me":
                 this.reconnectAsMe_();
                 break;
             default:

@@ -4,19 +4,19 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import classNames from "classnames";
 
 import differenceInDays from "date-fns/difference_in_days";
 import startOfWeek from "date-fns/start_of_week";
 
-import { EventRecord } from "../model";
-import { startOfDay } from "../util";
+import {EventRecord} from "../model";
+import {startOfDay} from "../util";
 
 import CalendarEvent from "./CalendarEvent.jsx";
 import Styles from "./CalendarEvent.less";
 
-import type { MouseCoordinates, MovingEventRect } from "../types";
+import type {MouseCoordinates, MovingEventRect} from "../types";
 
 type Props = {
     DEBUG_ORDER: boolean,
@@ -53,54 +53,44 @@ class CalendarEventWrapper extends React.Component<Props, null> {
 
         const showMovingEventGuide =
             showMovingEventGuideAfter || showMovingEventGuideBefore;
-        return (
-            <div
-                className={Styles.wrapper}
+        return <div
+            className={Styles.wrapper}
+            style={{
+                width: `calc((100% / 7) * ${numDays})`,
+            }}>
+            {DEBUG_ORDER && <div className={Styles.orderDebug}>
+                {eventRecordIndex}
+            </div>}
+            {showMovingEventGuide && <div
+                className={classNames(Styles.movingEventSortGuide, {
+                    [Styles.after]: showMovingEventGuideAfter,
+                    [Styles.before]: showMovingEventGuideBefore,
+                })}
                 style={{
-                    width: `calc((100% / 7) * ${numDays})`,
-                }}
-            >
-                {DEBUG_ORDER && (
-                    <div className={Styles.orderDebug}>{eventRecordIndex}</div>
-                )}
-                {showMovingEventGuide && (
-                    <div
-                        className={classNames(Styles.movingEventSortGuide, {
-                            [Styles.after]: showMovingEventGuideAfter,
-                            [Styles.before]: showMovingEventGuideBefore,
-                        })}
-                        style={{
-                            background:
-                                quip.apps.ui.ColorMap[showMovingEventGuideColor]
-                                    .VALUE,
-                        }}
-                    />
-                )}
-                <CalendarEvent
-                    eventRecord={eventRecord}
-                    isMoving={!!movingEvent}
-                    showMovingEventGuideAfter={showMovingEventGuideAfter}
-                    showMovingEventGuideBefore={showMovingEventGuideBefore}
-                    showMovingEventGuideColor={showMovingEventGuideColor}
-                    week={week}
-                />
-                {movingEvent &&
-                    movingEventRect && (
-                        <MovingEventWrapper movingEventRect={movingEventRect}>
-                            <CalendarEvent
-                                eventRecord={eventRecord}
-                                isInMovingEventWrapper
-                                week={week}
-                            />
-                        </MovingEventWrapper>
-                    )}
-            </div>
-        );
+                    background:
+                        quip.apps.ui.ColorMap[showMovingEventGuideColor].VALUE,
+                }}/>}
+            <CalendarEvent
+                eventRecord={eventRecord}
+                isMoving={!!movingEvent}
+                showMovingEventGuideAfter={showMovingEventGuideAfter}
+                showMovingEventGuideBefore={showMovingEventGuideBefore}
+                showMovingEventGuideColor={showMovingEventGuideColor}
+                week={week}/>
+            {movingEvent &&
+                movingEventRect && <MovingEventWrapper
+                    movingEventRect={movingEventRect}>
+                    <CalendarEvent
+                        eventRecord={eventRecord}
+                        isInMovingEventWrapper
+                        week={week}/>
+                </MovingEventWrapper>}
+        </div>;
     }
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const { eventRecord, start, end } = ownProps;
+    const {eventRecord, start, end} = ownProps;
     const eventRecordIndex = eventRecord.getIndex();
     const movingEvent =
         state.movingEvent && state.movingEvent.id() === eventRecord.id()
@@ -147,17 +137,14 @@ const MovingEventWrapper = ({
     children,
     movingEventRect,
 }: MovingEventWrapperProps) => {
-    const { left, top, width } = movingEventRect;
-    return (
-        <div
-            className={Styles.movingEventWrapper}
-            style={{
-                top,
-                left,
-                width,
-            }}
-        >
-            {children}
-        </div>
-    );
+    const {left, top, width} = movingEventRect;
+    return <div
+        className={Styles.movingEventWrapper}
+        style={{
+            top,
+            left,
+            width,
+        }}>
+        {children}
+    </div>;
 };

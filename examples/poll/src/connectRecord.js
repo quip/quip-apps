@@ -6,8 +6,7 @@ import React from "react";
 
 export default (
     rootRecord: quip.apps.RootRecord,
-    WrappedComponent: React.Component,
-) => {
+    WrappedComponent: React.Component) => {
     class RecordComponent extends React.Component {
         constructor(props) {
             super();
@@ -27,7 +26,7 @@ export default (
         }
 
         render() {
-            return <WrappedComponent {...this.state} {...{ rootRecord }} />;
+            return <WrappedComponent {...this.state} {...{rootRecord}}/>;
         }
     }
 

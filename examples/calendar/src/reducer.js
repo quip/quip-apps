@@ -1,7 +1,7 @@
 /* @flow */
 // Copyright 2017 Quip
 
-import { EventRecord, RootRecord } from "./model";
+import {EventRecord, RootRecord} from "./model";
 
 import type {
     DateRange,
@@ -111,7 +111,7 @@ function appReducer(state: AppState, action: Object) {
                 ...action.payload,
             };
         default:
-            return { ...state };
+            return {...state};
     }
 }
 

@@ -12,9 +12,10 @@ export default class ListenerRecord extends quip.apps.Record {
             this._unlistenParent = () => this.unlisten(listener);
             if (this.supportsComments()) {
                 const commentListener = this.listenToComments(() =>
-                    parent.notifyListeners(),
+                    parent.notifyListeners()
                 );
-                this._unlistenComments = () => this.unlistenToComments(commentListener);
+                this._unlistenComments = () =>
+                    this.unlistenToComments(commentListener);
             }
         }
     }

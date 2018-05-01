@@ -287,7 +287,9 @@ class RecordPicker extends React.Component {
                                         {this.props.entity.getHostname()}
                                     </b>,
                                     "hostname2": <b>
-                                        {this.props.entity.getClient().getHostname()}
+                                        {this.props.entity
+                                            .getClient()
+                                            .getHostname()}
                                     </b>,
                                 })}
                         </div>

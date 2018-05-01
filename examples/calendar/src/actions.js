@@ -1,10 +1,10 @@
 /* @flow */
 // Copyright 2017 Quip
 
-import { EventRecord, RootRecord } from "./model";
-import { setMenuDisplayMonth } from "./menus";
+import {EventRecord, RootRecord} from "./model";
+import {setMenuDisplayMonth} from "./menus";
 
-import { getMovingEventRectMap } from "./util";
+import {getMovingEventRectMap} from "./util";
 
 import type {
     MouseCoordinates,
@@ -15,8 +15,7 @@ import type {
 
 export const setFocusedEvent = (
     focusedEvent: ?EventRecord,
-    focusedEventTimestamp: ?Date,
-) => ({
+    focusedEventTimestamp: ?Date) => ({
     type: "SET_FOCUSED_EVENT",
     focusedEvent,
     focusedEventTimestamp,
@@ -35,8 +34,7 @@ export const setResizingEvent = (resizingEvent: ?EventRecord) => ({
 
 export const setMovingEvent = (
     movingEvent: ?EventRecord,
-    mouseStartCoordinates?: MouseStartCoordinates,
-) => ({
+    mouseStartCoordinates?: MouseStartCoordinates) => ({
     type: "SET_MOVING_EVENT",
     mouseStartCoordinates,
     movingEvent,
@@ -53,16 +51,14 @@ export const setMovingEventOrder = (movingEventOrder: ?MovingEventOrder) => ({
 });
 
 export const setMovingEventRectMap = (
-    movingEventRectMap: ?MovingEventRectMap,
-) => ({
+    movingEventRectMap: ?MovingEventRectMap) => ({
     type: "SET_MOVING_EVENT_RECT_MAP",
     movingEventRectMap,
 });
 
 export const setMouseCoordinates = (
     mouseCoordinates: MouseCoordinates,
-    draggingEventDateRange?: Object,
-) => ({
+    draggingEventDateRange?: Object) => ({
     type: "SET_MOUSE_COORDINATES",
     mouseCoordinates,
     draggingEventDateRange,

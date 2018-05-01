@@ -4,7 +4,7 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import classNames from "classnames";
 
 import isEqual from "date-fns/is_equal";
@@ -12,14 +12,14 @@ import isWithinRange from "date-fns/is_within_range";
 import isToday from "date-fns/is_today";
 import isWeekend from "date-fns/is_weekend";
 
-import { EventRecord } from "../model";
-import { dayInMonth, formatDate } from "../util";
+import {EventRecord} from "../model";
+import {dayInMonth, formatDate} from "../util";
 
 import Styles from "./Calendar.less";
 
 import CalendarEventWrapper from "./CalendarEventWrapper.jsx";
 
-import type { DateRange } from "../types";
+import type {DateRange} from "../types";
 
 type Props = {
     agenda: Array<any>,
@@ -41,49 +41,41 @@ class CalendarWeek extends React.Component<Props, null> {
             week,
         } = this.props;
         //console.log("week", week[0].getDate(), "render");
-        return (
-            <div className={Styles.weekRow}>
-                <div className={Styles.weekRowBackground}>
-                    {week.map((date, i) => (
-                        <CalendarDayBackground
-                            date={date}
-                            draggingEvent={draggingEvent}
-                            draggingEventDateRange={draggingEventDateRange}
-                            isInOtherMonth={!dayInMonth(date, displayMonth)}
-                            isSmallScreen={isSmallScreen}
-                            isToday={isToday(date)}
-                            isWeekend={isWeekend(date)}
-                            key={`bg-${i}`}
-                        />
-                    ))}
-                </div>
-                <div className={Styles.weekAgenda}>
-                    {agenda.map((row, rowIndex) => (
-                        <div key={rowIndex} className={Styles.weekAgendaRow}>
-                            {row.map(
-                                ({ event, start, end }, i) =>
-                                    event ? (
-                                        <CalendarEventWrapper
-                                            end={end}
-                                            eventRecord={event}
-                                            key={i}
-                                            start={start}
-                                            week={week}
-                                        />
-                                    ) : (
-                                        <div
-                                            key={i}
-                                            style={{
-                                                width: 100 / 7 + "%",
-                                            }}
-                                        />
-                                    ),
-                            )}
-                        </div>
-                    ))}
-                </div>
+        return <div className={Styles.weekRow}>
+            <div className={Styles.weekRowBackground}>
+                {week.map((date, i) => <CalendarDayBackground
+                    date={date}
+                    draggingEvent={draggingEvent}
+                    draggingEventDateRange={draggingEventDateRange}
+                    isInOtherMonth={!dayInMonth(date, displayMonth)}
+                    isSmallScreen={isSmallScreen}
+                    isToday={isToday(date)}
+                    isWeekend={isWeekend(date)}
+                    key={`bg-${i}`}/>)}
             </div>
-        );
+            <div className={Styles.weekAgenda}>
+                {agenda.map((row, rowIndex) => <div
+                    key={rowIndex}
+                    className={Styles.weekAgendaRow}>
+                    {row.map(
+                        ({event, start, end}, i) =>
+                            event ? (
+                                <CalendarEventWrapper
+                                    end={end}
+                                    eventRecord={event}
+                                    key={i}
+                                    start={start}
+                                    week={week}/>
+                            ) : (
+                                <div
+                                    key={i}
+                                    style={{
+                                        width: 100 / 7 + "%",
+                                    }}/>
+                            ))}
+                </div>)}
+            </div>
+        </div>;
     }
 }
 
@@ -117,16 +109,13 @@ const CalendarDayBackground = ({
     isWeekend,
 }: CalendarDayBackgroundProps) => {
     let style;
-    if (
-        draggingEvent &&
+    if (draggingEvent &&
         draggingEventDateRange &&
         isWithinRange(
             date,
             draggingEventDateRange.start,
-            draggingEventDateRange.end,
-        )
-    ) {
-        const { start, end } = draggingEventDateRange;
+            draggingEventDateRange.end)) {
+        const {start, end} = draggingEventDateRange;
         const color = quip.apps.ui.ColorMap[draggingEvent.getColor()].VALUE;
         let boxShadows = [
             `inset 0 1px 0 0 ${color}`, // TOP
@@ -144,24 +133,20 @@ const CalendarDayBackground = ({
             boxShadow: boxShadows.join(","),
         };
     }
-    return (
+    return <div
+        className={classNames(Styles.day, {
+            [Styles.isWeekend]: isWeekend,
+        })}
+        data-date-time={date.getTime()}>
+        <div className={Styles.dayHighlight} style={style}/>
         <div
-            className={classNames(Styles.day, {
-                [Styles.isWeekend]: isWeekend,
-            })}
-            data-date-time={date.getTime()}
-        >
-            <div className={Styles.dayHighlight} style={style} />
-            <div
-                className={classNames(Styles.dayNumber, {
-                    [Styles.isToday]: isToday,
-                    [Styles.isInOtherMonth]: isInOtherMonth,
-                })}
-            >
-                {!isSmallScreen && isToday
-                    ? formatDate(date, "MMMM D")
-                    : formatDate(date, "D")}
-            </div>
+            className={classNames(Styles.dayNumber, {
+                [Styles.isToday]: isToday,
+                [Styles.isInOtherMonth]: isInOtherMonth,
+            })}>
+            {!isSmallScreen && isToday
+                ? formatDate(date, "MMMM D")
+                : formatDate(date, "D")}
         </div>
-    );
+    </div>;
 };

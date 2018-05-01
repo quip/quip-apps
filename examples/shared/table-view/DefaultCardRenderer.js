@@ -97,8 +97,7 @@ export const DefaultCardRenderer = statusTypes => {
                                       setRowHeight(
                                           row.id,
                                           record.getColumn().getId(),
-                                          height,
-                                      )
+                                          height)
                                 : undefined
                         }
                         onFocus={() => onCardFocused(true)}
@@ -109,8 +108,8 @@ export const DefaultCardRenderer = statusTypes => {
                 cardComponent = <CommentToggle
                     record={record}
                     ref={el =>
-                        record.setDom(
-                            el && ReactDOM.findDOMNode(el).parentNode)}
+                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
+                    }
                     showComments={showComments}>
                     {comment => {
                         const paddingLeft = comment
@@ -143,8 +142,8 @@ export const DefaultCardRenderer = statusTypes => {
                     rootHeight={rootHeight}
                     record={record}
                     ref={el =>
-                        record.setDom(
-                            el && ReactDOM.findDOMNode(el).parentNode)}
+                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
+                    }
                     showComments={showComments}
                     metricType={metricType}/>;
                 break;
@@ -155,8 +154,8 @@ export const DefaultCardRenderer = statusTypes => {
                     rootHeight={rootHeight}
                     record={record}
                     ref={el =>
-                        record.setDom(
-                            el && ReactDOM.findDOMNode(el).parentNode)}
+                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
+                    }
                     showComments={showComments}
                     metricType={metricType}/>;
                 break;
@@ -165,8 +164,8 @@ export const DefaultCardRenderer = statusTypes => {
                     textWidth={width}
                     record={record}
                     ref={el =>
-                        record.setDom(
-                            el && ReactDOM.findDOMNode(el).parentNode)}
+                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
+                    }
                     showComments={showComments}
                     metricType={metricType}/>;
                 break;

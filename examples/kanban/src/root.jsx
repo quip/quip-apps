@@ -1,6 +1,6 @@
 // Copyright 2017 Quip
 
-import { spring } from "react-motion";
+import {spring} from "react-motion";
 
 import Board from "./board.jsx";
 import {
@@ -8,7 +8,7 @@ import {
     onSelectedCardChanged,
     refreshToolbar,
 } from "./menus.js";
-import { BoardRecord, CardRecord, ColumnRecord } from "./model.jsx";
+import {BoardRecord, CardRecord, ColumnRecord} from "./model.jsx";
 
 const kInitialColumns = [
     {
@@ -69,17 +69,15 @@ quip.apps.registerClass(CardRecord, CardRecord.CONSTRUCTOR_KEY);
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["insert-column"],
-    initializationCallback: (root, { isCreation, creationSource }) => {
+    initializationCallback: (root, {isCreation, creationSource}) => {
         const boardRecord = quip.apps.getRootRecord();
         let justCreated = false;
         if (isCreation) {
             ensureBoardPopulated(boardRecord);
             //quip.apps.sendMessage("created a Kanban Board");
             justCreated = true;
-        } else if (
-            quip.apps.CreationSource &&
-            creationSource === quip.apps.CreationSource.TEMPLATE
-        ) {
+        } else if (quip.apps.CreationSource &&
+            creationSource === quip.apps.CreationSource.TEMPLATE) {
             boardRecord.clearData();
             ensureBoardPopulated(boardRecord);
             justCreated = true;
@@ -88,10 +86,8 @@ quip.apps.initialize({
             <Board
                 entity={boardRecord}
                 onSelectedCardChanged={onSelectedCardChanged}
-                focusOnMount={justCreated}
-            />,
-            root,
-        );
+                focusOnMount={justCreated}/>,
+            root);
         refreshToolbar();
     },
 });

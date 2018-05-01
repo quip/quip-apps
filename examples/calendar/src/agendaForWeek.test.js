@@ -4,7 +4,7 @@ import eachDay from "date-fns/each_day";
 
 import agendaForWeek from "./agendaForWeek";
 
-import { stubEventRecord } from "./test_stubs";
+import {stubEventRecord} from "./test_stubs";
 
 const lastFridayDate = new Date(2017, 7, 4);
 const sundayDate = new Date(2017, 7, 6);

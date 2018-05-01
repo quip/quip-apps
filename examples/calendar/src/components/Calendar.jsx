@@ -5,7 +5,7 @@
 import quip from "quip";
 
 import React from "react";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import classNames from "classnames";
 import chunk from "lodash.chunk";
 import throttle from "lodash.throttle";
@@ -15,7 +15,7 @@ import startOfWeek from "date-fns/start_of_week";
 import Styles from "./Calendar.less";
 import StylesCalendarEvent from "./CalendarEvent.less";
 
-import { EventRecord, RootRecord } from "../model";
+import {EventRecord, RootRecord} from "../model";
 import {
     refreshEvents,
     setDebugProp,
@@ -53,7 +53,7 @@ import type {
     MovingEventOrder,
 } from "../types";
 
-const { CONTAINER_SIZE_UPDATE, ELEMENT_BLUR } = quip.apps.EventType;
+const {CONTAINER_SIZE_UPDATE, ELEMENT_BLUR} = quip.apps.EventType;
 
 const LONG_WEEK_DAYS = [
     quiptext("Sun [Sunday abbreviated]"),
@@ -103,8 +103,7 @@ class Calendar extends React.Component<Props, null> {
     componentWillMount() {
         quip.apps.addEventListener(
             CONTAINER_SIZE_UPDATE,
-            this.handleContainerResize,
-        );
+            this.handleContainerResize);
         quip.apps.addEventListener(ELEMENT_BLUR, this.onElementBlur);
         window.addEventListener("keydown", this.onKeyDown);
         window.document.body.addEventListener("mouseout", this.onBodyMouseOut);
@@ -117,14 +116,12 @@ class Calendar extends React.Component<Props, null> {
     componentWillUnmount() {
         quip.apps.removeEventListener(
             CONTAINER_SIZE_UPDATE,
-            this.handleContainerResize,
-        );
+            this.handleContainerResize);
         quip.apps.removeEventListener(ELEMENT_BLUR, this.onElementBlur);
         window.removeEventListener("keydown", this.onKeyDown);
         window.document.body.removeEventListener(
             "mouseout",
-            this.onBodyMouseOut,
-        );
+            this.onBodyMouseOut);
         this.props.rootRecord.unlisten(this.refresh);
     }
 
@@ -173,10 +170,9 @@ class Calendar extends React.Component<Props, null> {
             "focused",
             focusedEvent,
             e.button,
-            isSmallScreen,
-        );
+            isSmallScreen);
 
-        const mouseCoordinates = { x: e.pageX, y: e.pageY };
+        const mouseCoordinates = {x: e.pageX, y: e.pageY};
         const dateUnderMouse = dateAtPoint(mouseCoordinates);
         const isClickOnEvent = isClickOnCalendarEvent(mouseCoordinates);
         if (dateUnderMouse && !menuOpenRecord && !isClickOnEvent) {
@@ -185,18 +181,15 @@ class Calendar extends React.Component<Props, null> {
                     "NOT CALLING addEvent b/c selectedEvent",
                     selectedEvent,
                     " || focusedEvent",
-                    focusedEvent,
-                );
+                    focusedEvent);
             } else {
                 const newEvent = rootRecord.addEvent(
                     dateUnderMouse,
-                    dateUnderMouse,
-                );
+                    dateUnderMouse);
                 console.log(
                     "^^^^^^ addEvent dateUnderMouse",
                     dateUnderMouse,
-                    newEvent,
-                );
+                    newEvent);
                 this.props.setFocusedEvent(newEvent);
                 this.refresh();
             }
@@ -221,20 +214,17 @@ class Calendar extends React.Component<Props, null> {
             if (resizingEvent) {
                 draggingEventDateRange = getResizingEventDateRange(
                     resizingEvent,
-                    mouseCoordinates,
-                );
+                    mouseCoordinates);
             } else if (movingEvent) {
                 draggingEventDateRange = getMovingEventDateRange(
                     movingEvent,
                     mouseCoordinates,
-                    mouseStartCoordinates,
-                );
+                    mouseStartCoordinates);
 
                 const rectMap = getMovingEventRectMap(
                     movingEvent,
                     mouseStartCoordinates,
-                    mouseCoordinates,
-                );
+                    mouseCoordinates);
                 setMovingEventRectMap(rectMap);
 
                 // To figure out the new order position we use the start datetime
@@ -245,39 +235,34 @@ class Calendar extends React.Component<Props, null> {
                 const newOrder = this.getMovingEventOrder(
                     movingEvent,
                     movingEventRect,
-                    draggingEventDateRange,
-                );
+                    draggingEventDateRange);
                 //console.log("^^^^ newOrder", newOrder);
                 setMovingEventOrder(newOrder);
             }
             setMouseCoordinates(mouseCoordinates, draggingEventDateRange);
         },
         20,
-        { trailing: true },
-    );
+        {trailing: true});
 
     getMovingEventOrder(
         movingEvent,
         movingEventRect,
-        draggingEventDateRange,
-    ): MovingEventOrder {
-        const { rootRecord } = this.props;
+        draggingEventDateRange): MovingEventOrder {
+        const {rootRecord} = this.props;
         const movingEventId = movingEvent.id();
         const events = rootRecord
             .getEventsByStartDate(draggingEventDateRange.start)
             .filter(event => event.id() !== movingEventId);
         const isReOrderOnSameDay = isSameDay(
             movingEvent.getDateRange().start,
-            draggingEventDateRange.start,
-        );
+            draggingEventDateRange.start);
         const curIndex = movingEvent.getIndex();
         if (!events.length) {
             const index = isReOrderOnSameDay
                 ? curIndex
                 : rootRecord.getNextIndexForStartDate(
                       draggingEventDateRange.start,
-                      movingEvent,
-                  );
+                      movingEvent);
             return {
                 closestEvent: null,
                 index,
@@ -331,7 +316,7 @@ class Calendar extends React.Component<Props, null> {
     }
 
     onMouseMove = e => {
-        const { movingEvent, resizingEvent } = this.props;
+        const {movingEvent, resizingEvent} = this.props;
         if (!(resizingEvent || movingEvent)) {
             return;
         }
@@ -370,15 +355,13 @@ class Calendar extends React.Component<Props, null> {
             "selected",
             !!selectedEvent,
             "focused",
-            !!focusedEvent,
-        );
+            !!focusedEvent);
 
         if (mouseCoordinates) {
             if (resizingEvent) {
                 const newRange = getResizingEventDateRange(
                     resizingEvent,
-                    mouseCoordinates,
-                );
+                    mouseCoordinates);
                 const curRange = resizingEvent.getDateRange();
                 if (!areDateRangesEqual(curRange, newRange)) {
                     resizingEvent.setDateRange(newRange.start, newRange.end);
@@ -386,8 +369,7 @@ class Calendar extends React.Component<Props, null> {
                         "^^^^ set resizingEvent to newRange",
                         newRange,
                         "from",
-                        curRange,
-                    );
+                        curRange);
                 } else {
                     console.log("^^^^ no change for resizingEvent range");
                 }
@@ -397,8 +379,7 @@ class Calendar extends React.Component<Props, null> {
                 const newRange = getMovingEventDateRange(
                     movingEvent,
                     mouseCoordinates,
-                    mouseStartCoordinates,
-                );
+                    mouseStartCoordinates);
                 if (!areDateRangesEqual(curRange, newRange)) {
                     movingEvent.setDateRange(newRange.start, newRange.end);
                     console.log("^^^^ set movingEvent to newRange", newRange);
@@ -409,8 +390,7 @@ class Calendar extends React.Component<Props, null> {
                 if (movingEventOrder) {
                     console.log(
                         "^^^^ setIndex for movingEvent",
-                        movingEventOrder,
-                    );
+                        movingEventOrder);
                     movingEvent.setIndex(movingEventOrder.index);
                 }
                 this.props.setMovingEvent(null);
@@ -429,7 +409,7 @@ class Calendar extends React.Component<Props, null> {
             });
             return;
         }
-        const { isSmallScreen, selectedEvent } = this.props;
+        const {isSmallScreen, selectedEvent} = this.props;
         if (!selectedEvent || isSmallScreen) {
             return;
         }
@@ -454,44 +434,37 @@ class Calendar extends React.Component<Props, null> {
 
         const weekDays = isSmallScreen ? SHORT_WEEK_DAYS : LONG_WEEK_DAYS;
         const weeks = chunk(getCalendarMonth(displayMonth), 7);
-        return (
+        return <div
+            onMouseUp={this.onMouseUp}
+            onMouseMove={this.onMouseMove}
+            onMouseDown={this.onMouseDown}
+            className={classNames(Styles.Calendar, {
+                [Styles.moving]: !!movingEvent,
+                [Styles.resizing]: !!resizingEvent,
+            })}>
+            <CalendarNavHeader/>
+
+            <div className={Styles.weekHeader}>
+                {weekDays.map((title, i) => <div
+                    key={`${title}-${i}`}
+                    className={Styles.cell}>
+                    {title}
+                </div>)}
+            </div>
+
             <div
-                onMouseUp={this.onMouseUp}
-                onMouseMove={this.onMouseMove}
-                onMouseDown={this.onMouseDown}
-                className={classNames(Styles.Calendar, {
+                className={classNames(Styles.grid, {
                     [Styles.moving]: !!movingEvent,
                     [Styles.resizing]: !!resizingEvent,
-                })}
-            >
-                <CalendarNavHeader />
-
-                <div className={Styles.weekHeader}>
-                    {weekDays.map((title, i) => (
-                        <div key={`${title}-${i}`} className={Styles.cell}>
-                            {title}
-                        </div>
-                    ))}
-                </div>
-
-                <div
-                    className={classNames(Styles.grid, {
-                        [Styles.moving]: !!movingEvent,
-                        [Styles.resizing]: !!resizingEvent,
-                    })}
-                >
-                    {weeks.map((week, i) => (
-                        <CalendarWeek
-                            key={i}
-                            agenda={agendaForWeek(week, events)}
-                            week={week}
-                        />
-                    ))}
-                </div>
-
-                {isSmallScreen && <EventLegend />}
+                })}>
+                {weeks.map((week, i) => <CalendarWeek
+                    key={i}
+                    agenda={agendaForWeek(week, events)}
+                    week={week}/>)}
             </div>
-        );
+
+            {isSmallScreen && <EventLegend/>}
+        </div>;
     }
 }
 

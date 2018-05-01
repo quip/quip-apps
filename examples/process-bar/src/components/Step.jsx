@@ -5,7 +5,7 @@ import quip from "quip";
 import cx from "classnames";
 
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
-import { setFocusedStep } from "../menus";
+import {setFocusedStep} from "../menus";
 
 import Styles from "./Step.less";
 import Chevron from "quip-apps-chevron";
@@ -66,8 +66,7 @@ export default class Step extends React.Component {
             {
                 deleteStep: this.deleteStep,
                 record: this.props.record,
-            },
-        );
+            });
         e.preventDefault();
         e.stopPropagation();
     };
@@ -90,7 +89,7 @@ export default class Step extends React.Component {
     };
 
     render() {
-        const { record, selected, color } = this.props;
+        const {record, selected, color} = this.props;
         var extraRichTextBoxProps = {};
         if (quip.apps.isApiVersionAtLeast("0.1.039")) {
             extraRichTextBoxProps.allowedInlineStyles = [
@@ -100,71 +99,59 @@ export default class Step extends React.Component {
                 quip.apps.RichTextRecord.InlineStyle.CODE,
             ];
         }
-        return (
-            <div
-                className={cx(Styles.step, {
-                    [Styles.selected]: selected,
-                })}
-                ref={node => {
-                    this._node = node;
-                    record.setDom(node);
-                }}
-                style={{
-                    backgroundColor: selected
-                        ? quip.apps.ui.ColorMap[color].VALUE
-                        : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
-                    borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
-                    paddingTop: VERTICAL_PADDING,
-                    paddingBottom: VERTICAL_PADDING,
-                }}
-            >
-                <div className={Styles.contents}>
-                    <div className={Styles.label}>
-                        <quip.apps.ui.RichTextBox
-                            allowedStyles={[
-                                quip.apps.RichTextRecord.Style.TEXT_PLAIN,
-                            ]}
-                            color={
-                                selected
-                                    ? quip.apps.ui.ColorMap.WHITE.KEY
-                                    : color
-                            }
-                            handleKeyEvent={this.handleKeyEvent}
-                            minHeight={INPUT_HEIGHT}
-                            onBlur={this.handleBlur}
-                            onFocus={this.handleFocus}
-                            record={record}
-                            useDocumentTheme={false}
-                            width="100%"
-                            {...extraRichTextBoxProps}
-                        />
-                    </div>
-                    <div
-                        className={cx(Styles.commentsTrigger, {
-                            [Styles.commented]: record.getCommentCount() > 0,
-                        })}
-                    >
-                        <quip.apps.ui.CommentsTrigger
-                            color={color}
-                            invertColor={selected}
-                            record={record}
-                            showEmpty
-                        />
-                    </div>
-                    <div
-                        className={Styles.chevron}
-                        onClick={this.showContextMenu}
-                    >
-                        <Chevron
-                            color={
-                                selected
-                                    ? quip.apps.ui.ColorMap.WHITE.VALUE
-                                    : quip.apps.ui.ColorMap[color].VALUE
-                            }
-                        />
-                    </div>
+        return <div
+            className={cx(Styles.step, {
+                [Styles.selected]: selected,
+            })}
+            ref={node => {
+                this._node = node;
+                record.setDom(node);
+            }}
+            style={{
+                backgroundColor: selected
+                    ? quip.apps.ui.ColorMap[color].VALUE
+                    : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+                borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
+                paddingTop: VERTICAL_PADDING,
+                paddingBottom: VERTICAL_PADDING,
+            }}>
+            <div className={Styles.contents}>
+                <div className={Styles.label}>
+                    <quip.apps.ui.RichTextBox
+                        allowedStyles={[
+                            quip.apps.RichTextRecord.Style.TEXT_PLAIN,
+                        ]}
+                        color={
+                            selected ? quip.apps.ui.ColorMap.WHITE.KEY : color
+                        }
+                        handleKeyEvent={this.handleKeyEvent}
+                        minHeight={INPUT_HEIGHT}
+                        onBlur={this.handleBlur}
+                        onFocus={this.handleFocus}
+                        record={record}
+                        useDocumentTheme={false}
+                        width="100%"
+                        {...extraRichTextBoxProps}/>
+                </div>
+                <div
+                    className={cx(Styles.commentsTrigger, {
+                        [Styles.commented]: record.getCommentCount() > 0,
+                    })}>
+                    <quip.apps.ui.CommentsTrigger
+                        color={color}
+                        invertColor={selected}
+                        record={record}
+                        showEmpty/>
+                </div>
+                <div className={Styles.chevron} onClick={this.showContextMenu}>
+                    <Chevron
+                        color={
+                            selected
+                                ? quip.apps.ui.ColorMap.WHITE.VALUE
+                                : quip.apps.ui.ColorMap[color].VALUE
+                        }/>
                 </div>
             </div>
-        );
+        </div>;
     }
 }

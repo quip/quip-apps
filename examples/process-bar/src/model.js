@@ -73,9 +73,10 @@ class StepRecord extends quip.apps.RichTextRecord {
             const listener = this.listen(() => parent.notifyListeners());
             this._unlistenParent = () => this.unlisten(listener);
             const commentListener = this.listenToComments(() =>
-                parent.notifyListeners(),
+                parent.notifyListeners()
             );
-            this._unlistenComments = () => this.unlistenToComments(commentListener);
+            this._unlistenComments = () =>
+                this.unlistenToComments(commentListener);
         }
     }
 

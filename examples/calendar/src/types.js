@@ -1,7 +1,7 @@
 /* @flow */
 // Copyright 2017 Quip
 
-import type { EventRecord } from "./model";
+import type {EventRecord} from "./model";
 
 export type MouseCoordinates = {
     x: number,
