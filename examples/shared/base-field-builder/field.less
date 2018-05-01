@@ -225,12 +225,6 @@
     }
 }
 
-.readOnly {
-    .enumField {
-        opacity: 0.5;
-    }
-}
-
 .enumDropdown {
     background-color: white;
     border: 1px solid @lighGreyColor;
@@ -303,10 +297,13 @@
 
 .tokenField {
     display: flex;
+    flex-wrap: wrap;
     margin: 0;
+    max-height: 38px;
     overflow: hidden;
     padding: 0;
     position: relative;
+    width: 100%;
     z-index: 0;
 
     input:not([type=checkbox]):not([type=radio]) {
@@ -318,7 +315,7 @@
 }
 
 .tokenField.tokenFieldFocused {
-    flex-wrap: wrap;
+    max-height: none;
     overflow: scroll;
 }
 
@@ -329,9 +326,11 @@
     display: flex;
     flex: 0 0 auto;
     flex-wrap: nowrap;
+    height: 18px;
     margin-right: 3px;
     margin-top: 1px;
     margin-bottom: 1px;
+    max-width: 100%;
     padding: 0 5px;
 }
 
@@ -344,10 +343,25 @@
     }
 }
 
+.tokenText {
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 :global .rich-text-box.read-only {
     article .content {
         opacity: 0.5;
     }
+}
+
+.referenceField {
+    background: @blueColor;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
 .lockIcon {
@@ -365,11 +379,17 @@
         height: 18px;
         width: 18px;
     }
+
+    flex: 0 0 auto;
 }
 
 .readOnly {
     .lockIcon {
         display: flex;
+    }
+
+    .dateField, .enumField, .tokenField {
+        opacity: 0.5;
     }
 }
 
@@ -394,4 +414,11 @@
     font-size: 10px;
     font-weight: 700;
     line-height: 11px !important;
+}
+
+.booleanField {
+    &:extend(.textField);
+    input {
+        margin: 4px;
+    }
 }

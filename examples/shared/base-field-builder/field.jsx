@@ -1,7 +1,12 @@
 // Copyright 2017 Quip
 
 import Styles from "./field.less";
-import {entityListener, formatNumber, shallowEqual} from "./utils.jsx";
+import {
+    entityListener,
+    formatBoolean,
+    formatNumber,
+    shallowEqual,
+} from "./utils.jsx";
 import {BaseMenu} from "../../shared/base-field-builder/base-menu.js";
 import GrabberIcon from "./icons/grabber.jsx";
 import ArrowIcon from "./icons/arrow.jsx";
@@ -15,10 +20,13 @@ import WarningIcon from "./icons/warning.jsx";
 import ErrorPopover from "./error-popover.jsx";
 
 import {
-    FieldEntity,
     BooleanFieldEntity,
+    DateFieldEntity,
+    DateTimeFieldEntity,
     EnumFieldEntity,
+    FieldEntity,
     NumericFieldEntity,
+    ReferenceFieldEntity,
     TextFieldEntity,
     TokenFieldEntity,
 } from "./model/field.js";
@@ -33,7 +41,7 @@ const LOADING_STATUS = {
 };
 
 const DragHandle = SortableHandle(() => <div className={Styles.dragHandle}>
-    <GrabberIcon />
+    <GrabberIcon/>
 </div>);
 
 class Field extends React.Component {
@@ -54,6 +62,30 @@ class Field extends React.Component {
         };
         this.renderedEntityProperties_ = {};
     }
+
+    componentDidMount() {
+        document.addEventListener("mousedown", this.onMouseDown_);
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
+            this.hideDialog_);
+    }
+
+    componentWillUnmount() {
+        document.addEventListener("mousedown", this.onMouseDown_);
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
+            this.hideDialog_);
+    }
+
+    onMouseDown_ = e => {
+        if (this.fieldDialog_ && !this.fieldDialog_.contains(e.target)) {
+            this.hideDialog_();
+        }
+    };
+
+    hideDialog_ = () => {
+        this.setState({fieldDialog: null});
+    };
 
     showMenu_ = e => {
         this.props.menuDelegate.showFieldContextMenu(
@@ -138,17 +170,13 @@ class Field extends React.Component {
         let inputComponent;
         if (this.props.entity instanceof TokenFieldEntity) {
             inputComponent = <TokenField
-                createDialog={(dialogNode, dialogLeft, dialogTop) =>
-                    this.setState({dialogNode, dialogLeft, dialogTop})
-                }
+                createDialog={fieldDialog => this.setState({fieldDialog})}
                 focused={this.state.isFocused}
                 {...this.props}
                 onChangeFocus={this.onChangeFocus_}/>;
         } else if (this.props.entity instanceof EnumFieldEntity) {
             inputComponent = <EnumField
-                createDialog={(dialogNode, dialogLeft, dialogTop) =>
-                    this.setState({dialogNode, dialogLeft, dialogTop})
-                }
+                createDialog={fieldDialog => this.setState({fieldDialog})}
                 {...this.props}
                 onChangeFocus={this.onChangeFocus_}/>;
         } else if (this.props.entity instanceof NumericFieldEntity) {
@@ -166,6 +194,12 @@ class Field extends React.Component {
             inputComponent = <BooleanField
                 {...this.props}
                 onChangeFocus={this.onChangeFocus_}/>;
+        } else if (this.props.entity instanceof ReferenceFieldEntity) {
+            inputComponent = <ReferenceField {...this.props}/>;
+        } else if (this.props.entity instanceof DateFieldEntity) {
+            inputComponent = <DateField {...this.props}/>;
+        } else if (this.props.entity instanceof DateTimeFieldEntity) {
+            inputComponent = <DateTimeField {...this.props}/>;
         } else {
             return null;
         }
@@ -184,7 +218,7 @@ class Field extends React.Component {
             saveError = <div
                 onMouseEnter={this.onMouseEnterError_}
                 onMouseLeave={this.onMouseLeaveError_}>
-                <WarningIcon />
+                <WarningIcon/>
                 {errorPopover}
             </div>;
         }
@@ -198,17 +232,23 @@ class Field extends React.Component {
 
         let originalValue = this.props.entity.getOriginalDisplayValue();
         if (this.props.entity instanceof NumericFieldEntity) {
+            originalValue = this.props.entity.getOriginalValue();
             originalValue = formatNumber(originalValue);
+        } else if (this.props.entity instanceof BooleanFieldEntity) {
+            originalValue = this.props.entity.getOriginalValue();
+            originalValue = formatBoolean(originalValue);
         }
 
         let dialog;
-        if (this.state.dialogNode) {
+        if (this.state.fieldDialog) {
             const rect = this.rootNode_.getBoundingClientRect();
             dialog = <Dialog
+                ref={node => (this.fieldDialog_ = ReactDOM.findDOMNode(node))}
                 showBackdrop={false}
-                left={this.state.dialogLeft - rect.left}
-                top={this.state.dialogTop - rect.top}>
-                {this.state.dialogNode}
+                onDismiss={this.state.fieldDialog.onDismiss}
+                left={this.state.fieldDialog.left - rect.left}
+                top={this.state.fieldDialog.top - rect.top}>
+                {this.state.fieldDialog.node}
             </Dialog>;
         }
         return <div
@@ -220,14 +260,14 @@ class Field extends React.Component {
                 className={Styles.label}
                 ref={node => (this.props.entity.domNode = node)}>
                 <div className={Styles.labelText}>
-                    <DragHandle />
+                    <DragHandle/>
                     {this.props.entity.getLabel()}
                 </div>
                 <div
                     ref={node => (this.menuButton_ = node)}
                     className={Styles.fieldMenu}
                     onClick={this.showMenu_}>
-                    <ArrowIcon />
+                    <ArrowIcon/>
                 </div>
             </div>
             <div className={Styles.values} onClick={this.onValueClick_}>
@@ -246,9 +286,9 @@ class Field extends React.Component {
                                 showEmpty={true}/>
                         </div>
                         <div
-                            title={"This field is read-only."}
+                            title={quiptext("This field is read-only.")}
                             className={Styles.lockIcon}>
-                            <LockIcon />
+                            <LockIcon/>
                         </div>
                         <div className={Styles.status}>
                             <div
@@ -258,9 +298,9 @@ class Field extends React.Component {
                                     background: quip.apps.ui.Color.GREEN,
                                 }}
                                 onClick={this.showDraftMenu_}>
-                                <div>Draft</div>
+                                <div>{quiptext("Draft")}</div>
                                 <div>
-                                    <ArrowIcon />
+                                    <ArrowIcon/>
                                 </div>
                             </div>
                             <div className={Styles.saveError}>{saveError}</div>
@@ -325,7 +365,7 @@ class TextField extends React.Component {
         }
         const isValid = this.props.entity.isValid();
         if (!isValid) {
-            const message = "Not valid field value.";
+            const message = quiptext("Not valid field value.");
             this.props.onValidation(message);
         } else {
             this.props.onValidation(null);
@@ -399,7 +439,7 @@ class NumericField extends React.Component {
     onBlur_ = e => {
         const isValid = this.props.entity.isValid();
         if (!isValid) {
-            const message = "Not valid field value.";
+            const message = quiptext("Not valid field value.");
             this.props.onValidation(message);
         } else {
             this.props.onValidation(null);
@@ -439,11 +479,87 @@ class BooleanField extends React.Component {
         handleKeyEvent: React.PropTypes.func.isRequired,
     };
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            value: this.props.entity.getValue(),
+        };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const newValue = nextProps.entity.getValue();
+        if (newValue != this.state.value) {
+            this.setState({value: newValue});
+        }
+    }
+
+    onClick_ = e => {
+        const newValue = event.target.checked;
+        if (newValue !== this.state.value) {
+            this.setState({value: newValue});
+            this.props.entity.setValue(newValue);
+        }
+    };
+
     render() {
-        return <input
-            type="checkbox"
-            checked={this.props.entity.getDisplayValue()}
-            disabled={this.props.entity.isReadOnly()}/>;
+        return <div className={Styles.booleanField}>
+            <input
+                type="checkbox"
+                onClick={this.onClick_}
+                checked={this.state.value}
+                id={this.props.entity.getKey()}
+                disabled={this.props.entity.isReadOnly()}/>
+            <label for={this.props.entity.getKey()}>
+                {formatBoolean(this.state.value)}
+            </label>
+        </div>;
+    }
+}
+
+class ReferenceField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(ReferenceFieldEntity).isRequired,
+    };
+
+    onClick_ = e => {
+        const record = this.props.entity.getParentRecord();
+        const instanceUrl = record.getParentRecord().getInstanceUrl();
+        const recordId = this.props.entity.getValue();
+        const url = record.getClient().salesforceUrl(instanceUrl, recordId);
+        quip.apps.openLink(url);
+    };
+
+    render() {
+        return <div className={Styles.referenceField} onClick={this.onClick_}>
+            {this.props.entity.getDisplayValue()}
+        </div>;
+    }
+}
+
+export class DateField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(DateFieldEntity).isRequired,
+        width: React.PropTypes.number,
+    };
+
+    render() {
+        return <div
+            className={Styles.dateField}
+            style={{width: this.props.width}}>
+            {this.props.entity.getDisplayValue()}
+        </div>;
+    }
+}
+
+class DateTimeField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(DateTimeFieldEntity).isRequired,
+    };
+
+    render() {
+        return <div className={Styles.dateTimeField}>
+            {this.props.entity.getDisplayValue()}
+        </div>;
     }
 }
 
@@ -492,9 +608,9 @@ class EnumDropdown extends React.Component {
         return <div
             className={classNames.join(" ")}
             key={option.id}
-            onMouseDown={e => this.props.onRowClick(e, option)}>
+            onMouseDown={e => this.props.onRowClick(e, option, true)}>
             <div className={Styles.checkmarkIcon} style={checkmarkStyle}>
-                <CheckmarkIcon />
+                <CheckmarkIcon/>
             </div>
             <div className={Styles.enumLabel}>
                 {option.dropdownName || option.name}
@@ -530,20 +646,7 @@ export class EnumField extends React.Component {
         };
     }
 
-    handleClick_ = e => {
-        if (this.dropdownWrapper &&
-            !this.dropdownWrapper.contains(e.target) &&
-            !this.fieldDom.contains(e.target)) {
-            this.hideDropdown_();
-        }
-    };
-
     componentDidMount() {
-        document.addEventListener("mousedown", this.handleClick_);
-        quip.apps.addEventListener(
-            quip.apps.EventType.ELEMENT_BLUR,
-            this.hideDropdown_);
-
         if (this.props.entity.isReadOnly()) {
             return;
         }
@@ -569,14 +672,7 @@ export class EnumField extends React.Component {
             });
     }
 
-    componentWillUnmount() {
-        document.removeEventListener("mousedown", this.handleClick_);
-        quip.apps.removeEventListener(
-            quip.apps.EventType.ELEMENT_BLUR,
-            this.hideDropdown_);
-    }
-
-    hideDropdown_ = () => {
+    onDropdownHidden_ = () => {
         this.setState({dropdown: false}, () => {
             if (this.props.entity.getAutoCompleteUrl() &&
                 this.lastQuery !== null &&
@@ -593,24 +689,22 @@ export class EnumField extends React.Component {
                         useQuery: true,
                     };
                 }
-                this.onRowClick_(null, option);
-            } else if (this.props.createDialog) {
-                this.props.createDialog(null);
+                this.onRowClick_(null, option, false);
             }
         });
     };
 
     showDropdown_ = () => {
         const boundingRect = this.fieldDom.getBoundingClientRect();
-        this.props.createDialog(
-            <EnumDropdown
-                entity={this.props.entity}
-                ref={el => (this.dropdownWrapper = ReactDOM.findDOMNode(el))}
-                options={this.state.options}
-                onRowClick={this.onRowClick_}
-                showCheckmark={!this.props.entity.getAutoCompleteUrl()}/>,
-            boundingRect.left - 12,
-            boundingRect.bottom);
+        const node = <EnumDropdown
+            entity={this.props.entity}
+            options={this.state.options}
+            onRowClick={(e, option) => this.onRowClick_(e, option, true)}
+            showCheckmark={!this.props.entity.getAutoCompleteUrl()}/>;
+        const left = boundingRect.left - 12;
+        const top = boundingRect.bottom;
+        const onDismiss = this.onDropdownHidden_;
+        this.props.createDialog({node, left, top, onDismiss});
     };
 
     onUpdate_ = () => {
@@ -631,7 +725,10 @@ export class EnumField extends React.Component {
                 },
                 this.showDropdown_);
             client
-                .autocomplete(query, this.props.entity.getAutoCompleteUrl())
+                .autocomplete(
+                    query,
+                    this.props.entity.getAutoCompleteUrl(),
+                    this.props.entity.getKey())
                 .then(map => {
                     if (this.lastQuery === query && this.state.dropdown) {
                         if (map.length === 0) {
@@ -675,7 +772,6 @@ export class EnumField extends React.Component {
         if (this.props.onChangeFocus) {
             this.props.onChangeFocus(false);
         }
-        this.hideDropdown_();
     };
 
     onClick_ = e => {
@@ -701,7 +797,7 @@ export class EnumField extends React.Component {
             });
     };
 
-    onRowClick_ = (e, option) => {
+    onRowClick_ = (e, option, hide) => {
         if (e) {
             e.stopPropagation();
         }
@@ -710,11 +806,10 @@ export class EnumField extends React.Component {
         } else {
             this.lastQuery = option.name;
         }
-        this.setState({dropdown: false}, () => {
-            this.setEntityValue(option);
-            this.lastQuery = null;
+        this.setEntityValue(option);
+        if (hide) {
             this.props.createDialog(null);
-        });
+        }
     };
 
     setEntityValue(option) {
@@ -722,7 +817,6 @@ export class EnumField extends React.Component {
         if (this.props.entity.getAutoCompleteUrl()) {
             this.fieldDom.value = this.props.entity.getDisplayValue();
         }
-        this.forceUpdate();
     }
 
     render() {
@@ -739,6 +833,7 @@ export class EnumField extends React.Component {
                     onFocus={this.onFocus_}
                     onInput={this.onUpdate_}
                     ref={el => (this.fieldDom = el)}
+                    suppressContentEditableWarning={true}
                     style={{width: this.props.width}}>
                     {this.props.entity.getDisplayValue()}
                 </div>
@@ -766,7 +861,7 @@ export class EnumField extends React.Component {
                     ref={el => (this.fieldDom = el)}>
                     <div>{this.props.entity.getDisplayValue()}</div>
                     {!quip.apps.isMobile() &&
-                        !this.props.entity.isReadOnly() && <DropdownIcon />}
+                        !this.props.entity.isReadOnly() && <DropdownIcon/>}
                 </div>;
             }
         }
@@ -776,6 +871,7 @@ export class EnumField extends React.Component {
 export class TokenField extends React.Component {
     static propTypes = {
         createDialog: React.PropTypes.func.isRequired,
+        dialog: React.PropTypes.bool.isRequired,
         entity: React.PropTypes.instanceOf(FieldEntity).isRequired,
         focused: React.PropTypes.bool.isRequired,
         onChangeFocus: React.PropTypes.func,
@@ -793,14 +889,14 @@ export class TokenField extends React.Component {
         document.addEventListener("mousedown", this.handleClick_);
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.dismissDropdownAndFocus_);
+            this.dismissFocus_);
     }
 
     componentWillUnmount() {
         document.removeEventListener("mousedown", this.handleClick_);
         quip.apps.removeEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
-            this.dismissDropdownAndFocus_);
+            this.dismissFocus_);
     }
 
     handleKeyDown_ = e => {
@@ -822,25 +918,12 @@ export class TokenField extends React.Component {
     };
 
     handleClick_ = e => {
-        if (this.props.focused) {
-            const dismissDropdown =
-                !this.dropdownWrapper ||
-                !this.dropdownWrapper.contains(e.target);
-            const dismissFocus =
-                this.fieldDom && !this.fieldDom.contains(e.target);
-
-            if (dismissDropdown && dismissFocus) {
-                this.hideDropdown_();
-                this.dismissFocus_();
-            } else if (dismissDropdown) {
-                this.hideDropdown_();
-            }
+        if (this.props.focused &&
+            !this.props.dialog &&
+            this.fieldDom &&
+            !this.fieldDom.contains(e.target)) {
+            this.dismissFocus_();
         }
-    };
-
-    dismissDropdownAndFocus_ = () => {
-        this.dismissFocus_();
-        this.hideDropdown_();
     };
 
     dismissFocus_ = () => {
@@ -861,7 +944,6 @@ export class TokenField extends React.Component {
 
     onTokenClick_(item) {
         this.setState({selected: item});
-        this.hideDropdown_();
     }
 
     onUpdate_ = () => {
@@ -873,7 +955,7 @@ export class TokenField extends React.Component {
             let client = this.props.entity.getParentRecord().getClient();
             let dummyValue = {
                 id: "loading",
-                name: "Loading…",
+                name: quiptext("Loading…"),
                 serverValue: "",
                 useQuery: true,
             };
@@ -924,7 +1006,7 @@ export class TokenField extends React.Component {
                             options: [
                                 {
                                     id: "no_results",
-                                    name: "No Results",
+                                    name: quiptext("No Results"),
                                 },
                             ],
                         },
@@ -935,19 +1017,18 @@ export class TokenField extends React.Component {
 
     showDropdown_ = () => {
         const boundingRect = this.fieldDom.getBoundingClientRect();
-        this.props.createDialog(
-            <EnumDropdown
-                entity={this.props.entity}
-                ref={el => (this.dropdownWrapper = ReactDOM.findDOMNode(el))}
-                options={this.state.options}
-                onRowClick={this.onRowClick_}
-                showCheckmark={false}/>,
-            boundingRect.left - 12,
-            boundingRect.bottom);
+        const node = <EnumDropdown
+            entity={this.props.entity}
+            options={this.state.options}
+            onRowClick={(e, option) => this.onRowClick_(e, option, true)}
+            showCheckmark={false}/>;
+        const left = boundingRect.left - 12;
+        const top = boundingRect.bottom;
+        const onDismiss = this.onDropdownHidden_;
+        this.props.createDialog({node, left, top, onDismiss});
     };
 
-    hideDropdown_ = () => {
-        this.props.createDialog(null);
+    onDropdownHidden_ = () => {
         this.lastQuery = null;
     };
 
@@ -962,7 +1043,7 @@ export class TokenField extends React.Component {
             this.props.entity.setValue({items: items});
             this.inputDom.value = "";
         }
-        setTimeout(this.hideDropdown_, 0);
+        setTimeout(() => this.props.createDialog(null), 0);
     };
 
     render() {
@@ -972,7 +1053,13 @@ export class TokenField extends React.Component {
         }
         return <div
             className={classNames.join(" ")}
-            onClick={() => {
+            onClick={e => {
+                if (this.props.entity.isReadOnly() || quip.apps.isMobile()) {
+                    return;
+                }
+                if (e) {
+                    e.stopPropagation();
+                }
                 if (!this.props.focused) {
                     this.props.onChangeFocus(true);
                 } else if (this.inputDom) {
@@ -996,14 +1083,14 @@ export class TokenField extends React.Component {
                               }
                             : null
                     }>
-                    <div>{item.name}</div>
+                    <div className={Styles.tokenText}>{item.name}</div>
                     {this.props.focused && <div
                         className={Styles.clearIcon}
                         onClick={e => {
                             e.stopPropagation();
                             this.onClearClick_(item);
                         }}>
-                        <ClearIcon />
+                        <ClearIcon/>
                     </div>}
                 </div>;
             })}

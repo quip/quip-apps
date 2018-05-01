@@ -77,7 +77,16 @@ class EventRichTextBox extends React.Component<Props, null> {
         const { color, focused, titleRecord, week } = this.props;
         let key = `rtb-${titleRecord.id()}`;
         if (week) {
-            key = `-${key}-${week[0].getTime()}`;
+            key = `-${key}-${color}-${week[0].getTime()}`;
+        }
+        var extraRichTextBoxProps = {};
+        if (quip.apps.isApiVersionAtLeast("0.1.039")) {
+            extraRichTextBoxProps.allowedInlineStyles = [
+                quip.apps.RichTextRecord.InlineStyle.ITALIC,
+                quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
+                quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
+                quip.apps.RichTextRecord.InlineStyle.CODE,
+            ];
         }
         return (
             <div
@@ -85,16 +94,16 @@ class EventRichTextBox extends React.Component<Props, null> {
                 style={{ cursor: "text", wordBreak: "break-word" }}
             >
                 <RichTextBox
-                    allowedStyles={[
-                        quip.apps.RichTextRecord.Style.TEXT_PLAIN,
-                    ]}
+                    allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
                     color={color}
-                    onBlur={this.onBlur}
+                    disableSelection={!focused}
                     key={key}
-                    useDocumentTheme={false}
+                    onBlur={this.onBlur}
                     readOnly={!focused}
                     record={titleRecord}
+                    useDocumentTheme={false}
                     width="100%"
+                    {...extraRichTextBoxProps}
                 />
             </div>
         );

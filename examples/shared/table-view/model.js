@@ -12,6 +12,15 @@ export const COLUMN_TYPE = {
     CUSTOM: "custom",
 };
 
+export const COLUMN_TYPE_LABELS = {
+    [COLUMN_TYPE.PERSON]: quiptext("Person"),
+    [COLUMN_TYPE.STATUS]: quiptext("Status"),
+    [COLUMN_TYPE.DATE]: quiptext("Date"),
+    [COLUMN_TYPE.FILE]: quiptext("File"),
+    [COLUMN_TYPE.TEXT]: quiptext("Text"),
+    [COLUMN_TYPE.CUSTOM]: quiptext("Custom"),
+};
+
 export const toJSONPropTypeShape = arrayOrObj => {
     return PropTypes.shape({
         id: PropTypes.number.isRequired,

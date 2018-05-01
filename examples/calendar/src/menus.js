@@ -4,6 +4,7 @@
 // $FlowIssueQuipModule
 import quip from "quip";
 import isEqual from "date-fns/is_equal";
+import { localizedColorLabel } from "quip-apps-compat";
 
 import { EventRecord, colors } from "./model";
 
@@ -19,7 +20,7 @@ export function allMenuCommands() {
     return [
         {
             id: "set-display-month",
-            label: "Set Default Month",
+            label: quiptext("Set Default Month"),
             handler: () => {
                 quip.apps.getRootRecord().setDisplayMonth(displayMonth);
                 refreshToolbar();
@@ -27,21 +28,21 @@ export function allMenuCommands() {
         },
         {
             id: "delete-event",
-            label: "Delete",
+            label: quiptext("Delete"),
             handler: () => {
                 selectedEvent.delete();
             },
         },
         {
             id: "comment",
-            label: "Comment",
+            label: quiptext("Comment"),
             handler: () => {
                 quip.apps.showComments(selectedEvent.id());
             },
         },
         ...colors.map(color => ({
             id: color,
-            label: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
+            label: localizedColorLabel(color),
             handler: () => {
                 selectedEvent.setColor(color);
                 refreshToolbar();

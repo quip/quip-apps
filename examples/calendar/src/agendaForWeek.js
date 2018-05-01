@@ -1,12 +1,12 @@
 // Copyright 2017 Quip
 // @flow
 
-import endOfDay from "date-fns/end_of_day";
-import isSameDay from "date-fns/is_same_day";
 import isWithinRange from "date-fns/is_within_range";
 import areRangesOverlapping from "date-fns/are_ranges_overlapping";
 import max from "date-fns/max";
 import min from "date-fns/min";
+
+import { isSameDay, endOfDay } from "./util";
 
 import type { EventRecord } from "./model";
 

@@ -142,14 +142,14 @@ export default class RowContainer extends React.Component {
                     onClick={e => this.onRowClick_(e, index)}
                     onDoubleClick={e => this.onRowDoubleClick_(e, index)}
                     onMouseEnter={
-                        this.props.selectOnHover ? (
-                            e => this.onRowMouseEnter_(e, index)
-                        ) : null
+                        this.props.selectOnHover
+                            ? e => this.onRowMouseEnter_(e, index)
+                            : null
                     }
                     onMouseLeave={
-                        this.props.selectOnHover ? (
-                            e => this.onRowMouseLeave_(e, index)
-                        ) : null
+                        this.props.selectOnHover
+                            ? e => this.onRowMouseLeave_(e, index)
+                            : null
                     }>
                     {this.props.renderRow(row, isHighlighted, index)}
                 </div>;

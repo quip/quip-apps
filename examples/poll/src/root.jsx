@@ -3,6 +3,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import quip from "quip";
+import { localizedColorLabel } from "quip-apps-compat"
 
 import Connect from "./connectRecord";
 import registerModels from "./model";
@@ -55,19 +56,19 @@ quip.apps.initialize({
         },
         {
             id: "addOption",
-            label: "Add Option",
+            label: quiptext("Add Option"),
             handler: () => {
                 quip.apps.getRootRecord().addOption();
             },
         },
         {
             id: "settings",
-            label: "Color",
+            label: quiptext("Color"),
             subCommands: colors,
         },
         {
             id: "allowMultiple",
-            label: "Multiple Votes",
+            label: quiptext("Multiple Votes"),
             handler: () => {
                 quip.apps.getRootRecord().setAllowMultiple(true);
                 quip.apps.updateToolbarCommandsState([], ["allowMultiple"]);
@@ -75,7 +76,7 @@ quip.apps.initialize({
         },
         {
             id: "allowSingle",
-            label: "Single Vote",
+            label: quiptext("Single Vote"),
             handler: () => {
                 quip.apps.getRootRecord().setAllowMultiple(false);
                 quip.apps.updateToolbarCommandsState([], ["allowSingle"]);
@@ -83,19 +84,19 @@ quip.apps.initialize({
         },
         {
             id: "comment",
-            label: "Comment",
+            label: quiptext("Comment"),
             handler: (name, context) => {
                 quip.apps.showComments(context["record"].getId());
             },
         },
         {
             id: "delete",
-            label: "Delete",
+            label: quiptext("Delete"),
             handler: (name, context) => context[name](),
         },
         ...colors.map(color => ({
             id: color,
-            label: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
+            label: localizedColorLabel(color),
             handler: () => {
                 quip.apps.getRootRecord().set("color", color);
                 quip.apps.updateToolbarCommandsState([], [color]);

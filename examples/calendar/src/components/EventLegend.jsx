@@ -5,12 +5,10 @@
 import quip from "quip";
 import React from "react";
 import { connect } from "react-redux";
-import format from "date-fns/format";
 import isAfter from "date-fns/is_after";
 import isBefore from "date-fns/is_before";
 import isSameMonth from "date-fns/is_same_month";
 import isSameYear from "date-fns/is_same_year";
-import isSameDay from "date-fns/is_same_day";
 import isWithinRange from "date-fns/is_within_range";
 import classNames from "classnames";
 
@@ -18,9 +16,10 @@ import Styles from "./EventLegend.less";
 import EventDropdown from "./EventDropdown.jsx";
 import EventRichTextBox from "./EventRichTextBox.jsx";
 import { EventRecord } from "../model";
+import { isSameDay, formatDate } from "../util";
 
 const formatDateRange = (start, end) => {
-    const startText = format(start, "MMMM D");
+    const startText = formatDate(start, "MMMM D");
 
     const sameYear = isSameYear(start, end);
     const sameMonth = isSameMonth(start, end);
@@ -30,14 +29,14 @@ const formatDateRange = (start, end) => {
     }
 
     if (sameYear && sameMonth) {
-        return `${startText}-${format(end, "D")}`;
+        return `${startText}-${formatDate(end, "D")}`;
     }
 
     if (isSameYear(start, end)) {
-        return `${startText}-${format(end, "MMMM D")}`;
+        return `${startText}-${formatDate(end, "MMMM D")}`;
     }
 
-    return `${startText}-${format(end, "MMMM D YY")}`;
+    return `${startText}-${formatDate(end, "MMMM D YY")}`;
 };
 
 const eventsForMonth = (events, date) => {

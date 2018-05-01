@@ -5,10 +5,11 @@
 import quip from "quip";
 
 import isDate from "date-fns/is_date";
-import isSameDay from "date-fns/is_same_day";
 import startOfWeek from "date-fns/start_of_week";
 
 import type { DateRange } from "./types";
+
+import { isSameDay } from "./util";
 
 export const colors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -155,7 +156,7 @@ export class EventRecord extends quip.apps.Record {
             color: quip.apps.ui.ColorMap.RED.KEY,
             created: Date.now(),
             title: {
-                RichText_placeholderText: "New Event",
+                RichText_placeholderText: quiptext("New Event"),
             },
         };
     }

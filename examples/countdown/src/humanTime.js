@@ -28,6 +28,20 @@ export default ms => {
     return obj;
 };
 
+export function keyToLabel(key) {
+    const KEY_TO_LABEL = {
+        days: quiptext("days"),
+        hours: quiptext("hours"),
+        minutes: quiptext("minutes"),
+        seconds: quiptext("seconds"),
+        day: quiptext("day"),
+        hour: quiptext("hour"),
+        minute: quiptext("minute"),
+        second: quiptext("second"),
+    };
+    return KEY_TO_LABEL[key];
+}
+
 export function formatDate(date) {
     const day = date.getDate();
     const monthIndex = date.getMonth();

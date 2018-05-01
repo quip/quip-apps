@@ -135,6 +135,7 @@ class Card extends React.Component {
             scale: animateTo(1),
             draggingBoxShadowOpacity: animateTo(0),
         };
+        let readOnly = false;
         if (dragging || columnDragging) {
             style.translateX = left;
             style.translateY = top;
@@ -142,6 +143,7 @@ class Card extends React.Component {
             if (dragging) {
                 style.draggingBoxShadowOpacity = animateTo(0.75);
             }
+            readOnly = true;
         }
         if (entity.height > 0) {
             this.renderedWithHeight_ = true;
@@ -177,8 +179,16 @@ class Card extends React.Component {
                             .elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
                         style.backgroundColor = selected
                             ? quip.apps.ui.ColorMap[entityColor].VALUE
-                            : quip.apps.ui.ColorMap[entityColor]
-                                  .VALUE_LIGHT;
+                            : quip.apps.ui.ColorMap[entityColor].VALUE_LIGHT;
+                    }
+                    var extraRichTextBoxProps = {};
+                    if (quip.apps.isApiVersionAtLeast("0.1.039")) {
+                        extraRichTextBoxProps.allowedInlineStyles = [
+                            quip.apps.RichTextRecord.InlineStyle.ITALIC,
+                            quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
+                            quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
+                            quip.apps.RichTextRecord.InlineStyle.CODE,
+                        ];
                     }
 
                     return (
@@ -228,11 +238,13 @@ class Card extends React.Component {
                                             this.onEditorHeightChanged_
                                         }
                                         entity={entity}
-                                        readOnly={false}
+                                        readOnly={readOnly}
+                                        disableSelection={readOnly}
                                         onFocus={this.onEditorFocus}
                                         onBlur={this.stopEditing_}
                                         useDocumentTheme={false}
                                         handleKeyEvent={this.handleKeyEvent_}
+                                        {...extraRichTextBoxProps}
                                     />
                                 </div>
                                 <div

@@ -64,6 +64,13 @@ export class TimeoutError extends DefaultError {
     }
 }
 
+export class UnauthenticatedError extends DefaultError {
+    constructor(message = "Unauthenticated Error") {
+        super(message);
+        Object.setPrototypeOf(this, UnauthenticatedError.prototype);
+    }
+}
+
 // HTTP error with status code
 export class HttpError extends DefaultError {
     constructor(message = "Http Error") {

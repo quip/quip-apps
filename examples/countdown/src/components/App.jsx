@@ -198,7 +198,10 @@ export default class App extends React.Component {
                             onChangeSelectedDateMs={this.setDeadline}
                         />
                         <p className={Styles.calendarDateDesc}>
-                            Counting down to {deadlineDate.toLocaleDateString()}{" "}
+                            {quiptext("Counting down to %(date)s", {
+                                "date": deadlineDate.toLocaleDateString()
+                            })}
+                            {" "}
                             {moment(deadline)
                                 .tz(moment.tz.guess())
                                 .format("ha z")}

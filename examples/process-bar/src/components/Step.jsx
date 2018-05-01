@@ -91,6 +91,15 @@ export default class Step extends React.Component {
 
     render() {
         const { record, selected, color } = this.props;
+        var extraRichTextBoxProps = {};
+        if (quip.apps.isApiVersionAtLeast("0.1.039")) {
+            extraRichTextBoxProps.allowedInlineStyles = [
+                quip.apps.RichTextRecord.InlineStyle.ITALIC,
+                quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
+                quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
+                quip.apps.RichTextRecord.InlineStyle.CODE,
+            ];
+        }
         return (
             <div
                 className={cx(Styles.step, {
@@ -127,6 +136,7 @@ export default class Step extends React.Component {
                             record={record}
                             useDocumentTheme={false}
                             width="100%"
+                            {...extraRichTextBoxProps}
                         />
                     </div>
                     <div

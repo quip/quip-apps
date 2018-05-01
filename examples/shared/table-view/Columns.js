@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { toJSONPropTypeShape } from "./model.js";
 import Column from "./Column";
 import Card from "./Card";
+import { hashCode } from "./utils.js"
 import VirtualMove from "./lib/VirtualMove";
 
 import styles from "./Columns.less";
@@ -10,8 +11,8 @@ class Columns extends Component {
     static propTypes = {
         columns: toJSONPropTypeShape("array"),
         rows: toJSONPropTypeShape("array"),
-        widths: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
-        heights: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+        widths: React.PropTypes.object.isRequired,
+        heights: React.PropTypes.object.isRequired,
         headerHeight: React.PropTypes.number.isRequired,
         rootHeight: React.PropTypes.number.isRequired,
         setWidths: React.PropTypes.func.isRequired,
@@ -19,14 +20,14 @@ class Columns extends Component {
         setRowHeight: React.PropTypes.func,
         moveRow: React.PropTypes.func.isRequired,
         onRowDrop: React.PropTypes.func.isRequired,
-        onRowDeletelear: React.PropTypes.func.isRequired,
+        onRowDelete: React.PropTypes.func.isRequired,
         onColumnDrop: React.PropTypes.func.isRequired,
         onColumnAdd: React.PropTypes.func,
         onColumnDelete: React.PropTypes.func.isRequired,
         customRenderer: React.PropTypes.func.isRequired,
         onResizeEnd: React.PropTypes.func,
         onContextMenu: React.PropTypes.func,
-        globalError: React.PropTypes.Component,
+        globalError: React.PropTypes.element,
         errorStatus: React.PropTypes.string,
         metricType: React.PropTypes.string,
     };
@@ -361,9 +362,11 @@ class Columns extends Component {
                         items.map((column, i) => (
                             <Column
                                 moveColumn={moveItem}
-                                key={column.id}
+                                key={hashCode(column.id)}
                                 index={i}
-                                columns={{ id: columns.id, data: items }}
+                                columns={
+                                    {id: hashCode(columns.id), data: items}
+                                }
                                 rows={rows}
                                 column={column}
                                 width={widths[column.id]}

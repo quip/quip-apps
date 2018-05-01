@@ -25,6 +25,8 @@ export default class Dialog extends React.Component {
     componentWillUnmount() {
         if (this.props.showBackdrop) {
             quip.apps.dismissBackdrop();
+        } else if (this.props.onDismiss) {
+            this.props.onDismiss();
         }
         quip.apps.removeDetachedNode(ReactDOM.findDOMNode(this.dialogNode_));
     }

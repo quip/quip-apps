@@ -1,5 +1,7 @@
 // Copyright 2017 Quip
 
+import { localizedColorLabel } from "quip-apps-compat";
+
 import { kDefaultColumnColors } from "./model.jsx";
 
 const colors = kDefaultColumnColors;
@@ -22,35 +24,35 @@ export function allMenuCommands() {
     return [
         {
             id: "insert-column",
-            label: "Add Column",
+            label: quiptext("Add Column"),
             handler: () => {
                 quip.apps.getRootRecord().addColumn();
             },
         },
         {
             id: "delete-card",
-            label: "Delete",
+            label: quiptext("Delete"),
             handler: (name, context) => {
                 context.cardRecord.deleteCard();
             },
         },
         {
             id: "delete-column",
-            label: "Delete",
+            label: quiptext("Delete"),
             handler: (name, context) => {
                 context.cardRecord.getColumn().deleteColumn();
             },
         },
         {
             id: "comment",
-            label: "Comment",
+            label: quiptext("Comment"),
             handler: (name, context) => {
                 quip.apps.showComments(context.cardRecord.id());
             },
         },
         {
             id: "automatic-color",
-            label: "Automatic",
+            label: quiptext("Automatic"),
             handler: (name, context) => {
                 context.cardRecord.clearColor();
                 refreshToolbar();
@@ -58,7 +60,7 @@ export function allMenuCommands() {
         },
         ...colors.map(color => ({
             id: color,
-            label: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
+            label: localizedColorLabel(color),
             handler: (name, context) => {
                 const cardRecord = context.cardRecord;
                 if (cardRecord.isHeader()) {

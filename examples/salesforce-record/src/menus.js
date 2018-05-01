@@ -4,13 +4,16 @@ import {getRecordComponent, getRecordPickerComponent} from "./root.jsx";
 import {BaseMenu} from "../../shared/base-field-builder/base-menu.js";
 
 let selectedFieldEntity;
+let isLogoutInProgress_ = false;
 
 export class FieldBuilderMenu extends BaseMenu {
-    promptLogin_(onLoggedIn) {
-        if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
+    promptLogin_(onLoggedIn, onMismatchedInstance, onLoggedInFailed) {
+        if (quip.apps.getRootEntity().getClient().isLoggedIn() &&
+            quip.apps.getRootEntity().getClient().onSourceInstance()) {
             onLoggedIn();
         } else {
-            quip.apps.getRootEntity().login(onLoggedIn);
+            quip.apps.getRootEntity()
+                .login(onLoggedIn, onMismatchedInstance, onLoggedInFailed);
         }
     }
 
@@ -18,62 +21,56 @@ export class FieldBuilderMenu extends BaseMenu {
         return [
             {
                 id: "refresh-record",
-                label: "Refresh Now",
+                label: quiptext("Refresh Now"),
                 handler: () => {
-                    const selectedRecord = quip.apps
-                        .getRootEntity()
-                        .getSelectedRecord();
-                    selectedRecord.reload();
+                    this.promptLogin_(() => {
+                        this.refreshRecord_();
+                    }, () => {
+                        getRecordPickerComponent()
+                            .showMismatchedInstanceErrorDialog("refresh-record");
+                    });
                 },
             },
             {
                 id: "change-record",
-                label: "Change Record…",
+                label: quiptext("Change Record…"),
                 handler: () => {
                     this.promptLogin_(() => {
-                        getRecordPickerComponent().restoreToDefaultState();
-                        getRecordPickerComponent().fetchData();
-                        this.updateToolbar(
-                            quip.apps.getRootEntity().getSelectedRecord());
+                        this.changeRecord_();
+                    }, () => {
+                        getRecordPickerComponent()
+                            .showMismatchedInstanceErrorDialog("change-record");
                     });
                 },
             },
             {
                 id: "add-field",
-                label: "Add Field",
+                label: quiptext("Add Field"),
                 handler: () => {
                     this.promptLogin_(() => {
-                        getRecordComponent().showFieldPicker();
-                        quip.apps
-                            .getRootEntity()
-                            .getSelectedRecord()
-                            .fetchData();
-                        quip.apps
-                            .getRootEntity()
-                            .getSelectedRecord()
-                            .updateOwnerIdWithCurrentViewerId();
-                        this.updateToolbar(
-                            quip.apps.getRootEntity().getSelectedRecord());
+                        this.addField_();
+                    }, () => {
+                        getRecordPickerComponent()
+                            .showMismatchedInstanceErrorDialog("add-field");
                     });
                 },
             },
             {
                 id: "save-data",
-                label: "Save to Salesforce",
+                label: quiptext("Save to Salesforce"),
                 quipIcon: quip.apps.MenuIcons.SYNCING,
                 handler: () => {
                     this.promptLogin_(() => {
-                        getRecordComponent().hideFieldPicker();
-                        getRecordComponent().saveRecord();
-                        quip.apps.getRootEntity().getSelectedRecord();
-                        this.updateToolbar(
-                            quip.apps.getRootEntity().getSelectedRecord());
+                        this.saveData_();
+                    }, () => {
+                        getRecordPickerComponent()
+                            .showMismatchedInstanceErrorDialog("save-data");
                     });
                 },
             },
             {
                 id: "open-in-salesforce",
-                label: "Open in Salesforce",
+                label: quiptext("Open in Salesforce"),
                 handler: () => {
                     const selectedRecord = quip.apps
                         .getRootEntity()
@@ -83,46 +80,50 @@ export class FieldBuilderMenu extends BaseMenu {
             },
             {
                 id: "reconnect-as-me",
-                label: "Take Over…",
+                label: quiptext("Take Over…"),
                 handler: () => {
                     this.promptLogin_(() => {
-                        quip.apps.getRootEntity().fetchData();
-                        quip.apps
-                            .getRootEntity()
-                            .getSelectedRecord()
-                            .updateOwnerIdWithCurrentViewerId();
-                        this.updateToolbar(
-                            quip.apps.getRootEntity().getSelectedRecord());
+                        this.reconnectAsMe_();
+                    }, () => {
+                        getRecordPickerComponent()
+                            .showMismatchedInstanceErrorDialog("reconnect-as-me");
                     });
                 },
             },
             {
                 id: "logout",
-                label: "Log Out",
+                label: quiptext("Log Out"),
                 handler: () => {
+                    isLogoutInProgress_ = true;
+                    this.refreshToolbar();
                     quip.apps.getRootEntity().logout(() => {
+                        isLogoutInProgress_ = false;
+                        quip.apps
+                            .getRootEntity()
+                            .clearCachedData();
                         this.updateToolbar(
                             quip.apps.getRootEntity().getSelectedRecord());
+                        this.refreshToolbar();
                     });
                 },
             },
             {
                 id: "revert-changes",
-                label: "Discard Changes",
+                label: quiptext("Discard Changes"),
                 handler: () => {
                     selectedFieldEntity.revertToOriginal();
                 },
             },
             {
                 id: "remove-field",
-                label: "Hide Field",
+                label: quiptext("Hide Field"),
                 handler: () => {
                     selectedFieldEntity.remove();
                 },
             },
             {
                 id: "sync-field-edits",
-                label: "Save to Salesforce",
+                label: quiptext("Save to Salesforce"),
                 handler: () => {
                     //TODO
                 },
@@ -155,25 +156,26 @@ export class FieldBuilderMenu extends BaseMenu {
         const disabledCommands = [];
         const selectedRecord = quip.apps.getRootEntity().getSelectedRecord();
         if (!selectedRecord ||
-            (quip.apps.isExplorerTemplate && quip.apps.isExplorerTemplate())) {
+            (quip.apps.isExplorerTemplate && quip.apps.isExplorerTemplate()) ||
+            (quip.apps.getRootEntity().getClient().isLoggedIn() &&
+                !quip.apps.getRootEntity().getClient().onSourceInstance())) {
             disabledCommands.push("refresh-record");
             disabledCommands.push("change-record");
             disabledCommands.push("add-field");
             disabledCommands.push("save-data");
-            disabledCommands.push("reconnect-as-me");
             disabledCommands.push("open-in-salesforce");
         } else {
             if (selectedRecord.isPlaceholder() ||
                 (quip.apps.getViewingUser() !== null &&
                     selectedRecord.getOwnerId() ===
                         quip.apps.getViewingUser().getId())) {
-                disabledCommands.push("reconnect-as-me");
             }
             if (!selectedRecord.isDirty() || selectedRecord.saveInProgress()) {
                 disabledCommands.push("save-data");
             }
         }
-        if (!quip.apps.getRootEntity().getClient().isLoggedIn()) {
+        if (!quip.apps.getRootEntity().getClient().isLoggedIn() ||
+            isLogoutInProgress_) {
             disabledCommands.push("logout");
         }
         return disabledCommands;
@@ -194,30 +196,35 @@ export class FieldBuilderMenu extends BaseMenu {
                 mainMenuSubCommands.push(
                     quip.apps.DocumentMenuCommands.SEPARATOR);
 
-                const currentStatus = menuCommands.find(
-                    menu => menu.id === "current-instance");
-                if (currentStatus) {
-                    currentStatus.label = quip.apps
-                        .getRootEntity()
-                        .getClient()
-                        .getHostname();
-                }
                 const updatedMenuCommands = [
                     {
                         id: quip.apps.DocumentMenuCommands.MENU_MAIN,
                         subCommands: mainMenuSubCommands,
                     },
                 ];
-                if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
-                    updatedMenuCommands.push({
-                        id: "current-instance",
-                        label: quip.apps
-                            .getRootEntity()
-                            .getClient()
-                            .getHostname(),
-                        isHeader: true,
-                    });
-                }
+                updatedMenuCommands.push({
+                    id: "current-instance",
+                    label: quip.apps
+                        .getRootEntity()
+                        .getClient()
+                        .getHostname(),
+                    isHeader: true,
+                });
+                const allMenuCommands = [
+                    ...updatedMenuCommands,
+                    ...menuCommands,
+                ];
+                quip.apps.updateToolbar({
+                    menuCommands: allMenuCommands,
+                    highlightedCommandIds: highlightedCommandIds,
+                });
+            } else {
+                const updatedMenuCommands = [
+                    {
+                        id: quip.apps.DocumentMenuCommands.MENU_MAIN,
+                        subCommands: ["logout"],
+                    },
+                ];
                 const allMenuCommands = [
                     ...updatedMenuCommands,
                     ...menuCommands,
@@ -242,7 +249,6 @@ export class FieldBuilderMenu extends BaseMenu {
             quip.apps.DocumentMenuCommands.SEPARATOR,
             "last-updated-time",
             "refresh-record",
-            "reconnect-as-me",
         ];
         if (quip.apps.getRootEntity().getClient().isLoggedIn()) {
             mainMenuSubCommands.push(quip.apps.DocumentMenuCommands.SEPARATOR);
@@ -253,7 +259,9 @@ export class FieldBuilderMenu extends BaseMenu {
         let lastUpdatedLabel = BaseMenu.getLastUpdatedString(recordEntity);
         const recordOwner = recordEntity.getOwner();
         if (recordOwner !== null) {
-            lastUpdatedLabel += " • Connected as " + recordOwner.getName();
+            lastUpdatedLabel += " • " + quiptext("Connected as %(name)s", {
+                "name": recordOwner.getName()
+            });
         }
 
         const updatedMenuCommands = [
@@ -263,7 +271,8 @@ export class FieldBuilderMenu extends BaseMenu {
             },
             {
                 id: "record-header",
-                label: recordEntity.getHeaderName(),
+                label: recordEntity.getHeaderName() + "\n" +
+                    quip.apps.getRootEntity().getHostname(),
                 isHeader: true,
             },
             {
@@ -282,5 +291,81 @@ export class FieldBuilderMenu extends BaseMenu {
         }
         const allMenuCommands = [...updatedMenuCommands, ...menuCommands];
         quip.apps.updateToolbar({menuCommands: allMenuCommands});
+    }
+
+    refreshRecord_() {
+        const selectedRecord = quip.apps
+            .getRootEntity()
+            .getSelectedRecord();
+        if (selectedRecord) {
+            this.promptLogin_(() => {
+                selectedRecord.reload();
+            });
+        }
+    }
+
+    addField_() {
+        getRecordComponent().showFieldPicker();
+        quip.apps
+            .getRootEntity()
+            .getSelectedRecord()
+            .fetchData()
+            .then(response => {
+            })
+            .catch(error => {
+                getRecordComponent().errorHandling(error);
+            });
+        quip.apps
+            .getRootEntity()
+            .getSelectedRecord()
+            .updateOwnerIdWithCurrentViewerId();
+        this.updateToolbar(
+            quip.apps.getRootEntity().getSelectedRecord());
+    }
+
+    changeRecord_() {
+        getRecordPickerComponent().restoreToDefaultState();
+        getRecordPickerComponent().fetchData();
+        quip.apps.getRootEntity().getSelectedRecord().clearError();
+        getRecordComponent().clearError();
+        this.updateToolbar(
+            quip.apps.getRootEntity().getSelectedRecord());
+    }
+
+    saveData_() {
+        getRecordComponent().hideFieldPicker();
+        getRecordComponent().saveRecord();
+        quip.apps.getRootEntity().getSelectedRecord();
+        this.updateToolbar(
+            quip.apps.getRootEntity().getSelectedRecord());
+    }
+
+    reconnectAsMe_() {
+        quip.apps.getRootEntity().fetchData();
+        quip.apps
+            .getRootEntity()
+            .getSelectedRecord()
+            .updateOwnerIdWithCurrentViewerId();
+        this.updateToolbar(
+            quip.apps.getRootEntity().getSelectedRecord());
+    }
+
+    executeMenuOption(menuCommand) {
+        switch(menuCommand) {
+            case 'add-field':
+                this.addField_();
+                break;
+            case 'change-record':
+                this.changeRecord_();
+                break;
+            case 'save-data':
+                this.saveData_();
+                break;
+            case 'reconnect-as-me':
+                this.reconnectAsMe_();
+                break;
+            default:
+                break;
+        }
     }
 }

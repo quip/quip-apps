@@ -95,6 +95,12 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.salesforceClient_;
     }
 
+    clearCachedData() {
+        if (this.getSelectedRecord()) {
+            this.getSelectedRecord().clearCachedData();
+        }
+    }
+
     toggleUseSandbox() {
         const useSandbox = !this.useSandbox();
         this.setUseSandbox(useSandbox);
@@ -108,8 +114,11 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         this.setClient(salesforceClient);
     }
 
-    login(onAuthenticated) {
-        this.getClient().login(onAuthenticated);
+    login(onAuthenticated, onMismatchedInstance, onAuthenticationFailed) {
+        this.getClient().login(
+            onAuthenticated,
+            onMismatchedInstance,
+            onAuthenticationFailed);
     }
 
     logout(callback) {
@@ -117,12 +126,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     fetchData() {
-        let recordFetcher;
         let shouldOverWriteSchema = false;
         const selectedRecord = this.getSelectedRecord();
         if (selectedRecord && !selectedRecord.isPlaceholder()) {
-            recordFetcher = selectedRecord.fetchData(selectedRecord);
-
             const ownerId = selectedRecord.getOwnerId();
             const viewerId =
                 quip.apps.getViewingUser() !== null
@@ -152,16 +158,12 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             //...relatedListsFetchers,
         ];
 
-        if (recordFetcher) {
-            fetchers.push(recordFetcher);
-        }
         return Promise.all(fetchers).then(() => {
+            if (!this.getInstanceUrl()) {
+                this.setInstanceUrl(this.getClient().getInstanceUrl());
+            }
             if (!shouldOverWriteSchema) {
                 return;
-            }
-            const instanceUrl = this.getInstanceUrl();
-            if (this.getClient().getInstanceUrl() !== instanceUrl) {
-                this.setInstanceUrl(this.getClient().getInstanceUrl());
             }
             const recordTypes = this.getRecordTypes();
             const ownerId = quip.apps.getViewingUser().getId();
@@ -196,11 +198,14 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     fetchListViewsForType_(recordType) {
         const listViewsData = {};
         const allListViewLabel = "All " + RECORD_TYPE_DISPLAYNAMES[recordType];
-        const recentListViewLabel =
-            "Recently Viewed " + RECORD_TYPE_DISPLAYNAMES[recordType];
+        const recentListViewLabel = quiptext(
+            "Recently Viewed %(record_type)s",
+            {
+                "record_type": RECORD_TYPE_DISPLAYNAMES[recordType],
+            });
 
         listViewsData["RecentlyViewed"] = {
-            label: "Recently Viewed",
+            label: quiptext("Recently Viewed"),
             key: "RecentlyViewed",
             describeUrl: null,
             query:
@@ -293,28 +298,27 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                 resolve(recordsData);
             });
         } else {
-            return this.fetchDescribeQuery_(
-                recordType,
-                listViewKey).then(query => {
-                return this.fetchRecordsDataByQuery_(query, searchTerm)
-                    .then(recordsData => {
-                        if (searchTerm == null || searchTerm.length == 0) {
-                            const data = listViewsData[listViewKey];
-                            data.records = recordsData;
-                            data.lastFetchedTime = Date.now();
-                            this.pickerData[recordType].listViewsData[
-                                listViewKey
-                            ] = data;
-                        }
-                        const retRecordsData = recordsData;
-                        retRecordsData.requestTime = requestTime;
-                        return retRecordsData;
-                    })
-                    .catch(errorMessage => {
-                        // should throw exception with the time stamp
-                        throw errorMessage + " requestTime:" + requestTime;
-                    });
-            });
+            return this.fetchDescribeQuery_(recordType, listViewKey).then(
+                query => {
+                    return this.fetchRecordsDataByQuery_(query, searchTerm)
+                        .then(recordsData => {
+                            if (searchTerm == null || searchTerm.length == 0) {
+                                const data = listViewsData[listViewKey];
+                                data.records = recordsData;
+                                data.lastFetchedTime = Date.now();
+                                this.pickerData[recordType].listViewsData[
+                                    listViewKey
+                                ] = data;
+                            }
+                            const retRecordsData = recordsData;
+                            retRecordsData.requestTime = requestTime;
+                            return retRecordsData;
+                        })
+                        .catch(errorMessage => {
+                            // should throw exception with the time stamp
+                            throw errorMessage + " requestTime:" + requestTime;
+                        });
+                });
         }
     }
 
@@ -444,5 +448,14 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     getDom() {
         return this.domNode;
+    }
+
+    getHostname() {
+        const instanceUrl = this.getInstanceUrl();
+        if (instanceUrl && instanceUrl.includes("://")) {
+            const segs = instanceUrl.split("://");
+            return segs[1];
+        }
+        return this.instanceUrl;
     }
 }

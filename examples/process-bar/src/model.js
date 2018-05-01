@@ -45,7 +45,7 @@ class StepRecord extends quip.apps.RichTextRecord {
 
     static getDefaultProperties() {
         return {
-            RichText_placeholderText: "New Step",
+            RichText_placeholderText: quiptext("New Step"),
         };
     }
 

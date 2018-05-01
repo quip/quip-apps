@@ -6,7 +6,7 @@ import connectEntity from "./lib/connectEntity";
 import registerModels from "./model";
 import timePerf from "./lib/timePerf";
 import { DefaultCardRenderer } from "../../shared/table-view/DefaultCardRenderer.js";
-import { toJSON } from "../../shared/table-view/model.js";
+import { toJSON, COLUMN_TYPE as TABLE_VIEW_COLUMN_TYPE, COLUMN_TYPE_LABELS } from "../../shared/table-view/model.js";
 import {
     getHeights,
     getWidths,
@@ -242,29 +242,29 @@ quip.apps.initialize({
     menuCommands: [
         {
             id: "addColumn",
-            label: "Add Column",
+            label: quiptext("Add Column"),
             subCommands: Object.keys(COLUMN_TYPE).map(
                 type => type + "AddColumn",
             ),
         },
         {
             id: "addRow",
-            label: "Add Row",
+            label: quiptext("Add Row"),
             handler: () => quip.apps.getRootRecord().addRow(),
         },
         {
             id: "deleteColumn",
-            label: "Delete Column",
+            label: quiptext("Delete Column"),
             handler: (name, context) => context[name](),
         },
         {
             id: "deleteRow",
-            label: "Delete Row",
+            label: quiptext("Delete Row"),
             handler: (name, context) => context[name](),
         },
         ...Object.keys(COLUMN_TYPE).map(type => ({
             id: type + "AddColumn",
-            label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+            label: COLUMN_TYPE_LABELS[TABLE_VIEW_COLUMN_TYPE[type]],
             isHeader: false,
             handler: (name, context) => context["addColumn"](type),
         })),

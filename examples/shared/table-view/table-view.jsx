@@ -2,6 +2,7 @@
 
 import { toJSONPropTypeShape } from "./model.js";
 import Columns from "./Columns";
+import { hashCode } from "./utils.js";
 import styles from "./table-view.less";
 import VirtualMove from "./lib/VirtualMove";
 
@@ -20,8 +21,8 @@ export class TableView extends React.Component {
     static propTypes = {
         columns: toJSONPropTypeShape("array"),
         rows: toJSONPropTypeShape("array"),
-        widths: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
-        heights: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+        widths: React.PropTypes.object.isRequired,
+        heights: React.PropTypes.object.isRequired,
         setRowHeight: React.PropTypes.func,
         setWidths: React.PropTypes.func.isRequired,
         getMinWidth: React.PropTypes.func.isRequired,
@@ -34,9 +35,10 @@ export class TableView extends React.Component {
         customRenderer: React.PropTypes.func,
         onCardClicked: React.PropTypes.func,
         onContextMenu: React.PropTypes.func,
-        globalError: React.PropTypes.Component,
+        globalError: React.PropTypes.element,
         errorStatus: React.PropTypes.string,
         metricType: React.PropTypes.string,
+        bottomSpacing: React.PropTypes.number,
     };
 
     constructor(props) {
@@ -53,8 +55,9 @@ export class TableView extends React.Component {
             sumHeights(heights) +
             HEADER_HEIGHT -
             Object.keys(heights).length +
-            SCROLLBAR_HEIGHT +
-            SCROLLBAR_SPACING;
+            (this.props.bottomSpacing !== undefined
+                ? this.props.bottomSpacing
+                : SCROLLBAR_HEIGHT + SCROLLBAR_SPACING);
         const rowHeights = Object.keys(heights).reduce((acc, rowId) => {
             acc[rowId] = getRowHeight(heights[rowId]);
             return acc;
@@ -69,7 +72,7 @@ export class TableView extends React.Component {
                     {({ items, moveItem }) => (
                         <Columns
                             moveRow={moveItem}
-                            rows={{ id: rows.id, data: items }}
+                            rows={{ id: hashCode(rows.id), data: items }}
                             columns={columns}
                             widths={widths}
                             heights={rowHeights}

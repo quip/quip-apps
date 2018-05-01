@@ -10,7 +10,6 @@ import classNames from "classnames";
 import chunk from "lodash.chunk";
 import throttle from "lodash.throttle";
 
-import isSameDay from "date-fns/is_same_day";
 import startOfWeek from "date-fns/start_of_week";
 
 import Styles from "./Calendar.less";
@@ -32,6 +31,7 @@ import {
 
 import {
     areDateRangesEqual,
+    isSameDay,
     dateAtPoint,
     getCalendarMonth,
     getIsSmallScreen,
@@ -55,7 +55,15 @@ import type {
 
 const { CONTAINER_SIZE_UPDATE, ELEMENT_BLUR } = quip.apps.EventType;
 
-const LONG_WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const LONG_WEEK_DAYS = [
+    quiptext("Sun [Sunday abbreviated]"),
+    quiptext("Mon [Monday abbreviated]"),
+    quiptext("Tue [Tuesday abbreviated]"),
+    quiptext("Wed [Wednesday abbreviated]"),
+    quiptext("Thu [Thursday abbreviated]"),
+    quiptext("Fri [Friday abbreviated]"),
+    quiptext("Sat [Saturday abbreviated]"),
+];
 const SHORT_WEEK_DAYS = LONG_WEEK_DAYS.map(d => d[0]);
 const BUTTON_RIGHT_CLICK = 2;
 const BACKSPACE_KEY = 8;
@@ -239,7 +247,7 @@ class Calendar extends React.Component<Props, null> {
                     movingEventRect,
                     draggingEventDateRange,
                 );
-                console.log("^^^^ newOrder", newOrder);
+                //console.log("^^^^ newOrder", newOrder);
                 setMovingEventOrder(newOrder);
             }
             setMouseCoordinates(mouseCoordinates, draggingEventDateRange);
@@ -351,16 +359,18 @@ class Calendar extends React.Component<Props, null> {
 
         console.log(
             "Calendar onMouseUp",
+            "mouseCoordinates",
+            mouseCoordinates,
             "resizing",
             resizingEvent,
             "moving",
-            movingEvent,
+            !!movingEvent,
             "movingEventOrder",
             movingEventOrder,
             "selected",
-            selectedEvent,
+            !!selectedEvent,
             "focused",
-            focusedEvent,
+            !!focusedEvent,
         );
 
         if (mouseCoordinates) {
@@ -407,7 +417,6 @@ class Calendar extends React.Component<Props, null> {
                 this.props.setSelectedEvent(null);
             }
         } else {
-            this.props.setSelectedEvent(null);
             this.props.setMovingEvent(null);
         }
         this.props.setMouseCoordinates(null);

@@ -33,14 +33,13 @@ export default class App extends React.Component {
         }
 
         quip.apps.recordQuipMetric("delete_step");
-        //quip.apps.sendMessage("deleted a step");
     };
 
     render() {
         const { steps, selected, color } = this.props;
 
         return (
-            <div className={Styles.container}>
+            <div tabIndex="0" className={Styles.container}>
                 {steps
                     .getRecords()
                     .map(step => (

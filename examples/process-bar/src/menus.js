@@ -2,6 +2,7 @@
 /* @flow */
 
 import quip from "quip";
+import { localizedColorLabel } from "quip-apps-compat";
 
 const colors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -22,12 +23,12 @@ export function allMenuCommands() {
     return [
         {
             id: "color",
-            label: "Color",
+            label: quiptext("Color"),
             subCommands: colors,
         },
         ...colors.map(color => ({
             id: color,
-            label: quip.apps.ui.ColorMap[color].LABEL,
+            label: localizedColorLabel(color),
             handler: () => {
                 quip.apps.getRootRecord().set("color", color);
                 refreshToolbar();
@@ -36,7 +37,7 @@ export function allMenuCommands() {
         })),
         {
             id: "addStep",
-            label: "Add Step",
+            label: quiptext("Add Step"),
             handler: () => {
                 quip.apps
                     .getRootRecord()
@@ -47,7 +48,7 @@ export function allMenuCommands() {
         },
         {
             id: "selectStep",
-            label: "Select Step",
+            label: quiptext("Select Step"),
             handler: () => {
                 quip.apps.getRootRecord().set("selected", focusedStepId);
                 refreshToolbar();
@@ -56,7 +57,7 @@ export function allMenuCommands() {
         },
         {
             id: "selectStepFromMenu",
-            label: "Select Step",
+            label: quiptext("Select Step"),
             handler: (name, context) => {
                 quip.apps
                     .getRootRecord()
@@ -67,14 +68,14 @@ export function allMenuCommands() {
         },
         {
             id: "comment",
-            label: "Comment",
+            label: quiptext("Comment"),
             handler: (name, context) => {
                 quip.apps.showComments(context["record"].getId());
             },
         },
         {
             id: "deleteStep",
-            label: "Delete",
+            label: quiptext("Delete"),
             handler: (name, context) => {
                 context[name]();
                 refreshToolbar();

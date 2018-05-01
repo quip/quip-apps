@@ -119,3 +119,7 @@ export function formatNumber(value) {
     }).format(value);
     return formattedNumber;
 }
+
+export function formatBoolean(value) {
+    return value ? "True" : "False";
+}

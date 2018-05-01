@@ -31,11 +31,13 @@ export class BaseMenu {
         const isDirty = !recordEntity || recordEntity.isDirty();
         let syncingLabel;
         if (recordEntity && recordEntity.saveInProgress()) {
-            syncingLabel = "Saving…";
+            syncingLabel = quiptext("Saving…");
         } else if (!isDirty) {
             syncingLabel = this.getLastUpdatedString(recordEntity);
         } else {
-            syncingLabel = "Save to " + recordEntity.getSource();
+            syncingLabel = quiptext("Save to %(source)s", {
+                "source": recordEntity.getSource(),
+            });
         }
         return syncingLabel;
     }
@@ -48,10 +50,14 @@ export class BaseMenu {
     static getLastUpdatedStringFromTime(time) {
         const lastFetchedTime = moment(time);
         let format = "MM/D, h:mm A";
-        const yesterday = moment().subtract(1, "day").endOf("day");
+        const yesterday = moment()
+            .subtract(1, "day")
+            .endOf("day");
         if (lastFetchedTime > yesterday) {
             format = "h:mm A";
         }
-        return "Last Updated " + lastFetchedTime.format(format);
+        return quiptext("Last Updated %(time)s", {
+            "time": lastFetchedTime.format(format),
+        });
     }
 }

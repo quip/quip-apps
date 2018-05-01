@@ -8,10 +8,10 @@ import { connect } from "react-redux";
 import classNames from "classnames";
 
 import differenceInDays from "date-fns/difference_in_days";
-import startOfDay from "date-fns/start_of_day";
 import startOfWeek from "date-fns/start_of_week";
 
 import { EventRecord } from "../model";
+import { startOfDay } from "../util";
 
 import CalendarEvent from "./CalendarEvent.jsx";
 import Styles from "./CalendarEvent.less";

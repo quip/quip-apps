@@ -103,7 +103,7 @@ class Option extends ListenerRecord {
     static getDefaultProperties = lastIndex => ({
         votes: [],
         text: {
-            RichText_placeholderText: "New Option",
+            RichText_placeholderText: quiptext("New Option"),
         },
         createdAt: new Date().getTime(),
     });
@@ -155,13 +155,22 @@ class Option extends ListenerRecord {
 
         if (!rtr.empty() && sendMessage) {
             if (allowMultiple) {
-                quip.apps.sendMessage(`voted for ${text}`);
+                quip.apps.sendMessage(quiptext(
+                        "voted for %(option)s [snippet for a person]", {
+                            "option": text
+                        }));
             } else {
                 const hasVoted = parent.currentUserHasVoted();
                 if (hasVoted) {
-                    quip.apps.sendMessage(`changed their vote to ${text}`);
+                    quip.apps.sendMessage(quiptext(
+                        "changed their vote to %(option)s [snippet for a person]", {
+                            "option": text
+                        }));
                 } else {
-                    quip.apps.sendMessage(`voted for ${text}`);
+                    quip.apps.sendMessage(quiptext(
+                        "voted for %(option)s [snippet for a person]", {
+                            "option": text
+                        }));
                 }
             }
         }

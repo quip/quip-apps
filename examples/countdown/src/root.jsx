@@ -2,6 +2,7 @@
 
 import quip from "quip";
 import ReactDOM from "react-dom";
+import { localizedColorLabel } from "quip-apps-compat";
 
 import connectRecord from "./connectRecord";
 import { formatDate } from "./humanTime";
@@ -32,19 +33,19 @@ function allMenuCommands(deadlineDate) {
     return [
         {
             id: "date",
-            label: deadlineDate ? formatDate(deadlineDate) : "Date",
+            label: deadlineDate ? formatDate(deadlineDate) : quiptext("Date"),
             handler: () => {
                 rootInstance && rootInstance.toggleCalendar();
             },
         },
         {
             id: "color",
-            label: "Color",
+            label: quiptext("Color"),
             subCommands: colors,
         },
         ...colors.map(color => ({
             id: color,
-            label: color.charAt(0).toUpperCase() + color.slice(1).toLowerCase(),
+            label: localizedColorLabel(color),
             handler: () => {
                 quip.apps.getRootRecord().set("color", color);
                 quip.apps.updateToolbarCommandsState([], [color]);

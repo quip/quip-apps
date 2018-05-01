@@ -16,6 +16,7 @@ const OBJECT_INFO_ENDPOINT = "ui-api/object-info";
 
 const RECORDS_ENDPOINT = "ui-api/records";
 const RECORDS_BATCH_ENDPOINT = "ui-api/records/batch";
+const RECORDS_SINGLE_ENDPOINT = "ui-api/records";
 
 const SOQL_ENDPOINT = "query";
 
@@ -69,7 +70,7 @@ export class SalesforceClient {
         if (!instanceUrl) {
             instanceUrl = this.instanceUrl_;
         }
-        return `${instanceUrl}/one/one.app#/sObject/${recordId}/view`;
+        return `${instanceUrl}/${recordId}`;
     }
 
     isLoggedIn() {
@@ -81,7 +82,13 @@ export class SalesforceClient {
         }
     }
 
-    login(onAuthenticated) {
+    onSourceInstance() {
+        return (!quip.apps.getRootEntity().getInstanceUrl() ||
+            quip.apps.getRootEntity().getInstanceUrl() ===
+            this.getInstanceUrl());
+    }
+
+    login(onAuthenticated, onMismatchedInstance, onAuthenticationFailed) {
         if (this.isLoggedIn()) {
             onAuthenticated();
         } else {
@@ -93,13 +100,26 @@ export class SalesforceClient {
                     result => {
                         if (result) {
                             this.setAPIEndpoints_();
-                            onAuthenticated();
+                            if (this.onSourceInstance()) {
+                                if (onAuthenticated) {
+                                    onAuthenticated();
+                                }
+                            } else {
+                                if (onMismatchedInstance) {
+                                    onMismatchedInstance();
+                                }
+                            }
+                        } else {
+                            if (onAuthenticationFailed) {
+                                onAuthenticationFailed();
+                            }
                         }
                     })
                 .catch(error => {
                     if (error.error_code) {
-                        quip.apps.openLink(
-                            "https://quip.com/dev/liveapps/salesforce/config");
+                        if (onAuthenticationFailed) {
+                            onAuthenticationFailed(error.error_code);
+                        }
                     }
                 });
         }
@@ -156,7 +176,10 @@ export class SalesforceClient {
     }
 
     fetchRecord(recordId) {
-        return this.fetchRecords([recordId]);
+        const params = {layoutTypes: "Full"};
+        const recordsUrl = `${this
+            .apiUrl_}/${RECORDS_SINGLE_ENDPOINT}/${recordId}`;
+        return this.request("GET", recordsUrl, params);
     }
 
     fetchRecords(recordIds) {

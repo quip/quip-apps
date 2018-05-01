@@ -2,9 +2,12 @@
 
 import {
     BooleanFieldEntity,
+    DateFieldEntity,
+    DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
     NumericFieldEntity,
+    ReferenceFieldEntity,
     TextFieldEntity,
     TokenFieldEntity,
 } from "./field.js";
@@ -49,7 +52,10 @@ export class RecordEntity extends quip.apps.Record {
             .map(fieldKey => {
                 const fieldSchema = schema.fields[fieldKey];
                 const label = unescapeHTML(fieldSchema.label);
-                return {key: fieldKey, label: label};
+                const shortLabel = fieldSchema.shortLabel
+                    ? unescapeHTML(fieldSchema.shortLabel)
+                    : fieldSchema.shortLabel;
+                return {key: fieldKey, label: label, shortLabel: shortLabel};
             });
     }
 
@@ -209,7 +215,6 @@ export class RecordEntity extends quip.apps.Record {
                 }
                 break;
             }
-            case "Date":
             case "Phone":
             case "String":
             case "TextArea":
@@ -247,6 +252,18 @@ export class RecordEntity extends quip.apps.Record {
                 };
                 break;
             }
+            case "Reference": {
+                recordClass = ReferenceFieldEntity;
+                break;
+            }
+            case "Date": {
+                recordClass = DateFieldEntity;
+                break;
+            }
+            case "DateTime": {
+                recordClass = DateTimeFieldEntity;
+                break;
+            }
             default: {
                 return null;
             }
@@ -257,14 +274,14 @@ export class RecordEntity extends quip.apps.Record {
             label: unescapeHTML(schema.label),
             originalValue: {
                 "value": initialValue,
-                displayValue: fieldData.displayValue || initialValue,
+                "displayValue": fieldData.displayValue || initialValue,
             },
             value: value,
             type: type,
         };
         Object.assign(field, extras);
         this.get("fields").add(field);
-        this.saveFieldPrefrences();
+        this.saveFieldPreferences();
         const metricArgs = {
             action: "added_field",
             record_type: this.getType(),
@@ -302,7 +319,7 @@ export class RecordEntity extends quip.apps.Record {
         return null;
     }
 
-    saveFieldPrefrences() {}
+    saveFieldPreferences() {}
 
     reload() {
         this.fetchRecordId_(this.getRecordId());

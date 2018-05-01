@@ -20,7 +20,7 @@ export const RECORD_PREFIX_TYPE = {
     "006": "Opportunity",
 };
 
-const FIELD_PREFRENCES_KEY = "initByFields";
+const FIELD_PREFERENCES_KEY = "initByFields";
 const BLANK_STATE_FIELDS = {
     "Account": [
         "Name",
@@ -36,12 +36,16 @@ const BLANK_STATE_FIELDS = {
 const PERSISTED_KEYS = new Set(["Name", "FirstName", "LastName"]);
 
 const SUPPORTED_FIELD_TYPES = [
+    "Boolean",
     "Currency",
+    "Date",
+    "DateTime",
     "Double",
-    "Picklist",
     "Int",
     "Percent",
+    "Picklist",
     "Phone",
+    "Reference",
     "String",
     "TextArea",
     "Url",
@@ -68,9 +72,9 @@ export class SalesforceRecordEntity extends RecordEntity {
                 return;
             }
             if (!this.isPlaceholder()) {
-                const prefrences = quip.apps.getUserPreferences();
+                const preferences = quip.apps.getUserPreferences();
                 const initFieldsMap = JSON.parse(
-                    prefrences.getForKey(FIELD_PREFRENCES_KEY) || "{}");
+                    preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
                 const initFieldKeys =
                     initFieldsMap[this.getType()] ||
                     BLANK_STATE_FIELDS[this.getType()];
@@ -89,25 +93,25 @@ export class SalesforceRecordEntity extends RecordEntity {
     getDemoText() {
         const useSandbox = this.getParentRecord().useSandbox();
         if (useSandbox) {
-            return "Using Sandbox";
+            return quiptext("Using Sandbox");
         }
         return null;
     }
 
-    saveFieldPrefrences() {
+    saveFieldPreferences() {
         if (this.isPlaceholder()) {
             return;
         }
-        const prefrences = quip.apps.getUserPreferences();
+        const preferences = quip.apps.getUserPreferences();
         const initFieldsMap = JSON.parse(
-            prefrences.getForKey(FIELD_PREFRENCES_KEY) || "{}");
+            preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
         const fieldKeys = this.getFields().map(field => {
             return field.getKey();
         });
         initFieldsMap[this.getType()] = fieldKeys;
-        const newPrefrence = {};
-        newPrefrence[FIELD_PREFRENCES_KEY] = JSON.stringify(initFieldsMap);
-        prefrences.save(newPrefrence);
+        const newPreferences = {};
+        newPreferences[FIELD_PREFERENCES_KEY] = JSON.stringify(initFieldsMap);
+        preferences.save(newPreferences);
     }
 
     getSource() {
@@ -162,7 +166,8 @@ export class SalesforceRecordEntity extends RecordEntity {
             if (field.isDirty()) {
                 if (!field.isValid()) {
                     hasInvalidFields = true;
-                    field.setError(new InvalidValueError("Invalid Value"));
+                    field.setError(
+                        new InvalidValueError(quiptext("Invalid Value")));
                 }
                 updatedFields[field.getKey()] = field.getServerValue();
             }
@@ -172,7 +177,7 @@ export class SalesforceRecordEntity extends RecordEntity {
         if (hasInvalidFields) {
             this.saveInProgress_ = false;
             this.error_ = new InvalidValueError(
-                "Some fields have invalid values");
+                quiptext("Some fields have invalid values"));
             return Promise.reject(this.error_);
         }
 
@@ -183,6 +188,14 @@ export class SalesforceRecordEntity extends RecordEntity {
                 return ResponseHandler.parseFieldsData(response, schema);
             })
             .then(fieldsDataArray => {
+                const metricArgs = {
+                    action: "saved_record",
+                    record_type: this.getType(),
+                    fields_count: String(Object.keys(updatedFields).length),
+                };
+                const metricName = this.getMetricName();
+                quip.apps.recordQuipMetric(metricName, metricArgs);
+
                 this.setLastFetchedTime(Date.now());
                 this.error_ = null;
                 this.saveInProgress_ = false;
@@ -200,7 +213,8 @@ export class SalesforceRecordEntity extends RecordEntity {
                         if (fieldEntity.isDirty()) {
                             if (!fieldEntity.isEqualToObject(parsedValue)) {
                                 fieldEntity.setError(
-                                    new InvalidValueError("Field Save Error"));
+                                    new InvalidValueError(
+                                        quiptext("Field Save Error")));
                                 failedFieldKeys.push(fieldData.key);
                             }
                         } else {
@@ -216,19 +230,41 @@ export class SalesforceRecordEntity extends RecordEntity {
                 }
                 if (failedFieldKeys.length !== 0) {
                     throw new FieldsCannotBeUpdatedError(
-                        "Some fields can not be updated");
+                        quiptext("Some fields can not be updated"));
                 }
             })
             .catch(error => {
                 this.saveInProgress_ = false;
                 if (error instanceof BadRequestError) {
                     this.setError(
-                        new InvalidValueError("Invalid Value Provided"));
+                        new InvalidValueError(
+                            quiptext("Invalid Value Provided")));
                 } else {
                     this.setError(error);
                 }
                 throw this.getError();
             });
+    }
+
+    updateFields_(fieldsDataArray) {
+        const schema = this.getSchema();
+        for (let fieldData of fieldsDataArray) {
+            const fieldEntity = this.getField(fieldData.key);
+            if (!fieldEntity) {
+                continue;
+            }
+            const type = schema.fields[fieldData.key].dataType;
+            const parsedValue = ResponseHandler.parseFieldValue(
+                fieldData.value,
+                type);
+            if (!fieldEntity.isDirty()) {
+                fieldEntity.setValue(parsedValue);
+            }
+            fieldEntity.setOriginalValue(parsedValue, fieldData.displayValue);
+            if (fieldEntity.format) {
+                fieldEntity.format();
+            }
+        }
     }
 
     clearError() {
@@ -241,15 +277,21 @@ export class SalesforceRecordEntity extends RecordEntity {
 
     setError(error) {
         if (error && !(error instanceof DefaultError)) {
-            this.error_ = new DefaultError("Could Not Connect.");
+            this.error_ = new DefaultError(quiptext("Could Not Connect."));
         } else {
             this.error_ = error;
         }
     }
 
+    clearCachedData() {
+        this.error_ = null;
+        this.saveInProgress_ = false;
+        this.cachedFieldsDataArray_ = [];
+    }
+
     getError() {
         if (this.error_ && !(this.error_ instanceof DefaultError)) {
-            this.error_ = new DefaultError("Could Not Connect.");
+            this.error_ = new DefaultError(quiptext("Could Not Connect."));
         }
         return this.error_;
     }
@@ -261,7 +303,7 @@ export class SalesforceRecordEntity extends RecordEntity {
             this.setType(type);
         } else {
             this.error_ = new TypeNotSupportedError(
-                "Record type not supported",
+                quiptext("Record type not supported"),
                 recordId);
             throw this.error_;
         }
@@ -280,11 +322,12 @@ export class SalesforceRecordEntity extends RecordEntity {
             .fetchRecord(recordId)
             .then(response => {
                 const schema = this.getSchema();
-                return ResponseHandler.parseBatchFieldsData(response, schema);
+                return ResponseHandler.parseFieldsData(response, schema);
             })
             .then(fieldsDataArray => {
                 this.setFieldsDataArray(fieldsDataArray);
                 this.setLastFetchedTime(Date.now());
+                this.updateFields_(fieldsDataArray);
             });
     }
 
@@ -347,7 +390,7 @@ export class SalesforceRecordEntity extends RecordEntity {
                         retValues = [
                             {
                                 id: "Select…",
-                                name: "Select…",
+                                name: quiptext("Select…"),
                                 serverValue: "",
                                 isEmpty: true,
                             },

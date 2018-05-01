@@ -156,7 +156,7 @@ class StatusPicker extends Component {
                         className={styles.newStatusInput}
                         style={{ color: DEFAULT_COLOR.VALUE }}
                         type="text"
-                        placeholder="New Status..."
+                        placeholder={quiptext("New Status...")}
                     />
 
                 </div>

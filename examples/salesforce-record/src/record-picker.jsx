@@ -3,6 +3,7 @@
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import ChevronIcon from "../../shared/base-field-builder/icons/chevron.jsx";
 import Dialog from "../../shared/dialog/dialog.jsx";
+import InstructionsDialog from "./instructions-dialog.jsx";
 import {entityListener} from "../../shared/base-field-builder/utils.jsx";
 import Record from "../../shared/base-field-builder/record.jsx";
 import RowContainer from "../../shared/base-field-builder/row-container.jsx";
@@ -16,11 +17,11 @@ import {
 } from "./model/record-picker.js";
 
 export const RECORD_TYPE_DISPLAYNAMES = {
-    "Account": "Accounts",
+    "Account": quiptext("Accounts"),
     //"Case": "Cases",
-    "Contact": "Contacts",
-    "Lead": "Leads",
-    "Opportunity": "Opportunities",
+    "Contact": quiptext("Contacts [people]"),
+    "Lead": quiptext("Leads [sales]"),
+    "Opportunity": quiptext("Opportunities"),
 };
 
 const LOADING_STATUS = {
@@ -40,6 +41,9 @@ class RecordPicker extends React.Component {
         const states = {
             showDialog: false,
             listViewsLoadingStatus: LOADING_STATUS.LOADING,
+            showConnectedAppInstructions: false,
+            showMismatchedInstanceError: false,
+            prevMenuCommand: null,
         };
         this.state = Object.assign(states, this.defaultDialogState());
     }
@@ -60,7 +64,8 @@ class RecordPicker extends React.Component {
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
             this.hideDialog_);
-        if (this.props.entity.getClient().isLoggedIn()) {
+        if (this.props.entity.getClient().isLoggedIn() &&
+            this.props.entity.getClient().onSourceInstance()) {
             this.fetchData();
         }
     }
@@ -143,13 +148,30 @@ class RecordPicker extends React.Component {
             }
             this.setState({showDialog: true});
         } else {
-            this.props.entity.login(() => {
-                this.props.menuDelegate.updateToolbar(
-                    this.props.entity.getSelectedRecord());
-                this.fetchData();
-                this.setState({showDialog: true});
-            });
+            this.props.entity.login(
+                () => {
+                    this.props.menuDelegate.updateToolbar(
+                        this.props.entity.getSelectedRecord());
+                    this.fetchData();
+                    this.setState({showDialog: true});
+                },
+                () => {
+                    this.setState({
+                        showDialog: false,
+                        showMismatchedInstanceError: true,
+                    });
+                },
+                errorCode => {
+                    this.setState({showConnectedAppInstructions: true});
+                });
         }
+    };
+
+    showMismatchedInstanceErrorDialog = menuCommand => {
+        this.setState({
+            showMismatchedInstanceError: true,
+            prevMenuCommand: menuCommand,
+        });
     };
 
     hideDialog_ = e => {
@@ -207,9 +229,83 @@ class RecordPicker extends React.Component {
         }
     };
 
+    logoutAndReconnect_ = () => {
+        this.props.entity.logout(() => {
+            this.dismissMismatchedInstanceErrorDialog_();
+            this.props.entity.login(
+                () => {
+                    this.props.menuDelegate.updateToolbar(
+                        this.props.entity.getSelectedRecord());
+                    this.props.menuDelegate.executeMenuOption(
+                        this.state.prevMenuCommand);
+                    this.setState({
+                        prevMenuCommand: null,
+                    });
+                },
+                () => {
+                    this.setState({
+                        showDialog: false,
+                        showMismatchedInstanceError: true,
+                    });
+                },
+                errorCode => {
+                    this.setState({showConnectedAppInstructions: true});
+                });
+        });
+    };
+
+    dismissMismatchedInstanceErrorDialog_ = () => {
+        this.setState({
+            showMismatchedInstanceError: false,
+        });
+    };
+
     render() {
+        let connectedAppInstructions;
         let recordPickerDialog;
-        if (this.state.showDialog) {
+        if (this.state.showConnectedAppInstructions) {
+            connectedAppInstructions = <InstructionsDialog
+                onDismiss={() => {
+                    this.setState({showConnectedAppInstructions: false});
+                }}/>;
+        } else if (this.state.showMismatchedInstanceError) {
+            recordPickerDialog = <Dialog
+                onDismiss={this.dismissMismatchedInstanceErrorDialog_}>
+                <div className={Styles.errorDialog}>
+                    <div className={Styles.header}>
+                        {quiptext("Reconnect to Salesforce?")}
+                    </div>
+                    <div className={Styles.errorTextBlock}>
+                        <div className={Styles.errorTextDescription}>
+                            {quiptext(
+                                "This record is connected to %(hostname1)s " +
+                                    "but you're logged into %(hostname2)s. Would " +
+                                    "you like to logout and reconnect to modify " +
+                                    "this record?",
+                                {
+                                    "hostname1": <b>
+                                        {this.props.entity.getHostname()}
+                                    </b>,
+                                    "hostname2": <b>
+                                        {this.props.entity.getClient().getHostname()}
+                                    </b>,
+                                })}
+                        </div>
+                    </div>
+                    <div className={Styles.actions}>
+                        <quip.apps.ui.Button
+                            text={quiptext("Cancel")}
+                            onClick={
+                                this.dismissMismatchedInstanceErrorDialog_
+                            }/>
+                        <quip.apps.ui.Button
+                            primary={true}
+                            text={quiptext("Log Out and Reconnect")}
+                            onClick={this.logoutAndReconnect_}/>
+                    </div>
+                </div>
+            </Dialog>;
+        } else if (this.state.showDialog) {
             const recordType = this.state.selectedRecordType;
             const relatedMenuCommandIds = this.props.entity
                 .getRelatedListsForType(recordType)
@@ -222,14 +318,14 @@ class RecordPicker extends React.Component {
             const selectedListView = listViews.filter(listView => {
                 return listView.key === this.state.selectedListViewKey;
             });
-            let recordFilterPlaceholder = "Search";
+            let recordFilterPlaceholder = quiptext("Search");
             if (selectedListView && selectedListView[0]) {
                 recordFilterPlaceholder += " " + selectedListView[0].label;
             }
             recordPickerDialog = <Dialog onDismiss={this.hideDialog_}>
                 <div className={Styles.dialog}>
                     <div className={Styles.header}>
-                        {"Select Salesforce Record"}
+                        {quiptext("Select Salesforce Record")}
                     </div>
                     <div className={Styles.picker}>
                         <RecordTypePicker
@@ -263,12 +359,12 @@ class RecordPicker extends React.Component {
                     </div>
                     <div className={Styles.actions}>
                         <quip.apps.ui.Button
-                            text="Cancel"
+                            text={quiptext("Cancel")}
                             onClick={this.hideDialog_}/>
                         <quip.apps.ui.Button
                             primary={true}
                             disabled={this.state.selectedRecordId === null}
-                            text="Select Record"
+                            text={quiptext("Select Record")}
                             onClick={this.selectRecord_}/>
                     </div>
                 </div>
@@ -291,8 +387,8 @@ class RecordPicker extends React.Component {
         let recordContainerOnclick;
         if (selectedRecord && selectedRecord.isPlaceholder()) {
             const actionText = this.props.entity.getClient().isLoggedIn()
-                ? "Select Record…"
-                : "Connect to Salesforce…";
+                ? quiptext("Select Record…")
+                : quiptext("Connect to Salesforce…");
             recordContainerClassNames.push(Styles.placeholder);
             chooseRecordButton = <div className={Styles.openPicker}>
                 <quip.apps.ui.Button
@@ -311,6 +407,7 @@ class RecordPicker extends React.Component {
                 {recordComponent}
             </div>
             {recordPickerDialog}
+            {connectedAppInstructions}
         </div>;
     }
 }
@@ -372,7 +469,9 @@ class ListViewPicker extends React.Component {
             return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
         }
         if (this.props.listViewsLoadingStatus == LOADING_STATUS.ERROR) {
-            return <div className={Styles.errorLoading}>Could Not Connect</div>;
+            return <div className={Styles.errorLoading}>
+                {quiptext("Could Not Connect")}
+            </div>;
         }
         return <div className={Styles.listViewPicker}>
             <RowContainer
@@ -494,7 +593,7 @@ class RecordFilter extends React.Component {
         const resultRecords = this.state.recordsData;
         const placeholder = this.props.searchPlaceholder
             ? this.props.searchPlaceholder
-            : "Search";
+            : quiptext("Search");
         let recordsContent;
         if (this.state.recordDataLoadingStatus == LOADING_STATUS.LOADING) {
             recordsContent = <quip.apps.ui.Image.Placeholder
@@ -502,12 +601,12 @@ class RecordFilter extends React.Component {
                 loading={true}/>;
         } else if (this.state.recordDataLoadingStatus == LOADING_STATUS.ERROR) {
             recordsContent = <div className={Styles.errorLoading}>
-                Could Not Connect
+                {quiptext("Could Not Connect")}
             </div>;
         } else {
             if (resultRecords.length == 0) {
                 recordsContent = <div className={Styles.noResult}>
-                    No Results
+                    {quiptext("No Results")}
                 </div>;
             } else {
                 recordsContent = <RowContainer

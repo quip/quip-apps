@@ -7,6 +7,7 @@
 
 import addDays from "date-fns/add_days";
 import differenceInDays from "date-fns/difference_in_days";
+import format from "date-fns/format"
 import getDay from "date-fns/get_day";
 import getDaysInMonth from "date-fns/get_days_in_month";
 import isAfter from "date-fns/is_after";
@@ -17,6 +18,18 @@ import startOfMonth from "date-fns/start_of_month";
 import subDays from "date-fns/sub_days";
 import subMonths from "date-fns/sub_months";
 
+import de from "date-fns/locale/de"
+import es from "date-fns/locale/es"
+import fr from "date-fns/locale/fr"
+import it from "date-fns/locale/it"
+import ja from "date-fns/locale/ja"
+import ko from "date-fns/locale/ko"
+import nl from "date-fns/locale/nl"
+import pt from "date-fns/locale/pt"
+import ru from "date-fns/locale/ru"
+import tr from "date-fns/locale/tr"
+import zh_cn from "date-fns/locale/zh_cn"
+
 import range from "lodash.range";
 
 import polyfills from "./polyfills";
@@ -24,11 +37,25 @@ import type { EventRecord } from "./model";
 
 import type {
     DateRange,
-    MouseCoordinates,
-    MouseStartCoordinates,
-    MovingEventRect,
-    MovingEventRectMap,
+        MouseCoordinates,
+        MouseStartCoordinates,
+        MovingEventRect,
+        MovingEventRectMap,
 } from "./types";
+
+const SUPPORTED_LANGUAGES = {
+    "de": de,
+    "es": es,
+    "fr": fr,
+    "it": it,
+    "ja": ja,
+    "ko": ko,
+    "nl": nl,
+    "pt": pt,
+    "ru": ru,
+    "tr": tr,
+    "zh_CN": zh_cn
+};
 
 const makeDateRange = (startDate: Date, numberOfDays: number) =>
     range(0, numberOfDays).map(index => addDays(startDate, index));
@@ -54,6 +81,56 @@ export const getCalendarMonth = (monthDate: Date): Array<Date> => {
         ...makeDateRange(startOfMonth(monthDate), daysInMonth),
         ...nextMonthDays,
     ];
+};
+
+export const formatDate = (date, dateFormat) => {
+    const user = quip.apps.getViewingUser();
+    let options;
+    if (user && user.getLanguage && user.getLanguage() in SUPPORTED_LANGUAGES) {
+        options = {
+            "locale": SUPPORTED_LANGUAGES[user.getLanguage()]
+        };
+    }
+    return format(date, dateFormat, options);
+};
+
+export const isSameDay = (date1: Date, date2: Date): boolean => {
+    // Simplified implementation of isSameDay from date-fns that does not call
+    // setHours on the start/end dates before comparing them (setHours is
+    // expensive on iOS, and we call this function a lot).
+    return date1.getDate() == date2.getDate() &&
+        date1.getMonth() == date2.getMonth() &&
+        date1.getFullYear() == date2.getFullYear();
+};
+
+const startOfDayCache = {};
+
+export const startOfDay = (date: Date): Date => {
+    // Caching implementation of startOfDay from date-fns that avoids repeatedly
+    // calling setHours (slow on iOS) when used with the same timestamp (which
+    // often happens when rendering a calendar month).
+    const cacheKey = "start-of-day-" + date.getTime();
+    let result = startOfDayCache[cacheKey];
+    if (!result) {
+        result = new Date(date.getTime());
+        result.setHours(0, 0, 0, 0);
+        startOfDayCache[cacheKey] = result;
+    }
+    return result;
+};
+
+const endOfDayCache = {};
+
+export const endOfDay = (date: Date): Date => {
+    // See startOfDay comments.
+    const cacheKey = "end-of-day-" + date.getTime();
+    let result = endOfDayCache[cacheKey];
+    if (!result) {
+        result = new Date(date.getTime());
+        result.setHours(23, 59, 59, 999);
+        endOfDayCache[cacheKey] = result;
+    }
+    return result;
 };
 
 export const dayInMonth = (date: Date, month: Date) =>

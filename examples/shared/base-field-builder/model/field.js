@@ -4,10 +4,6 @@ import {ResponseHandler} from "../response-handler.js";
 import {DefaultError, InvalidValueError} from "../error.js";
 import {formatNumber} from "../utils.jsx";
 
-import moment from "moment";
-
-export const DATE_FORMAT = "MM/D/YYYY, h:mm A";
-
 export class FieldEntity extends quip.apps.Record {
     static ID = "field";
 
@@ -188,7 +184,7 @@ export class FieldEntity extends quip.apps.Record {
         this.delete();
         if (recordMetric) {
             const record = this.getParentRecord();
-            record.saveFieldPrefrences();
+            record.saveFieldPreferences();
             const metricArgs = {
                 action: "removed_field",
                 record_type: record.getType(),
@@ -322,11 +318,8 @@ export class TextFieldEntity extends FieldEntity {
             case "Url":
             case "Website":
             case "TextArea":
+            case "Date": // For backwards compatibility where date was text.
                 return true;
-            case "Date":
-                valid =
-                    value === "" || moment(value, DATE_FORMAT, true).isValid();
-                break;
             default:
                 valid = false;
                 break;
@@ -401,6 +394,10 @@ export class BooleanFieldEntity extends FieldEntity {
 
     setValue(value) {
         this.set("value", value);
+    }
+
+    isDirty() {
+        return super.isDirty() || this.getValue() !== this.getOriginalValue();
     }
 }
 
@@ -506,5 +503,125 @@ export class TokenFieldEntity extends EnumFieldEntity {
 
     getServerValue() {
         return this.get("value").items.map(item => item.serverValue);
+    }
+}
+
+export class ReferenceFieldEntity extends FieldEntity {
+    static ID = "referenceField";
+
+    static getProperties() {
+        const fieldProperties = super.getProperties();
+        const ownProperties = {
+            value: "string",
+            originalValue: "object",
+        };
+        return Object.assign(ownProperties, fieldProperties);
+    }
+
+    getOriginalValue() {
+        return this.get("originalValue").value;
+    }
+
+    setOriginalValue(originalValue, displayValue) {
+        this.set("originalValue", {
+            value: originalValue,
+            displayValue: displayValue,
+        });
+    }
+
+    getValue() {
+        return this.get("value");
+    }
+
+    setValue(value) {
+        this.set("value", value);
+    }
+
+    getDisplayValue() {
+        return this.get("originalValue").displayValue;
+    }
+
+    isDirty() {
+        return false;
+    }
+}
+
+export class DateTimeFieldEntity extends FieldEntity {
+    static ID = "dateTimeField";
+
+    static getProperties() {
+        const fieldProperties = super.getProperties();
+        const ownProperties = {
+            value: "string",
+            originalValue: "object",
+        };
+        return Object.assign(ownProperties, fieldProperties);
+    }
+
+    getOriginalValue() {
+        return this.get("originalValue").value;
+    }
+
+    setOriginalValue(originalValue, displayValue) {
+        this.set("originalValue", {
+            value: originalValue,
+            displayValue: displayValue,
+        });
+    }
+
+    getValue() {
+        return this.get("value");
+    }
+
+    setValue(value) {
+        this.set("value", value);
+    }
+
+    getDisplayValue() {
+        return this.get("originalValue").displayValue;
+    }
+
+    isDirty() {
+        return false;
+    }
+}
+
+export class DateFieldEntity extends FieldEntity {
+    static ID = "dateField";
+
+    static getProperties() {
+        const fieldProperties = super.getProperties();
+        const ownProperties = {
+            value: "string",
+            originalValue: "object",
+        };
+        return Object.assign(ownProperties, fieldProperties);
+    }
+
+    getOriginalValue() {
+        return this.get("originalValue").value;
+    }
+
+    setOriginalValue(originalValue, displayValue) {
+        this.set("originalValue", {
+            value: originalValue,
+            displayValue: displayValue || originalValue,
+        });
+    }
+
+    getValue() {
+        return this.get("value");
+    }
+
+    setValue(value) {
+        this.set("value", value);
+    }
+
+    getDisplayValue() {
+        return this.get("originalValue").displayValue;
+    }
+
+    isDirty() {
+        return false;
     }
 }

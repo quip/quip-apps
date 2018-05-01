@@ -1,6 +1,5 @@
 // Copyright 2017 Quip
 
-import {DATE_FORMAT} from "./model/field.js";
 import {unescapeHTML} from "./utils.jsx";
 import moment from "moment";
 import IntlPolyfill from "intl";
@@ -36,30 +35,55 @@ export class ResponseHandler {
             const fieldsDataArray = [];
             let hasParseError = false;
             let errorMessage;
+            let fieldData;
             for (let key in schemaFields) {
-                if (!fields[key]) {
-                    continue;
-                }
-                let value = fields[key].value
-                    ? unescapeHTML(fields[key].value)
-                    : null;
-                if (schemaFields[key].dataType === "Picklist") {
-                    if (value) {
-                        value = {id: value, name: value, serverValue: value};
-                    } else {
-                        value = {
-                            id: "Select…",
-                            name: "Select…",
-                            serverValue: "",
-                            isEmpty: true,
-                        };
+                if (schemaFields[key].dataType === "Reference") {
+                    const relationshipName = schemaFields[key].relationshipName;
+                    if (relationshipName) {
+                        if (!fields[relationshipName]) {
+                            continue;
+                        }
                     }
+                    fieldData = {
+                        key: key,
+                        value: fields[key].value || null,
+                        displayValue:
+                            unescapeHTML(
+                                fields[relationshipName].displayValue) ||
+                            fields[relationshipName].value,
+                    };
+                } else {
+                    if (!fields[key]) {
+                        continue;
+                    }
+                    let value = fields[key].value
+                        ? unescapeHTML(fields[key].value)
+                        : null;
+                    if (typeof fields[key].value == typeof true) {
+                        value = fields[key].value;
+                    }
+                    if (schemaFields[key].dataType === "Picklist") {
+                        if (value) {
+                            value = {
+                                id: value,
+                                name: value,
+                                serverValue: value,
+                            };
+                        } else {
+                            value = {
+                                id: "Select…",
+                                name: quiptext("Select…"),
+                                serverValue: "",
+                                isEmpty: true,
+                            };
+                        }
+                    }
+                    fieldData = {
+                        key: key,
+                        value: value,
+                        displayValue: fields[key].displayValue,
+                    };
                 }
-                const fieldData = {
-                    key: key,
-                    value: value,
-                    displayValue: fields[key].displayValue,
-                };
                 fieldsDataArray.push(fieldData);
                 if (hasParseError) {
                     reject(errorMessage);
@@ -84,7 +108,9 @@ export class ResponseHandler {
                     return {
                         label: listView.Name,
                         key: listView.DeveloperName,
-                        describeUrl: `sobjects/${recordType}/listviews/${listView.Id}/describe`,
+                        describeUrl: `sobjects/${recordType}/listviews/${
+                            listView.Id
+                        }/describe`,
                         id: listView.Id,
                     };
                 });
@@ -107,9 +133,11 @@ export class ResponseHandler {
                 "label",
                 "length",
                 "precision",
+                "referenceToInfos",
+                "relationshipName",
+                "required",
                 "scale",
                 "updateable",
-                "required",
             ]);
             const schema = {};
             schema.themeInfo = response.themeInfo;
@@ -219,10 +247,11 @@ export class ResponseHandler {
                 }
             }
             case "Boolean": {
-                return value || false;
-            }
-            case "Date": {
-                return value ? moment(value).format(DATE_FORMAT) : "";
+                if (typeof value == typeof true) {
+                    return value;
+                } else {
+                    return value === "true";
+                }
             }
             default: {
                 return value || null;

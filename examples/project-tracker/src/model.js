@@ -1,6 +1,7 @@
 // Copyright 2017 Quip
 import {
     COLUMN_TYPE as TABLE_VIEW_COLUMN_TYPE,
+    COLUMN_TYPE_LABELS,
     ColumnRecord,
     DateRecord,
     FileRecord,
@@ -13,8 +14,6 @@ import {
 } from "../../shared/table-view/model.js";
 import debounce from "lodash.debounce";
 const colors = quip.apps.ui.ColorMap;
-
-const titleCase = s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
 export const COLUMN_TYPE = (({ PERSON, STATUS, DATE, FILE, TEXT }) => ({
     PERSON,
@@ -30,7 +29,7 @@ const COLUMN_NAME = {
 
 const DEFAULT_ROW = {
     [COLUMN_NAME.PROJECT]: {
-        contents: { RichText_placeholderText: "New Project" },
+        contents: { RichText_placeholderText: quiptext("New Project") },
     },
 };
 
@@ -58,17 +57,18 @@ export class RootRecord extends quip.apps.RootRecord {
     }
 
     seed() {
-        this.addStatusType("Upcoming", colors.BLUE);
-        this.addStatusType("In Progress", colors.YELLOW);
-        this.addStatusType("Complete", colors.GREEN);
+        this.addStatusType(quiptext("Upcoming"), colors.BLUE);
+        this.addStatusType(quiptext("In Progress"), colors.YELLOW);
+        this.addStatusType(quiptext("Complete"), colors.GREEN);
 
         const seedColumns = [
             {
                 name: COLUMN_NAME.PROJECT,
                 type: COLUMN_TYPE.TEXT,
                 contents: {
-                    RichText_defaultText: "Project",
-                    RichText_placeholderText: titleCase(COLUMN_TYPE.TEXT),
+                    RichText_defaultText: quiptext("Project"),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE.TEXT]),
                 },
                 draggable: false,
                 deletable: false,
@@ -76,29 +76,33 @@ export class RootRecord extends quip.apps.RootRecord {
             {
                 type: COLUMN_TYPE.PERSON,
                 contents: {
-                    RichText_defaultText: "Owner",
-                    RichText_placeholderText: titleCase(COLUMN_TYPE.PERSON),
+                    RichText_defaultText: quiptext("Owner"),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE.PERSON]),
                 },
             },
             {
                 type: COLUMN_TYPE.STATUS,
                 contents: {
-                    RichText_defaultText: "Status",
-                    RichText_placeholderText: titleCase(COLUMN_TYPE.STATUS),
+                    RichText_defaultText: quiptext("Status"),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE.STATUS]),
                 },
             },
             {
                 type: COLUMN_TYPE.DATE,
                 contents: {
-                    RichText_defaultText: "Deadline",
-                    RichText_placeholderText: titleCase(COLUMN_TYPE.DATE),
+                    RichText_defaultText: quiptext("Deadline"),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE.DATE]),
                 },
             },
             {
                 type: COLUMN_TYPE.FILE,
                 contents: {
-                    RichText_defaultText: "Attachment",
-                    RichText_placeholderText: titleCase(COLUMN_TYPE.FILE),
+                    RichText_defaultText: quiptext("Attachment"),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE.FILE]),
                 },
             },
         ];
@@ -120,7 +124,8 @@ export class RootRecord extends quip.apps.RootRecord {
             data = {
                 type: COLUMN_TYPE[data],
                 contents: {
-                    RichText_placeholderText: titleCase(data),
+                    RichText_placeholderText: (
+                        COLUMN_TYPE_LABELS[COLUMN_TYPE[data]]),
                 },
             };
         }

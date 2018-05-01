@@ -111,7 +111,7 @@ class Status extends Component {
                             <div className={styles.withText}>{text}</div>
                         </div>
                     ) : (
-                        <div className={styles.withoutText}>Set Status...</div>
+                        <div className={styles.withoutText}>{quiptext("Set Status...")}</div>
                     )}
                 </div>
                 <Modal

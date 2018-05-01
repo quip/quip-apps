@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:quip/quip.git"
+    "url": "git@github.com:quip/quip-apps.git"
   },
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --https",
@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "intl": "^1.2.5",
-    "moment": "2.18.1",
+    "moment": "^2.19.3",
     "react-modal": "^2.3.2",
     "react-sortable-hoc": "0.6.1",
     "whatwg-fetch": "^2.0.3",
-    "create-quip-app": "^0.0.7",
-    "quip-apps-webpack-config": ">=0.0.18"
+    "create-quip-app": "^0.0.31",
+    "quip-apps-webpack-config": "^0.0.31"
   }
 }

@@ -105,7 +105,7 @@ class Deadline extends Component {
                             </div>
                         </div>
                     ) : (
-                        "Set Date..."
+                        quiptext("Set Date...")
                     )}
                 </div>
                 <Modal

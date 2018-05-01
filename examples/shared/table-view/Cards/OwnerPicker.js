@@ -117,7 +117,10 @@ class OwnerPicker extends Component {
             }
             this.setState({ inputText: "", autoComplete: [], focusedIndex: 0 });
             quip.apps.addWhitelistedUser(user.getId());
-            quip.apps.sendMessage("Added {0} to " + this.props.projectName, [
+            quip.apps.sendMessage(quiptext("Added %(person)s to %(project)s", {
+                "person": "{0}",
+                "project": this.props.projectName
+            }), [
                 user.getId(),
             ]);
         }
@@ -145,7 +148,7 @@ class OwnerPicker extends Component {
                             className={styles.input}
                             onChange={this.onInputChange}
                             type="text"
-                            placeholder="Add People..."
+                            placeholder={quiptext("Add People...")}
                         />
                     </div>
                     <div>

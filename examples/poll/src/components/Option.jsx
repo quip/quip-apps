@@ -104,6 +104,15 @@ export default class Option extends React.Component {
 
         const user = quip.apps.getViewingUser();
         const progressPct = totalVotes ? votesCount / totalVotes * 100 : 0;
+        var extraRichTextBoxProps = {};
+        if (quip.apps.isApiVersionAtLeast("0.1.039")) {
+            extraRichTextBoxProps.allowedInlineStyles = [
+                quip.apps.RichTextRecord.InlineStyle.ITALIC,
+                quip.apps.RichTextRecord.InlineStyle.STRIKETHROUGH,
+                quip.apps.RichTextRecord.InlineStyle.UNDERLINE,
+                quip.apps.RichTextRecord.InlineStyle.CODE,
+            ];
+        }
         return (
             <div className={Styles.root} ref={node => record.setDom(node)}>
                 {user && multiple && (
@@ -160,6 +169,7 @@ export default class Option extends React.Component {
                                             .TEXT_PLAIN,
                                     ]}
                                     handleKeyEvent={this.handleKeyEvent}
+                                    {...extraRichTextBoxProps}
                                 />
                             </div>
 
@@ -185,9 +195,9 @@ export default class Option extends React.Component {
                                         quip.apps.ui.ColorMap[color].VALUE,
                                 }}
                             >
-                                {`${votesCount} ${votesCount === 1
-                                    ? "vote"
-                                    : "votes"}`}
+                                {votesCount === 1 ?
+                                    quiptext("1 vote") :
+                                    quiptext("%(count)s votes", {"count": votesCount})}
                             </div>
                         </div>
                     </div>

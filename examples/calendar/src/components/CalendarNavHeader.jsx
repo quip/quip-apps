@@ -4,13 +4,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import addMonths from "date-fns/add_months";
-import format from "date-fns/format";
 import subMonths from "date-fns/sub_months";
 
 import LeftChevron from "./LeftChevron.jsx";
 import RightChevron from "./RightChevron.jsx";
 
 import { setDisplayMonth } from "../actions";
+import { formatDate } from "../util";
 
 import Styles from "./CalendarNavHeader.less";
 
@@ -35,11 +35,11 @@ class CalendarNavHeader extends React.Component<Props, null> {
             <div className={Styles.container}>
                 <div className={Styles.displayMonthContainer}>
                     <span className={Styles.displayMonth}>
-                        {format(displayMonth, "MMMM")}
+                        {formatDate(displayMonth, "MMMM")}
                     </span>
 
                     <span className={Styles.displayYear}>
-                        {format(displayMonth, "YYYY")}
+                        {formatDate(displayMonth, "YYYY")}
                     </span>
                 </div>
                 <div className={Styles.navButtonGroup}>

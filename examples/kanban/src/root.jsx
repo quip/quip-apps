@@ -12,15 +12,15 @@ import { BoardRecord, CardRecord, ColumnRecord } from "./model.jsx";
 
 const kInitialColumns = [
     {
-        headerText: "To Do",
+        headerText: quiptext("To Do"),
         numCards: 1,
     },
     {
-        headerText: "In Progress",
+        headerText: quiptext("In Progress"),
         numCards: 1,
     },
     {
-        headerText: "Done",
+        headerText: quiptext("Done"),
         numCards: 1,
     },
 ];
@@ -69,12 +69,20 @@ quip.apps.registerClass(CardRecord, CardRecord.CONSTRUCTOR_KEY);
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["insert-column"],
-    initializationCallback: (root, params) => {
+    initializationCallback: (root, { isCreation, creationSource }) => {
         const boardRecord = quip.apps.getRootRecord();
-        const justCreated = params.isCreation;
-        if (justCreated) {
+        let justCreated = false;
+        if (isCreation) {
             ensureBoardPopulated(boardRecord);
             //quip.apps.sendMessage("created a Kanban Board");
+            justCreated = true;
+        } else if (
+            quip.apps.CreationSource &&
+            creationSource === quip.apps.CreationSource.TEMPLATE
+        ) {
+            boardRecord.clearData();
+            ensureBoardPopulated(boardRecord);
+            justCreated = true;
         }
         ReactDOM.render(
             <Board

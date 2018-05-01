@@ -7,6 +7,7 @@ import Card from "./Card";
 import { animateTo } from "./lib/animation";
 import ChevronDown from "./lib/components/icons/ChevronDown";
 import Grabber from "./lib/components/icons/Grabber";
+import { hashCode } from "./utils.js"
 
 const { RichTextBox } = quip.apps.ui;
 
@@ -27,8 +28,8 @@ class Column extends Component {
         // Height / width
         rootHeight: React.PropTypes.number.isRequired,
         width: React.PropTypes.number.isRequired,
-        widths: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
-        heights: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+        widths: React.PropTypes.object.isRequired,
+        heights: React.PropTypes.object.isRequired,
         setRowHeight: React.PropTypes.func,
         // Resize columns
         onResizeColumn: React.PropTypes.func.isRequired,
@@ -41,9 +42,9 @@ class Column extends Component {
         onColumnDrop: React.PropTypes.func.isRequired,
         // Row dragging
         onRowDrag: React.PropTypes.func.isRequired,
-        rowDraggingIndex: React.PropTypes.number.isRequired,
+        rowDraggingIndex: React.PropTypes.number,
         rowDraggingInProgress: React.PropTypes.bool.isRequired,
-        globalError: React.PropTypes.Component,
+        globalError: React.PropTypes.element,
         errorStatus: React.PropTypes.string,
         metricType: React.PropTypes.string,
     };
@@ -484,7 +485,7 @@ class Column extends Component {
                                 const isLastRow = i === rows.data.length - 1;
                                 return (
                                     <Card
-                                        key={row.id}
+                                        key={hashCode(row.id)}
                                         rowIndex={i}
                                         width={width}
                                         rootHeight={rootHeight}

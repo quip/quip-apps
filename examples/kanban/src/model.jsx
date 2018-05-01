@@ -11,6 +11,7 @@ export const kDefaultColumnColors = [
 ];
 
 const ACTIVITY_LOG_MESSAGES = {
+    // TODO translate with quiptext if we reenable.
     ADD_COLUMN: () => {
         return "added a column.";
     },
@@ -137,7 +138,8 @@ export class ColumnRecord extends quip.apps.Record {
     }
 
     addCard(isHeader, defaultText, index) {
-        let defaultPlaceholderText = isHeader ? "New Title" : "New Card";
+        let defaultPlaceholderText = (
+            isHeader ? quiptext("New Title") : quiptext("New Card"));
         quip.apps.recordQuipMetric("add_card");
         return this.get("cards").add(
             {

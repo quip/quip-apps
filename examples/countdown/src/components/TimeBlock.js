@@ -4,6 +4,7 @@ import quip from "quip";
 import React, { Component } from "react";
 import cx from "classnames";
 
+import { keyToLabel } from "../humanTime.js";
 import Styles from "./TimeBlock.less";
 
 class TimeBlock extends Component {
@@ -46,7 +47,7 @@ class TimeBlock extends Component {
                     {number}
                 </div>
 
-                <div className={Styles.unitText}>{unit}</div>
+                <div className={Styles.unitText}>{keyToLabel(unit)}</div>
             </div>
         );
     }

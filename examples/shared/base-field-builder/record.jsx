@@ -157,7 +157,8 @@ class Record extends React.Component {
         const error = this.props.entity.getError();
         if (error instanceof TypeNotSupportedError) {
             return <div className={Styles.notSupported}>
-                This Salesforce record type is currently not supported.
+                {quiptext(
+                    "This Salesforce record type is currently not supported.")}
             </div>;
         }
 
@@ -186,7 +187,7 @@ class Record extends React.Component {
                         onKeyUp={this.onKeyUp_}
                         onFocus={this.showFieldPicker}
                         value={this.state.query}
-                        placeholder="Add a field"
+                        placeholder={quiptext("Add a field")}
                         ref={node => (this.textInput_ = node)}/>
                 </div>
                 {fieldPicker}
@@ -231,7 +232,7 @@ class Record extends React.Component {
         } else {
             let setError = error;
             if (!(error instanceof DefaultError)) {
-                setError = new DefaultError("Could Not Connect.");
+                setError = new DefaultError(quiptext("Could Not Connect."));
             }
             this.setState({
                 error: setError,
@@ -249,7 +250,7 @@ class Record extends React.Component {
             error: null,
             errorMessage: "",
         });
-    }
+    };
 
     updateToolbar_ = () => {
         this.props.menuDelegate.updateToolbar(this.props.entity);
@@ -319,7 +320,7 @@ class Record extends React.Component {
         this.setState({
             fieldsOrder: arrayMove(fieldsOrder, oldIndex, newIndex),
         });
-        this.props.entity.saveFieldPrefrences();
+        this.props.entity.saveFieldPreferences();
     };
 
     setRecordId_ = e => {
@@ -430,7 +431,7 @@ class RecordHeader extends React.Component {
                 className={Styles.warning}
                 onMouseEnter={this.props.onMouseEnterError}
                 onMouseLeave={this.props.onMouseLeaveError}>
-                <div className={Styles.warningText}>{"Error"}</div>
+                <div className={Styles.warningText}>{quiptext("Error")}</div>
                 <WarningIcon/>
                 {errorPopover}
             </div>;

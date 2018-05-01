@@ -7,14 +7,13 @@ import React from "react";
 import { connect } from "react-redux";
 import classNames from "classnames";
 
-import format from "date-fns/format";
 import isEqual from "date-fns/is_equal";
 import isWithinRange from "date-fns/is_within_range";
 import isToday from "date-fns/is_today";
 import isWeekend from "date-fns/is_weekend";
 
 import { EventRecord } from "../model";
-import { dayInMonth } from "../util";
+import { dayInMonth, formatDate } from "../util";
 
 import Styles from "./Calendar.less";
 
@@ -160,8 +159,8 @@ const CalendarDayBackground = ({
                 })}
             >
                 {!isSmallScreen && isToday
-                    ? format(date, "MMMM D")
-                    : format(date, "D")}
+                    ? formatDate(date, "MMMM D")
+                    : formatDate(date, "D")}
             </div>
         </div>
     );

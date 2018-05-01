@@ -77,9 +77,9 @@ class File extends Component {
     getBody = () => {
         switch (this.getCurrentState()) {
         case STATES.UPLOADING:
-            return "Uploading...";
+            return quiptext("Uploading...");
         case STATES.CHOOSE_FILE:
-            return "Choose File...";
+            return quiptext("Choose File...");
         case STATES.HAS_FILE:
             return quip.apps.getBlobById(this.state.blobId).filename();
         default: return "";

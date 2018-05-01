@@ -48,8 +48,8 @@
         "lodash.range": "^3.2.0",
         "lodash.throttle": "^4.1.1",
         "svg-react-loader": "^0.4.4",
-        "create-quip-app": "^0.0.7",
-        "quip-apps-chevron": "^0.0.8",
-        "quip-apps-webpack-config": ">=0.0.18"
+        "create-quip-app": "^0.0.31",
+        "quip-apps-chevron": "^0.0.31",
+        "quip-apps-webpack-config": "^0.0.31"
     }
 }

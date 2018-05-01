@@ -4,11 +4,14 @@ import {RecordPickerEntity} from "./model/record-picker.js";
 import PlaceholderData from "./placeholder-data.js";
 
 import {
+    BooleanFieldEntity,
+    DateFieldEntity,
+    DateTimeFieldEntity,
+    EnumFieldEntity,
     FieldEntity,
     NumericFieldEntity,
+    ReferenceFieldEntity,
     TextFieldEntity,
-    BooleanFieldEntity,
-    EnumFieldEntity,
 } from "../../shared/base-field-builder/model/field.js";
 
 import {SalesforceRecordEntity} from "./model/salesforce-record.js";
@@ -23,13 +26,16 @@ if (quip.apps.ui.Spinner) {
     quip.apps.ui.Image.Placeholder = quip.apps.ui.Spinner;
 }
 
-quip.apps.registerClass(RecordPickerEntity, RecordPickerEntity.ID);
-quip.apps.registerClass(SalesforceRecordEntity, SalesforceRecordEntity.ID);
-quip.apps.registerClass(FieldEntity, FieldEntity.ID);
-quip.apps.registerClass(TextFieldEntity, TextFieldEntity.ID);
-quip.apps.registerClass(NumericFieldEntity, NumericFieldEntity.ID);
 quip.apps.registerClass(BooleanFieldEntity, BooleanFieldEntity.ID);
+quip.apps.registerClass(DateFieldEntity, DateFieldEntity.ID);
+quip.apps.registerClass(DateTimeFieldEntity, DateTimeFieldEntity.ID);
 quip.apps.registerClass(EnumFieldEntity, EnumFieldEntity.ID);
+quip.apps.registerClass(FieldEntity, FieldEntity.ID);
+quip.apps.registerClass(NumericFieldEntity, NumericFieldEntity.ID);
+quip.apps.registerClass(RecordPickerEntity, RecordPickerEntity.ID);
+quip.apps.registerClass(ReferenceFieldEntity, ReferenceFieldEntity.ID);
+quip.apps.registerClass(SalesforceRecordEntity, SalesforceRecordEntity.ID);
+quip.apps.registerClass(TextFieldEntity, TextFieldEntity.ID);
 
 let rootComponent;
 export function getRecordComponent() {
@@ -66,6 +72,10 @@ quip.apps.initialize({
                 });
             }
         } else if (params.isCreation) {
+            rootRecord.loadPlaceholderData(PlaceholderData);
+        } else if (quip.apps.CreationSource &&
+            params.creationSource === quip.apps.CreationSource.TEMPLATE) {
+            rootRecord.clearData();
             rootRecord.loadPlaceholderData(PlaceholderData);
         }
 

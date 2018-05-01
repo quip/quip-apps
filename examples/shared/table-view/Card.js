@@ -34,7 +34,6 @@ class Card extends Component {
         onContextMenu: React.PropTypes.func,
         // Column records
         column: toJSONPropTypeShape("object"),
-        columns: toJSONPropTypeShape("array"),
         // Row records
         row: toJSONPropTypeShape("object"),
         rows: toJSONPropTypeShape("array"),
@@ -43,7 +42,7 @@ class Card extends Component {
         rowIndex: React.PropTypes.number,
         rowDraggingIndex: React.PropTypes.number,
         // Height getting / setting
-        heights: React.PropTypes.arrayOf(React.PropTypes.number),
+        heights: React.PropTypes.object,
         rootHeight: React.PropTypes.number,
         setRowHeight: React.PropTypes.func,
         // Booleans
@@ -252,7 +251,7 @@ class Card extends Component {
         return (
             <Motion style={this.calcStyle()}>
                 {({ y }) => {
-                    const translateStr = 
+                    const translateStr =
                         `translate(0px, ${y - 1 - rowIndex}px)`;
                     const cardWrapStyle = {
                         position: "absolute",

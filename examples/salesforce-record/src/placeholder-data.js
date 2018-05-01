@@ -6,27 +6,27 @@ export default class PlaceholderData {
     static schema = {
         "fields": {
             "Employees": {
-                "label": "Employees",
+                "label": quiptext("Employees"),
                 "dataType": "String",
                 "updateable": true,
             },
             "Industry": {
-                "label": "Industry",
+                "label": quiptext("Industry"),
                 "dataType": "String",
                 "updateable": true,
             },
             "Name": {
-                "label": "Account Name",
+                "label": quiptext("Account Name"),
                 "dataType": "String",
                 "updateable": true,
             },
             "TotalSales": {
-                "label": "Total Sales",
+                "label": quiptext("Total Sales"),
                 "dataType": "String",
                 "updateable": true,
             },
             "Type": {
-                "label": "Type",
+                "label": quiptext("Type"),
                 "dataType": "String",
                 "updateable": true,
             },
@@ -45,13 +45,13 @@ export default class PlaceholderData {
                 "value": "Acme Corp Inc",
             },
             "Industry": {
-                "value": "Technology",
+                "value": quiptext("Technology"),
             },
             "TotalSales": {
                 "value": "$80,000.00",
             },
             "Type": {
-                "value": "Mid-Market",
+                "value": quiptext("Mid-Market"),
             },
         },
     };

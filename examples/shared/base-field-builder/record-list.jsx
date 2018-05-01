@@ -4,6 +4,7 @@ import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import Card from "../table-view/Card.less";
 import Checkbox from "../../shared/base-field-builder/icons/checkbox.jsx";
 import Chevron from "../../shared/base-field-builder/icons/draft-chevron.jsx";
+import ColumnPicker from "./column-picker.jsx";
 import cx from "classnames";
 import Dialog from "../dialog/dialog.jsx";
 import ErrorPopover from "./error-popover.jsx";
@@ -14,18 +15,19 @@ import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-list.less";
 import WarningIcon from "./icons/warning.jsx";
 
-import {BadRequestError, InvalidValueError} from "./error.js";
 import {
-    BooleanFieldEntity,
-    EnumFieldEntity,
-    FieldEntity,
-    TextFieldEntity,
-} from "./model/field.js";
+    BadRequestError,
+    InvalidValueError,
+    UnauthenticatedError,
+} from "./error.js";
 
 import {COLUMN_TYPE, toJSON} from "../table-view/model.js";
 import {CommentVisibilityToggle} from "../table-view/lib/comment-component.jsx";
-import {EnumField, TokenField} from "./field.jsx";
-import {entityListener} from "./utils.jsx";
+import {DateField, EnumField, TokenField} from "./field.jsx";
+import {DateFieldEntity} from "./model/field.js";
+import {RecordEntity} from "./model/record.js";
+import {Y_BORDER} from "../table-view/Card.js";
+
 import {
     getHeights,
     getWidths,
@@ -37,8 +39,6 @@ import {
     sumHeights,
     TableView,
 } from "../../shared/table-view/table-view.jsx";
-import {RecordEntity} from "./model/record.js";
-import {Y_BORDER} from "../table-view/Card.js";
 
 const LOADING_STATUS = {
     LOADING: 0,
@@ -64,10 +64,16 @@ export default class RecordList extends React.Component {
         widths: React.PropTypes.object.isRequired,
         onContextMenu: React.PropTypes.func,
         metricType: React.PropTypes.string,
+        bottomSpacing: React.PropTypes.number,
+        tableLoading: React.PropTypes.bool,
     };
 
     constructor(props) {
         super(props);
+        const heights = getHeights({
+            columns: props.columns,
+            rows: props.entities,
+        });
         this.state = {
             loadingStatus: LOADING_STATUS.UNLOADED,
             query: "",
@@ -77,7 +83,8 @@ export default class RecordList extends React.Component {
                 props.widths,
                 this.getDefaultWidth_,
                 this.getMinWidth_),
-            heights: getHeights({columns: props.columns, rows: props.entities}),
+            heights: heights,
+            errorBorderHeight: sumHeights(heights) - props.entities.length,
         };
     }
 
@@ -120,11 +127,14 @@ export default class RecordList extends React.Component {
         this.props.entities.map(entity => {
             recordsErrorStatus[entity.getRecordId()].showErrorPopover = false;
         });
+        const contains =
+            this.fieldDialog_ && this.fieldDialog_.contains(e.target);
         this.setState({
             showFieldPicker:
                 this.fieldPicker_ && this.fieldPicker_.contains(e.target),
             showGlobalErrorPopover: false,
             recordsErrorStatus: JSON.stringify(recordsErrorStatus),
+            fieldDialog: contains ? this.state.fieldDialog : null,
         });
     };
 
@@ -137,6 +147,7 @@ export default class RecordList extends React.Component {
             showFieldPicker: false,
             showGlobalErrorPopover: false,
             recordsErrorStatus: JSON.stringify(recordsErrorStatus),
+            fieldDialog: null,
         });
     };
 
@@ -149,20 +160,20 @@ export default class RecordList extends React.Component {
                     showErrorPopover: false,
                 };
             });
+
             this.setState({
-                loadingStatus: LOADING_STATUS.LOADING,
+                loadingStatus: this.hasLoaded_(entities)
+                    ? LOADING_STATUS.LOADED
+                    : LOADING_STATUS.LOADING,
                 recordsErrorStatus: JSON.stringify(recordsErrorStatus),
                 globalErrorMessage: null,
                 showGlobalErrorPopover: false,
-                errorBorderHeight: 0,
             });
 
             const fetchers = [];
             for (let entity of entities) {
-                if (!entity.isPlaceholder()) {
-                    const fetcher = entity.fetchData();
-                    fetchers.push(fetcher);
-                }
+                const fetcher = entity.fetchData();
+                fetchers.push(fetcher);
             }
             const rootRecord = quip.apps.getRootRecord();
             rootRecord.setFetching(true);
@@ -171,9 +182,6 @@ export default class RecordList extends React.Component {
                 .then(response => {
                     rootRecord.setFetching(false);
                     this.onEntityLoaded_();
-                    this.setState({
-                        loadingStatus: LOADING_STATUS.LOADED,
-                    });
                 })
                 .catch(error => {
                     rootRecord.setFetching(false);
@@ -184,6 +192,12 @@ export default class RecordList extends React.Component {
                     } else {
                         // Show users the stale data.
                         this.onEntityLoaded_();
+                    }
+                    if (!(error instanceof UnauthenticatedError)) {
+                        setTimeout(() => {
+                            // Rethrow to log an exception.
+                            throw error;
+                        });
                     }
                 });
         }
@@ -196,10 +210,13 @@ export default class RecordList extends React.Component {
         const nextRowCount = nextProps.entities.length;
 
         const newState = {};
-        if (rowCount !== nextRowCount) {
+        const inHeights = entity => entity.getId() in this.state.heights;
+        if (rowCount !== nextRowCount || !nextProps.entities.every(inHeights)) {
             newState.heights = getHeights(
                 {columns: nextProps.columns, rows: nextProps.entities},
                 this.state.heights);
+            newState.errorBorderHeight =
+                sumHeights(newState.heights) - nextProps.entities.length;
         }
 
         let updateWidths = columnCount !== nextColumnCount;
@@ -297,11 +314,13 @@ export default class RecordList extends React.Component {
 
     recordErrorHandling = (entity, error) => {
         const recordsErrorStatus = JSON.parse(this.state.recordsErrorStatus);
-        recordsErrorStatus[entity.getRecordId()].errorMessage =
-            error && error.toString();
-        this.setState({
-            recordsErrorStatus: JSON.stringify(recordsErrorStatus),
-        });
+        const status = recordsErrorStatus[entity.getRecordId()];
+        if (status) {
+            status.errorMessage = error && error.toString();
+            this.setState({
+                recordsErrorStatus: JSON.stringify(recordsErrorStatus),
+            });
+        }
     };
 
     clearGlobalError = () => {
@@ -446,7 +465,7 @@ export default class RecordList extends React.Component {
             name: field.key,
             type: COLUMN_TYPE.CUSTOM,
             contents: {
-                RichText_defaultText: field.label,
+                RichText_defaultText: field.shortLabel || field.label,
             },
             titleEditable: false,
         });
@@ -505,21 +524,6 @@ export default class RecordList extends React.Component {
         }, 2000);
     };
 
-    setRowHeight_ = (rowId, columnId, height) => {
-        this.setState(({heights}) => ({
-            heights: Object.assign(heights, {
-                [rowId]: Object.assign(heights[rowId] || {}, {
-                    // Height comes directly from RichTextBoxes so we need to
-                    // add padding back in
-                    [columnId]: Math.max(
-                        height + ROW_PADDING,
-                        ROW_START_HEIGHT),
-                }),
-            }),
-            errorBorderHeight: sumHeights(heights),
-        }));
-    };
-
     onDraftClick_ = (draftBadge, field, e) => {
         if (field.isDirty()) {
             this.props.menuDelegate.showDraftContextMenu(e, draftBadge, field);
@@ -558,6 +562,11 @@ export default class RecordList extends React.Component {
         setRowHeight,
         cardFocused,
         onCardFocused) => {
+        if (this.state.loadingStatus !== LOADING_STATUS.LOADED) {
+            // Displays an empty cell as contents are loading.
+            return <div>{isFirstColumn && "Loading…"}</div>;
+        }
+
         const showComments = quip.apps.isMobile() || cardHovered || cardFocused;
         const entity = quip.apps.getRecordById(cell.id);
         let draft;
@@ -601,18 +610,19 @@ export default class RecordList extends React.Component {
                     this.onDraftClick_(draftBadge, entity, e);
                 }}>
                 <span className={Styles.draftText}>Draft</span>
-                <Chevron />
+                <Chevron/>
             </div>;
         }
 
         let component;
 
         let lockIcon = <div
-            title={"This field is read-only."}
-            className={Styles.lockIcon}>
-            <LockIcon />
+            title={quiptext("This field is read-only.")}
+            className={Field.lockIcon}>
+            <LockIcon/>
         </div>;
 
+        const fixedWidth = width - CELL_OPTIONS_SPACING;
         if (cell.contents.key === "key") {
             let errorIndicator;
             let errorPopover;
@@ -628,7 +638,7 @@ export default class RecordList extends React.Component {
                         content: {
                             border: "0px",
                             borderStyle: "none",
-                            "border-image-source": "none",
+                            borderImageSource: "none",
                         },
                         overlay: {
                             marginLeft: "-10px",
@@ -638,6 +648,7 @@ export default class RecordList extends React.Component {
                     };
                     errorPopover = <Modal
                         isOpen={true}
+                        onRequestClose={() => {}}
                         rootHeight={0}
                         style={modalStyle}
                         wrapperRef={entity.domNode}>
@@ -670,7 +681,7 @@ export default class RecordList extends React.Component {
                     className={Styles.warningInCell}
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}>
-                    <WarningIcon />
+                    <WarningIcon/>
                 </div>;
             }
             const classNames = [Styles.keyCellName];
@@ -694,7 +705,7 @@ export default class RecordList extends React.Component {
             entity.getType() === "Url") {
             const classNames = [Styles.recordListCell];
             if (entity.isReadOnly()) {
-                classNames.push(Styles.readOnly);
+                classNames.push(Field.readOnly);
             }
             component = <div className={classNames.join(" ")}>
                 <div
@@ -704,22 +715,22 @@ export default class RecordList extends React.Component {
                     {lockIcon}
                     {draft}
                 </div>
-                <quip.apps.ui.RichTextBox
-                    minHeight={LINE_HEIGHT}
-                    maxHeight={cardFocused ? undefined : LINE_HEIGHT * 2}
-                    onFocus={() => onCardFocused(true)}
-                    onBlur={() => onCardFocused(false)}
-                    readOnly={entity.isReadOnly()}
-                    ref={node => (entity.domNode = ReactDOM.findDOMNode(node))}
-                    onComponentHeightChanged={
-                        setRowHeight && !cardFocused
-                            ? height =>
-                                  setRowHeight(row.id, cell.columnId, height)
-                            : undefined
-                    }
-                    record={entity.get("value")}
-                    scrollable={false}
-                    width={width - CELL_OPTIONS_SPACING}/>
+                {entity instanceof DateFieldEntity ? (
+                    <DateField entity={entity} width={fixedWidth}/>
+                ) : (
+                    <quip.apps.ui.RichTextBox
+                        minHeight={LINE_HEIGHT}
+                        maxHeight={cardFocused ? undefined : LINE_HEIGHT * 2}
+                        onFocus={() => onCardFocused(true)}
+                        onBlur={() => onCardFocused(false)}
+                        readOnly={entity.isReadOnly()}
+                        ref={node =>
+                            (entity.domNode = ReactDOM.findDOMNode(node))
+                        }
+                        record={entity.get("value")}
+                        scrollable={false}
+                        width={fixedWidth}/>
+                )}
             </div>;
         } else if (entity.getType() === "Picklist" ||
             entity.getType() === "Token") {
@@ -728,36 +739,36 @@ export default class RecordList extends React.Component {
                 cardFocused ? Field.cardFocused : Field.cardBlurred,
             ];
             if (entity.isReadOnly()) {
-                classNames.push(Styles.readOnly);
+                classNames.push(Field.readOnly);
             }
-            const updatedWidth = width - CELL_OPTIONS_SPACING;
-            component = <div className={classNames.join(" ")}>
+            component = <div
+                className={classNames.join(" ")}
+                onClick={() =>
+                    entity.getType() === "Token" && entity.domNode.click()
+                }>
                 <div className={Styles.recordListCellOptions} style={{width}}>
                     {commentsTrigger}
                     {lockIcon}
                     {draft}
                 </div>
                 {entity.getType() === "Picklist" && <EnumField
-                    createDialog={(dialogNode, dialogLeft, dialogTop) =>
-                        this.setState({dialogNode, dialogLeft, dialogTop})
-                    }
+                    createDialog={fieldDialog => this.setState({fieldDialog})}
                     entity={entity}
                     onChangeFocus={result => onCardFocused(result)}
-                    width={updatedWidth}
+                    width={fixedWidth}
                     ref={node =>
                         (entity.domNode = ReactDOM.findDOMNode(node))
                     }/>}
                 {entity.getType() === "Token" && <TokenField
-                    createDialog={(dialogNode, dialogLeft, dialogTop) =>
-                        this.setState({dialogNode, dialogLeft, dialogTop})
-                    }
+                    createDialog={fieldDialog => this.setState({fieldDialog})}
+                    dialog={this.state.fieldDialog}
                     entity={entity}
                     focused={cardFocused}
                     onChangeFocus={result => onCardFocused(result)}
-                    width={updatedWidth}
-                    ref={node =>
-                        (entity.domNode = ReactDOM.findDOMNode(node))
-                    }/>}
+                    width={fixedWidth}
+                    ref={node => {
+                        entity.domNode = ReactDOM.findDOMNode(node);
+                    }}/>}
             </div>;
         } else {
             component = <div>Unsupported type</div>;
@@ -778,15 +789,16 @@ export default class RecordList extends React.Component {
     };
 
     render() {
-        if (this.state.loadingStatus == LOADING_STATUS.LOADING ||
-            this.state.loadingStatus == LOADING_STATUS.UNLOADED) {
+        if ((this.state.loadingStatus == LOADING_STATUS.LOADING ||
+                this.state.loadingStatus == LOADING_STATUS.UNLOADED) &&
+            !this.props.tableLoading) {
             if (this.props.entities.length > 8) {
                 return <div
                     style={{
                         textAlign: "center",
                         width: this.props.loadingWidth,
                     }}>
-                    Loading…
+                    {quiptext("Loading…")}
                 </div>;
             } else {
                 return <div style={{width: this.props.loadingWidth}}>
@@ -816,13 +828,15 @@ export default class RecordList extends React.Component {
         }
 
         let dialog;
-        if (this.state.dialogNode) {
+        if (this.state.fieldDialog) {
             const rect = this.rootNode_.getBoundingClientRect();
             dialog = <Dialog
+                ref={node => (this.fieldDialog_ = ReactDOM.findDOMNode(node))}
                 showBackdrop={false}
-                left={this.state.dialogLeft - rect.left}
-                top={this.state.dialogTop - rect.top}>
-                {this.state.dialogNode}
+                onDismiss={this.state.fieldDialog.onDismiss}
+                left={this.state.fieldDialog.left - rect.left}
+                top={this.state.fieldDialog.top - rect.top}>
+                {this.state.fieldDialog.node}
             </Dialog>;
         }
 
@@ -840,7 +854,7 @@ export default class RecordList extends React.Component {
                     content: {
                         border: "0px",
                         borderStyle: "none",
-                        "border-image-source": "none",
+                        borderImageSource: "none",
                     },
                     overlay: {
                         marginLeft: "20px",
@@ -850,6 +864,7 @@ export default class RecordList extends React.Component {
                 };
                 errorPopover = <Modal
                     isOpen={true}
+                    onRequestClose={() => {}}
                     rootHeight={0}
                     style={modalStyle}
                     wrapperRef={this.rootNode_}>
@@ -863,7 +878,7 @@ export default class RecordList extends React.Component {
                 className={Styles.warningGlobal}
                 onMouseEnter={this.onMouseEnterGlobalError_}
                 onMouseLeave={this.onMouseLeaveGlobalError_}>
-                <WarningIcon />
+                <WarningIcon/>
                 {errorPopover}
             </div>;
 
@@ -880,7 +895,7 @@ export default class RecordList extends React.Component {
         if (this.state.loadingStatus == LOADING_STATUS.ERROR) {
             messageDiv = <div className={Styles.noConnect}>
                 <div className={Styles.errorText}>
-                    <WarningIcon />
+                    <WarningIcon/>
                     <div>Could Not Connect</div>
                 </div>
                 <div
@@ -915,13 +930,13 @@ export default class RecordList extends React.Component {
                 onRowDelete={this.onRowDelete_}
                 onResizeEnd={this.onResizeEnd_}
                 rows={row}
-                setRowHeight={this.setRowHeight_}
                 setWidths={this.setWidths_}
                 getMinWidth={this.getMinWidth_}
                 widths={widths}
                 globalError={errorIndicator}
                 errorStatus={this.state.recordsErrorStatus}
-                metricType={this.props.metricType}/>
+                metricType={this.props.metricType}
+                bottomSpacing={this.props.bottomSpacing}/>
             {messageDiv}
             {errorBorder}
         </div>;
@@ -950,6 +965,7 @@ export default class RecordList extends React.Component {
                                     key: field.getKey(),
                                     value: field.getDisplayValue(),
                                     dirty: field.isDirty(),
+                                    loaded: this.state.loadingStatus,
                                 },
                             };
                         })
@@ -970,78 +986,4 @@ export default class RecordList extends React.Component {
             })),
         };
     }
-}
-
-class ColumnPicker extends React.Component {
-    static propTypes = {
-        initialColumns: React.PropTypes.arrayOf(React.PropTypes.object)
-            .isRequired,
-        selectedColumns: React.PropTypes.arrayOf(React.PropTypes.object)
-            .isRequired,
-        onComplete: React.PropTypes.func.isRequired,
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedColumns: props.selectedColumns,
-        };
-    }
-
-    render() {
-        return <div className={Styles.dialog}>
-            <div className={Styles.editColumnHeader}>{"Edit Columns"}</div>
-            <RowContainer
-                rows={this.props.initialColumns}
-                renderRow={this.renderRow_}
-                containerClassName={Styles.editColumnContents}/>
-            <div className={Styles.actions}>
-                <quip.elements.ui.Button
-                    text="Cancel"
-                    onClick={this.cancelDialog_}/>
-                <quip.elements.ui.Button
-                    primary={true}
-                    onClick={this.saveColumns_}
-                    text="Save Columns"/>
-            </div>
-        </div>;
-    }
-
-    cancelDialog_ = () => {
-        this.props.onComplete(false, this.state.selectedColumns);
-    };
-
-    saveColumns_ = () => {
-        this.props.onComplete(true, this.state.selectedColumns);
-    };
-
-    renderRow_ = (field, isHighlighted, index) => {
-        const classNames = [Styles.fieldRow];
-        if (this.state.selectedColumns.find(
-                column => column.key === field.key)) {
-            classNames.push(Styles.highlighted);
-        }
-        return <div
-            className={classNames.join(" ")}
-            onClick={() => {
-                this.toggleColumn_(field);
-            }}>
-            <Checkbox />
-            {field.label}
-        </div>;
-    };
-
-    toggleColumn_ = field => {
-        const column = this.state.selectedColumns.find(
-            column => column.key === field.key);
-        if (column) {
-            this.state.selectedColumns.splice(
-                this.state.selectedColumns.indexOf(column),
-                1);
-            this.setState({selectedColumns: this.state.selectedColumns});
-        } else {
-            this.state.selectedColumns.push(field);
-            this.setState({selectedColumns: this.state.selectedColumns});
-        }
-    };
 }
