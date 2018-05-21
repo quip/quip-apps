@@ -1,2 +1,2 @@
 package.json
-webpack.config.js
+*.config.js
