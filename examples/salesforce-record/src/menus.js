@@ -1,87 +1,52 @@
 // Copyright 2017 Quip
 
 import {getRecordComponent, getRecordPickerComponent} from "./root.jsx";
+import {AUTH_CONFIG_NAMES} from "./model/record-picker";
 import {BaseMenu} from "../../shared/base-field-builder/base-menu.js";
+import {MismatchedInstanceError} from "./client";
 
 let selectedFieldEntity;
 let isLogoutInProgress_ = false;
 
 export class FieldBuilderMenu extends BaseMenu {
-    promptLogin_(onLoggedIn, onMismatchedInstance, onLoggedInFailed) {
-        if (quip.apps
-                .getRootEntity()
-                .getClient()
-                .isLoggedIn() &&
-            quip.apps
-                .getRootEntity()
-                .getClient()
-                .onSourceInstance()) {
-            onLoggedIn();
-        } else {
-            quip.apps
-                .getRootEntity()
-                .login(onLoggedIn, onMismatchedInstance, onLoggedInFailed);
-        }
-    }
-
     allMenuCommands() {
+        const wrapHandlerWithLogin = (menuCommand, handler) => () =>
+            getRecordPickerComponent()
+                .ensureLoggedIn(menuCommand)
+                .then(handler)
+                .catch(err => {
+                    console.warn(
+                        `${menuCommand} handler failed because not logged in.`);
+                });
         return [
             {
                 id: "refresh-record",
                 label: quiptext("Refresh Now"),
-                handler: () => {
-                    this.promptLogin_(
-                        () => {
-                            this.refreshRecord_();
-                        },
-                        () => {
-                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
-                                "refresh-record");
-                        });
-                },
+                handler: wrapHandlerWithLogin("refresh-record", () =>
+                    this.refreshRecord_()
+                ),
             },
             {
                 id: "change-record",
                 label: quiptext("Change Record…"),
-                handler: () => {
-                    this.promptLogin_(
-                        () => {
-                            this.changeRecord_();
-                        },
-                        () => {
-                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
-                                "change-record");
-                        });
-                },
+                handler: wrapHandlerWithLogin("change-record", () =>
+                    this.changeRecord_()
+                ),
             },
             {
                 id: "add-field",
                 label: quiptext("Add Field"),
-                handler: () => {
-                    this.promptLogin_(
-                        () => {
-                            this.addField_();
-                        },
-                        () => {
-                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
-                                "add-field");
-                        });
-                },
+                handler: wrapHandlerWithLogin("add-field", () =>
+                    this.addField_()
+                ),
             },
             {
                 id: "save-data",
                 label: quiptext("Save to Salesforce"),
                 quipIcon: quip.apps.MenuIcons.SYNCING,
-                handler: () => {
-                    this.promptLogin_(
-                        () => {
-                            this.saveData_();
-                        },
-                        () => {
-                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
-                                "save-data");
-                        });
-                },
+                handler: wrapHandlerWithLogin("save-data", () =>
+                    this.saveData_()
+                ),
             },
             {
                 id: "open-in-salesforce",
@@ -96,52 +61,19 @@ export class FieldBuilderMenu extends BaseMenu {
             {
                 id: "reconnect-as-me",
                 label: quiptext("Take Over…"),
-                handler: () => {
-                    this.promptLogin_(
-                        () => {
-                            this.reconnectAsMe_();
-                        },
-                        () => {
-                            getRecordPickerComponent().showMismatchedInstanceErrorDialog(
-                                "reconnect-as-me");
-                        });
-                },
-            },
-            {
-                id: "logout",
-                label: quiptext("Log Out"),
-                handler: () => {
-                    isLogoutInProgress_ = true;
-                    this.refreshToolbar();
-                    quip.apps.getRootEntity().logout(() => {
-                        isLogoutInProgress_ = false;
-                        quip.apps.getRootEntity().clearCachedData();
-                        this.updateToolbar(
-                            quip.apps.getRootEntity().getSelectedRecord());
-                        this.refreshToolbar();
-                    });
-                },
+                handler: wrapHandlerWithLogin("reconnect-as-me", () =>
+                    this.reconnectAsMe_()
+                ),
             },
             {
                 id: "revert-changes",
                 label: quiptext("Discard Changes"),
-                handler: () => {
-                    selectedFieldEntity.revertToOriginal();
-                },
+                handler: () => selectedFieldEntity.revertToOriginal(),
             },
             {
                 id: "remove-field",
                 label: quiptext("Hide Field"),
-                handler: () => {
-                    selectedFieldEntity.remove();
-                },
-            },
-            {
-                id: "sync-field-edits",
-                label: quiptext("Save to Salesforce"),
-                handler: () => {
-                    //TODO
-                },
+                handler: () => selectedFieldEntity.remove(),
             },
         ];
     }
@@ -205,71 +137,29 @@ export class FieldBuilderMenu extends BaseMenu {
         return disabledCommands;
     }
 
+    isCommandDisabled_(id) {
+        return this.getDisabledCommands_().indexOf(id) >= 0;
+    }
+
     refreshToolbar() {
         quip.apps.updateToolbarCommandsState(this.getDisabledCommands_(), []);
     }
 
     updateToolbar(recordEntity) {
         const menuCommands = this.allMenuCommands();
-        if (recordEntity.isPlaceholder()) {
-            const highlightedCommandIds = [];
-            const mainMenuSubCommands = [];
-            if (quip.apps
-                    .getRootEntity()
-                    .getClient()
-                    .isLoggedIn()) {
-                mainMenuSubCommands.push("current-instance");
-                mainMenuSubCommands.push("logout");
-                mainMenuSubCommands.push(
-                    quip.apps.DocumentMenuCommands.SEPARATOR);
+        const toolbarCommandIds = this.getToolbarCommandIds(recordEntity);
+        const instanceCommands = this.getInstanceCommands_();
+        const hasInstanceCommands = Object.keys(instanceCommands).length > 0;
 
-                const updatedMenuCommands = [
-                    {
-                        id: quip.apps.DocumentMenuCommands.MENU_MAIN,
-                        subCommands: mainMenuSubCommands,
-                    },
-                ];
-                updatedMenuCommands.push({
-                    id: "current-instance",
-                    label: quip.apps
-                        .getRootEntity()
-                        .getClient()
-                        .getHostname(),
-                    isHeader: true,
-                });
-                const allMenuCommands = [
-                    ...updatedMenuCommands,
-                    ...menuCommands,
-                ];
-                quip.apps.updateToolbar({
-                    menuCommands: allMenuCommands,
-                    highlightedCommandIds: highlightedCommandIds,
-                });
-            } else {
-                const updatedMenuCommands = [
-                    {
-                        id: quip.apps.DocumentMenuCommands.MENU_MAIN,
-                        subCommands: ["logout"],
-                    },
-                ];
-                const allMenuCommands = [
-                    ...updatedMenuCommands,
-                    ...menuCommands,
-                ];
-                quip.apps.updateToolbar({
-                    menuCommands: allMenuCommands,
-                    highlightedCommandIds: highlightedCommandIds,
-                });
-            }
+        if (recordEntity.isPlaceholder()) {
+            this.updateMenuForPlaceholderRecord_(
+                menuCommands,
+                toolbarCommandIds,
+                instanceCommands);
             return;
-        }
-        const syncingMenu = menuCommands.find(menu => menu.id === "save-data");
-        if (syncingMenu) {
-            syncingMenu.label = BaseMenu.getSyncingString(recordEntity);
         }
         const mainMenuSubCommands = [
             "record-header",
-            "add-field",
             "change-record",
             "open-in-salesforce",
             quip.apps.DocumentMenuCommands.SEPARATOR,
@@ -277,13 +167,10 @@ export class FieldBuilderMenu extends BaseMenu {
             "last-updated-time",
             "refresh-record",
         ];
-        if (quip.apps
-                .getRootEntity()
-                .getClient()
-                .isLoggedIn()) {
-            mainMenuSubCommands.push(quip.apps.DocumentMenuCommands.SEPARATOR);
-            mainMenuSubCommands.push("current-instance");
-            mainMenuSubCommands.push("logout");
+        if (hasInstanceCommands) {
+            mainMenuSubCommands.push(
+                quip.apps.DocumentMenuCommands.SEPARATOR,
+                ...Object.keys(instanceCommands));
         }
 
         let lastUpdatedLabel = BaseMenu.getLastUpdatedString(recordEntity);
@@ -295,7 +182,6 @@ export class FieldBuilderMenu extends BaseMenu {
                     "name": recordOwner.getName(),
                 });
         }
-
         const updatedMenuCommands = [
             {
                 id: quip.apps.DocumentMenuCommands.MENU_MAIN,
@@ -315,30 +201,97 @@ export class FieldBuilderMenu extends BaseMenu {
                 isHeader: true,
             },
         ];
+        updatedMenuCommands.push(...Object.values(instanceCommands));
 
-        if (quip.apps
-                .getRootEntity()
-                .getClient()
-                .isLoggedIn()) {
-            updatedMenuCommands.push({
-                id: "current-instance",
-                label: quip.apps
-                    .getRootEntity()
-                    .getClient()
-                    .getHostname(),
-                isHeader: true,
-            });
-        }
         const allMenuCommands = [...updatedMenuCommands, ...menuCommands];
-        quip.apps.updateToolbar({menuCommands: allMenuCommands});
+        quip.apps.updateToolbar({
+            toolbarCommandIds,
+            menuCommands: allMenuCommands,
+        });
+    }
+
+    updateMenuForPlaceholderRecord_(
+        menuCommands,
+        toolbarCommandIds,
+        instanceCommands) {
+        const updatedMenuCommands = [
+            {
+                id: quip.apps.DocumentMenuCommands.MENU_MAIN,
+                subCommands: Object.keys(instanceCommands),
+            },
+            ...Object.values(this.getInstanceCommands_()),
+        ];
+        const allMenuCommands = [...updatedMenuCommands, ...menuCommands];
+        quip.apps.updateToolbar({
+            toolbarCommandIds,
+            menuCommands: allMenuCommands,
+            highlightedCommandIds: [],
+        });
+    }
+
+    getInstanceCommands_() {
+        const rootEntity = quip.apps.getRootEntity();
+        const isLoggedIn = rootEntity.getClient().isLoggedIn();
+
+        const commands = {};
+        if (isLoggedIn) {
+            commands["current-instance"] = {
+                id: "current-instance",
+                label: rootEntity.getClient().getHostname(),
+                isHeader: true,
+            };
+        }
+        if (quip.apps.getRootEntity().hasSandboxAuth()) {
+            commands["toggle-sandbox"] = {
+                id: "toggle-sandbox",
+                label: rootEntity.useSandbox()
+                    ? quiptext("Use Production")
+                    : quiptext("Use Sandbox"),
+                handler: () => quip.apps.getRootEntity().toggleUseSandbox(),
+            };
+        }
+        if (isLoggedIn) {
+            commands["logout"] = {
+                id: "logout",
+                label: quiptext("Log Out"),
+                handler: () => this.logout_(),
+            };
+        }
+        return commands;
+    }
+
+    logout_() {
+        isLogoutInProgress_ = true;
+        this.refreshToolbar();
+        return quip.apps
+            .getRootEntity()
+            .logout()
+            .then(() => {
+                isLogoutInProgress_ = false;
+                quip.apps.getRootEntity().clearCachedData();
+                this.updateToolbar(
+                    quip.apps.getRootEntity().getSelectedRecord());
+                this.refreshToolbar();
+            });
+    }
+
+    getToolbarCommandIds(recordEntity) {
+        const commandIds = this.getDefaultToolbarCommandIds();
+        if (!recordEntity.isPlaceholder() &&
+            !this.isCommandDisabled_("add-field")) {
+            commandIds.push("add-field");
+        }
+        return commandIds;
+    }
+
+    getDefaultToolbarCommandIds() {
+        return [quip.apps.DocumentMenuCommands.MENU_MAIN, "save-data"];
     }
 
     refreshRecord_() {
         const selectedRecord = quip.apps.getRootEntity().getSelectedRecord();
         if (selectedRecord) {
-            this.promptLogin_(() => {
-                selectedRecord.reload();
-            });
+            selectedRecord.reload();
         }
     }
 

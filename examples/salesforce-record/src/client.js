@@ -10,6 +10,7 @@ import {
     NotFoundError,
     InternalServerError,
     ServiceUnavailableError,
+    TypeNotSupportedError,
 } from "../../shared/base-field-builder/error.js";
 
 const OBJECT_INFO_ENDPOINT = "ui-api/object-info";
@@ -50,8 +51,8 @@ export class SalesforceClient {
         this.apiUrl_ = `${this.instanceUrl_}/${API_VERSION}`;
     }
 
-    logout(callback) {
-        this.auth_.logout(callback);
+    logout() {
+        return this.auth_.logout();
     }
 
     getInstanceUrl() {
@@ -74,12 +75,7 @@ export class SalesforceClient {
     }
 
     isLoggedIn() {
-        if (this.auth_) {
-            return this.auth_.isLoggedIn();
-        } else {
-            // For dev environment
-            return true;
-        }
+        return this.auth_ && this.auth_.isLoggedIn();
     }
 
     onSourceInstance() {
@@ -89,41 +85,31 @@ export class SalesforceClient {
         );
     }
 
-    login(onAuthenticated, onMismatchedInstance, onAuthenticationFailed) {
+    ensureLoggedIn() {
         if (this.isLoggedIn()) {
-            onAuthenticated();
-        } else {
-            this.auth_
-                .login(
-                    {
-                        prompt: "login",
-                    },
-                    result => {
-                        if (result) {
-                            this.setAPIEndpoints_();
-                            if (this.onSourceInstance()) {
-                                if (onAuthenticated) {
-                                    onAuthenticated();
-                                }
-                            } else {
-                                if (onMismatchedInstance) {
-                                    onMismatchedInstance();
-                                }
-                            }
-                        } else {
-                            if (onAuthenticationFailed) {
-                                onAuthenticationFailed();
-                            }
-                        }
-                    })
-                .catch(error => {
-                    if (error.error_code) {
-                        if (onAuthenticationFailed) {
-                            onAuthenticationFailed(error.error_code);
-                        }
-                    }
-                });
+            return Promise.resolve();
         }
+        return this.login_();
+    }
+
+    login_() {
+        return (
+            this.auth_
+                // Let caller catch if login() fails
+                .login({
+                    prompt: "login",
+                })
+                .then(result => {
+                    if (!result) {
+                        console.warn("Salesforce login failed to complete.");
+                        return Promise.reject();
+                    }
+                    this.setAPIEndpoints_();
+                    if (!this.onSourceInstance()) {
+                        return Promise.reject(new MismatchedInstanceError());
+                    }
+                })
+        );
     }
 
     fetchListViews(recordType, fetchType = "recent") {
@@ -148,9 +134,11 @@ export class SalesforceClient {
                 return this.fetchSoqlQuery(query);
             }
         }
-        return new Promise((resolve, reject) => {
-            reject("The fetchType is not supported: ", fetchType);
-        });
+        return Promise.reject(
+            new TypeNotSupportedError(
+                "The fetchType is not supported",
+                null,
+                fetchType));
     }
 
     fetchApiLink(link) {
@@ -249,10 +237,8 @@ export class SalesforceClient {
                 return response.json();
             });
         } else {
-            if (!this.auth_.isLoggedIn()) {
-                return new Promise((resolve, reject) => {
-                    reject("Unauthorized access");
-                });
+            if (!this.isLoggedIn()) {
+                return Promise.reject(new UnauthorizedError());
             }
             fetcher = new Promise((resolve, reject) => {
                 this.auth_.request(
@@ -268,49 +254,59 @@ export class SalesforceClient {
                     return this.refreshToken_().then(response =>
                         this.request(fetchMethod, baseUrl, data, false)
                     );
-                } else if (response.status >= 400) {
-                    let error;
-                    switch (response.status) {
-                        case 400:
-                            error = new BadRequestError();
-                            break;
-                        case 401:
-                            error = new UnauthorizedError();
-                            break;
-                        case 403:
-                            error = new ForbiddenError();
-                            break;
-                        case 404:
-                            error = new NotFoundError();
-                            break;
-                        case 500:
-                            error = new InternalServerError();
-                            break;
-                        case 503:
-                            error = new ServiceUnavailableError();
-                            break;
-                        default:
-                            error = new DefaultError(response.status);
-                            break;
-                    }
-                    return Promise.reject(error);
-                } else {
-                    return response.json();
                 }
+                if (response.status >= 400) {
+                    const error = this.getErrorFromStatus_(response.status);
+                    return Promise.reject(error);
+                }
+                return response.json();
             });
         }
         return Promise.race([timeout, fetcher]);
     }
 
     refreshToken_() {
-        return new Promise((resolve, reject) => {
-            this.auth_.refreshToken(response => {
-                if (response && response.status >= 400) {
-                    reject(response);
-                } else {
-                    resolve(response);
-                }
-            });
+        return this.auth_.refreshToken().then(response => {
+            if (response && response.status >= 400) {
+                return Promise.reject(
+                    this.getErrorFromStatus_(response.status));
+            }
+            return response;
         });
+    }
+
+    getErrorFromStatus_(status) {
+        let error;
+        switch (response.status) {
+            case 400:
+                error = new BadRequestError();
+                break;
+            case 401:
+                error = new UnauthorizedError();
+                break;
+            case 403:
+                error = new ForbiddenError();
+                break;
+            case 404:
+                error = new NotFoundError();
+                break;
+            case 500:
+                error = new InternalServerError();
+                break;
+            case 503:
+                error = new ServiceUnavailableError();
+                break;
+            default:
+                error = new DefaultError(response.status);
+                break;
+        }
+        return error;
+    }
+}
+
+export class MismatchedInstanceError extends Error {
+    constructor(message) {
+        super(message);
+        Object.setPrototypeOf(this, MismatchedInstanceError.prototype);
     }
 }

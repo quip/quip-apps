@@ -126,13 +126,16 @@ export class SalesforceRecordEntity extends RecordEntity {
         const type = this.getType();
         if (type == "Account" || type == "Opportunity") {
             return this.getFieldData("Name").value || "";
-        } else if (type == "Contact" || type == "Lead") {
+        }
+
+        if (type == "Contact" || type == "Lead") {
             return (
                 (this.getFieldData("FirstName").value || "") +
                 " " +
                 (this.getFieldData("LastName").value || "")
             );
         }
+
         return "Unknown";
     }
 
@@ -312,9 +315,9 @@ export class SalesforceRecordEntity extends RecordEntity {
     fetchData() {
         if (!this.isPlaceholder()) {
             return this.fetchRecordId_(this.getRecordId());
-        } else {
-            return Promise.resolve();
         }
+
+        return Promise.resolve();
     }
 
     fetchRecordId_(recordId) {
@@ -402,9 +405,9 @@ export class SalesforceRecordEntity extends RecordEntity {
                     ].picklistOptions = retValues;
                     return retValues;
                 });
-        } else {
-            return Promise.resolve(
-                this.getSchema().fields[field.getKey()].picklistOptions);
         }
+
+        return Promise.resolve(
+            this.getSchema().fields[field.getKey()].picklistOptions);
     }
 }

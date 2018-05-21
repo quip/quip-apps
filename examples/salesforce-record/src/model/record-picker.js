@@ -7,6 +7,12 @@ import {
 } from "./salesforce-record.js";
 import {RECORD_TYPE_DISPLAYNAMES} from "../record-picker.jsx";
 import {SalesforceClient} from "../client.js";
+import PlaceholderData from "../placeholder-data.js";
+
+export const AUTH_CONFIG_NAMES = {
+    PRODUCTION: "salesforce",
+    SANDBOX: "salesforce-test",
+};
 
 export const SUPPORTED_RECORD_TYPES = [
     "Account",
@@ -89,6 +95,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     setClient(client) {
         this.salesforceClient_ = client;
+        this.setInstanceUrl(client.getInstanceUrl());
     }
 
     getClient() {
@@ -102,27 +109,31 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     toggleUseSandbox() {
+        if (!this.hasSandboxAuth()) {
+            return;
+        }
+
         const useSandbox = !this.useSandbox();
         this.setUseSandbox(useSandbox);
-        let auth;
-        if (useSandbox) {
-            auth = quip.apps.auth("salesforce-test");
-        } else {
-            auth = quip.apps.auth("salesforce");
-        }
+        const auth = quip.apps.auth(
+            useSandbox
+                ? AUTH_CONFIG_NAMES.SANDBOX
+                : AUTH_CONFIG_NAMES.PRODUCTION);
         const salesforceClient = new SalesforceClient(auth);
         this.setClient(salesforceClient);
+        this.clearSelectedRecord();
+        this.loadPlaceholderData(PlaceholderData);
     }
 
-    login(onAuthenticated, onMismatchedInstance, onAuthenticationFailed) {
-        this.getClient().login(
-            onAuthenticated,
-            onMismatchedInstance,
-            onAuthenticationFailed);
+    ensureLoggedIn() {
+        const client = this.getClient();
+        return client
+            .ensureLoggedIn()
+            .then(() => this.setInstanceUrl(client.getInstanceUrl()));
     }
 
-    logout(callback) {
-        this.getClient().logout(callback);
+    logout() {
+        return this.getClient().logout();
     }
 
     fetchData() {
@@ -180,19 +191,17 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     fetchRecordSchemaForType_(recordType) {
         const recordData = this.pickerData[recordType];
         if (this.isRecent(recordData.schema)) {
-            return new Promise(function(resolve, reject) {
-                resolve(recordData.schema);
-            });
-        } else {
-            return this.getClient()
-                .fetchObjectInfo(recordType)
-                .then(ResponseHandler.parseSchema)
-                .then(response => {
-                    recordData.schema = response;
-                    recordData.schema.lastFetchedTime = Date.now();
-                    return recordData.schema;
-                });
+            return Promise.resolve(recordData.schema);
         }
+
+        return this.getClient()
+            .fetchObjectInfo(recordType)
+            .then(ResponseHandler.parseSchema)
+            .then(response => {
+                recordData.schema = response;
+                recordData.schema.lastFetchedTime = Date.now();
+                return recordData.schema;
+            });
     }
 
     fetchListViewsForType_(recordType) {
@@ -275,14 +284,14 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                 seg[0] += ` Where Name LIKE \'${searchTerm}%\' `;
             }
             return seg[0] + "order by" + seg[1];
-        } else {
-            if (query.includes("where")) {
-                query += ` AND Name LIKE \'${searchTerm}%\' `;
-            } else {
-                query += ` Where Name LIKE \'${searchTerm}%\' `;
-            }
-            return query;
         }
+
+        if (query.includes("where")) {
+            query += ` AND Name LIKE \'${searchTerm}%\' `;
+        } else {
+            query += ` Where Name LIKE \'${searchTerm}%\' `;
+        }
+        return query;
     }
 
     fetchRecordDataForListView(recordType, listViewKey, searchTerm = null) {
@@ -292,34 +301,30 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             Object.keys(listViewsData[listViewKey]).length > 0 &&
             listViewsData[listViewKey].records &&
             !searchTerm) {
-            return new Promise(function(resolve, reject) {
-                const recordsData = listViewsData[listViewKey].records;
-                recordsData.requestTime = requestTime;
-                resolve(recordsData);
-            });
-        } else {
-            return this.fetchDescribeQuery_(recordType, listViewKey).then(
-                query => {
-                    return this.fetchRecordsDataByQuery_(query, searchTerm)
-                        .then(recordsData => {
-                            if (searchTerm == null || searchTerm.length == 0) {
-                                const data = listViewsData[listViewKey];
-                                data.records = recordsData;
-                                data.lastFetchedTime = Date.now();
-                                this.pickerData[recordType].listViewsData[
-                                    listViewKey
-                                ] = data;
-                            }
-                            const retRecordsData = recordsData;
-                            retRecordsData.requestTime = requestTime;
-                            return retRecordsData;
-                        })
-                        .catch(errorMessage => {
-                            // should throw exception with the time stamp
-                            throw errorMessage + " requestTime:" + requestTime;
-                        });
-                });
+            const recordsData = listViewsData[listViewKey].records;
+            recordsData.requestTime = requestTime;
+            resolve(recordsData);
+            return Promise.resolve(recordsData);
         }
+        return this.fetchDescribeQuery_(recordType, listViewKey)
+            .then(query => this.fetchRecordsDataByQuery_(query, searchTerm))
+            .then(recordsData => {
+                if (searchTerm == null || searchTerm.length == 0) {
+                    const data = listViewsData[listViewKey];
+                    data.records = recordsData;
+                    data.lastFetchedTime = Date.now();
+                    this.pickerData[recordType].listViewsData[
+                        listViewKey
+                    ] = data;
+                }
+                const retRecordsData = recordsData;
+                retRecordsData.requestTime = requestTime;
+                return retRecordsData;
+            })
+            .catch(errorMessage => {
+                // should throw exception with the time stamp
+                throw errorMessage + " requestTime:" + requestTime;
+            });
     }
 
     fetchDescribeQuery_(recordType, listViewKey) {
@@ -327,23 +332,20 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             listViewKey
         ].query;
         if (targetQuery) {
-            return new Promise(function(resolve, reject) {
-                resolve(targetQuery);
-            });
-        } else {
-            const describeUrl = this.pickerData[recordType].listViewsData[
-                listViewKey
-            ].describeUrl;
-            return this.getClient()
-                .fetchApiLink(describeUrl)
-                .then(ResponseHandler.parseListViewsDescribe)
-                .then(query => {
-                    this.pickerData[recordType].listViewsData[
-                        listViewKey
-                    ].query = query;
-                    return query;
-                });
+            return Promise.resolve(targetQuery);
         }
+        const describeUrl = this.pickerData[recordType].listViewsData[
+            listViewKey
+        ].describeUrl;
+        return this.getClient()
+            .fetchApiLink(describeUrl)
+            .then(ResponseHandler.parseListViewsDescribe)
+            .then(query => {
+                this.pickerData[recordType].listViewsData[
+                    listViewKey
+                ].query = query;
+                return query;
+            });
     }
 
     isRecent(data) {
@@ -366,7 +368,11 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     useSandbox() {
-        return this.get("useSandbox");
+        return this.hasSandboxAuth() && this.get("useSandbox");
+    }
+
+    hasSandboxAuth() {
+        return !!quip.apps.auth(AUTH_CONFIG_NAMES.SANDBOX);
     }
 
     setUseSandbox(useSandbox) {
@@ -393,9 +399,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         const storedSchema = this.getRecordTypes()[recordType].schema;
         if (Object.keys(storedSchema).length !== 0) {
             return storedSchema;
-        } else {
-            return this.pickerData[recordType].schema;
         }
+
+        return this.pickerData[recordType].schema;
     }
 
     getSelectedRecord() {

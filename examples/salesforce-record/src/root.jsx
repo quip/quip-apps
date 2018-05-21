@@ -1,6 +1,6 @@
 // Copyright 2017 Quip
 
-import {RecordPickerEntity} from "./model/record-picker.js";
+import {RecordPickerEntity, AUTH_CONFIG_NAMES} from "./model/record-picker.js";
 import PlaceholderData from "./placeholder-data.js";
 
 import {
@@ -52,16 +52,16 @@ const menuDelegate = new FieldBuilderMenu();
 
 quip.apps.initialize({
     menuCommands: menuDelegate.allMenuCommands(),
-    toolbarCommandIds: [quip.apps.DocumentMenuCommands.MENU_MAIN, "save-data"],
+    toolbarCommandIds: menuDelegate.getDefaultToolbarCommandIds(),
     initializationCallback: function(root, params) {
         const rootRecord = quip.apps.getRootRecord();
-
-        let auth;
-        if (!DEV_LOCALLY) {
-            auth = quip.apps.auth("salesforce");
-        }
+        const auth = quip.apps.auth(
+            rootRecord.useSandbox()
+                ? AUTH_CONFIG_NAMES.SANDBOX
+                : AUTH_CONFIG_NAMES.PRODUCTION);
         const salesforceClient = new SalesforceClient(auth);
         rootRecord.setClient(salesforceClient);
+
         if (params.isCreation && params.creationUrl) {
             const recordId = params.creationUrl
                 .split("sObject/")[1]

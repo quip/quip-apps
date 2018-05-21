@@ -8,13 +8,17 @@ import {entityListener} from "../../shared/base-field-builder/utils.jsx";
 import Record from "../../shared/base-field-builder/record.jsx";
 import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-picker.less";
-import {DefaultError} from "../../shared/base-field-builder/error.js";
+import {
+    DefaultError,
+    UnauthenticatedError,
+} from "../../shared/base-field-builder/error.js";
 
 import {
     RecordPickerEntity,
     SUPPORTED_LISTVIEWS,
     SUPPORTED_RECORD_TYPES,
 } from "./model/record-picker.js";
+import {MismatchedInstanceError} from "./client.js";
 
 export const RECORD_TYPE_DISPLAYNAMES = {
     "Account": quiptext("Accounts"),
@@ -148,31 +152,22 @@ class RecordPicker extends React.Component {
             }
             this.setState({showDialog: true});
         } else {
-            this.props.entity.login(
-                () => {
-                    this.props.menuDelegate.updateToolbar(
-                        this.props.entity.getSelectedRecord());
-                    this.fetchData();
-                    this.setState({showDialog: true});
-                },
-                () => {
-                    this.setState({
-                        showDialog: false,
-                        showMismatchedInstanceError: true,
-                    });
-                },
-                errorCode => {
-                    this.setState({showConnectedAppInstructions: true});
-                });
+            this.ensureLoggedIn().then(() => {
+                this.props.menuDelegate.updateToolbar(
+                    this.props.entity.getSelectedRecord());
+                this.fetchData();
+                this.setState({showDialog: true});
+            });
         }
     };
 
-    showMismatchedInstanceErrorDialog = menuCommand => {
+    showMismatchedInstanceErrorDialog_(prevMenuCommand) {
+        this.hideDialog_();
         this.setState({
+            prevMenuCommand,
             showMismatchedInstanceError: true,
-            prevMenuCommand: menuCommand,
         });
-    };
+    }
 
     hideDialog_ = e => {
         const states = {
@@ -230,29 +225,37 @@ class RecordPicker extends React.Component {
     };
 
     logoutAndReconnect_ = () => {
-        this.props.entity.logout(() => {
-            this.dismissMismatchedInstanceErrorDialog_();
-            this.props.entity.login(
-                () => {
-                    this.props.menuDelegate.updateToolbar(
-                        this.props.entity.getSelectedRecord());
-                    this.props.menuDelegate.executeMenuOption(
-                        this.state.prevMenuCommand);
-                    this.setState({
-                        prevMenuCommand: null,
-                    });
-                },
-                () => {
-                    this.setState({
-                        showDialog: false,
-                        showMismatchedInstanceError: true,
-                    });
-                },
-                errorCode => {
-                    this.setState({showConnectedAppInstructions: true});
-                });
-        });
+        this.props.entity
+            .logout()
+            .then(() => this.dismissMismatchedInstanceErrorDialog_())
+            .then(() => this.ensureLoggedIn())
+            .then(() => {
+                this.props.menuDelegate.updateToolbar(
+                    this.props.entity.getSelectedRecord());
+                this.props.menuDelegate.executeMenuOption(
+                    this.state.prevMenuCommand);
+                this.setState({prevMenuCommand: null});
+            });
     };
+
+    ensureLoggedIn(prevMenuCommand = null) {
+        return this.props.entity.ensureLoggedIn().catch(err => {
+            this.handleLoginError_(err, prevMenuCommand);
+            // Re-raise so that callers can catch.
+            return Promise.reject();
+        });
+    }
+
+    handleLoginError_(err, prevMenuCommand) {
+        if (err instanceof MismatchedInstanceError) {
+            this.showMismatchedInstanceErrorDialog_(prevMenuCommand);
+            return;
+        }
+        // Use loginError instead of err object because it's {} when login fails
+        const loginError = new UnauthenticatedError(
+            "Unable to login to Salesforce");
+        this.getRecordComponent().errorHandling(loginError);
+    }
 
     dismissMismatchedInstanceErrorDialog_ = () => {
         this.setState({
