@@ -84,6 +84,38 @@ const SUPPORTED_OBJECT_TYPES = {
         DEFAULT_FIELDS: ["Trial_Expiry__c", "FirstName", "LastName"],
         HEADER_FIELDS: ["FirstName", "LastName"],
     },
+
+    "Case": {
+        PREFIX: "500",
+        DISPLAY_NAME: quiptext("Cases [support case]"),
+        LIST_VIEWS: ["RecentlyViewed", "AllOpenCases", "AllCases"],
+        DEFAULT_FIELDS: [
+            "CaseNumber",
+            "Subject",
+            "AccountId",
+            "Type",
+            "Priority",
+            "Status",
+            "OwnerId",
+        ],
+        HEADER_FIELDS: ["CaseNumber"],
+        SEARCH_FIELD: "Subject",
+    },
+
+    "User": {
+        PREFIX: "005",
+        DISPLAY_NAME: quiptext("Users"),
+        LIST_VIEWS: ["RecentlyViewed", "AllUsers"],
+        DEFAULT_FIELDS: [
+            "FirstName",
+            "LastName",
+            "Username",
+            "Department",
+            "Title",
+        ],
+        HEADER_FIELDS: ["FirstName", "LastName"],
+        SEARCH_FIELD: "Name",
+    },
 };
 
 /**
