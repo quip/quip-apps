@@ -21,7 +21,7 @@ const RECORDS_SINGLE_ENDPOINT = "ui-api/records";
 
 const SOQL_ENDPOINT = "query";
 
-const API_VERSION = "services/data/v41.0";
+const API_VERSION = "services/data/v42.0";
 
 // Access toke for local development
 const ACCESS_TOKEN = "";

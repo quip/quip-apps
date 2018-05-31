@@ -14,19 +14,12 @@ import {
 } from "../../shared/base-field-builder/error.js";
 
 import {
-    RecordPickerEntity,
-    SUPPORTED_LISTVIEWS,
-    SUPPORTED_RECORD_TYPES,
-} from "./model/record-picker.js";
+    SUPPORTED_OBJECT_TYPE_KEYS,
+    getDisplayName,
+    getSupportedListViews,
+} from "./config.js";
+import {RecordPickerEntity} from "./model/record-picker.js";
 import {MismatchedInstanceError} from "./client.js";
-
-export const RECORD_TYPE_DISPLAYNAMES = {
-    "Account": quiptext("Accounts"),
-    //"Case": "Cases",
-    "Contact": quiptext("Contacts [people]"),
-    "Lead": quiptext("Leads [sales]"),
-    "Opportunity": quiptext("Opportunities"),
-};
 
 const LOADING_STATUS = {
     LOADING: 0,
@@ -53,8 +46,8 @@ class RecordPicker extends React.Component {
     }
 
     defaultDialogState() {
-        const defaultRecordType = SUPPORTED_RECORD_TYPES[0];
-        const defaultListView = SUPPORTED_LISTVIEWS[defaultRecordType][0];
+        const defaultRecordType = SUPPORTED_OBJECT_TYPE_KEYS[0];
+        const defaultListView = getSupportedListViews(defaultRecordType)[0];
         return {
             selectedRecordType: defaultRecordType,
             selectedListViewKey: defaultListView,
@@ -109,7 +102,9 @@ class RecordPicker extends React.Component {
                     listViewsLoadingStatus: LOADING_STATUS.LOADED,
                 });
             })
-            .catch(errorMessage => {
+            .catch(err => {
+                console.error(err);
+                this.getRecordComponent().errorHandling(err);
                 this.setState({
                     listViewsLoadingStatus: LOADING_STATUS.ERROR,
                 });
@@ -118,7 +113,7 @@ class RecordPicker extends React.Component {
 
     addRelatedListsToMenu_ = () => {
         const menuCommands = this.props.menuDelegate.allMenuCommands();
-        const relatedMenuCommands = SUPPORTED_RECORD_TYPES.map(type => {
+        const relatedMenuCommands = SUPPORTED_OBJECT_TYPE_KEYS.map(type => {
             const relatedLists = this.props.entity.getRelatedListsForType(type);
             return relatedLists.map(relatedList => {
                 const label = relatedList.label;
@@ -186,8 +181,8 @@ class RecordPicker extends React.Component {
     selectRecordType_ = (e, newlySelectedRecordType) => {
         e.preventDefault();
         if (newlySelectedRecordType != this.state.selectedRecordType) {
-            const defaultListView =
-                SUPPORTED_LISTVIEWS[newlySelectedRecordType][0];
+            const defaultListView = getSupportedListViews(
+                newlySelectedRecordType)[0];
             this.setState({
                 selectedRecordType: newlySelectedRecordType,
                 selectedListViewKey: defaultListView,
@@ -335,7 +330,7 @@ class RecordPicker extends React.Component {
                     <div className={Styles.picker}>
                         <RecordTypePicker
                             selectedType={recordType}
-                            types={SUPPORTED_RECORD_TYPES}
+                            types={SUPPORTED_OBJECT_TYPE_KEYS}
                             onClick={this.selectRecordType_}/>
                         <div
                             className={Styles.columnGroup}
@@ -434,7 +429,7 @@ class RecordTypePicker extends React.Component {
         return <div
             className={classNames.join(" ")}
             onClick={e => this.props.onClick(e, type)}>
-            {RECORD_TYPE_DISPLAYNAMES[type]}
+            {getDisplayName(type) || type}
         </div>;
     };
 
@@ -451,7 +446,8 @@ class RecordTypePicker extends React.Component {
 class ListViewPicker extends React.Component {
     static propTypes = {
         listViews: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-        listViewsLoadingStatus: React.PropTypes.enum,
+        listViewsLoadingStatus: React.PropTypes.oneOf(
+            Object.values(LOADING_STATUS)),
         selectedListViewKey: React.PropTypes.string.isRequired,
         onClick: React.PropTypes.func.isRequired,
     };
@@ -492,7 +488,7 @@ class RecordFilter extends React.Component {
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
         selectedRecordType: React.PropTypes.string.isRequired,
         selectedListViewKey: React.PropTypes.string.isRequired,
-        selectedRecordId: React.PropTypes.string.isRequired,
+        selectedRecordId: React.PropTypes.string,
         menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
         menuCommandIds: React.PropTypes.arrayOf(React.PropTypes.string)
             .isRequired,
@@ -544,6 +540,7 @@ class RecordFilter extends React.Component {
                 this.setState({recordDataLoadingStatus: LOADING_STATUS.LOADED});
             })
             .catch(errorMessage => {
+                console.error(errorMessage);
                 let requestTimeOfError;
                 if (errorMessage.includes("requestTime:")) {
                     const seg = errorMessage.split("requestTime:");

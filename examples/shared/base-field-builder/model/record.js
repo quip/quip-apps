@@ -29,11 +29,11 @@ export class RecordEntity extends quip.apps.Record {
         };
     }
 
-    suppertedFieldTypes() {
+    supportedFieldTypes() {
         throw Error("Unimplemented abstract method.");
     }
 
-    supprtedFieldsDataArray() {
+    supportedFieldsDataArray() {
         const schema = this.getSchema();
         const visibleKeys = new Set(
             this.getFieldsDataArray().map(field => field.key));
@@ -43,7 +43,7 @@ export class RecordEntity extends quip.apps.Record {
                 if (fieldSchema.dataType === "TextArea") {
                     return fieldSchema.extraTypeInfo === "PlainTextArea";
                 }
-                return this.suppertedFieldTypes().includes(
+                return this.supportedFieldTypes().includes(
                     fieldSchema.dataType);
             })
             .filter(fieldKey => {
@@ -291,7 +291,7 @@ export class RecordEntity extends quip.apps.Record {
         quip.apps.recordQuipMetric(this.getMetricName(), metricArgs);
     }
 
-    fetchData() {
+    fetchData(isInitialMount) {
         if (!this.isPlaceholder()) {
             return this.fetchRecordId_(this.getRecordId());
         } else {

@@ -1,7 +1,7 @@
 // Copyright 2017 Quip
 
 import {getRecordComponent, getRecordPickerComponent} from "./root.jsx";
-import {AUTH_CONFIG_NAMES} from "./model/record-picker";
+import {AUTH_CONFIG_NAMES} from "./config.js";
 import {BaseMenu} from "../../shared/base-field-builder/base-menu.js";
 import {MismatchedInstanceError} from "./client";
 
@@ -256,6 +256,13 @@ export class FieldBuilderMenu extends BaseMenu {
                 label: quiptext("Log Out"),
                 handler: () => this.logout_(),
             };
+        } else {
+            commands["login"] = {
+                id: "login",
+                label: quiptext("Log In"),
+                handler: () =>
+                    getRecordPickerComponent().ensureLoggedIn("login"),
+            };
         }
         return commands;
     }
@@ -314,7 +321,6 @@ export class FieldBuilderMenu extends BaseMenu {
 
     changeRecord_() {
         getRecordPickerComponent().restoreToDefaultState();
-        getRecordPickerComponent().fetchData();
         quip.apps
             .getRootEntity()
             .getSelectedRecord()

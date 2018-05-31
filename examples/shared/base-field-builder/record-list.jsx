@@ -816,11 +816,11 @@ export default class RecordList extends React.Component {
                 ref={node => (this.fieldPicker_ = ReactDOM.findDOMNode(node))}>
                 <ColumnPicker
                     initialColumns={this.props.entities[0]
-                        .supprtedFieldsDataArray()
+                        .supportedFieldsDataArray()
                         .sort((a, b) => a.label.localeCompare(b.label))}
                     onComplete={this.onColumnsEdited_}
                     selectedColumns={this.props.entities[0]
-                        .supprtedFieldsDataArray()
+                        .supportedFieldsDataArray()
                         .filter(field =>
                             this.props.entities[0].getField(field.key)
                         )}/>

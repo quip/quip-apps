@@ -9,32 +9,14 @@ import {
     InvalidValueError,
     BadRequestError,
 } from "../../../shared/base-field-builder/error.js";
-
-// Source:
-// http://www.fishofprey.com/2011/09/obscure-salesforce-object-key-prefixes.html
-export const RECORD_PREFIX_TYPE = {
-    "001": "Account",
-    "500": "Case",
-    "003": "Contact",
-    "00Q": "Lead",
-    "006": "Opportunity",
-};
+import {
+    getDefaultFields,
+    getObjectTypeFromPrefix,
+    getHeaderFields,
+} from "../config.js";
 
 const FIELD_PREFERENCES_KEY = "initByFields";
-const BLANK_STATE_FIELDS = {
-    "Account": [
-        "Name",
-        "Combo Sector",
-        "BillingCity",
-        "Employees",
-        "edw_num_licenses__c",
-    ],
-    "Opportunity": ["Name", "CloseDate"],
-    "Contact": ["Title", "FirstName", "LastName", "PhoneExtension__c"],
-    "Lead": ["Trial_Expiry__c", "FirstName", "LastName"],
-};
 const PERSISTED_KEYS = new Set(["Name", "FirstName", "LastName"]);
-
 const SUPPORTED_FIELD_TYPES = [
     "Boolean",
     "Currency",
@@ -70,19 +52,6 @@ export class SalesforceRecordEntity extends RecordEntity {
             } catch (e) {
                 // Show record type not supported in the UI
                 return;
-            }
-            if (!this.isPlaceholder()) {
-                const preferences = quip.apps.getUserPreferences();
-                const initFieldsMap = JSON.parse(
-                    preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
-                const initFieldKeys =
-                    initFieldsMap[this.getType()] ||
-                    BLANK_STATE_FIELDS[this.getType()];
-                this.fetchData().then(() => {
-                    initFieldKeys.map(fieldKey => {
-                        this.addField(fieldKey);
-                    });
-                });
             }
         }
         this.saveInProgress_ = false;
@@ -123,20 +92,18 @@ export class SalesforceRecordEntity extends RecordEntity {
     }
 
     getHeaderName() {
+        const fallbackTitle = quiptext("Unknown");
         const type = this.getType();
-        if (type == "Account" || type == "Opportunity") {
-            return this.getFieldData("Name").value || "";
-        }
-
-        if (type == "Contact" || type == "Lead") {
-            return (
-                (this.getFieldData("FirstName").value || "") +
-                " " +
-                (this.getFieldData("LastName").value || "")
-            );
-        }
-
-        return "Unknown";
+        const headerFields = getHeaderFields(type);
+        return (
+            headerFields
+                .map(fieldName => {
+                    const field = this.getFieldData(fieldName);
+                    return (field && field.value) || "";
+                })
+                .join(" ")
+                .trim() || fallbackTitle
+        );
     }
 
     getType() {
@@ -249,27 +216,6 @@ export class SalesforceRecordEntity extends RecordEntity {
             });
     }
 
-    updateFields_(fieldsDataArray) {
-        const schema = this.getSchema();
-        for (let fieldData of fieldsDataArray) {
-            const fieldEntity = this.getField(fieldData.key);
-            if (!fieldEntity) {
-                continue;
-            }
-            const type = schema.fields[fieldData.key].dataType;
-            const parsedValue = ResponseHandler.parseFieldValue(
-                fieldData.value,
-                type);
-            if (!fieldEntity.isDirty()) {
-                fieldEntity.setValue(parsedValue);
-            }
-            fieldEntity.setOriginalValue(parsedValue, fieldData.displayValue);
-            if (fieldEntity.format) {
-                fieldEntity.format();
-            }
-        }
-    }
-
     clearError() {
         this.error_ = null;
     }
@@ -301,7 +247,7 @@ export class SalesforceRecordEntity extends RecordEntity {
 
     initTypeFromRecordId_(recordId) {
         const recordIdPrefix = recordId.substring(0, 3);
-        const type = RECORD_PREFIX_TYPE[recordIdPrefix];
+        const type = getObjectTypeFromPrefix(recordIdPrefix);
         if (type) {
             this.setType(type);
         } else {
@@ -312,11 +258,19 @@ export class SalesforceRecordEntity extends RecordEntity {
         }
     }
 
-    fetchData() {
+    fetchData(isInitialMount) {
         if (!this.isPlaceholder()) {
-            return this.fetchRecordId_(this.getRecordId());
+            return this.fetchRecordId_(this.getRecordId()).then(
+                fieldsDataArray => {
+                    this.initFieldsFromPreferences_();
+                    if (isInitialMount) {
+                        // On initial mount, update the stored fields in case the data
+                        // has been updated on the Salesforce end.
+                        const fieldsDataArray = this.getFieldsDataArray();
+                        this.updateFields_(fieldsDataArray);
+                    }
+                });
         }
-
         return Promise.resolve();
     }
 
@@ -330,8 +284,40 @@ export class SalesforceRecordEntity extends RecordEntity {
             .then(fieldsDataArray => {
                 this.setFieldsDataArray(fieldsDataArray);
                 this.setLastFetchedTime(Date.now());
-                this.updateFields_(fieldsDataArray);
+                return fieldsDataArray;
             });
+    }
+
+    initFieldsFromPreferences_() {
+        const preferences = quip.apps.getUserPreferences();
+        const initFieldsMap = JSON.parse(
+            preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
+        const initFieldKeys =
+            initFieldsMap[this.getType()] || getDefaultFields(this.getType());
+        initFieldKeys.map(fieldKey => {
+            this.addField(fieldKey);
+        });
+    }
+
+    updateFields_(fieldsDataArray) {
+        const schema = this.getSchema();
+        for (const fieldData of fieldsDataArray) {
+            const fieldEntity = this.getField(fieldData.key);
+            if (!fieldEntity) {
+                continue;
+            }
+            const type = schema.fields[fieldData.key].dataType;
+            const parsedValue = ResponseHandler.parseFieldValue(
+                fieldData.value,
+                type);
+            if (!fieldEntity.isDirty()) {
+                fieldEntity.setValue(parsedValue);
+            }
+            fieldEntity.setOriginalValue(parsedValue, fieldData.displayValue);
+            if (fieldEntity.format) {
+                fieldEntity.format();
+            }
+        }
     }
 
     hasLoaded() {
@@ -371,7 +357,7 @@ export class SalesforceRecordEntity extends RecordEntity {
         return PERSISTED_KEYS;
     }
 
-    suppertedFieldTypes() {
+    supportedFieldTypes() {
         return SUPPORTED_FIELD_TYPES;
     }
 

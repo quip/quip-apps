@@ -37,6 +37,9 @@ export class ResponseHandler {
             let errorMessage;
             let fieldData;
             for (let key in schemaFields) {
+                if (!fields[key]) {
+                    continue;
+                }
                 if (schemaFields[key].dataType === "Reference") {
                     const relationshipName = schemaFields[key].relationshipName;
                     if (relationshipName) {
@@ -53,9 +56,6 @@ export class ResponseHandler {
                             fields[relationshipName].value,
                     };
                 } else {
-                    if (!fields[key]) {
-                        continue;
-                    }
                     let value = fields[key].value
                         ? unescapeHTML(fields[key].value)
                         : null;
@@ -130,6 +130,9 @@ export class ResponseHandler {
             const keys = new Set([
                 "calculated",
                 "dataType",
+                // Extra type info is required for differentiating between
+                // TextArea types
+                "extraTypeInfo",
                 "label",
                 "length",
                 "precision",
@@ -179,27 +182,19 @@ export class ResponseHandler {
         });
     }
 
-    static parseSoqlRecords(response) {
-        return new Promise(function(resolve, reject) {
-            if (response.records) {
-                const result = response.records.map(record => {
-                    const recordType = record.attributes.type;
-                    let name;
-                    if (recordType === "Case") {
-                        name = record.Subject;
-                    } else {
-                        name = record.Name;
-                    }
-                    return {
-                        name: name,
-                        id: record.Id,
-                    };
-                });
-                resolve(result);
-            } else {
-                reject(response);
-            }
+    static parseSoqlRecords(response, getNameField) {
+        if (!response.records) {
+            return Promise.reject(response);
+        }
+        const result = response.records.map(record => {
+            const recordType = record.attributes.type;
+            const nameField = getNameField(recordType);
+            return {
+                name: record[nameField],
+                id: record.Id,
+            };
         });
+        return Promise.resolve(result);
     }
 
     static parseFloatWithLocale(value, locale = "en-US") {

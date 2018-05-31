@@ -1,6 +1,7 @@
 // Copyright 2017 Quip
 
-import {RecordPickerEntity, AUTH_CONFIG_NAMES} from "./model/record-picker.js";
+import {AUTH_CONFIG_NAMES} from "./config.js";
+import {RecordPickerEntity} from "./model/record-picker.js";
 import PlaceholderData from "./placeholder-data.js";
 
 import {

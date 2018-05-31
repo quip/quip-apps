@@ -66,7 +66,7 @@ class Record extends React.Component {
         if (this.props.entity.isLoggedIn() &&
             this.props.entity.getClient().onSourceInstance()) {
             this.props.entity
-                .fetchData()
+                .fetchData(true)
                 .then(() => {
                     this.updateToolbar_();
                     this.setState({
@@ -230,6 +230,7 @@ class Record extends React.Component {
                 errorMessage: "",
             });
         } else {
+            console.error(error);
             let setError = error;
             if (!(error instanceof DefaultError)) {
                 setError = new DefaultError(quiptext("Could Not Connect."));

@@ -1,63 +1,18 @@
 // Copyright 2017 Quip
 
 import {ResponseHandler} from "../../../shared/base-field-builder/response-handler.js";
+import {SalesforceRecordEntity} from "./salesforce-record.js";
 import {
-    SalesforceRecordEntity,
-    RECORD_PREFIX_TYPE,
-} from "./salesforce-record.js";
-import {RECORD_TYPE_DISPLAYNAMES} from "../record-picker.jsx";
+    AUTH_CONFIG_NAMES,
+    SUPPORTED_OBJECT_TYPE_KEYS,
+    getDisplayName,
+    getSearchField,
+} from "../config.js";
 import {SalesforceClient} from "../client.js";
 import PlaceholderData from "../placeholder-data.js";
+import {awaitValues, mapKeysToObject} from "../util.js";
 
-export const AUTH_CONFIG_NAMES = {
-    PRODUCTION: "salesforce",
-    SANDBOX: "salesforce-test",
-};
-
-export const SUPPORTED_RECORD_TYPES = [
-    "Account",
-    "Opportunity",
-    //"Case",
-    "Contact",
-    "Lead",
-];
-
-export const SUPPORTED_LISTVIEWS = {
-    "Account": [
-        "RecentlyViewed",
-        "RecentlyViewedAccounts",
-        "MyAccounts",
-        "NewThisWeek",
-        "AllAccounts",
-    ],
-    "Contact": [
-        "RecentlyViewed",
-        "RecentlyViewedContacts",
-        "MyContacts",
-        "NewThisWeek",
-        "BirthdaysThisMonth",
-        "AllContacts",
-    ],
-    //"Case": ["RecentlyViewedCases"],
-    "Lead": [
-        "RecentlyViewed",
-        "RecentlyViewedLeads",
-        "MyUnreadLeads",
-        "TodaysLeads",
-        "AllOpenLeads",
-    ],
-    "Opportunity": [
-        "RecentlyViewed",
-        "RecentlyViewedOpportunities",
-        "ClosingNextMonth",
-        "ClosingThisMonth",
-        "MyOpportunities",
-        "NewThisWeek",
-        "Default_Opportunity_Pipeline",
-        "Won",
-        "AllOpportunities",
-    ],
-};
+/** @typedef {{schema: Object, listViewsData: Object}} RecordTypeData */
 
 export class RecordPickerEntity extends quip.apps.RootRecord {
     static ID = "recordPicker";
@@ -73,24 +28,22 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     static getDefaultProperties() {
-        let defaultRecordTypes = {};
-        for (let recordType of SUPPORTED_RECORD_TYPES) {
-            defaultRecordTypes[recordType] = {
-                relatedLists: [],
-                schema: {},
-            };
-        }
-        return {recordTypes: defaultRecordTypes, useSandbox: false};
+        const recordTypes = this.createRecordTypes_(SUPPORTED_OBJECT_TYPE_KEYS);
+        return {recordTypes, useSandbox: false};
+    }
+
+    static createRecordTypes_(objectTypeKeys) {
+        return mapKeysToObject(objectTypeKeys, () => ({
+            relatedLists: [],
+            schema: {},
+        }));
     }
 
     initialize() {
-        this.pickerData = {};
-        SUPPORTED_RECORD_TYPES.map(type => {
-            this.pickerData[type] = {
-                listViewsData: {},
-                schema: {},
-            };
-        });
+        this.pickerData = mapKeysToObject(SUPPORTED_OBJECT_TYPE_KEYS, () => ({
+            listViewsData: {},
+            schema: {},
+        }));
     }
 
     setClient(client) {
@@ -137,54 +90,51 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     fetchData() {
-        let shouldOverWriteSchema = false;
-        const selectedRecord = this.getSelectedRecord();
-        if (selectedRecord && !selectedRecord.isPlaceholder()) {
-            const ownerId = selectedRecord.getOwnerId();
-            const viewerId =
-                quip.apps.getViewingUser() !== null
-                    ? quip.apps.getViewingUser().getId()
-                    : null;
+        return this.ensureLoggedIn()
+            .then(() => this.fetchDataForTypes_(SUPPORTED_OBJECT_TYPE_KEYS))
+            .then(recordTypeToData => {
+                const recordTypeEntries = Object.entries(recordTypeToData);
+                // Update picker data
+                recordTypeEntries.forEach(([recordType, data]) => {
+                    this.pickerData[recordType] = data;
+                });
+                // Only update schemas if current user is the one who selected
+                // the record.
+                if (!this.shouldOverwriteSchema_()) {
+                    return;
+                }
+                const ownerId = quip.apps.getViewingUser().getId();
+                const recordTypes = RecordPickerEntity.createRecordTypes_(
+                    Object.keys(recordTypeToData));
+                recordTypeEntries.forEach(([recordType, {schema}]) => {
+                    recordTypes[recordType].schema = schema;
+                });
+                this.setRecordTypes(recordTypes);
+            });
+    }
 
-            if (ownerId !== null && ownerId === viewerId) {
-                shouldOverWriteSchema = true;
-            }
-        }
-        const recordTypes = Object.keys(this.getRecordTypes());
-        const schemaFetchers = recordTypes.map(recordType =>
-            this.fetchRecordSchemaForType_(recordType)
+    /**
+     * @param {string[]} recordTypeKeys
+     * @return {Promise<Object<string, RecordTypeData>}
+     * @private
+     */
+    fetchDataForTypes_(recordTypeKeys) {
+        /** @type {Object<string, Promise<RecordTypeData>} */
+        const dataFetchers = mapKeysToObject(recordTypeKeys, recordType =>
+            this.fetchDataForType_(recordType)
         );
+        return awaitValues(dataFetchers);
+    }
 
-        const listViewFetchers = recordTypes.map(recordType =>
-            this.fetchListViewsForType_(recordType)
-        );
-
-        //const relatedListsFetchers = recordTypes.map(recordType =>
-        //    this.fetchRelatedListsForType_(recordType)
-        //);
-
-        const fetchers = [
-            ...schemaFetchers,
-            ...listViewFetchers,
-            //...relatedListsFetchers,
-        ];
-
-        return Promise.all(fetchers).then(() => {
-            if (!this.getInstanceUrl()) {
-                this.setInstanceUrl(this.getClient().getInstanceUrl());
-            }
-            if (!shouldOverWriteSchema) {
-                return;
-            }
-            const recordTypes = this.getRecordTypes();
-            const ownerId = quip.apps.getViewingUser().getId();
-            for (let recordType of SUPPORTED_RECORD_TYPES) {
-                recordTypes[recordType].schema = this.pickerData[
-                    recordType
-                ].schema;
-                recordTypes[recordType].ownerId = ownerId;
-            }
-            this.setRecordTypes(recordTypes);
+    /**
+     * @param {string} recordType
+     * @return {Promise<RecordTypeData>}
+     * @private
+     */
+    fetchDataForType_(recordType) {
+        return awaitValues({
+            schema: this.fetchRecordSchemaForType_(recordType),
+            listViewsData: this.fetchListViewsForType_(recordType),
         });
     }
 
@@ -197,28 +147,26 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.getClient()
             .fetchObjectInfo(recordType)
             .then(ResponseHandler.parseSchema)
-            .then(response => {
-                recordData.schema = response;
-                recordData.schema.lastFetchedTime = Date.now();
-                return recordData.schema;
-            });
+            .then(schema => ({...schema, lastFetchedTime: Date.now()}));
     }
 
     fetchListViewsForType_(recordType) {
         const listViewsData = {};
-        const allListViewLabel = "All " + RECORD_TYPE_DISPLAYNAMES[recordType];
+        const recordDisplayName = getDisplayName(recordType);
+        const allListViewLabel = `All ${recordDisplayName}`;
         const recentListViewLabel = quiptext(
             "Recently Viewed %(record_type)s",
             {
-                "record_type": RECORD_TYPE_DISPLAYNAMES[recordType],
+                "record_type": recordDisplayName,
             });
 
+        const searchField = getSearchField(recordType);
         listViewsData["RecentlyViewed"] = {
             label: quiptext("Recently Viewed"),
             key: "RecentlyViewed",
             describeUrl: null,
             query:
-                `SELECT Name, Id, LastModifiedDate FROM ${recordType}` +
+                `SELECT ${searchField}, Id, LastModifiedDate FROM ${recordType}` +
                 ` WHERE LastViewedDate != NULL ORDER BY LastViewedDate DESC`,
             id: "RecentlyViewed",
         };
@@ -229,7 +177,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                 return ResponseHandler.parseListViews(response, recordType);
             })
             .then(listViews => {
-                listViews.map(listView => {
+                listViews.forEach(listView => {
                     if (listView.label != allListViewLabel &&
                         listView.label != recentListViewLabel) {
                         //FIXME: temp dedup
@@ -240,10 +188,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                     label: allListViewLabel,
                     key: "All",
                     describeUrl: null,
-                    query: `SELECT Name, Id, LastModifiedDate FROM ${recordType}`,
+                    query: `SELECT ${searchField}, Id, LastModifiedDate FROM ${recordType}`,
                     id: "All",
                 };
-                this.pickerData[recordType].listViewsData = listViewsData;
                 return listViewsData;
             });
     }
@@ -260,36 +207,39 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             });
     }
 
-    fetchRecordsDataByQuery_(query, searchTerm = null) {
+    fetchRecordsDataByQuery_(query, recordType, searchTerm = null) {
         if (searchTerm) {
-            query = this.reformatQuery_(query, searchTerm);
+            query = this.reformatQuery_(query, recordType, searchTerm);
         }
         // FIXME
         query = query + " LIMIT 200";
         return this.getClient()
             .fetchSoqlQuery(query)
-            .then(ResponseHandler.parseSoqlRecords);
+            .then(response =>
+                ResponseHandler.parseSoqlRecords(response, getSearchField)
+            );
     }
 
     //TODO: move to util.js
-    reformatQuery_(query, searchTerm) {
+    reformatQuery_(query, recordType, searchTerm) {
         if (!query) return;
         query = query.toLowerCase();
 
+        const searchField = getSearchField(recordType);
         if (query.includes("order by")) {
             const seg = query.split("order by");
             if (seg[0].includes("where")) {
-                seg[0] += ` AND Name LIKE \'${searchTerm}%\' `;
+                seg[0] += ` AND ${searchField} LIKE \'%${searchTerm}%\' `;
             } else {
-                seg[0] += ` Where Name LIKE \'${searchTerm}%\' `;
+                seg[0] += ` Where ${searchField} LIKE \'%${searchTerm}%\' `;
             }
             return seg[0] + "order by" + seg[1];
         }
 
         if (query.includes("where")) {
-            query += ` AND Name LIKE \'${searchTerm}%\' `;
+            query += ` AND ${searchField} LIKE \'%${searchTerm}%\' `;
         } else {
-            query += ` Where Name LIKE \'${searchTerm}%\' `;
+            query += ` Where ${searchField} LIKE \'%${searchTerm}%\' `;
         }
         return query;
     }
@@ -303,11 +253,12 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             !searchTerm) {
             const recordsData = listViewsData[listViewKey].records;
             recordsData.requestTime = requestTime;
-            resolve(recordsData);
             return Promise.resolve(recordsData);
         }
         return this.fetchDescribeQuery_(recordType, listViewKey)
-            .then(query => this.fetchRecordsDataByQuery_(query, searchTerm))
+            .then(query =>
+                this.fetchRecordsDataByQuery_(query, recordType, searchTerm)
+            )
             .then(recordsData => {
                 if (searchTerm == null || searchTerm.length == 0) {
                     const data = listViewsData[listViewKey];
@@ -348,6 +299,21 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             });
     }
 
+    shouldOverwriteSchema_() {
+        const selectedRecord = this.getSelectedRecord();
+        const isRealRecord = selectedRecord && !selectedRecord.isPlaceholder();
+        if (!isRealRecord) {
+            return false;
+        }
+        const ownerId = selectedRecord.getOwnerId();
+        const viewerId =
+            quip.apps.getViewingUser() !== null
+                ? quip.apps.getViewingUser().getId()
+                : null;
+        const isCurrentUserOwner = !!ownerId && viewerId === ownerId;
+        return isCurrentUserOwner;
+    }
+
     isRecent(data) {
         const recencyThreshold = 1000 * 60 * 5;
         const now = Date.now();
@@ -355,8 +321,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
     }
 
     isExpired() {
-        return SUPPORTED_RECORD_TYPES.some(
-            type => !this.isRecent(this.pickerData[type].schema));
+        const everySchemaIsRecent = Object.values(this.pickerData).every(
+            ({schema}) => this.isRecent(schema));
+        return !everySchemaIsRecent;
     }
 
     getRecordTypes() {
@@ -404,15 +371,19 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.pickerData[recordType].schema;
     }
 
+    /**
+     * @return {SalesforceRecordEntity}
+     */
     getSelectedRecord() {
         return this.get("selectedRecord");
     }
 
     setSelectedRecord(recordId) {
         this.clearSelectedRecord();
+        // Update the schema and owner based on the current user's view.
         const recordTypes = this.getRecordTypes();
         const ownerId = quip.apps.getViewingUser().getId();
-        for (let recordType of SUPPORTED_RECORD_TYPES) {
+        for (const recordType of SUPPORTED_OBJECT_TYPE_KEYS) {
             recordTypes[recordType].schema = this.pickerData[recordType].schema;
             recordTypes[recordType].ownerId = ownerId;
         }

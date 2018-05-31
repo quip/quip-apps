@@ -11,7 +11,7 @@ class FieldPicker extends React.Component {
         entity: React.PropTypes.instanceOf(RecordEntity).isRequired,
         onSelectField: React.PropTypes.func,
         query: React.PropTypes.string.isRequired,
-        fromTop: React.PropTypes.boolean,
+        fromTop: React.PropTypes.bool,
         downwardsOffset: React.PropTypes.number,
         upwardsOffset: React.PropTypes.number,
         className: React.PropTypes.string,
@@ -69,7 +69,7 @@ class FieldPicker extends React.Component {
         }
         const addedFieldKeys = new Set(
             this.props.entity.getFields().map(entity => entity.getKey()));
-        const fields = this.props.entity.supprtedFieldsDataArray();
+        const fields = this.props.entity.supportedFieldsDataArray();
         sortBy(fields, field => field.label);
         const resultFields = fields.filter(field => {
             return (
