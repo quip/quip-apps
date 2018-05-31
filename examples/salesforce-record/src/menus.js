@@ -321,6 +321,7 @@ export class FieldBuilderMenu extends BaseMenu {
 
     changeRecord_() {
         getRecordPickerComponent().restoreToDefaultState();
+        getRecordPickerComponent().fetchData();
         quip.apps
             .getRootEntity()
             .getSelectedRecord()

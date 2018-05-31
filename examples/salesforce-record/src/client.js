@@ -277,7 +277,7 @@ export class SalesforceClient {
 
     getErrorFromStatus_(status) {
         let error;
-        switch (response.status) {
+        switch (status) {
             case 400:
                 error = new BadRequestError();
                 break;
@@ -297,7 +297,7 @@ export class SalesforceClient {
                 error = new ServiceUnavailableError();
                 break;
             default:
-                error = new DefaultError(response.status);
+                error = new DefaultError(status);
                 break;
         }
         return error;

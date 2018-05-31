@@ -139,3 +139,18 @@ export class GatewayTimeoutError extends HttpError {
         this.code_ = 504;
     }
 }
+
+/**
+ * Returns whether an error is an instance of an Error class derived from
+ * DefaultError, but not DefaultError itself. Error objects that were not
+ * constructed from a class derived from DefaultError will also be falsey (e.g.
+ * null, POJSOs, strings).
+ * @param {?DefaultError|Error|Object|string} maybeError
+ * @return {boolean}
+ */
+export function isNonDefaultError(maybeError) {
+    return (
+        maybeError instanceof DefaultError &&
+        maybeError.constructor !== DefaultError
+    );
+}

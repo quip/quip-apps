@@ -71,7 +71,7 @@ class Field extends React.Component {
     }
 
     componentWillUnmount() {
-        document.addEventListener("mousedown", this.onMouseDown_);
+        document.removeEventListener("mousedown", this.onMouseDown_);
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
             this.hideDialog_);

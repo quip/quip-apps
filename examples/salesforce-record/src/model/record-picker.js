@@ -11,6 +11,7 @@ import {
 import {SalesforceClient} from "../client.js";
 import PlaceholderData from "../placeholder-data.js";
 import {awaitValues, mapKeysToObject} from "../util.js";
+import {ForbiddenError} from "../../../shared/base-field-builder/error.js";
 
 /** @typedef {{schema: Object, listViewsData: Object}} RecordTypeData */
 
@@ -93,24 +94,41 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.ensureLoggedIn()
             .then(() => this.fetchDataForTypes_(SUPPORTED_OBJECT_TYPE_KEYS))
             .then(recordTypeToData => {
-                const recordTypeEntries = Object.entries(recordTypeToData);
-                // Update picker data
-                recordTypeEntries.forEach(([recordType, data]) => {
-                    this.pickerData[recordType] = data;
-                });
+                const validRecordTypeEntries = Object.entries(recordTypeToData)
+                    // Data can be undefined if the type is not available.
+                    .filter(([_, data]) => typeof data !== "undefined");
+                this.updatePickerData_(validRecordTypeEntries);
                 // Only update schemas if current user is the one who selected
                 // the record.
-                if (!this.shouldOverwriteSchema_()) {
-                    return;
+                if (this.shouldOverwriteSchema_()) {
+                    this.updateSchemas_(validRecordTypeEntries);
                 }
-                const ownerId = quip.apps.getViewingUser().getId();
-                const recordTypes = RecordPickerEntity.createRecordTypes_(
-                    Object.keys(recordTypeToData));
-                recordTypeEntries.forEach(([recordType, {schema}]) => {
-                    recordTypes[recordType].schema = schema;
-                });
-                this.setRecordTypes(recordTypes);
             });
+    }
+
+    updatePickerData_(recordTypeEntries) {
+        const validRecordTypes = Object.create(null);
+        recordTypeEntries.forEach(([recordType, data]) => {
+            validRecordTypes[recordType] = true;
+            this.pickerData[recordType] = data;
+        });
+        // Picker data can be invalid if a claimed supported object type cannot
+        // be queried for.
+        Object.keys(this.pickerData)
+            .filter(recordType => !(recordType in validRecordTypes))
+            .forEach(
+                invalidRecordType => delete this.pickerData[invalidRecordType]);
+    }
+
+    updateSchemas_(recordTypeEntries) {
+        const ownerId = quip.apps.getViewingUser().getId();
+        const recordTypeKeys = recordTypeEntries.map(([key, _]) => key);
+        const recordTypes = RecordPickerEntity.createRecordTypes_(
+            recordTypeKeys);
+        recordTypeEntries.forEach(([recordType, {schema}]) => {
+            recordTypes[recordType].schema = schema;
+        });
+        this.setRecordTypes(recordTypes);
     }
 
     /**
@@ -135,6 +153,13 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return awaitValues({
             schema: this.fetchRecordSchemaForType_(recordType),
             listViewsData: this.fetchListViewsForType_(recordType),
+        }).catch(err => {
+            if (err instanceof ForbiddenError) {
+                console.warn(
+                    `Unknown or not permitted record type ${recordType}`);
+                return undefined;
+            }
+            return Promise.reject(err);
         });
     }
 
@@ -272,10 +297,13 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                 retRecordsData.requestTime = requestTime;
                 return retRecordsData;
             })
-            .catch(errorMessage => {
+            .catch(error =>
                 // should throw exception with the time stamp
-                throw errorMessage + " requestTime:" + requestTime;
-            });
+                Promise.reject({
+                    error,
+                    requestTime,
+                })
+            );
     }
 
     fetchDescribeQuery_(recordType, listViewKey) {
@@ -434,5 +462,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             return segs[1];
         }
         return this.instanceUrl;
+    }
+
+    getSupportedRecordTypes() {
+        return Object.keys(this.pickerData);
     }
 }

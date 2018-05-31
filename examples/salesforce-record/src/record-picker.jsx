@@ -11,13 +11,10 @@ import Styles from "./record-picker.less";
 import {
     DefaultError,
     UnauthenticatedError,
+    isNonDefaultError,
 } from "../../shared/base-field-builder/error.js";
 
-import {
-    SUPPORTED_OBJECT_TYPE_KEYS,
-    getDisplayName,
-    getSupportedListViews,
-} from "./config.js";
+import {getDisplayName, getSupportedListViews} from "./config.js";
 import {RecordPickerEntity} from "./model/record-picker.js";
 import {MismatchedInstanceError} from "./client.js";
 
@@ -38,15 +35,16 @@ class RecordPicker extends React.Component {
         const states = {
             showDialog: false,
             listViewsLoadingStatus: LOADING_STATUS.LOADING,
+            listViewsLoadingError: null,
             showConnectedAppInstructions: false,
             showMismatchedInstanceError: false,
             prevMenuCommand: null,
         };
-        this.state = Object.assign(states, this.defaultDialogState());
+        this.state = {...states, ...this.defaultDialogState()};
     }
 
     defaultDialogState() {
-        const defaultRecordType = SUPPORTED_OBJECT_TYPE_KEYS[0];
+        const defaultRecordType = this.props.entity.getSupportedRecordTypes()[0];
         const defaultListView = getSupportedListViews(defaultRecordType)[0];
         return {
             selectedRecordType: defaultRecordType,
@@ -107,28 +105,32 @@ class RecordPicker extends React.Component {
                 this.getRecordComponent().errorHandling(err);
                 this.setState({
                     listViewsLoadingStatus: LOADING_STATUS.ERROR,
+                    listViewsLoadingError: err,
                 });
             });
     }
 
     addRelatedListsToMenu_ = () => {
         const menuCommands = this.props.menuDelegate.allMenuCommands();
-        const relatedMenuCommands = SUPPORTED_OBJECT_TYPE_KEYS.map(type => {
-            const relatedLists = this.props.entity.getRelatedListsForType(type);
-            return relatedLists.map(relatedList => {
-                const label = relatedList.label;
-                const key = this.relatedListCommandId_(type, relatedList);
-                return {
-                    id: key,
-                    label: label,
-                    handler: () => {
-                        this.setState({
-                            selectedRelatedListKey: relatedList.key,
-                        });
-                    },
-                };
+        const relatedMenuCommands = this.props.entity
+            .getSupportedRecordTypes()
+            .map(type => {
+                const relatedLists = this.props.entity.getRelatedListsForType(
+                    type);
+                return relatedLists.map(relatedList => {
+                    const label = relatedList.label;
+                    const key = this.relatedListCommandId_(type, relatedList);
+                    return {
+                        id: key,
+                        label: label,
+                        handler: () => {
+                            this.setState({
+                                selectedRelatedListKey: relatedList.key,
+                            });
+                        },
+                    };
+                });
             });
-        });
         const flattenedRelatedMenuCommands = [].concat(...relatedMenuCommands);
         const allMenuCommands = [
             ...flattenedRelatedMenuCommands,
@@ -306,7 +308,11 @@ class RecordPicker extends React.Component {
                 </div>
             </Dialog>;
         } else if (this.state.showDialog) {
-            const recordType = this.state.selectedRecordType;
+            const {
+                selectedRecordType: recordType,
+                listViewsLoadingStatus,
+                listViewsLoadingError,
+            } = this.state;
             const relatedMenuCommandIds = this.props.entity
                 .getRelatedListsForType(recordType)
                 .map(relatedList => {
@@ -314,7 +320,6 @@ class RecordPicker extends React.Component {
                 });
 
             const listViews = this.props.entity.getListViewsForType(recordType);
-            const listViewsLoadingStatus = this.state.listViewsLoadingStatus;
             const selectedListView = listViews.filter(listView => {
                 return listView.key === this.state.selectedListViewKey;
             });
@@ -330,7 +335,7 @@ class RecordPicker extends React.Component {
                     <div className={Styles.picker}>
                         <RecordTypePicker
                             selectedType={recordType}
-                            types={SUPPORTED_OBJECT_TYPE_KEYS}
+                            types={this.props.entity.getSupportedRecordTypes()}
                             onClick={this.selectRecordType_}/>
                         <div
                             className={Styles.columnGroup}
@@ -338,11 +343,12 @@ class RecordPicker extends React.Component {
                             <ListViewPicker
                                 listViews={listViews}
                                 listViewsLoadingStatus={listViewsLoadingStatus}
+                                listViewsLoadingError={listViewsLoadingError}
                                 selectedListViewKey={
                                     this.state.selectedListViewKey
                                 }
                                 onClick={this.selectListView_}/>
-                            {listViewsLoadingStatus ==
+                            {listViewsLoadingStatus ===
                                 LOADING_STATUS.LOADED && <RecordFilter
                                 entity={this.props.entity}
                                 selectedRecordType={recordType}
@@ -448,6 +454,7 @@ class ListViewPicker extends React.Component {
         listViews: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
         listViewsLoadingStatus: React.PropTypes.oneOf(
             Object.values(LOADING_STATUS)),
+        listViewsLoadingError: React.PropTypes.instanceOf(Error),
         selectedListViewKey: React.PropTypes.string.isRequired,
         onClick: React.PropTypes.func.isRequired,
     };
@@ -466,12 +473,17 @@ class ListViewPicker extends React.Component {
     };
 
     render() {
-        if (this.props.listViewsLoadingStatus == LOADING_STATUS.LOADING) {
+        const {listViewsLoadingStatus, listViewsLoadingError} = this.props;
+        if (listViewsLoadingStatus == LOADING_STATUS.LOADING) {
             return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
         }
-        if (this.props.listViewsLoadingStatus == LOADING_STATUS.ERROR) {
+        if (listViewsLoadingStatus == LOADING_STATUS.ERROR) {
+            const shouldShowSpecificErrorMessage = isNonDefaultError(
+                listViewsLoadingError);
             return <div className={Styles.errorLoading}>
-                {quiptext("Could Not Connect")}
+                {shouldShowSpecificErrorMessage
+                    ? listViewsLoadingError.message
+                    : quiptext("Could Not Connect")}
             </div>;
         }
         return <div className={Styles.listViewPicker}>
@@ -504,13 +516,18 @@ class RecordFilter extends React.Component {
             query: this.props.initialQuery || "",
             recordsData: [],
             recordDataLoadingStatus: LOADING_STATUS.LOADING,
+            recordDataLoadingError: null,
             timeoutId: null,
         };
     }
 
     componentDidMount() {
+        this.mounted = true;
         this.fetchRecordData_();
         this.focusInput_();
+    }
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -532,33 +549,32 @@ class RecordFilter extends React.Component {
                 this.props.selectedListViewKey,
                 searchTerm)
             .then(records => {
-                if (!this.state.recordsData ||
-                    !this.state.recordsData.requestTime ||
-                    this.state.recordsData.requestTime < records.requestTime) {
-                    this.setState({recordsData: records});
+                if (this.isRequestMostRecent_(records.requestTime) &&
+                    this.mounted) {
+                    this.setState({
+                        recordsData: records,
+                        recordDataLoadingStatus: LOADING_STATUS.LOADED,
+                    });
                 }
-                this.setState({recordDataLoadingStatus: LOADING_STATUS.LOADED});
             })
-            .catch(errorMessage => {
-                console.error(errorMessage);
-                let requestTimeOfError;
-                if (errorMessage.includes("requestTime:")) {
-                    const seg = errorMessage.split("requestTime:");
-                    if (seg.length >= 1) {
-                        requestTimeOfError = new Number(seg[1]);
-                    }
-                }
-                if (!this.state.recordsData ||
-                    !this.state.recordsData.requestTime ||
-                    (requestTimeOfError &&
-                        requestTimeOfError >
-                            this.state.recordsData.requestTime)) {
+            .catch(({error, requestTime}) => {
+                console.error(error);
+                if (this.isRequestMostRecent_(requestTime)) {
                     this.setState({
                         recordDataLoadingStatus: LOADING_STATUS.ERROR,
+                        recordDataLoadingError: error,
                     });
-                } // else keep the old state
+                }
+                // else keep the old state
             });
     };
+
+    isRequestMostRecent_(requestTime) {
+        if (!this.state.recordsData || !this.state.recordsData.requestTime) {
+            return true;
+        }
+        return requestTime >= this.state.recordsData.requestTime;
+    }
 
     onChange_ = e => {
         let timeoutId = this.state.timeoutId;
@@ -592,18 +608,27 @@ class RecordFilter extends React.Component {
     };
 
     render() {
-        const resultRecords = this.state.recordsData;
+        const {
+            recordsData: resultRecords,
+            recordDataLoadingStatus,
+            recordDataLoadingError,
+        } = this.state;
         const placeholder = this.props.searchPlaceholder
             ? this.props.searchPlaceholder
             : quiptext("Search");
         let recordsContent;
-        if (this.state.recordDataLoadingStatus == LOADING_STATUS.LOADING) {
+        const hasError = recordDataLoadingStatus === LOADING_STATUS.ERROR;
+        if (recordDataLoadingStatus == LOADING_STATUS.LOADING) {
             recordsContent = <quip.apps.ui.Image.Placeholder
                 size={25}
                 loading={true}/>;
-        } else if (this.state.recordDataLoadingStatus == LOADING_STATUS.ERROR) {
+        } else if (hasError) {
+            const shouldShowSpecificErrorMessage = isNonDefaultError(
+                recordDataLoadingError);
             recordsContent = <div className={Styles.errorLoading}>
-                {quiptext("Could Not Connect")}
+                {shouldShowSpecificErrorMessage
+                    ? recordDataLoadingError.message
+                    : quiptext("Could Not Connect")}
             </div>;
         } else {
             if (resultRecords.length == 0) {
@@ -627,7 +652,8 @@ class RecordFilter extends React.Component {
                     value={this.state.query}
                     onChange={this.onChange_}
                     placeholder={placeholder}
-                    ref={node => (this.searchInput_ = node)}/>
+                    ref={node => (this.searchInput_ = node)}
+                    disabled={hasError}/>
             </div>
             {recordsContent}
         </div>;
