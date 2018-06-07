@@ -1,0 +1,14 @@
+{
+    "name": "quip-automation-api-oauth2",
+    "version": "0.0.1",
+    "description": "Demo for Quip Automation API OAUTH2",
+    "license": "Apache-2.0",
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
+    },
+    "author": "",
+    "devDependencies": {
+        "quip-apps-webpack-config": ">=0.0.18"
+    }
+}
