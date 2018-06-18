@@ -69,6 +69,25 @@ module.exports = {
                 }),
             },
             {
+                test: /\.css$/,
+                loader: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: [
+                        {
+                            loader: "css-loader",
+                        },
+                        {
+                            loader: "postcss-loader",
+                            options: {
+                                plugins: loader => [
+                                    Autoprefixer(),
+                                ]
+                            }
+                        },
+                    ],
+                }),
+            },
+            {
                 test: /\.svg/,
                 use: [
                     {
