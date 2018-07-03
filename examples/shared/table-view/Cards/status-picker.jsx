@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import cx from "classnames";
 import omit from "lodash.omit";
-import {StatusRecord, toJSONPropTypeShape} from "../model";
+import {StatusRecord, toJSONPropTypeShape, toJSON} from "../model";
 
 import {X} from "reline";
 
@@ -33,7 +33,7 @@ class StatusPicker extends Component {
 
     newStatusSubmit = e => {
         const newStatus = e.target.value;
-        const id = getRootRecord()
+        const id = this.getColumnRecord()
             .addStatusType(newStatus, DEFAULT_COLOR)
             .getId();
         this.focusNewlyCreatedStatus(id, newStatus);
@@ -53,7 +53,7 @@ class StatusPicker extends Component {
     };
 
     removeStatus = id => {
-        getRootRecord().removeStatusType(id);
+        this.getColumnRecord().removeStatusType(id);
     };
 
     setStatus = e => {
@@ -67,7 +67,7 @@ class StatusPicker extends Component {
     };
 
     changeColor = (id, color) => {
-        getRootRecord().changeStatusColor(id, color);
+        this.getColumnRecord().changeStatusColor(id, color);
         this.setState({colorPicker: ""});
     };
 
@@ -79,7 +79,7 @@ class StatusPicker extends Component {
 
     saveStatus = e => {
         const {text, id} = this.state.editingStatus;
-        getRootRecord().changeStatusText(id, text);
+        this.getColumnRecord().changeStatusText(id, text);
     };
 
     makeColorPicker = id => {
@@ -103,6 +103,10 @@ class StatusPicker extends Component {
         }
         style={{background: bgColor}}
         className={styles.colorSwatch}/>;
+
+    getColumnRecord() {
+        return this.props.record.getColumn();
+    }
 
     render() {
         const {record, statusTypes} = this.props;

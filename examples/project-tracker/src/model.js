@@ -35,17 +35,16 @@ const DEFAULT_ROW = {
 
 export class RootRecord extends quip.apps.RootRecord {
     static CONSTRUCTOR_KEY = "Root";
+    static DATA_VERSION = 2;
 
     static getProperties = () => ({
         columns: quip.apps.RecordList.Type(ColumnRecord),
-        statusTypes: quip.apps.RecordList.Type(StatusTypeRecord),
         rows: quip.apps.RecordList.Type(RowRecord),
         widths: "object",
     });
 
     static getDefaultProperties = () => ({
         columns: [],
-        statusTypes: [],
         rows: [],
         widths: {},
     });
@@ -57,10 +56,6 @@ export class RootRecord extends quip.apps.RootRecord {
     }
 
     seed() {
-        this.addStatusType(quiptext("Upcoming"), colors.BLUE);
-        this.addStatusType(quiptext("In Progress"), colors.YELLOW);
-        this.addStatusType(quiptext("Complete"), colors.GREEN);
-
         const seedColumns = [
             {
                 name: COLUMN_NAME.PROJECT,
@@ -109,10 +104,16 @@ export class RootRecord extends quip.apps.RootRecord {
 
         seedColumns.forEach(column => this.addColumn(column));
         [...Array(3)].forEach(() => this.addRow());
+
+        this.setDataVersion(RootRecord.DATA_VERSION);
     }
 
     getColumns() {
         return this.get("columns").getRecords();
+    }
+
+    getColumnById(id) {
+        return this.getColumns().find(s => s.getId() === id);
     }
 
     getRows() {
@@ -130,6 +131,7 @@ export class RootRecord extends quip.apps.RootRecord {
             };
         }
         const column = this.get("columns").add(data, index);
+        column.seed();
         this.getRows().forEach(row => row.addCell(column));
         return column;
     }
@@ -142,30 +144,6 @@ export class RootRecord extends quip.apps.RootRecord {
             row.addCell(column, cellData);
         });
         return row;
-    }
-
-    addStatusType(text, color) {
-        return this.get("statusTypes").add({text, color});
-    }
-
-    removeStatusType(id) {
-        this.getStatusById(id).delete();
-    }
-
-    changeStatusText(id, text) {
-        this.getStatusById(id).set("text", text);
-    }
-
-    changeStatusColor(id, color) {
-        this.getStatusById(id).set("color", color);
-    }
-
-    getStatuses() {
-        return this.get("statusTypes").getRecords();
-    }
-
-    getStatusById(id) {
-        return this.getStatuses().find(s => s.getId() === id);
     }
 
     setDom(node) {

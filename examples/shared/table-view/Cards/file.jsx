@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import {X} from "reline";
 import cx from "classnames";
 import {FileRecord, X_DELETE_MARGIN, X_SIZE} from "../model";
@@ -10,7 +10,7 @@ const STATES = {
     HAS_FILE: "hasfile",
 };
 
-class File extends Component {
+class File extends PureComponent {
     static propTypes = {
         record: React.PropTypes.instanceOf(FileRecord).isRequired,
         textWidth: React.PropTypes.number,
@@ -19,21 +19,31 @@ class File extends Component {
 
     constructor(props) {
         super(props);
+        this.blobId_ = props.record.getBlob();
         this.state = {
             uploading: false,
-            blobId: null,
         };
     }
 
     componentWillMount() {
-        const {record} = this.props;
-        this.setState({blobId: record.getBlob()});
+        this.props.record.listen(this.update_);
     }
 
+    componentWillUnmount() {
+        this.props.record.unlisten(this.update_);
+    }
+
+    update_ = () => {
+        const blobId = this.props.record.getBlob();
+        if (blobId != this.blobId_) {
+            this.blobId_ = blobId;
+            this.forceUpdate();
+        }
+    };
+
     onClick = () => {
-        const {blobId} = this.state;
-        if (blobId) {
-            return quip.apps.getBlobById(blobId).openInLightbox();
+        if (this.blobId_) {
+            return quip.apps.getBlobById(this.blobId_).openInLightbox();
         }
         return quip.apps.showFilePicker(
             () => this.setState({uploading: true}),
@@ -44,7 +54,7 @@ class File extends Component {
         const {record} = this.props;
         const blobId = blobArr[0].blob.id();
         record.setBlob(blobId);
-        this.setState({uploading: false, blobId});
+        this.setState({uploading: false});
         if (this.props.metricType) {
             quip.apps.recordQuipMetric(this.props.metricType, {
                 action: "add_file",
@@ -55,7 +65,6 @@ class File extends Component {
     removeFile = e => {
         e.stopPropagation();
         this.props.record.removeBlob();
-        this.setState({blobId: null});
         if (this.props.metricType) {
             quip.apps.recordQuipMetric(this.props.metricType, {
                 action: "remove_file",
@@ -64,11 +73,11 @@ class File extends Component {
     };
 
     getCurrentState = () => {
-        const {uploading, blobId} = this.state;
+        const {uploading} = this.state;
         if (uploading) return STATES.UPLOADING;
-        if (!uploading && !blobId) return STATES.CHOOSE_FILE;
-        if (!uploading && blobId) {
-            const blob = quip.apps.getBlobById(blobId);
+        if (!uploading && !this.blobId_) return STATES.CHOOSE_FILE;
+        if (!uploading && this.blobId_) {
+            const blob = quip.apps.getBlobById(this.blobId_);
             return blob ? STATES.HAS_FILE : STATES.UPLOADING;
         }
     };
@@ -80,7 +89,7 @@ class File extends Component {
             case STATES.CHOOSE_FILE:
                 return quiptext("Choose File...");
             case STATES.HAS_FILE:
-                return quip.apps.getBlobById(this.state.blobId).filename();
+                return quip.apps.getBlobById(this.blobId_).filename();
             default:
                 return "";
         }

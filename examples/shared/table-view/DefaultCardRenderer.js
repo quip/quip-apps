@@ -4,28 +4,18 @@ import {
     COLUMN_TYPE,
     COMMENT_TRIGGER_MAKEUP,
 } from "../../shared/table-view/model.js";
-import Deadline from "./Cards/Deadline";
-import File from "./Cards/File";
-import Owner from "./Cards/Owner";
-import Status from "./Cards/Status";
-import {
-    CommentToggle,
-    CommentVisibilityToggle,
-    withCommentWidthToggle,
-} from "../table-view/lib/comment-component.jsx";
-import {Y_PADDING, Y_BORDER} from "./Card.js";
 
-import cx from "classnames";
+import Deadline from "./Cards/deadline.jsx";
+import File from "./Cards/file.jsx";
+import Owner from "./Cards/owner.jsx";
+import Status from "./Cards/status.jsx";
+import {CommentToggle} from "../table-view/lib/comment-component.jsx";
+
 import styles from "./Card.less";
 
-const CommentableDeadline = withCommentWidthToggle(Deadline);
-const CommentableFile = withCommentWidthToggle(File);
-const CommentableStatus = withCommentWidthToggle(Status);
-
 const LINE_HEIGHT = 17;
-const COMMENT_TRIGGER_HEIGHT = 13;
 
-export const DefaultCardRenderer = statusTypes => {
+export const DefaultCardRenderer = () => {
     return (
         cell,
         row,
@@ -37,36 +27,31 @@ export const DefaultCardRenderer = statusTypes => {
         setRowHeight,
         cardFocused,
         onCardFocused,
+        onCardBlurred,
         rowDraggingInProgress,
         columnDraggingInProgress,
-        metricType) => {
+        metricType,
+        statusTypes) => {
         const record = quip.apps.getRecordById(cell.id);
         let cardComponent;
         const showComments = quip.apps.isMobile() || cardHovered || cardFocused;
-
-        const commentsTriggerStyle = {
-            alignSelf: "flex-start",
-            position: "relative",
-            top:
-                (rowHeight -
-                    (Y_BORDER + Y_PADDING) * 2 -
-                    COMMENT_TRIGGER_HEIGHT) /
-                2,
+        const displayStyleFn = showCommentIcon => {
+            if (record.getColumn().getType() == COLUMN_TYPE.PERSON) {
+                return {
+                    "display": showCommentIcon ? "block" : "none",
+                };
+            } else {
+                return {
+                    "visibility": showCommentIcon ? "visible" : "hidden",
+                };
+            }
         };
-        const commentsTrigger = <CommentVisibilityToggle
+        const commentsTrigger = <CommentToggle
             record={record}
-            showComments={showComments}>
-            <span
-                style={cardFocused ? commentsTriggerStyle : undefined}
-                onClick={e => e.stopPropagation()}>
-                <quip.apps.ui.CommentsTrigger
-                    className={cx(styles.commentsTrigger, {
-                        [styles.firstColumnComment]: isFirstColumn,
-                    })}
-                    record={record}
-                    showEmpty/>
-            </span>
-        </CommentVisibilityToggle>;
+            showComments={showComments}
+            rowHeight={rowHeight}
+            isFirstColumn={isFirstColumn}
+            displayStyleFn={displayStyleFn}/>;
 
         switch (record.getColumn().getType()) {
             case COLUMN_TYPE.TEXT:
@@ -100,73 +85,48 @@ export const DefaultCardRenderer = statusTypes => {
                                           height)
                                 : undefined
                         }
-                        onFocus={() => onCardFocused(true)}
-                        onBlur={() => onCardFocused(false)}/>
+                        onFocus={onCardFocused}
+                        onBlur={onCardBlurred}/>
                 </div>;
                 break;
             case COLUMN_TYPE.PERSON:
-                cardComponent = <CommentToggle
+                cardComponent = <Owner
+                    availableWidth={width}
+                    rowHeight={rowHeight}
                     record={record}
-                    ref={el =>
-                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
-                    }
-                    showComments={showComments}>
-                    {comment => {
-                        const paddingLeft = comment
-                            ? COMMENT_TRIGGER_MAKEUP
-                            : 0;
-                        // This is equivalent to the comment trigger makeup
-                        // minus the size of the comment bubble.
-                        const paddingRight = comment ? 5 : 0;
-                        return <Owner
-                            availableWidth={width}
-                            rowHeight={rowHeight}
-                            rootHeight={rootHeight}
-                            record={record}
-                            paddingLeft={paddingLeft}
-                            paddingRight={paddingRight}
-                            showComments={showComments}
-                            projectName={quip.apps
-                                .getRecordById(row.text.data[0].id)
-                                .get("contents")
-                                .getTextContent()}
-                            metricType={metricType}/>;
-                    }}
-                </CommentToggle>;
+                    projectRecord={quip.apps.getRecordById(row.text.data[0].id)}
+                    metricType={metricType}
+                    showComments={showComments}/>;
                 break;
             case COLUMN_TYPE.STATUS:
-                cardComponent = <CommentableStatus
+                cardComponent = <Status
                     statusTypes={statusTypes}
-                    textWidth={width}
+                    textWidth={width - COMMENT_TRIGGER_MAKEUP}
                     rowHeight={rowHeight}
                     rootHeight={rootHeight}
                     record={record}
                     ref={el =>
                         record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
                     }
-                    showComments={showComments}
                     metricType={metricType}/>;
                 break;
             case COLUMN_TYPE.DATE:
-                cardComponent = <CommentableDeadline
-                    textWidth={width}
+                cardComponent = <Deadline
+                    textWidth={width - COMMENT_TRIGGER_MAKEUP}
                     rowHeight={rowHeight}
-                    rootHeight={rootHeight}
                     record={record}
                     ref={el =>
                         record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
                     }
-                    showComments={showComments}
                     metricType={metricType}/>;
                 break;
             case COLUMN_TYPE.FILE:
-                cardComponent = <CommentableFile
-                    textWidth={width}
+                cardComponent = <File
+                    textWidth={width - COMMENT_TRIGGER_MAKEUP}
                     record={record}
                     ref={el =>
                         record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
                     }
-                    showComments={showComments}
                     metricType={metricType}/>;
                 break;
         }

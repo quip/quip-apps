@@ -7,8 +7,6 @@
  * object type.
  * @property {string} DISPLAY_NAME The human-readable, pluralized display name
  * of the object type.
- * @property {Array<string>} LIST_VIEWS A list of supported list views to show
- * when picking a record.
  * @property {Array<string>} DEFAULT_FIELDS The default fields to show for the
  * object type if the user has not saved their own preferences.
  * @property {=Array<string>} HEADER_FIELDS The fields to use when
@@ -23,13 +21,6 @@ const SUPPORTED_OBJECT_TYPES = {
     "Account": {
         PREFIX: "001",
         DISPLAY_NAME: quiptext("Accounts"),
-        LIST_VIEWS: [
-            "RecentlyViewed",
-            "RecentlyViewedAccounts",
-            "MyAccounts",
-            "NewThisWeek",
-            "AllAccounts",
-        ],
         DEFAULT_FIELDS: [
             "Name",
             "Combo Sector",
@@ -42,31 +33,12 @@ const SUPPORTED_OBJECT_TYPES = {
     "Opportunity": {
         PREFIX: "006",
         DISPLAY_NAME: quiptext("Opportunities"),
-        LIST_VIEWS: [
-            "RecentlyViewed",
-            "RecentlyViewedOpportunities",
-            "ClosingNextMonth",
-            "ClosingThisMonth",
-            "MyOpportunities",
-            "NewThisWeek",
-            "Default_Opportunity_Pipeline",
-            "Won",
-            "AllOpportunities",
-        ],
         DEFAULT_FIELDS: ["Name", "CloseDate"],
     },
 
     "Contact": {
         PREFIX: "003",
         DISPLAY_NAME: quiptext("Contacts [people]"),
-        LIST_VIEWS: [
-            "RecentlyViewed",
-            "RecentlyViewedContacts",
-            "MyContacts",
-            "NewThisWeek",
-            "BirthdaysThisMonth",
-            "AllContacts",
-        ],
         DEFAULT_FIELDS: ["Title", "FirstName", "LastName", "PhoneExtension__c"],
         HEADER_FIELDS: ["FirstName", "LastName"],
     },
@@ -74,13 +46,6 @@ const SUPPORTED_OBJECT_TYPES = {
     "Lead": {
         PREFIX: "00Q",
         DISPLAY_NAME: quiptext("Leads [sales]"),
-        LIST_VIEWS: [
-            "RecentlyViewed",
-            "RecentlyViewedLeads",
-            "MyUnreadLeads",
-            "TodaysLeads",
-            "AllOpenLeads",
-        ],
         DEFAULT_FIELDS: ["Trial_Expiry__c", "FirstName", "LastName"],
         HEADER_FIELDS: ["FirstName", "LastName"],
     },
@@ -88,7 +53,6 @@ const SUPPORTED_OBJECT_TYPES = {
     "Case": {
         PREFIX: "500",
         DISPLAY_NAME: quiptext("Cases [support case]"),
-        LIST_VIEWS: ["RecentlyViewed", "AllOpenCases", "AllCases"],
         DEFAULT_FIELDS: [
             "CaseNumber",
             "Subject",
@@ -105,7 +69,6 @@ const SUPPORTED_OBJECT_TYPES = {
     "User": {
         PREFIX: "005",
         DISPLAY_NAME: quiptext("Users"),
-        LIST_VIEWS: ["RecentlyViewed", "AllUsers"],
         DEFAULT_FIELDS: [
             "FirstName",
             "LastName",
@@ -150,16 +113,6 @@ export function getObjectTypeFromPrefix(objectIdPrefix) {
  */
 export function getDisplayName(objectType) {
     return SUPPORTED_OBJECT_TYPES[objectType].DISPLAY_NAME;
-}
-
-/**
- * Returns the supported list views that are displayed when selecting a record
- * for a given object type.
- * @param {string} objectType
- * @return {!Array<string>}
- */
-export function getSupportedListViews(objectType) {
-    return [...SUPPORTED_OBJECT_TYPES[objectType].LIST_VIEWS];
 }
 
 /**

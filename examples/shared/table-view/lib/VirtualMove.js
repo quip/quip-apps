@@ -13,26 +13,23 @@ export default class VirtualMove extends Component {
         super(props);
         this.state = {
             items: props.items,
+            isActiveDrag: false,
         };
     }
 
+    toggleActiveDrag = isDrag => {
+        this.setState({isActiveDrag: isDrag});
+    };
+
     componentWillReceiveProps(nextProps) {
-        if (this.state.items.length !== nextProps.items.length) {
-            return this.setState({items: nextProps.items});
+        if (this.state.isActiveDrag) {
+            // If we are currently dragging a row or column, we want to wait
+            // until the dragging operation is finished before updating the
+            // state since the state update may conflict with the drag in
+            // progress.
+            return;
         }
-        const stateOrder = this.state.items.map(obj => obj.id);
-        const propsOrder = nextProps.items.map(obj => obj.id);
-        for (var i = 0; i < stateOrder.length; i++) {
-            if (propsOrder.indexOf(stateOrder[i]) === -1) {
-                return this.setState({items: nextProps.items});
-            }
-        }
-        for (var i = 0; i < stateOrder.length; i++) {
-            if (stateOrder[i] !== propsOrder[i]) {
-                return;
-            }
-        }
-        return this.setState({items: nextProps.items});
+        this.setState({items: nextProps.items});
     }
 
     moveItem = (id, index) => {
@@ -47,6 +44,7 @@ export default class VirtualMove extends Component {
             {this.props.children({
                 items: this.state.items,
                 moveItem: this.moveItem,
+                toggleActiveDrag: this.toggleActiveDrag,
             })}
         </div>;
     }

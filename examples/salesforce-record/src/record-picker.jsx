@@ -3,9 +3,6 @@
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import ChevronIcon from "../../shared/base-field-builder/icons/chevron.jsx";
 import Dialog from "../../shared/dialog/dialog.jsx";
-import InstructionsDialog from "./instructions-dialog.jsx";
-import {entityListener} from "../../shared/base-field-builder/utils.jsx";
-import Record from "../../shared/base-field-builder/record.jsx";
 import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-picker.less";
 import {
@@ -16,7 +13,7 @@ import {
 
 import {getDisplayName, getSupportedListViews} from "./config.js";
 import {RecordPickerEntity} from "./model/record-picker.js";
-import {MismatchedInstanceError} from "./client.js";
+import {getRecordComponent} from "./root.jsx";
 
 const LOADING_STATUS = {
     LOADING: 0,
@@ -24,85 +21,77 @@ const LOADING_STATUS = {
     ERROR: 2,
 };
 
-class RecordPicker extends React.Component {
+export default class RecordPicker extends React.Component {
     static propTypes = {
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
-        menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
+        onSelectRecord: React.PropTypes.func.isRequired,
+        onDismiss: React.PropTypes.func.isRequired,
     };
 
     constructor(props) {
         super(props);
-        const states = {
-            showDialog: false,
+        const recordTypes = props.entity.getSupportedRecordTypes();
+        this.state = {
+            recordTypes,
+            selectedRecordType: recordTypes[0],
+            listViews: [],
+            selectedListViewKey: null,
             listViewsLoadingStatus: LOADING_STATUS.LOADING,
             listViewsLoadingError: null,
-            showConnectedAppInstructions: false,
-            showMismatchedInstanceError: false,
-            prevMenuCommand: null,
-        };
-        this.state = {...states, ...this.defaultDialogState()};
-    }
-
-    defaultDialogState() {
-        const defaultRecordType = this.props.entity.getSupportedRecordTypes()[0];
-        const defaultListView = getSupportedListViews(defaultRecordType)[0];
-        return {
-            selectedRecordType: defaultRecordType,
-            selectedListViewKey: defaultListView,
-            selectedRecordId: null,
-            selectedRelatedListKey: null,
+            sobjects: [],
+            sobjectsLoadingStatus: LOADING_STATUS.LOADING,
+            sobjectsLoadingError: null,
+            query: "",
+            selectedObjectId: null,
         };
     }
 
     componentDidMount() {
-        this.props.menuDelegate.refreshToolbar();
-        quip.apps.addEventListener(
-            quip.apps.EventType.ELEMENT_BLUR,
-            this.hideDialog_);
         if (this.props.entity.getClient().isLoggedIn() &&
             this.props.entity.getClient().onSourceInstance()) {
-            this.fetchData();
+            this.fetchData_();
         }
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.selectedRelatedListKey === null &&
-            this.state.selectedRelatedListKey !== null &&
-            this.columnGroupNode_) {
-            const columnGroupNode = ReactDOM.findDOMNode(this.columnGroupNode_);
-            columnGroupNode.scrollLeft = columnGroupNode.scrollWidth;
-        }
-        this.props.menuDelegate.refreshToolbar();
     }
 
     componentWillUnmount() {
-        quip.apps.removeEventListener(
-            quip.apps.EventType.ELEMENT_BLUR,
-            this.hideDialog_);
+        this.requestToken_ = undefined;
     }
 
-    getRecordComponent() {
-        return this.recordComponent_.getWrappedComponent();
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.selectedRecordType !== prevState.selectedRecordType) {
+            this.fetchListViews_();
+            return;
+        }
+
+        if (this.state.listViews !== prevState.listViews ||
+            this.state.selectedListViewKey !== prevState.selectedListViewKey) {
+            this.setState(
+                {
+                    query: "",
+                },
+                this.fetchRecordData_);
+            return;
+        }
     }
 
-    relatedListCommandId_(type, relatedList) {
-        return `related_${type}_${relatedList.key}`;
-    }
-
-    fetchData() {
+    fetchData_() {
+        // TODO: Remove this up-front fetch of all object list views.
         this.setState({
             listViewsLoadingStatus: LOADING_STATUS.LOADING,
         });
         this.props.entity
             .fetchData()
             .then(() => {
-                this.setState({
-                    listViewsLoadingStatus: LOADING_STATUS.LOADED,
-                });
+                this.setState(
+                    {
+                        listViewsLoadingStatus: LOADING_STATUS.LOADED,
+                    },
+                    this.fetchListViews_);
             })
             .catch(err => {
                 console.error(err);
-                this.getRecordComponent().errorHandling(err);
+                // TODO: Remove circular dependency.
+                getRecordComponent().errorHandling(err);
                 this.setState({
                     listViewsLoadingStatus: LOADING_STATUS.ERROR,
                     listViewsLoadingError: err,
@@ -110,315 +99,169 @@ class RecordPicker extends React.Component {
             });
     }
 
-    addRelatedListsToMenu_ = () => {
-        const menuCommands = this.props.menuDelegate.allMenuCommands();
-        const relatedMenuCommands = this.props.entity
-            .getSupportedRecordTypes()
-            .map(type => {
-                const relatedLists = this.props.entity.getRelatedListsForType(
-                    type);
-                return relatedLists.map(relatedList => {
-                    const label = relatedList.label;
-                    const key = this.relatedListCommandId_(type, relatedList);
-                    return {
-                        id: key,
-                        label: label,
-                        handler: () => {
-                            this.setState({
-                                selectedRelatedListKey: relatedList.key,
-                            });
-                        },
-                    };
-                });
-            });
-        const flattenedRelatedMenuCommands = [].concat(...relatedMenuCommands);
-        const allMenuCommands = [
-            ...flattenedRelatedMenuCommands,
-            ...menuCommands,
-        ];
-        quip.apps.updateToolbar({menuCommands: allMenuCommands});
-    };
-
-    showDialog_ = e => {
-        e.preventDefault();
-        if (this.props.entity.getClient().isLoggedIn()) {
-            if (this.state.listViewsLoadingStatus == LOADING_STATUS.ERROR ||
-                (this.state.listViewsLoadingStatus == LOADING_STATUS.LOADED &&
-                    this.props.entity.isExpired())) {
-                this.fetchData();
-            }
-            this.setState({showDialog: true});
-        } else {
-            this.ensureLoggedIn().then(() => {
-                this.props.menuDelegate.updateToolbar(
-                    this.props.entity.getSelectedRecord());
-                this.fetchData();
-                this.setState({showDialog: true});
-            });
+    fetchListViews_() {
+        // TODO: Make this dynamic.
+        if (!this.state.selectedRecordType ||
+            this.state.listViewsLoadingStatus !== LOADING_STATUS.LOADED) {
+            return;
         }
-    };
 
-    showMismatchedInstanceErrorDialog_(prevMenuCommand) {
-        this.hideDialog_();
+        const listViews = this.props.entity.getListViewsForType(
+            this.state.selectedRecordType);
+
         this.setState({
-            prevMenuCommand,
-            showMismatchedInstanceError: true,
+            listViews,
+            selectedListViewKey: listViews[0].key,
         });
     }
 
-    hideDialog_ = e => {
-        const states = {
-            showDialog: false,
-        };
-        this.setState(Object.assign(states, this.defaultDialogState()));
-    };
+    fetchRecordData_() {
+        this.setState({sobjectsLoadingStatus: LOADING_STATUS.LOADING});
 
-    restoreToDefaultState = () => {
-        const states = {
-            showDialog: true,
-        };
-        this.setState(Object.assign(states, this.defaultDialogState()));
+        // Sentinel value used so we only respond to latest search.
+        const requestToken = {};
+        this.requestToken_ = requestToken;
+
+        this.props.entity
+            .fetchRecordDataForListView(
+                this.state.selectedRecordType,
+                this.state.selectedListViewKey,
+                this.state.query)
+            .then(records => {
+                if (requestToken !== this.requestToken_) {
+                    return;
+                }
+                this.setState({
+                    sobjects: records,
+                    sobjectsLoadingStatus: LOADING_STATUS.LOADED,
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                if (requestToken !== this.requestToken_) {
+                    return;
+                }
+                this.setState({
+                    sobjectsLoadingStatus: LOADING_STATUS.ERROR,
+                    sobjectsLoadingError: error,
+                });
+            });
+    }
+
+    setQuery_ = query => {
+        if (this.timeoutId_) {
+            window.clearTimeout(this.timeoutId_);
+        }
+
+        this.timeoutId_ = window.setTimeout(() => {
+            this.fetchRecordData_();
+            this.timeoutId_ = undefined;
+        }, 500);
+
+        this.setState({
+            query,
+        });
     };
 
     selectRecordType_ = (e, newlySelectedRecordType) => {
-        e.preventDefault();
-        if (newlySelectedRecordType != this.state.selectedRecordType) {
-            const defaultListView = getSupportedListViews(
-                newlySelectedRecordType)[0];
-            this.setState({
-                selectedRecordType: newlySelectedRecordType,
-                selectedListViewKey: defaultListView,
-                selectedRecordId: null,
-                selectedRelatedListKey: null,
-            });
-        }
+        this.setState({
+            selectedRecordType: newlySelectedRecordType,
+        });
     };
 
     selectListView_ = (e, newlySelectedListView) => {
-        e.preventDefault();
-        if (newlySelectedListView.key != this.state.selectedListViewKey) {
-            this.setState({
-                selectedListViewKey: newlySelectedListView.key,
-                selectedRecordId: null,
-                selectedRelatedListKey: null,
-            });
-        }
+        this.setState({
+            selectedListViewKey: newlySelectedListView.key,
+        });
     };
 
     selectRecordId_ = (e, newlySelectedRecord) => {
         if (newlySelectedRecord &&
-            newlySelectedRecord.id != this.state.selectedRecordId) {
+            newlySelectedRecord.id != this.state.selectedObjectId) {
             this.setState({
-                selectedRecordId: newlySelectedRecord.id,
+                selectedObjectId: newlySelectedRecord.id,
             });
         }
     };
 
     selectRecord_ = e => {
-        if (this.state.selectedRecordId !== null) {
-            this.props.entity.setSelectedRecord(this.state.selectedRecordId);
-            this.hideDialog_();
-        }
-    };
-
-    logoutAndReconnect_ = () => {
-        this.props.entity
-            .logout()
-            .then(() => this.dismissMismatchedInstanceErrorDialog_())
-            .then(() => this.ensureLoggedIn())
-            .then(() => {
-                this.props.menuDelegate.updateToolbar(
-                    this.props.entity.getSelectedRecord());
-                this.props.menuDelegate.executeMenuOption(
-                    this.state.prevMenuCommand);
-                this.setState({prevMenuCommand: null});
-            });
-    };
-
-    ensureLoggedIn(prevMenuCommand = null) {
-        return this.props.entity.ensureLoggedIn().catch(err => {
-            this.handleLoginError_(err, prevMenuCommand);
-            // Re-raise so that callers can catch.
-            return Promise.reject();
-        });
-    }
-
-    handleLoginError_(err, prevMenuCommand) {
-        if (err instanceof MismatchedInstanceError) {
-            this.showMismatchedInstanceErrorDialog_(prevMenuCommand);
+        if (this.state.selectedObjectId === null) {
             return;
         }
-        // Use loginError instead of err object because it's {} when login fails
-        const loginError = new UnauthenticatedError(
-            "Unable to login to Salesforce");
-        this.getRecordComponent().errorHandling(loginError);
-    }
 
-    dismissMismatchedInstanceErrorDialog_ = () => {
-        this.setState({
-            showMismatchedInstanceError: false,
-        });
+        this.props.onSelectRecord(this.state.selectedObjectId);
     };
 
     render() {
-        let connectedAppInstructions;
-        let recordPickerDialog;
-        if (this.state.showConnectedAppInstructions) {
-            connectedAppInstructions = <InstructionsDialog
-                onDismiss={() => {
-                    this.setState({showConnectedAppInstructions: false});
-                }}/>;
-        } else if (this.state.showMismatchedInstanceError) {
-            recordPickerDialog = <Dialog
-                onDismiss={this.dismissMismatchedInstanceErrorDialog_}>
-                <div className={Styles.errorDialog}>
-                    <div className={Styles.header}>
-                        {quiptext("Reconnect to Salesforce?")}
-                    </div>
-                    <div className={Styles.errorTextBlock}>
-                        <div className={Styles.errorTextDescription}>
-                            {quiptext(
-                                "This record is connected to %(hostname1)s " +
-                                    "but you're logged into %(hostname2)s. Would " +
-                                    "you like to logout and reconnect to modify " +
-                                    "this record?",
-                                {
-                                    "hostname1": <b>
-                                        {this.props.entity.getHostname()}
-                                    </b>,
-                                    "hostname2": <b>
-                                        {this.props.entity
-                                            .getClient()
-                                            .getHostname()}
-                                    </b>,
-                                })}
-                        </div>
-                    </div>
-                    <div className={Styles.actions}>
-                        <quip.apps.ui.Button
-                            text={quiptext("Cancel")}
-                            onClick={
-                                this.dismissMismatchedInstanceErrorDialog_
-                            }/>
-                        <quip.apps.ui.Button
-                            primary={true}
-                            text={quiptext("Log Out and Reconnect")}
-                            onClick={this.logoutAndReconnect_}/>
-                    </div>
-                </div>
-            </Dialog>;
-        } else if (this.state.showDialog) {
-            const {
-                selectedRecordType: recordType,
-                listViewsLoadingStatus,
-                listViewsLoadingError,
-            } = this.state;
-            const relatedMenuCommandIds = this.props.entity
-                .getRelatedListsForType(recordType)
-                .map(relatedList => {
-                    return this.relatedListCommandId_(recordType, relatedList);
-                });
+        const {
+            recordTypes,
+            selectedRecordType,
+            listViews,
+            selectedListViewKey,
+            listViewsLoadingStatus,
+            listViewsLoadingError,
+            query,
+            sobjects,
+            sobjectsLoadingStatus,
+            sobjectsLoadingError,
+            selectedObjectId,
+        } = this.state;
 
-            const listViews = this.props.entity.getListViewsForType(recordType);
-            const selectedListView = listViews.filter(listView => {
-                return listView.key === this.state.selectedListViewKey;
-            });
-            let recordFilterPlaceholder = quiptext("Search");
-            if (selectedListView && selectedListView[0]) {
-                recordFilterPlaceholder += " " + selectedListView[0].label;
+        const {onDismiss, entity} = this.props;
+        let recordFilterPlaceholder = quiptext("Search");
+        listViews.forEach(listView => {
+            if (listView.key === selectedListViewKey) {
+                recordFilterPlaceholder += " " + listView.label;
             }
-            recordPickerDialog = <Dialog onDismiss={this.hideDialog_}>
-                <div className={Styles.dialog}>
-                    <div className={Styles.header}>
-                        {quiptext("Select Salesforce Record")}
-                    </div>
-                    <div className={Styles.picker}>
-                        <RecordTypePicker
-                            selectedType={recordType}
-                            types={this.props.entity.getSupportedRecordTypes()}
-                            onClick={this.selectRecordType_}/>
-                        <div
-                            className={Styles.columnGroup}
-                            ref={node => (this.columnGroupNode_ = node)}>
-                            <ListViewPicker
-                                listViews={listViews}
-                                listViewsLoadingStatus={listViewsLoadingStatus}
-                                listViewsLoadingError={listViewsLoadingError}
-                                selectedListViewKey={
-                                    this.state.selectedListViewKey
-                                }
-                                onClick={this.selectListView_}/>
-                            {listViewsLoadingStatus ===
-                                LOADING_STATUS.LOADED && <RecordFilter
-                                entity={this.props.entity}
-                                selectedRecordType={recordType}
-                                selectedListViewKey={
-                                    this.state.selectedListViewKey
-                                }
-                                searchPlaceholder={recordFilterPlaceholder}
-                                selectedRecordId={this.state.selectedRecordId}
-                                menuDelegate={this.props.menuDelegate}
-                                menuCommandIds={relatedMenuCommandIds}
-                                onClick={this.selectRecordId_}
-                                onSubmit={this.selectRecord_}/>}
-                        </div>
-                    </div>
-                    <div className={Styles.actions}>
-                        <quip.apps.ui.Button
-                            text={quiptext("Cancel")}
-                            onClick={this.hideDialog_}/>
-                        <quip.apps.ui.Button
-                            primary={true}
-                            disabled={this.state.selectedRecordId === null}
-                            text={quiptext("Select Record")}
-                            onClick={this.selectRecord_}/>
+        });
+
+        return <Dialog onDismiss={onDismiss}>
+            <div className={Styles.dialog}>
+                <div className={Styles.header}>
+                    {quiptext("Select Salesforce Record")}
+                </div>
+                <div className={Styles.picker}>
+                    <RecordTypePicker
+                        selectedType={selectedRecordType}
+                        types={recordTypes}
+                        onClick={this.selectRecordType_}/>
+                    <div className={Styles.columnGroup}>
+                        <ListViewPicker
+                            listViews={listViews}
+                            listViewsLoadingStatus={listViewsLoadingStatus}
+                            listViewsLoadingError={listViewsLoadingError}
+                            selectedListViewKey={selectedListViewKey}
+                            onClick={this.selectListView_}/>
+                        {listViewsLoadingStatus ===
+                            LOADING_STATUS.LOADED && <RecordFilter
+                            query={query}
+                            sobjects={sobjects}
+                            sobjectsLoadingStatus={sobjectsLoadingStatus}
+                            sobjectsLoadingError={sobjectsLoadingError}
+                            entity={entity}
+                            selectedRecordType={selectedRecordType}
+                            selectedListViewKey={selectedListViewKey}
+                            searchPlaceholder={recordFilterPlaceholder}
+                            selectedObjectId={selectedObjectId}
+                            onClick={this.selectRecordId_}
+                            onSubmit={this.selectRecord_}
+                            onUpdateQuery={this.setQuery_}/>}
                     </div>
                 </div>
-            </Dialog>;
-        }
-
-        const selectedRecord = this.props.entity.getSelectedRecord();
-        // Should hit this only in url unfurling case
-        if (!selectedRecord) {
-            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
-        }
-        const recordComponent = <Record
-            entity={selectedRecord}
-            menuDelegate={this.props.menuDelegate}
-            ref={node => (this.recordComponent_ = node)}/>;
-
-        const recordContainerClassNames = [];
-        let chooseRecordButton;
-        let placeholderOverlay;
-        let recordContainerOnclick;
-        if (selectedRecord && selectedRecord.isPlaceholder()) {
-            const actionText = this.props.entity.getClient().isLoggedIn()
-                ? quiptext("Select Record…")
-                : quiptext("Connect to Salesforce…");
-            recordContainerClassNames.push(Styles.placeholder);
-            chooseRecordButton = <div className={Styles.openPicker}>
-                <quip.apps.ui.Button
-                    disabled={this.state.showDialog}
-                    text={actionText}/>
-            </div>;
-            placeholderOverlay = <div className={Styles.placeholderOverlay}/>;
-            recordContainerOnclick = this.showDialog_;
-        }
-        return <div className={Styles.root}>
-            <div
-                className={recordContainerClassNames.join(" ")}
-                onClick={recordContainerOnclick}>
-                {chooseRecordButton}
-                {placeholderOverlay}
-                {recordComponent}
+                <div className={Styles.actions}>
+                    <quip.apps.ui.Button
+                        text={quiptext("Cancel")}
+                        onClick={onDismiss}/>
+                    <quip.apps.ui.Button
+                        primary={true}
+                        disabled={selectedObjectId === null}
+                        text={quiptext("Select Record")}
+                        onClick={this.selectRecord_}/>
+                </div>
             </div>
-            {recordPickerDialog}
-            {connectedAppInstructions}
-        </div>;
+        </Dialog>;
     }
 }
-
-export default entityListener(RecordPicker);
 
 class RecordTypePicker extends React.Component {
     static propTypes = {
@@ -455,7 +298,7 @@ class ListViewPicker extends React.Component {
         listViewsLoadingStatus: React.PropTypes.oneOf(
             Object.values(LOADING_STATUS)),
         listViewsLoadingError: React.PropTypes.instanceOf(Error),
-        selectedListViewKey: React.PropTypes.string.isRequired,
+        selectedListViewKey: React.PropTypes.string,
         onClick: React.PropTypes.func.isRequired,
     };
 
@@ -474,10 +317,10 @@ class ListViewPicker extends React.Component {
 
     render() {
         const {listViewsLoadingStatus, listViewsLoadingError} = this.props;
-        if (listViewsLoadingStatus == LOADING_STATUS.LOADING) {
+        if (listViewsLoadingStatus === LOADING_STATUS.LOADING) {
             return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
         }
-        if (listViewsLoadingStatus == LOADING_STATUS.ERROR) {
+        if (listViewsLoadingStatus === LOADING_STATUS.ERROR) {
             const shouldShowSpecificErrorMessage = isNonDefaultError(
                 listViewsLoadingError);
             return <div className={Styles.errorLoading}>
@@ -497,100 +340,34 @@ class ListViewPicker extends React.Component {
 
 class RecordFilter extends React.Component {
     static propTypes = {
+        query: React.PropTypes.string.isRequired,
+        sobjects: React.PropTypes.isRequired, // TODO:
+        sobjectsLoadingStatus: React.PropTypes.number.isRequired,
+        sobjectsLoadingError: React.PropTypes.string.isRequired,
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
         selectedRecordType: React.PropTypes.string.isRequired,
-        selectedListViewKey: React.PropTypes.string.isRequired,
-        selectedRecordId: React.PropTypes.string,
-        menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
-        menuCommandIds: React.PropTypes.arrayOf(React.PropTypes.string)
-            .isRequired,
+        selectedListViewKey: React.PropTypes.string,
+        selectedObjectId: React.PropTypes.string,
         onClick: React.PropTypes.func.isRequired,
-        initialQuery: React.PropTypes.string,
         searchPlaceholder: React.PropTypes.string,
         onSubmit: React.PropTypes.func,
+        onUpdateQuery: React.PropTypes.func,
     };
 
     constructor(props) {
         super(props);
-        this.state = {
-            query: this.props.initialQuery || "",
-            recordsData: [],
-            recordDataLoadingStatus: LOADING_STATUS.LOADING,
-            recordDataLoadingError: null,
-            timeoutId: null,
-        };
     }
 
     componentDidMount() {
-        this.mounted = true;
-        this.fetchRecordData_();
         this.focusInput_();
-    }
-    componentWillUnmount() {
-        this.mounted = false;
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedRecordType !== this.props.selectedRecordType ||
             nextProps.selectedListViewKey !== this.props.selectedListViewKey) {
-            this.setState({query: "", recordsData: []}, () => {
-                this.fetchRecordData_(this.state.query);
-                this.focusInput_();
-            });
+            this.focusInput_();
         }
     }
-
-    fetchRecordData_ = searchTerm => {
-        const selectedRecordType = this.props.selectedRecordType;
-        this.setState({recordDataLoadingStatus: LOADING_STATUS.LOADING});
-        this.props.entity
-            .fetchRecordDataForListView(
-                selectedRecordType,
-                this.props.selectedListViewKey,
-                searchTerm)
-            .then(records => {
-                if (this.isRequestMostRecent_(records.requestTime) &&
-                    this.mounted) {
-                    this.setState({
-                        recordsData: records,
-                        recordDataLoadingStatus: LOADING_STATUS.LOADED,
-                    });
-                }
-            })
-            .catch(({error, requestTime}) => {
-                console.error(error);
-                if (this.isRequestMostRecent_(requestTime)) {
-                    this.setState({
-                        recordDataLoadingStatus: LOADING_STATUS.ERROR,
-                        recordDataLoadingError: error,
-                    });
-                }
-                // else keep the old state
-            });
-    };
-
-    isRequestMostRecent_(requestTime) {
-        if (!this.state.recordsData || !this.state.recordsData.requestTime) {
-            return true;
-        }
-        return requestTime >= this.state.recordsData.requestTime;
-    }
-
-    onChange_ = e => {
-        let timeoutId = this.state.timeoutId;
-        if (timeoutId) {
-            window.clearTimeout(timeoutId);
-        }
-        const searchTerm = e.target.value;
-        timeoutId = window.setTimeout(() => {
-            this.fetchRecordData_(searchTerm);
-            this.setState({timeoutId: null});
-        }, 500);
-        this.setState({
-            timeoutId: timeoutId,
-            query: e.target.value,
-        });
-    };
 
     focusInput_ = () => {
         if (this.searchInput_) {
@@ -599,104 +376,66 @@ class RecordFilter extends React.Component {
     };
 
     renderRow_ = (recordData, isHighlighted, index) => {
-        const highlighted = this.props.selectedRecordId === recordData.id;
-        return <RecordFilterRow
-            recordData={recordData}
-            isHighlighted={highlighted}
-            menuDelegate={this.props.menuDelegate}
-            menuCommandIds={this.props.menuCommandIds}/>;
+        const classNames = [Styles.recordRow];
+        if (this.props.selectedObjectId === recordData.id) {
+            classNames.push(Styles.highlighted);
+        }
+
+        return <div className={classNames.join(" ")}>{recordData.name}</div>;
     };
 
     render() {
         const {
-            recordsData: resultRecords,
-            recordDataLoadingStatus,
-            recordDataLoadingError,
-        } = this.state;
-        const placeholder = this.props.searchPlaceholder
-            ? this.props.searchPlaceholder
-            : quiptext("Search");
+            query,
+            sobjects,
+            sobjectsLoadingStatus,
+            sobjectsLoadingError,
+            searchPlaceholder,
+            onClick,
+            onSubmit,
+            onUpdateQuery,
+        } = this.props;
+
         let recordsContent;
-        const hasError = recordDataLoadingStatus === LOADING_STATUS.ERROR;
-        if (recordDataLoadingStatus == LOADING_STATUS.LOADING) {
+        const hasError = sobjectsLoadingStatus === LOADING_STATUS.ERROR;
+        if (sobjectsLoadingStatus === LOADING_STATUS.LOADING) {
             recordsContent = <quip.apps.ui.Image.Placeholder
                 size={25}
                 loading={true}/>;
         } else if (hasError) {
             const shouldShowSpecificErrorMessage = isNonDefaultError(
-                recordDataLoadingError);
+                sobjectsLoadingError);
             recordsContent = <div className={Styles.errorLoading}>
                 {shouldShowSpecificErrorMessage
-                    ? recordDataLoadingError.message
+                    ? sobjectsLoadingError.message
                     : quiptext("Could Not Connect")}
             </div>;
         } else {
-            if (resultRecords.length == 0) {
+            if (sobjects.length == 0) {
                 recordsContent = <div className={Styles.noResult}>
                     {quiptext("No Results")}
                 </div>;
             } else {
                 recordsContent = <RowContainer
-                    rows={resultRecords}
+                    rows={sobjects}
                     renderRow={this.renderRow_}
                     containerClassName={Styles.scrollableList}
                     isActive={true}
-                    onSubmitSelectedRow={this.props.onSubmit}
-                    onSelectionChanage={this.props.onClick}/>;
+                    onSubmitSelectedRow={onSubmit}
+                    onSelectionChange={onClick}/>;
             }
         }
         return <div className={Styles.recordFilter}>
             <div className={Styles.searchInput}>
                 <input
                     className={Styles.searchInputControl}
-                    value={this.state.query}
-                    onChange={this.onChange_}
-                    placeholder={placeholder}
+                    value={query}
+                    onChange={e => onUpdateQuery(e.target.value)}
+                    placeholder={searchPlaceholder}
                     ref={node => (this.searchInput_ = node)}
                     disabled={hasError}/>
             </div>
             {recordsContent}
-        </div>;
-    }
-}
-
-class RecordFilterRow extends React.Component {
-    static propTypes = {
-        recordData: React.PropTypes.object.isRequired,
-        isHighlighted: React.PropTypes.bool.isRequired,
-        menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
-        menuCommandIds: React.PropTypes.arrayOf(React.PropTypes.string)
-            .isRequired,
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {showingMenu: false};
-    }
-
-    showMenu_ = e => {
-        if (this.state.showingMenu) {
-            return;
-        }
-        this.setState({showingMenu: true});
-        this.props.menuDelegate.showRecordPickerContextMenu(
-            e,
-            this.menuButton_,
-            this.props.menuCommandIds,
-            () => this.setState({showingMenu: false}));
-    };
-
-    render() {
-        const classNames = [Styles.recordRow];
-        if (this.props.isHighlighted) {
-            classNames.push(Styles.highlighted);
-        }
-        const menuButtonClassNames = [Styles.menuButton];
-        if (this.state.showingMenu) {
-            menuButtonClassNames.push(Styles.active);
-        }
-        return <div className={classNames.join(" ")}>
-            {this.props.recordData.name}
         </div>;
     }
 }

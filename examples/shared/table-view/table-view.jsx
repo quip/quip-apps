@@ -1,7 +1,7 @@
 // Copyright 2017 Quip
 
 import {toJSONPropTypeShape} from "./model.js";
-import Columns from "./Columns";
+import Columns from "./columns.jsx";
 import {hashCode} from "./utils.js";
 import styles from "./table-view.less";
 import VirtualMove from "./lib/VirtualMove";
@@ -31,6 +31,7 @@ export class TableView extends React.Component {
         onColumnDrop: React.PropTypes.func.isRequired,
         onColumnAdd: React.PropTypes.func,
         onColumnDelete: React.PropTypes.func.isRequired,
+        onColumnSort: React.PropTypes.func.isRequired,
         onResizeEnd: React.PropTypes.func,
         customRenderer: React.PropTypes.func,
         onCardClicked: React.PropTypes.func,
@@ -67,8 +68,9 @@ export class TableView extends React.Component {
             style={{width, height}}
             className={styles.wrapper}>
             <VirtualMove items={rows.data}>
-                {({items, moveItem}) => <Columns
+                {({items, moveItem, toggleActiveDrag}) => <Columns
                     moveRow={moveItem}
+                    toggleActiveDrag={toggleActiveDrag}
                     rows={{id: hashCode(rows.id), data: items}}
                     columns={columns}
                     widths={widths}
@@ -83,6 +85,7 @@ export class TableView extends React.Component {
                     onColumnDrop={this.props.onColumnDrop}
                     onColumnAdd={this.props.onColumnAdd}
                     onColumnDelete={this.props.onColumnDelete}
+                    onColumnSort={this.props.onColumnSort}
                     onResizeEnd={this.props.onResizeEnd}
                     customRenderer={this.props.customRenderer}
                     onCardClicked={this.props.onCardClicked}

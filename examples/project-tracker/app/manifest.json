@@ -2,6 +2,7 @@
     "id": "JdGAjAc35Es",
     "manifest_version": 1,
     "name": "Project Tracker",
+    "description": "Assign, oversee, and organize your projects. Set deadlines and attach files.",
     "version_name": "1.0",
     "version_number": 1,
     "min_api_version": "0.1.027",

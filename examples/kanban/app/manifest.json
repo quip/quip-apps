@@ -2,6 +2,7 @@
     "id": "KORAjAYHE50",
     "manifest_version": 1,
     "name": "Kanban Board",
+    "description": "Use cards and columns to organize your work. Drag cards to track progress.",
     "version_name": "0.1.0",
     "version_number": 1,
     "min_api_version": "0.1.022",

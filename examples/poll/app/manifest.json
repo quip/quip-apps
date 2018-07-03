@@ -2,6 +2,7 @@
     "id": "JYKAjAYyzLM",
     "manifest_version": 1,
     "name": "Poll",
+    "description": "Ask a question, add choices, and let the people decide.",
     "version_name": "1.0",
     "version_number": 1,
     "min_api_version": "0.1.022",

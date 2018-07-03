@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {toJSONPropTypeShape} from "./model.js";
-import Column from "./Column";
-import Card from "./Card";
+import Column from "./column.jsx";
+import Card from "./card.jsx";
 import {hashCode} from "./utils.js";
 import VirtualMove from "./lib/VirtualMove";
 
@@ -24,12 +24,14 @@ class Columns extends Component {
         onColumnDrop: React.PropTypes.func.isRequired,
         onColumnAdd: React.PropTypes.func,
         onColumnDelete: React.PropTypes.func.isRequired,
+        onColumnSort: React.PropTypes.func.isRequired,
         customRenderer: React.PropTypes.func.isRequired,
         onResizeEnd: React.PropTypes.func,
         onContextMenu: React.PropTypes.func,
         globalError: React.PropTypes.element,
         errorStatus: React.PropTypes.string,
         metricType: React.PropTypes.string,
+        toggleActiveDrag: React.PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -61,6 +63,7 @@ class Columns extends Component {
 
     columnDragInProgress = columnDraggingInProgress => {
         this.setState({columnDraggingInProgress});
+        this.props.toggleActiveDrag(columnDraggingInProgress);
     };
 
     // Start Row Dragging Functions
@@ -73,6 +76,7 @@ class Columns extends Component {
         const index = this.props.rows.data.findIndex(
             dataRow => dataRow.id === row.id);
         this.setState({rowDraggingInProgress: true});
+        this.props.toggleActiveDrag(true);
         this.setRowDragBounds({
             e,
             rows: this.props.rows,
@@ -166,13 +170,9 @@ class Columns extends Component {
         const row = this.props.rows.data[draggingRowIndex];
         if (row) {
             this.props.onRowDrop(row.id, draggingRowIndex);
+            this.props.toggleActiveDrag(false);
         }
         this.setState({
-            dragCurrentY: 0,
-            dragStartY: 0,
-            rowDrops: {prev: null, next: null},
-            rowDropOffset: 0,
-            rowDragOffset: 0,
             draggingRowIndex: null,
             draggingRowMoved: 0,
             rowDraggingInProgress: false,
@@ -344,7 +344,7 @@ class Columns extends Component {
         return <div className={styles.wrapper}>
             {draggingRowIndex !== null && this.makeDraggingRow()}
             <VirtualMove items={columns.data}>
-                {({items, moveItem}) =>
+                {({items, moveItem, toggleActiveDrag}) =>
                     items.map((column, i) => <Column
                         moveColumn={moveItem}
                         key={hashCode(column.id)}
@@ -362,6 +362,7 @@ class Columns extends Component {
                         onResizeColumnStart={this.onResizeColumnStart}
                         onResizeColumnEnd={this.onResizeColumnEnd}
                         onRowDrag={this.onRowDrag}
+                        toggleActiveDrag={toggleActiveDrag}
                         onRowDelete={this.props.onRowDelete}
                         rowDraggingIndex={draggingRowIndex}
                         onColumnDrop={this.props.onColumnDrop}
@@ -370,6 +371,7 @@ class Columns extends Component {
                         rowDraggingInProgress={rowDraggingInProgress}
                         onColumnAdd={this.props.onColumnAdd}
                         onColumnDelete={this.props.onColumnDelete}
+                        onColumnSort={this.props.onColumnSort}
                         customRenderer={this.props.customRenderer}
                         onCardClicked={this.props.onCardClicked}
                         onContextMenu={this.props.onContextMenu}

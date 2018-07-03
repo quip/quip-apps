@@ -56,6 +56,7 @@ class Card extends Component {
         onCardFocused: React.PropTypes.func,
         onCardClicked: React.PropTypes.func,
         metricType: React.PropTypes.string,
+        statusTypes: React.PropTypes.object,
     };
 
     constructor(props) {
@@ -95,7 +96,7 @@ class Card extends Component {
         return true;
     }
 
-    onCardFocused_ = isFocused => {
+    setFocus_ = isFocused => {
         if (isFocused) {
             quip.apps.addDetachedNode(ReactDOM.findDOMNode(this));
         } else {
@@ -107,6 +108,14 @@ class Card extends Component {
         });
     };
 
+    onCardFocused_ = () => {
+        this.setFocus_(true);
+    };
+
+    onCardBlurred_ = () => {
+        this.setFocus_(false);
+    };
+
     makeCard = (record, cardHovered, isFirstColumn) => {
         const {
             heights,
@@ -115,6 +124,7 @@ class Card extends Component {
             setRowHeight,
             rowDraggingInProgress,
             columnDraggingInProgress,
+            statusTypes,
         } = this.props;
         const rowHeight = heights[row.id];
         return this.props.customRenderer(
@@ -128,9 +138,11 @@ class Card extends Component {
             setRowHeight,
             this.state.cardFocused,
             this.onCardFocused_,
+            this.onCardBlurred_,
             rowDraggingInProgress,
             columnDraggingInProgress,
-            this.props.metricType);
+            this.props.metricType,
+            statusTypes);
     };
 
     makePadding = isFirstColumn => {

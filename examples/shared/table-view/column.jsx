@@ -1,9 +1,9 @@
 import cx from "classnames";
 import React, {Component} from "react";
-import {toJSONPropTypeShape} from "./model.js";
+import {toJSONPropTypeShape, toJSON} from "./model.js";
 import {Motion} from "react-motion";
 import isEqual from "lodash.isequal";
-import Card from "./Card";
+import Card from "./card.jsx";
 import {animateTo} from "./lib/animation";
 import ChevronDown from "./lib/components/icons/ChevronDown";
 import Grabber from "./lib/components/icons/Grabber";
@@ -22,6 +22,7 @@ class Column extends Component {
         moveColumn: React.PropTypes.func.isRequired,
         onColumnAdd: React.PropTypes.func,
         onColumnDelete: React.PropTypes.func.isRequired,
+        onColumnSort: React.PropTypes.func.isRequired,
         onContextMenu: React.PropTypes.func.isRequired,
         onRowDelete: React.PropTypes.func.isRequired,
         customRenderer: React.PropTypes.func.isRequired,
@@ -47,6 +48,7 @@ class Column extends Component {
         globalError: React.PropTypes.element,
         errorStatus: React.PropTypes.string,
         metricType: React.PropTypes.string,
+        toggleActiveDrag: React.PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -100,6 +102,7 @@ class Column extends Component {
         const {column, columnDragInProgress} = this.props;
         const {left} = this.columnDomMap_[column.id].getBoundingClientRect();
         columnDragInProgress(true);
+        this.props.toggleActiveDrag(true);
         this.setState({
             isDraggingColumn: true,
             dragStartX: e.clientX,
@@ -117,14 +120,11 @@ class Column extends Component {
         const {index, column, columnDragInProgress} = this.props;
         columnDragInProgress(false);
         this.props.onColumnDrop(column.id, index);
+        this.props.toggleActiveDrag(false);
         this.setState({
             isDraggingColumn: false,
             dragStartX: 0,
-            dragAnchorX: 0,
             dragCurrentX: 0,
-            columnDropWidths: {prev: null, next: null},
-            columnDragMoved: 0,
-            columnDropOffset: 0,
             columnDragOffset: 0,
         });
     };
@@ -258,8 +258,18 @@ class Column extends Component {
 
     showContextMenu = e => {
         const {column, index} = this.props;
-        const commands = ["addColumn", "deleteColumn"];
+        const commands = [
+            "sortAscending",
+            "sortDescending",
+            quip.apps.DocumentMenuCommands.SEPARATOR,
+            "addColumn",
+        ];
+        if (column.deletable) {
+            commands.push("deleteColumn");
+        }
         const context = {
+            sortAscending: () => this.props.onColumnSort(column.id, true),
+            sortDescending: () => this.props.onColumnSort(column.id, false),
             deleteColumn: () => this.props.onColumnDelete(column.id),
             addColumn: type =>
                 this.props.onColumnAdd(column.id, type, index + 1),
@@ -422,12 +432,11 @@ class Column extends Component {
                                 onBlur={this.onColumnTitleBlur_}
                                 useDocumentTheme={false}/>
                         </div>
-                        {column.deletable &&
-                            !quip.apps.isMobile() && <div
-                                className={styles.dropdown}
-                                onClick={this.showContextMenu}>
-                                <ChevronDown/>
-                            </div>}
+                        {!quip.apps.isMobile() && <div
+                            className={styles.dropdown}
+                            onClick={this.showContextMenu}>
+                            <ChevronDown/>
+                        </div>}
                         {!isDraggingColumn &&
                             !quip.apps.isMobile() && <div
                                 onMouseDown={e =>
@@ -447,6 +456,12 @@ class Column extends Component {
                         }
                         const isFirstRow = i === 0;
                         const isLastRow = i === rows.data.length - 1;
+                        const statusTypes = {};
+                        const statuses = column.statusTypes;
+                        if (statuses) {
+                            const records = statuses.getRecords();
+                            statusTypes.data = records.map(r => toJSON(r));
+                        }
                         return <Card
                             key={hashCode(row.id)}
                             rowIndex={i}
@@ -472,7 +487,8 @@ class Column extends Component {
                             customRenderer={this.props.customRenderer}
                             onCardClicked={this.props.onCardClicked}
                             onContextMenu={this.props.onContextMenu}
-                            metricType={this.props.metricType}/>;
+                            metricType={this.props.metricType}
+                            statusTypes={statusTypes}/>;
                     })}
                 </div>;
             }}

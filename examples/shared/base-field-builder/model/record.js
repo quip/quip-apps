@@ -13,7 +13,7 @@ import {
 } from "./field.js";
 
 import {unescapeHTML} from "../utils.jsx";
-import {ResponseHandler} from "../response-handler.js";
+import {parseFieldValue} from "../response-handler.js";
 
 export class RecordEntity extends quip.apps.Record {
     static ID = "record";
@@ -189,9 +189,7 @@ export class RecordEntity extends quip.apps.Record {
         }
         const type = schema.dataType;
         const isReadOnly = schema.calculated || !schema.updateable;
-        let initialValue = ResponseHandler.parseFieldValue(
-            fieldData.value,
-            type);
+        let initialValue = parseFieldValue(fieldData.value, type);
         let defaultText;
         let value = initialValue;
         let recordClass;

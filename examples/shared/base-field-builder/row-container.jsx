@@ -7,7 +7,7 @@ export default class RowContainer extends React.Component {
         containerClassName: React.PropTypes.string,
         isActive: React.PropTypes.bool,
         onSubmitSelectedRow: React.PropTypes.func,
-        onSelectionChanage: React.PropTypes.func,
+        onSelectionChange: React.PropTypes.func,
         selectOnHover: React.PropTypes.bool,
         defaultSelectedRowIndex: React.PropTypes.number,
     };
@@ -35,10 +35,10 @@ export default class RowContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.props.onSelectionChanage &&
+        if (this.props.onSelectionChange &&
             this.state.selectedRowIndex !== prevState.selectedRowIndex) {
             const row = this.props.rows[this.state.selectedRowIndex];
-            this.props.onSelectionChanage(
+            this.props.onSelectionChange(
                 null,
                 row,
                 this.state.selectedRowIndex);

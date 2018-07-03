@@ -1,7 +1,11 @@
 // Copyright 2017 Quip
 
 import {RecordEntity} from "../../../shared/base-field-builder/model/record.js";
-import {ResponseHandler} from "../../../shared/base-field-builder/response-handler.js";
+import {
+    parsePicklistOptions,
+    parseFieldsData,
+    parseFieldValue,
+} from "../../../shared/base-field-builder/response-handler.js";
 import {
     DefaultError,
     TypeNotSupportedError,
@@ -154,10 +158,9 @@ export class SalesforceRecordEntity extends RecordEntity {
         return this.getClient()
             .updateRecord(this.getRecordId(), {fields: updatedFields})
             .then(response => {
-                const schema = this.getSchema();
-                return ResponseHandler.parseFieldsData(response, schema);
-            })
-            .then(fieldsDataArray => {
+                const fieldsDataArray = parseFieldsData(
+                    response,
+                    this.getSchema());
                 const metricArgs = {
                     action: "saved_record",
                     record_type: this.getType(),
@@ -175,9 +178,7 @@ export class SalesforceRecordEntity extends RecordEntity {
                 for (let fieldData of fieldsDataArray) {
                     const fieldEntity = this.getField(fieldData.key);
                     const type = schema.fields[fieldData.key].dataType;
-                    const parsedValue = ResponseHandler.parseFieldValue(
-                        fieldData.value,
-                        type);
+                    const parsedValue = parseFieldValue(fieldData.value, type);
 
                     if (fieldEntity) {
                         if (fieldEntity.isDirty()) {
@@ -278,10 +279,9 @@ export class SalesforceRecordEntity extends RecordEntity {
         return this.getClient()
             .fetchRecord(recordId)
             .then(response => {
-                const schema = this.getSchema();
-                return ResponseHandler.parseFieldsData(response, schema);
-            })
-            .then(fieldsDataArray => {
+                const fieldsDataArray = parseFieldsData(
+                    response,
+                    this.getSchema());
                 this.setFieldsDataArray(fieldsDataArray);
                 this.setLastFetchedTime(Date.now());
                 return fieldsDataArray;
@@ -307,9 +307,7 @@ export class SalesforceRecordEntity extends RecordEntity {
                 continue;
             }
             const type = schema.fields[fieldData.key].dataType;
-            const parsedValue = ResponseHandler.parseFieldValue(
-                fieldData.value,
-                type);
+            const parsedValue = parseFieldValue(fieldData.value, type);
             if (!fieldEntity.isDirty()) {
                 fieldEntity.setValue(parsedValue);
             }
@@ -336,14 +334,13 @@ export class SalesforceRecordEntity extends RecordEntity {
 
     loadPlaceholderData(placeholerData) {
         const schema = this.getSchema();
-        const fieldsDataArray = ResponseHandler.parseFieldsData(
+        const fieldsDataArray = parseFieldsData(
             placeholerData.fieldsData,
-            schema).then(fieldsDataArray => {
-            this.setFieldsDataArray(fieldsDataArray);
-            for (let key of placeholerData.fieldsOrder) {
-                this.addField(key);
-            }
-        });
+            schema);
+        this.setFieldsDataArray(fieldsDataArray);
+        for (let key of placeholerData.fieldsOrder) {
+            this.addField(key);
+        }
     }
 
     openLink() {
@@ -368,10 +365,9 @@ export class SalesforceRecordEntity extends RecordEntity {
             const fieldApiName = field.getKey();
             return this.getClient()
                 .fetchPicklistOptions(recordType, recordTypeId, fieldApiName)
-                .then(response =>
-                    ResponseHandler.parsePicklistOptions(response)
-                )
-                .then(values => {
+                .then(response => {
+                    const values = parsePicklistOptions(response);
+
                     let retValues;
                     if (field.isRequired()) {
                         retValues = values;

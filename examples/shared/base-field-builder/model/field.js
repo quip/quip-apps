@@ -1,6 +1,6 @@
 // Copyright 2017 Quip
 
-import {ResponseHandler} from "../response-handler.js";
+import {parseFieldValue} from "../response-handler.js";
 import {DefaultError, InvalidValueError} from "../error.js";
 import {formatNumber} from "../utils.jsx";
 
@@ -283,9 +283,7 @@ export class TextFieldEntity extends FieldEntity {
     }
 
     getValue() {
-        return ResponseHandler.parseFieldValue(
-            this.getRawValue(),
-            this.getType());
+        return parseFieldValue(this.getRawValue(), this.getType());
     }
 
     setValue(value) {

@@ -1,12 +1,21 @@
 // Copyright 2017 Quip
 
-import Card from "../Card.less";
-import {COMMENT_TRIGGER_MAKEUP} from "../model.js";
+import cx from "classnames";
+import styles from "../Card.less";
+import {Card} from "../Card.less";
+
+import {COLUMN_TYPE, COMMENT_TRIGGER_MAKEUP} from "../../table-view/model.js";
+import {Y_BORDER} from "../../table-view/card.jsx";
+
+const COMMENT_TRIGGER_HEIGHT = 13;
 
 export class CommentToggle extends React.Component {
     static propTypes = {
         record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,
         showComments: React.PropTypes.bool.isRequired,
+        rowHeight: React.PropTypes.number.isRequired,
+        isFirstColumn: React.PropTypes.bool.isRequired,
+        displayStyleFn: React.PropTypes.func,
     };
 
     constructor(props) {
@@ -34,47 +43,29 @@ export class CommentToggle extends React.Component {
     };
 
     render() {
-        const comments = this.props.showComments || this.state.hasComments;
-        return this.props.children(comments);
-    }
-}
-
-export class CommentVisibilityToggle extends React.Component {
-    render() {
-        return <CommentToggle
-            record={this.props.record}
-            showComments={this.props.showComments}>
-            {comments => {
-                if (comments) {
-                    return this.props.children;
-                } else {
-                    return null;
-                }
-            }}
-        </CommentToggle>;
-    }
-}
-
-export const withCommentWidthToggle = Component => {
-    return class extends React.Component {
-        static propTypes = {
-            record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,
-            showComments: React.PropTypes.bool.isRequired,
-            textWidth: React.PropTypes.number.isRequired,
-        };
-
-        render() {
-            return <CommentToggle
-                record={this.props.record}
-                showComments={this.props.showComments}>
-                {comments => {
-                    let width = comments
-                        ? this.props.textWidth - COMMENT_TRIGGER_MAKEUP
-                        : this.props.textWidth;
-                    return <Component {...this.props} textWidth={width}/>;
-                }}
-            </CommentToggle>;
+        const {isFirstColumn, rowHeight, record} = this.props;
+        const showCommentIcon =
+            this.props.showComments || this.state.hasComments;
+        let displayStyle = {};
+        if (this.props.displayStyleFn) {
+            displayStyle = this.props.displayStyleFn(showCommentIcon);
         }
-    };
-    return CommentToggle;
-};
+        const commentsTriggerStyle = Object.assign(
+            {
+                alignSelf: "flex-start",
+                position: "relative",
+                top: (rowHeight - Y_BORDER * 2 - COMMENT_TRIGGER_HEIGHT) / 2,
+            },
+            displayStyle);
+        return <span
+            style={commentsTriggerStyle}
+            onClick={e => e.stopPropagation()}>
+            <quip.apps.ui.CommentsTrigger
+                className={cx(styles.commentsTrigger, {
+                    [styles.firstColumnComment]: {isFirstColumn},
+                })}
+                record={record}
+                showEmpty={true}/>
+        </span>;
+    }
+}

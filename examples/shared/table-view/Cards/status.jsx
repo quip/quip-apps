@@ -7,7 +7,7 @@ import {
     X_SIZE,
     toJSONPropTypeShape,
 } from "../model";
-import StatusPicker from "./StatusPicker";
+import StatusPicker from "./status-picker.jsx";
 import Modal from "../lib/components/Modal";
 import styles from "./Status.less";
 
@@ -78,7 +78,10 @@ class Status extends Component {
         const {showPicker} = this.state;
         const currentStatusId = record.getStatus();
         const currentStatus =
-            currentStatusId && getRootRecord().getStatusById(currentStatusId);
+            currentStatusId &&
+            getRootRecord()
+                .getColumnById(record.getColumnId())
+                .getStatusById(currentStatusId);
         const {text, color} = currentStatus
             ? currentStatus.getData()
             : {text: "", color: {}};
@@ -87,6 +90,23 @@ class Status extends Component {
                 width: 250,
             },
         };
+
+        let modal;
+        if (showPicker) {
+            modal = <Modal
+                style={modalStyle}
+                onRequestClose={this.hidePicker}
+                rootHeight={rootHeight}
+                topOffset={rowHeight / 2 + 20}
+                onBlur={this.hidePicker}
+                wrapperRef={this.wrapper}>
+                <StatusPicker
+                    statusTypes={statusTypes}
+                    hidePicker={this.hidePicker}
+                    record={record}
+                    metricType={this.props.metricType}/>
+            </Modal>;
+        }
 
         return <div
             className={styles.wrapper}
@@ -111,20 +131,7 @@ class Status extends Component {
                     </div>
                 )}
             </div>
-            <Modal
-                style={modalStyle}
-                onRequestClose={this.hidePicker}
-                rootHeight={rootHeight}
-                topOffset={rowHeight / 2 + 20}
-                isOpen={showPicker}
-                onBlur={this.hidePicker}
-                wrapperRef={this.wrapper}>
-                <StatusPicker
-                    statusTypes={statusTypes}
-                    hidePicker={this.hidePicker}
-                    record={record}
-                    metricType={this.props.metricType}/>
-            </Modal>
+            {modal}
         </div>;
     }
 }

@@ -65,22 +65,6 @@ class Root extends quip.apps.RootRecord {
         this.set("allowMultiple", value);
     }
 
-    currentUserHasVoted() {
-        const user = quip.apps.getViewingUser();
-        if (!user) {
-            return false;
-        }
-
-        const findUserVote = option =>
-            option
-                .get("votes")
-                .getRecords()
-                .find(vote => vote.get("user") === user.getId());
-
-        const found = this.getOptions().find(findUserVote);
-        return Boolean(found);
-    }
-
     getTotalVotes() {
         return this.getOptions().reduce(
             (acc, option) => acc + option.getVotesCount(),
@@ -152,29 +136,10 @@ class Option extends ListenerRecord {
         }
 
         if (!rtr.empty() && sendMessage) {
-            if (allowMultiple) {
-                quip.apps.sendMessage(
-                    quiptext("voted for %(option)s [snippet for a person]", {
-                        "option": text,
-                    }));
-            } else {
-                const hasVoted = parent.currentUserHasVoted();
-                if (hasVoted) {
-                    quip.apps.sendMessage(
-                        quiptext(
-                            "changed their vote to %(option)s [snippet for a person]",
-                            {
-                                "option": text,
-                            }));
-                } else {
-                    quip.apps.sendMessage(
-                        quiptext(
-                            "voted for %(option)s [snippet for a person]",
-                            {
-                                "option": text,
-                            }));
-                }
-            }
+            quip.apps.sendMessage(
+                quiptext("voted for %(option)s [snippet for a person]", {
+                    "option": text,
+                }));
         }
         quip.apps.recordQuipMetric("voted");
     }

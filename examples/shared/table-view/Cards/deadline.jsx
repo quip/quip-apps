@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import {X} from "reline";
 import {DateRecord, X_DELETE_MARGIN, X_SIZE} from "../model";
 import Modal from "../lib/components/Modal";
@@ -6,21 +6,37 @@ import styles from "./Deadline.less";
 
 const {CalendarPicker} = quip.apps.ui;
 
-class Deadline extends Component {
+class Deadline extends PureComponent {
     static propTypes = {
         record: React.PropTypes.instanceOf(DateRecord).isRequired,
         rowHeight: React.PropTypes.number.isRequired,
-        rootHeight: React.PropTypes.number.isRequired,
         textWidth: React.PropTypes.number,
         metricType: React.PropTypes.string,
     };
 
     constructor(props) {
         super(props);
+        this.date_ = props.record.getDate();
         this.state = {
             showCalendar: false,
         };
     }
+
+    componentWillMount() {
+        this.props.record.listen(this.update_);
+    }
+
+    componentWillUnmount() {
+        this.props.record.unlisten(this.update_);
+    }
+
+    update_ = () => {
+        const recordDate = this.props.record.getDate();
+        if (recordDate != this.date_) {
+            this.date_ = recordDate;
+            this.forceUpdate();
+        }
+    };
 
     modalOpen = () =>
         !quip.apps.isMobile() && this.setState({showCalendar: true});
@@ -28,7 +44,7 @@ class Deadline extends Component {
 
     pickDate = e => {
         quip.apps.pickDate(dateMs => this.props.record.setDate(dateMs), {
-            initialDateMs: this.props.record.getDate(),
+            initialDateMs: this.date_,
             anchor: e.currentTarget,
             offsetY: 20,
         });
@@ -66,9 +82,22 @@ class Deadline extends Component {
     };
 
     render() {
-        const {record, rowHeight, rootHeight, textWidth} = this.props;
+        const {record, rowHeight, textWidth} = this.props;
         const {showCalendar} = this.state;
-        const date = record.getDate();
+        const date = this.date_;
+
+        let modal;
+        if (showCalendar) {
+            modal = <Modal
+                onRequestClose={this.modalClose}
+                topOffset={rowHeight / 2 + 20}
+                onBlur={this.modalClose}
+                wrapperRef={this.wrapper}>
+                <CalendarPicker
+                    initialSelectedDateMs={date || Date.now()}
+                    onChangeSelectedDateMs={this.changeDate}/>
+            </Modal>;
+        }
 
         return <div
             ref={el => (this.wrapper = el)}
@@ -100,17 +129,7 @@ class Deadline extends Component {
                     quiptext("Set Date...")
                 )}
             </div>
-            <Modal
-                onRequestClose={this.modalClose}
-                rootHeight={rootHeight}
-                topOffset={rowHeight / 2 + 20}
-                isOpen={showCalendar}
-                onBlur={this.modalClose}
-                wrapperRef={this.wrapper}>
-                <CalendarPicker
-                    initialSelectedDateMs={date || Date.now()}
-                    onChangeSelectedDateMs={this.changeDate}/>
-            </Modal>
+            {modal}
         </div>;
     }
 }

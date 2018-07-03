@@ -1,6 +1,10 @@
 // Copyright 2017 Quip
 
-import {ResponseHandler} from "../../../shared/base-field-builder/response-handler.js";
+import {
+    parseListViews,
+    parseSchema,
+    parseSoqlRecords,
+} from "../../../shared/base-field-builder/response-handler.js";
 import {SalesforceRecordEntity} from "./salesforce-record.js";
 import {
     AUTH_CONFIG_NAMES,
@@ -35,7 +39,6 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     static createRecordTypes_(objectTypeKeys) {
         return mapKeysToObject(objectTypeKeys, () => ({
-            relatedLists: [],
             schema: {},
         }));
     }
@@ -171,8 +174,10 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
         return this.getClient()
             .fetchObjectInfo(recordType)
-            .then(ResponseHandler.parseSchema)
-            .then(schema => ({...schema, lastFetchedTime: Date.now()}));
+            .then(response => ({
+                ...parseSchema(response),
+                lastFetchedTime: Date.now(),
+            }));
     }
 
     fetchListViewsForType_(recordType) {
@@ -197,11 +202,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         };
 
         return this.getClient()
-            .fetchListViews(recordType, "recent")
+            .fetchListViews(recordType)
             .then(response => {
-                return ResponseHandler.parseListViews(response, recordType);
-            })
-            .then(listViews => {
+                const listViews = parseListViews(response, recordType);
                 listViews.forEach(listView => {
                     if (listView.label != allListViewLabel &&
                         listView.label != recentListViewLabel) {
@@ -220,18 +223,6 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             });
     }
 
-    fetchRelatedListsForType_(recordType) {
-        return this.getClient()
-            .fetchRelatedLists(recordType)
-            .then(ResponseHandler.parseRelatedLists)
-            .then(relatedLists => {
-                const recordTypes = this.getRecordTypes();
-                recordTypes[recordType].relatedLists = relatedLists;
-                this.setRecordTypes(recordTypes);
-                return relatedLists;
-            });
-    }
-
     fetchRecordsDataByQuery_(query, recordType, searchTerm = null) {
         if (searchTerm) {
             query = this.reformatQuery_(query, recordType, searchTerm);
@@ -240,9 +231,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         query = query + " LIMIT 200";
         return this.getClient()
             .fetchSoqlQuery(query)
-            .then(response =>
-                ResponseHandler.parseSoqlRecords(response, getSearchField)
-            );
+            .then(response => parseSoqlRecords(response, getSearchField));
     }
 
     //TODO: move to util.js
@@ -271,13 +260,11 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     fetchRecordDataForListView(recordType, listViewKey, searchTerm = null) {
         const listViewsData = this.pickerData[recordType].listViewsData;
-        const requestTime = Date.now();
         if (listViewsData[listViewKey] !== undefined &&
             Object.keys(listViewsData[listViewKey]).length > 0 &&
             listViewsData[listViewKey].records &&
             !searchTerm) {
             const recordsData = listViewsData[listViewKey].records;
-            recordsData.requestTime = requestTime;
             return Promise.resolve(recordsData);
         }
         return this.fetchDescribeQuery_(recordType, listViewKey)
@@ -294,16 +281,8 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                     ] = data;
                 }
                 const retRecordsData = recordsData;
-                retRecordsData.requestTime = requestTime;
                 return retRecordsData;
-            })
-            .catch(error =>
-                // should throw exception with the time stamp
-                Promise.reject({
-                    error,
-                    requestTime,
-                })
-            );
+            });
     }
 
     fetchDescribeQuery_(recordType, listViewKey) {
@@ -318,8 +297,8 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         ].describeUrl;
         return this.getClient()
             .fetchApiLink(describeUrl)
-            .then(ResponseHandler.parseListViewsDescribe)
-            .then(query => {
+            .then(response => {
+                const query = response.query;
                 this.pickerData[recordType].listViewsData[
                     listViewKey
                 ].query = query;
@@ -384,10 +363,6 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     getListViewsForType(recordType) {
         return Object.values(this.pickerData[recordType].listViewsData);
-    }
-
-    getRelatedListsForType(recordType) {
-        return this.getRecordTypes()[recordType].relatedLists;
     }
 
     getSchemaForType(recordType) {

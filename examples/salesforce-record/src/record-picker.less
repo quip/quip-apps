@@ -142,7 +142,8 @@
     }
 }
 
-.noResult, .errorLoading {
+.noResult,
+.errorLoading {
     margin: auto;
     text-align: center;
     color: #999;
@@ -151,4 +152,24 @@
 
 :global .image-placeholder {
     background-color: transparent !important;
+}
+
+.loginContext {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: 94px;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    color: #353535;
+    z-index: 100;
+    width: 500px;
+    opacity: 1;
+    text-align: center;
+    a {
+        color: #29b6f2;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }

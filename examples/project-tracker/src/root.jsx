@@ -108,7 +108,7 @@ class Root extends React.Component {
         if (max > 4) return 150;
         /* From here we start at 128 (removed the `+N`) and
           subtract (Picture width (30 at time of writing) - negative
-          margin we add in Owner.js (12 at time of writing)). This could
+          margin we add in owner.jsx (12 at time of writing)). This could
           be a function but it's fine for now I think?
           **/
         if (max === 4) return 128;
@@ -188,14 +188,67 @@ class Root extends React.Component {
         column.delete();
     };
 
+    getElementFn_ = cell => {
+        switch (cell.getType()) {
+            case COLUMN_TYPE.TEXT:
+                return element =>
+                    element.get("contents").getTextContent() || "";
+            case COLUMN_TYPE.DATE:
+                return element => element.getDate() || 0;
+            case COLUMN_TYPE.FILE:
+                return element => {
+                    // Sort by file name
+                    const blobId = element.getBlob();
+                    return blobId
+                        ? quip.apps.getBlobById(blobId).filename()
+                        : "";
+                };
+            case COLUMN_TYPE.STATUS:
+                return (element, column) => {
+                    // Sort by status text
+                    const id = element.getStatus();
+                    return id ? column.getStatusById(id).getText() : "";
+                };
+            case COLUMN_TYPE.PERSON:
+                return element => {
+                    // Sort by first user's full name
+                    const users = element.getUsers();
+                    return users.length ? users[0].getName() : "";
+                };
+            default:
+                return element => element;
+        }
+    };
+
+    onColumnSort_ = (id, isAscending) => {
+        const column = quip.apps.getRecordById(id);
+        const rows = column.getParentRecord().getRows();
+        const getElement = this.getElementFn_(column);
+        rows.sort((a, b) => {
+            const elementA = getElement(a.getCell(column), column);
+            const elementB = getElement(b.getCell(column), column);
+            if (elementA > elementB) {
+                return isAscending ? 1 : -1;
+            }
+            if (elementA < elementB) {
+                return isAscending ? -1 : 1;
+            }
+            return 0;
+        });
+        const recordRows = this.props.record.get("rows");
+        rows.forEach((row, i) => {
+            recordRows.move(row, i);
+        });
+    };
+
     render() {
         const {record} = this.props;
-        const {rows, columns, statusTypes} = toJSON(record);
+        const {rows, columns} = toJSON(record);
         const {widths, heights} = this.state;
 
         return <TableView
             ref={node => record.setDom(ReactDOM.findDOMNode(node))}
-            customRenderer={DefaultCardRenderer(statusTypes)}
+            customRenderer={DefaultCardRenderer()}
             columns={columns}
             rows={rows}
             heights={heights}
@@ -206,6 +259,7 @@ class Root extends React.Component {
             onColumnDrop={this.onColumnDrop_}
             onColumnAdd={this.onColumnAdd_}
             onColumnDelete={this.onColumnDelete_}
+            onColumnSort={this.onColumnSort_}
             onRowDrop={this.onRowDrop_}
             onRowDelete={this.onRowDelete_}
             onResizeEnd={this.onResizeEnd_}
@@ -232,6 +286,33 @@ quip.apps.initialize({
 
         if (isCreation) {
             rootRecord.seed();
+        } else {
+            if (rootRecord.getDataVersion() < RootRecord.DATA_VERSION) {
+                // Migrate data to new format
+                const columns = rootRecord.getColumns();
+                const statusTypes = rootRecord.get("statusTypes").getRecords();
+                /** @private {Map<string, string>} */
+                const migrationMap = new Map();
+                columns.forEach(function(col) {
+                    if (col.getType() == "status") {
+                        let record;
+                        statusTypes.forEach(function(status) {
+                            record = col.addStatusType(
+                                status.getText(),
+                                status.getColor());
+                            migrationMap.set(status.getId(), record.getId());
+                        });
+                        const cells = col.getCells();
+                        cells.forEach(function(cell) {
+                            const status = cell.getStatus();
+                            if (status) {
+                                cell.setStatus(migrationMap.get(status));
+                            }
+                        });
+                    }
+                });
+                rootRecord.setDataVersion(RootRecord.DATA_VERSION);
+            }
         }
 
         const Connected = connectEntity(rootRecord, Root, {
@@ -246,6 +327,16 @@ quip.apps.initialize({
     },
     toolbarCommandIds: ["addRow"],
     menuCommands: [
+        {
+            id: "sortAscending",
+            label: quiptext("Sort Ascending"),
+            handler: (name, context) => context[name](),
+        },
+        {
+            id: "sortDescending",
+            label: quiptext("Sort Descending"),
+            handler: (name, context) => context[name](),
+        },
         {
             id: "addColumn",
             label: quiptext("Add Column"),

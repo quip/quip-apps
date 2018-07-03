@@ -1,9 +1,7 @@
 // Copyright 2017 Quip
 
-import {getRecordComponent, getRecordPickerComponent} from "./root.jsx";
-import {AUTH_CONFIG_NAMES} from "./config.js";
+import {getRecordComponent, getRootComponent} from "./root.jsx";
 import {BaseMenu} from "../../shared/base-field-builder/base-menu.js";
-import {MismatchedInstanceError} from "./client";
 
 let selectedFieldEntity;
 let isLogoutInProgress_ = false;
@@ -11,7 +9,7 @@ let isLogoutInProgress_ = false;
 export class FieldBuilderMenu extends BaseMenu {
     allMenuCommands() {
         const wrapHandlerWithLogin = (menuCommand, handler) => () =>
-            getRecordPickerComponent()
+            getRootComponent()
                 .ensureLoggedIn(menuCommand)
                 .then(handler)
                 .catch(err => {
@@ -88,15 +86,6 @@ export class FieldBuilderMenu extends BaseMenu {
         selectedFieldEntity = fieldEntity;
         const commands = ["revert-changes"];
         quip.apps.showContextMenuFromButton(button, commands);
-    }
-
-    showRecordPickerContextMenu(e, button, commands, onDismiss) {
-        quip.apps.showContextMenuFromButton(
-            button,
-            commands,
-            [],
-            [],
-            onDismiss);
     }
 
     getDisabledCommands_() {
@@ -260,8 +249,7 @@ export class FieldBuilderMenu extends BaseMenu {
             commands["login"] = {
                 id: "login",
                 label: quiptext("Log In"),
-                handler: () =>
-                    getRecordPickerComponent().ensureLoggedIn("login"),
+                handler: () => getRootComponent().ensureLoggedIn("login"),
             };
         }
         return commands;
@@ -320,8 +308,7 @@ export class FieldBuilderMenu extends BaseMenu {
     }
 
     changeRecord_() {
-        getRecordPickerComponent().restoreToDefaultState();
-        getRecordPickerComponent().fetchData();
+        getRootComponent().changeRecord();
         quip.apps
             .getRootEntity()
             .getSelectedRecord()

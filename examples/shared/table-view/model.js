@@ -2,6 +2,7 @@
 
 import ListenerRecord from "./lib/listenerRecord";
 import {PropTypes} from "react";
+const colors = quip.apps.ui.ColorMap;
 
 export const COLUMN_TYPE = {
     PERSON: "person",
@@ -61,6 +62,7 @@ export class ColumnRecord extends ListenerRecord {
         draggable: "boolean",
         titleEditable: "boolean",
         deletable: "boolean",
+        statusTypes: quip.apps.RecordList.Type(StatusTypeRecord),
     });
 
     static getDefaultProperties = () => ({
@@ -68,6 +70,7 @@ export class ColumnRecord extends ListenerRecord {
         draggable: true,
         titleEditable: true,
         deletable: true,
+        statusTypes: [],
     });
 
     toJSON() {
@@ -79,7 +82,42 @@ export class ColumnRecord extends ListenerRecord {
             draggable: this.isDraggable(),
             titleEditable: this.isTitleEditable(),
             deletable: this.isDeletable(),
+            statusTypes: this.getStatusTypes(),
         };
+    }
+
+    seed() {
+        this.addStatusType(quiptext("Upcoming"), colors.BLUE);
+        this.addStatusType(quiptext("In Progress"), colors.YELLOW);
+        this.addStatusType(quiptext("Complete"), colors.GREEN);
+    }
+
+    removeStatusType(id) {
+        this.getStatusById(id).delete();
+    }
+
+    changeStatusText(id, text) {
+        this.getStatusById(id).set("text", text);
+    }
+
+    changeStatusColor(id, color) {
+        this.getStatusById(id).set("color", color);
+    }
+
+    addStatusType(text, color) {
+        return this.get("statusTypes").add({text, color});
+    }
+
+    getStatusTypes() {
+        return this.get("statusTypes");
+    }
+
+    getStatuses() {
+        return this.get("statusTypes").getRecords();
+    }
+
+    getStatusById(id) {
+        return this.getStatuses().find(s => s.getId() === id);
     }
 
     getContents() {
@@ -215,7 +253,20 @@ export class PersonRecord extends CellRecord {
     });
 
     addUser(user) {
-        this.get("users").add({user: user.getId()});
+        if (!quip.apps.getUserById(user.id())) {
+            quip.apps.addWhitelistedUser(user.getId());
+            const callback = () => {
+                this.get("users").add({user: user.getId()});
+                quip.apps.removeEventListener(
+                    quip.apps.EventType.WHITELISTED_USERS_LOADED,
+                    callback);
+            };
+            quip.apps.addEventListener(
+                quip.apps.EventType.WHITELISTED_USERS_LOADED,
+                callback);
+        } else {
+            this.get("users").add({user: user.getId()});
+        }
     }
 
     removeUser(user) {
@@ -244,6 +295,10 @@ export class StatusRecord extends CellRecord {
 
     setStatus(id) {
         this.set("currentStatusId", id);
+    }
+
+    getColumnId() {
+        return this.get("columnId");
     }
 
     getStatus() {

@@ -22,11 +22,11 @@ import {
 } from "./error.js";
 
 import {COLUMN_TYPE, toJSON} from "../table-view/model.js";
-import {CommentVisibilityToggle} from "../table-view/lib/comment-component.jsx";
+import {CommentToggle} from "../table-view/lib/comment-component.jsx";
 import {DateField, EnumField, TokenField} from "./field.jsx";
 import {DateFieldEntity} from "./model/field.js";
 import {RecordEntity} from "./model/record.js";
-import {Y_BORDER} from "../table-view/Card.js";
+import {Y_BORDER} from "../table-view/card.jsx";
 
 import {
     getHeights,
@@ -48,7 +48,6 @@ const LOADING_STATUS = {
 };
 
 const CELL_OPTIONS_SPACING = 45;
-const COMMENT_TRIGGER_HEIGHT = 13;
 const DRAFT_HEIGHT = 20;
 const LINE_HEIGHT = 17;
 
@@ -561,7 +560,8 @@ export default class RecordList extends React.Component {
         rootHeight,
         setRowHeight,
         cardFocused,
-        onCardFocused) => {
+        onCardFocused,
+        onCardBlurred) => {
         if (this.state.loadingStatus !== LOADING_STATUS.LOADED) {
             // Displays an empty cell as contents are loading.
             return <div>{isFirstColumn && "Loading…"}</div>;
@@ -571,27 +571,15 @@ export default class RecordList extends React.Component {
         const entity = quip.apps.getRecordById(cell.id);
         let draft;
         let draftBadge;
-
-        const commentsTriggerStyle = {
-            alignSelf: "flex-start",
-            position: "relative",
-            top: (rowHeight - Y_BORDER * 2 - COMMENT_TRIGGER_HEIGHT) / 2,
+        const displayStyleFn = showCommentIcon => {
+            return {"display": showCommentIcon ? "block" : "none"};
         };
-
-        const commentsTrigger = <CommentVisibilityToggle
+        const commentsTrigger = <CommentToggle
             record={entity}
-            showComments={showComments}>
-            <span
-                style={cardFocused ? commentsTriggerStyle : undefined}
-                onClick={e => e.stopPropagation()}>
-                <quip.apps.ui.CommentsTrigger
-                    className={cx(Card.commentsTrigger, {
-                        [Card.firstColumnComment]: isFirstColumn,
-                    })}
-                    record={entity}
-                    showEmpty/>
-            </span>
-        </CommentVisibilityToggle>;
+            showComments={showComments}
+            rowHeight={rowHeight}
+            isFirstColumn={isFirstColumn}
+            displayStyleFn={displayStyleFn}/>;
 
         if (cell.contents.key !== "key" && entity.isDirty()) {
             const draftStyle = {
@@ -647,7 +635,6 @@ export default class RecordList extends React.Component {
                         wrapper: {margin: "0px"},
                     };
                     errorPopover = <Modal
-                        isOpen={true}
                         onRequestClose={() => {}}
                         rootHeight={0}
                         style={modalStyle}
@@ -721,8 +708,8 @@ export default class RecordList extends React.Component {
                     <quip.apps.ui.RichTextBox
                         minHeight={LINE_HEIGHT}
                         maxHeight={cardFocused ? undefined : LINE_HEIGHT * 2}
-                        onFocus={() => onCardFocused(true)}
-                        onBlur={() => onCardFocused(false)}
+                        onFocus={onCardFocused}
+                        onBlur={onCardBlurred}
                         readOnly={entity.isReadOnly()}
                         ref={node =>
                             (entity.domNode = ReactDOM.findDOMNode(node))
@@ -863,7 +850,6 @@ export default class RecordList extends React.Component {
                     wrapper: {margin: "0px"},
                 };
                 errorPopover = <Modal
-                    isOpen={true}
                     onRequestClose={() => {}}
                     rootHeight={0}
                     style={modalStyle}

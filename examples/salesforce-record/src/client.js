@@ -16,8 +16,6 @@ import {
 const OBJECT_INFO_ENDPOINT = "ui-api/object-info";
 
 const RECORDS_ENDPOINT = "ui-api/records";
-const RECORDS_BATCH_ENDPOINT = "ui-api/records/batch";
-const RECORDS_SINGLE_ENDPOINT = "ui-api/records";
 
 const SOQL_ENDPOINT = "query";
 
@@ -112,79 +110,43 @@ export class SalesforceClient {
         );
     }
 
-    fetchListViews(recordType, fetchType = "recent") {
-        if (fetchType) {
-            let query;
-            switch (fetchType) {
-                case "recent":
-                    query =
-                        `SELECT name,id,developerName FROM ListView where sobjecttype` +
-                        `=\'${recordType}\' AND LastViewedDate != NULL ORDER BY ` +
-                        `LastViewedDate DESC limit 10`;
-                    break;
-                case "all":
-                    query =
-                        `SELECT name,id,developerName FROM ListView where sobjecttype` +
-                        `=\'${recordType}\'`;
-                    break;
-                default:
-                    break;
-            }
-            if (query) {
-                return this.fetchSoqlQuery(query);
-            }
-        }
-        return Promise.reject(
-            new TypeNotSupportedError(
-                "The fetchType is not supported",
-                null,
-                fetchType));
+    fetchListViews(recordType) {
+        const query =
+            `SELECT name,id,developerName FROM ListView where sobjecttype` +
+            `=\'${recordType}\' AND LastViewedDate != NULL ORDER BY ` +
+            `LastViewedDate DESC limit 10`;
+        return this.fetchSoqlQuery(query);
     }
 
     fetchApiLink(link) {
         const url = `${this.instanceUrl_}/${API_VERSION}/${link}`;
-        return this.request("GET", url);
+        return this.request_("GET", url);
     }
 
     fetchPicklistOptions(recordType, recordTypeId, fieldName) {
         const url = `${
             this.apiUrl_
         }/${OBJECT_INFO_ENDPOINT}/${recordType}/picklist-values/${recordTypeId}/${fieldName}`;
-        return this.request("GET", url);
+        return this.request_("GET", url);
     }
 
     fetchSoqlQuery(query) {
         const params = {q: query};
         const soqlUrl = `${this.apiUrl_}/${SOQL_ENDPOINT}/`;
-        return this.request("GET", soqlUrl, params);
+        return this.request_("GET", soqlUrl, params);
     }
 
     fetchObjectInfo(recordType) {
         const objectInfoUrl = `${
             this.apiUrl_
         }/${OBJECT_INFO_ENDPOINT}/${recordType}`;
-        return this.request("GET", objectInfoUrl);
+        return this.request_("GET", objectInfoUrl);
     }
 
     fetchRecord(recordId) {
         const params = {layoutTypes: "Full"};
-        const recordsUrl = `${
-            this.apiUrl_
-        }/${RECORDS_SINGLE_ENDPOINT}/${recordId}`;
-        return this.request("GET", recordsUrl, params);
-    }
-
-    fetchRecords(recordIds) {
-        const params = {layoutTypes: "Full"};
-        const recordsUrl = `${
-            this.apiUrl_
-        }/${RECORDS_BATCH_ENDPOINT}/${recordIds.join(",")}`;
-        return this.request("GET", recordsUrl, params);
-    }
-
-    fetchRelatedLists(recordType) {
-        const url = `${this.apiUrl_}/sobjects/${recordType}/describe/layouts`;
-        return this.request("GET", url);
+        const recordsUrl = `${this.apiUrl_}/${RECORDS_ENDPOINT}/${recordId}`;
+        return this.request_("GET", recordsUrl, params);
     }
 
     toQueryString(params) {
@@ -199,10 +161,10 @@ export class SalesforceClient {
 
     updateRecord(recordId, body = {}) {
         const url = `${this.apiUrl_}/${RECORDS_ENDPOINT}/${recordId}`;
-        return this.request("PATCH", url, body);
+        return this.request_("PATCH", url, body);
     }
 
-    request(fetchMethod, baseUrl, data = {}, tryRefreshToken = true) {
+    request_(fetchMethod, baseUrl, data = {}, tryRefreshToken = true) {
         const method = fetchMethod.trim().toUpperCase();
         let url = baseUrl;
         let body;
@@ -252,7 +214,7 @@ export class SalesforceClient {
                 if (response.status == 401 && tryRefreshToken) {
                     // refetch the endpoint after refresh
                     return this.refreshToken_().then(response =>
-                        this.request(fetchMethod, baseUrl, data, false)
+                        this.request_(fetchMethod, baseUrl, data, false)
                     );
                 }
                 if (response.status >= 400) {

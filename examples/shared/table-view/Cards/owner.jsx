@@ -1,8 +1,8 @@
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import Plus from "../lib/components/icons/Plus";
 import OwnerTooltip from "./OwnerTooltip";
-import OwnerPicker from "./OwnerPicker";
-import {PersonRecord} from "../model";
+import OwnerPicker from "./owner-picker.jsx";
+import {PersonRecord, TextRecord, COMMENT_TRIGGER_MAKEUP} from "../model";
 import Modal from "../lib/components/Modal";
 import styles from "./Owner.less";
 const {ProfilePicture} = quip.apps.ui;
@@ -10,24 +10,24 @@ const {ProfilePicture} = quip.apps.ui;
 const PROFILE_SIZE = 30;
 const PROFILE_OVERLAP = 12;
 
-class Owner extends Component {
+class Owner extends PureComponent {
     static propTypes = {
         availableWidth: React.PropTypes.number.isRequired,
-        paddingLeft: React.PropTypes.number.isRequired,
-        paddingRight: React.PropTypes.number.isRequired,
         rowHeight: React.PropTypes.number.isRequired,
-        rootHeight: React.PropTypes.number.isRequired,
         record: React.PropTypes.instanceOf(PersonRecord),
-        projectName: React.PropTypes.string.isRequired,
+        projectRecord: React.PropTypes.instanceOf(TextRecord),
         metricType: React.PropTypes.string,
+        showComments: React.PropTypes.bool.isRequired,
     };
     constructor(props) {
         super(props);
+        this.owners_ = props.record.getUsers();
         this.state = {
             members: [],
             plusNumberWidth: 0,
             showPicker: false,
             toolTipData: null,
+            hasComments: props.record.getCommentCount() > 0,
         };
     }
 
@@ -39,6 +39,7 @@ class Owner extends Component {
         quip.apps.addEventListener(
             quip.apps.EventType.WHITELISTED_USERS_LOADED,
             this.whitelistedUsersLoaded);
+        this.props.record.listenToComments(this.updateHasComments);
     }
 
     componentWillUnmount() {
@@ -48,10 +49,43 @@ class Owner extends Component {
         quip.apps.removeEventListener(
             quip.apps.EventType.WHITELISTED_USERS_LOADED,
             this.whitelistedUsersLoaded);
+        this.props.record.unlisten(this.update_);
+        this.props.record.get("users").unlisten(this.update_);
+        this.props.record.unlistenToComments(this.updateHasComments);
     }
 
+    componentWillMount() {
+        this.props.record.listen(this.update_);
+        this.props.record.get("users").listen(this.update_);
+    }
+
+    updateHasComments = () => {
+        if (!quip.apps.isMobile()) {
+            const hasComments = this.props.record.getCommentCount() > 0;
+            if (hasComments != this.state.hasComments) {
+                this.setState({hasComments: hasComments});
+            }
+        }
+    };
+
+    update_ = () => {
+        const owners = this.props.record.getUsers();
+        if (owners.length != this.owners_.length) {
+            this.owners_ = owners;
+            this.forceUpdate();
+        }
+
+        for (let i = 0; i < owners.length; i++) {
+            if (owners[i] !== this.owners_[i]) {
+                this.owners_ = owners;
+                this.forceUpdate();
+                return;
+            }
+        }
+    };
+
     whitelistedUsersLoaded = () => {
-        this.forceUpdate();
+        this.update_();
     };
 
     setMembers = () => {
@@ -72,14 +106,21 @@ class Owner extends Component {
         const {
             record,
             rowHeight,
-            rootHeight,
-            projectName,
+            projectRecord,
             availableWidth,
-            paddingLeft,
-            paddingRight,
+            showComments,
         } = this.props;
-        const {showPicker, members, toolTipData, plusNumberWidth} = this.state;
-        const owners = record.getUsers();
+        const {
+            showPicker,
+            members,
+            toolTipData,
+            plusNumberWidth,
+            hasComments,
+        } = this.state;
+        const showCommentsIcon = showComments || hasComments;
+        const paddingLeft = showCommentsIcon ? COMMENT_TRIGGER_MAKEUP : 0;
+        const paddingRight = 0;
+        const owners = this.owners_;
         const pickerModalStyle = {
             content: {
                 width: 230,
@@ -105,6 +146,38 @@ class Owner extends Component {
                     plusNumberWidth -
                     commentWidth) /
                     (PROFILE_SIZE - PROFILE_OVERLAP)) + 1;
+
+        let pickerModal;
+        if (showPicker) {
+            pickerModal = <Modal
+                style={pickerModalStyle}
+                onRequestClose={this.hidePicker}
+                topOffset={rowHeight / 2 + 20}
+                onBlur={this.hidePicker}
+                wrapperRef={this.wrapper}>
+                <OwnerPicker
+                    record={record}
+                    owners={owners}
+                    members={members}
+                    projectRecord={projectRecord}
+                    metricType={this.props.metricType}/>
+            </Modal>;
+        }
+
+        let tooltipModal;
+        if (!showPicker && toolTipData) {
+            tooltipModal = <Modal
+                style={tooltipModalStyle}
+                onRequestClose={this.hidePicker}
+                topOffset={rowHeight / 2 + 10}
+                wrapperRef={this.wrapper}>
+                <OwnerTooltip
+                    onMouseEnter={() => this.showToolTip(toolTipData)}
+                    onMouseLeave={this.hideToolTip}
+                    user={toolTipData}/>
+            </Modal>;
+        }
+
         return <div
             ref={el => (this.wrapper = el)}
             className={styles.wrapper}
@@ -148,33 +221,8 @@ class Owner extends Component {
                     className={styles.emptyOwners}>
                     <Plus size={18}/>
                 </div>}
-            <Modal
-                style={pickerModalStyle}
-                onRequestClose={this.hidePicker}
-                rootHeight={rootHeight}
-                topOffset={rowHeight / 2 + 20}
-                isOpen={showPicker}
-                onBlur={this.hidePicker}
-                wrapperRef={this.wrapper}>
-                <OwnerPicker
-                    record={record}
-                    owners={owners}
-                    members={members}
-                    projectName={projectName}
-                    metricType={this.props.metricType}/>
-            </Modal>
-            <Modal
-                style={tooltipModalStyle}
-                onRequestClose={this.hidePicker}
-                rootHeight={rootHeight}
-                topOffset={rowHeight / 2 + 10}
-                isOpen={toolTipData && !showPicker}
-                wrapperRef={this.wrapper}>
-                <OwnerTooltip
-                    onMouseEnter={() => this.showToolTip(toolTipData)}
-                    onMouseLeave={this.hideToolTip}
-                    user={toolTipData}/>
-            </Modal>
+            {pickerModal}
+            {tooltipModal}
         </div>;
     }
 }

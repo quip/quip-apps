@@ -15,10 +15,6 @@ export class BaseMenu {
         throw Error("Unimplemented abstract method.");
     }
 
-    showRecordPickerContextMenu(e, button, commands, onDismiss) {
-        throw Error("Unimplemented abstract method.");
-    }
-
     refreshToolbar() {
         throw Error("Unimplemented abstract method.");
     }

@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import cx from "classnames";
-import {PersonRecord} from "../model";
+import {PersonRecord, TextRecord} from "../model";
 import {X} from "reline";
 import styles from "./OwnerPicker.less";
 const {ProfilePicture} = quip.apps.ui;
@@ -10,7 +10,7 @@ class OwnerPicker extends Component {
         record: React.PropTypes.instanceOf(PersonRecord).isRequired,
         owners: React.PropTypes.arrayOf(
             React.PropTypes.instanceOf(PersonRecord)).isRequired,
-        projectName: React.PropTypes.string.isRequired,
+        projectRecord: React.PropTypes.instanceOf(TextRecord).isRequired,
         metricType: React.PropTypes.string,
     };
     constructor(props) {
@@ -114,11 +114,13 @@ class OwnerPicker extends Component {
                 });
             }
             this.setState({inputText: "", autoComplete: [], focusedIndex: 0});
-            quip.apps.addWhitelistedUser(user.getId());
+            const projectName = this.props.projectRecord
+                .get("contents")
+                .getTextContent();
             quip.apps.sendMessage(
                 quiptext("Added %(person)s to %(project)s", {
                     "person": "{0}",
-                    "project": this.props.projectName,
+                    "project": projectName,
                 }),
                 [user.getId()]);
         }
