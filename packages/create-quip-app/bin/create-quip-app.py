@@ -163,6 +163,12 @@ def is_enumerated_path(manifest, path):
     if old_resources:
         logging.error("Please rename 'resources' to 'other_resources'.")
     resource_patterns = old_resources + manifest.get("other_resources", [])
+    toolbar_icon = manifest.get("toolbar_icon")
+    if toolbar_icon:
+        resource_patterns.append(toolbar_icon)
+    thumbnail = manifest.get("thumbnail")
+    if thumbnail:
+        resource_patterns.append(thumbnail)
     js_filenames = set(manifest.get("js_files", []))
     css_filenames = set(manifest.get("css_files", []))
 
