@@ -10,7 +10,8 @@
     "initial_height": 116,
     "initial_width": 400,
     "toolbar_color": "yellow",
-    "toolbar_icon": "countdown",
+    "toolbar_icon": "icons/toolbar.svg",
+    "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"]
 }

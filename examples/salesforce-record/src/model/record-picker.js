@@ -52,7 +52,6 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     setClient(client) {
         this.salesforceClient_ = client;
-        this.setInstanceUrl(client.getInstanceUrl());
     }
 
     getClient() {
@@ -84,9 +83,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
 
     ensureLoggedIn() {
         const client = this.getClient();
-        return client
-            .ensureLoggedIn()
-            .then(() => this.setInstanceUrl(client.getInstanceUrl()));
+        return client.ensureLoggedIn();
     }
 
     logout() {
@@ -357,10 +354,6 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.get("instanceUrl");
     }
 
-    setInstanceUrl(instanceUrl) {
-        return this.set("instanceUrl", instanceUrl);
-    }
-
     getListViewsForType(recordType) {
         return Object.values(this.pickerData[recordType].listViewsData);
     }
@@ -391,6 +384,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             recordTypes[recordType].ownerId = ownerId;
         }
         this.setRecordTypes(recordTypes);
+        this.set("instanceUrl", this.getClient().getInstanceUrl());
         this.set("selectedRecord", {
             recordId: recordId,
             ownerId: ownerId,
@@ -408,6 +402,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         if (this.getSelectedRecord()) {
             this.getSelectedRecord().clear();
         }
+        this.clear("instanceUrl");
         this.clear("selectedRecord");
     }
 
