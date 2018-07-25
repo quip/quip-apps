@@ -1,0 +1,41 @@
+.inputCheckContainer {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    align-self: center;
+    vertical-align: middle;
+
+    &.selected {
+        border: none;
+    }
+}
+
+.checkmark {
+    fill: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes scale {
+    0%,
+    100% {
+        transform: none;
+    }
+    50% {
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
