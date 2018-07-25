@@ -6,7 +6,7 @@ import quip from "quip";
 import {localizedColorLabel} from "quip-apps-compat";
 
 import Connect from "./connectRecord";
-import registerModels from "./model";
+import registerModels, {login, logout} from "./model";
 
 import App from "./components/App.jsx";
 
@@ -15,10 +15,27 @@ registerModels();
 let selectedRowIds = [];
 export function setSelectedRowIds(rowIds) {
     selectedRowIds = rowIds;
-    let toolbarCommandIds = ["addRow"];
+    updateToolbar();
+}
+
+function getToolbarCommandIds() {
+    let toolbarCommandIds = [];
+    const hasToken = !!quip.apps.getUserPreferences().getForKey("token");
+    toolbarCommandIds.push(hasToken ? "logout" : "login");
+
+    if (!hasToken) {
+        return toolbarCommandIds;
+    }
+
+    toolbarCommandIds.push("addRow");
     if (selectedRowIds.length) {
         toolbarCommandIds.push("deleteRow");
     }
+    return toolbarCommandIds;
+}
+
+export function updateToolbar() {
+    const toolbarCommandIds = getToolbarCommandIds();
     quip.apps.updateToolbar({toolbarCommandIds});
 }
 
@@ -28,6 +45,7 @@ quip.apps.initialize({
         if (isCreation) {
             rootRecord.seed();
         }
+        updateToolbar();
 
         const ConnectedApp = Connect(rootRecord, App);
         ReactDOM.render(<ConnectedApp />, rootNode);
@@ -48,6 +66,22 @@ quip.apps.initialize({
                 quip.apps.getRootRecord().deleteRows(selectedRowIds);
             },
         },
+        {
+            id: "login",
+            label: quiptext("Login"),
+            handler: () => {
+                console.log("login");
+                login();
+            },
+        },
+        {
+            id: "logout",
+            label: quiptext("Logout"),
+            handler: () => {
+                console.log("logout");
+                logout();
+            },
+        },
     ],
-    toolbarCommandIds: ["addRow"],
+    toolbarCommandIds: [],
 });

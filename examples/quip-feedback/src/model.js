@@ -3,6 +3,7 @@
 import quip from "quip";
 
 import ListenerRecord from "./listenerRecord";
+import {updateToolbar} from "./root.jsx";
 
 const defaultRowText = index =>
     `Row${typeof index === "number" ? ` ${index + 1}` : ""}`;
@@ -109,7 +110,7 @@ export function login() {
             const token = auth.getTokenResponse();
             let prefs = quip.apps.getUserPreferences();
             prefs.save({token});
-            console.log("LOGIN!", token);
+            updateToolbar();
         },
         error => {
             console.error("ERROR", error);
@@ -123,7 +124,8 @@ export function logout() {
         () => {
             let prefs = quip.apps.getUserPreferences();
             prefs.save({token: null});
-            this.forceUpdate();
+
+            updateToolbar();
         },
         error => {
             this.setState({error});

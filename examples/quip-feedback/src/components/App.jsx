@@ -18,8 +18,22 @@ export default class App extends React.Component {
     constructor(props) {
         super();
         this.state = {
+            isLoggedIn: false,
             selectedRowIds: [],
         };
+    }
+
+    componentDidMount() {
+        quip.apps.addEventListener(
+            quip.apps.EventType.USER_PREFERENCE_UPDATE,
+            () => {
+                this.setState({
+                    isLoggedIn: !!quip.apps
+                        .getUserPreferences()
+                        .getForKey("token"),
+                });
+            }
+        );
     }
 
     deleteRow = ({row}) => {
@@ -44,6 +58,7 @@ export default class App extends React.Component {
 
     render() {
         const {rows, rootRecord} = this.props;
+        const {isLoggedIn} = this.state;
 
         return (
             <div className={Styles.app}>
@@ -55,6 +70,7 @@ export default class App extends React.Component {
                         .map((row, i, records) => (
                             <Row
                                 key={row.getId()}
+                                isLoggedIn={isLoggedIn}
                                 record={row}
                                 selected={this.isSelectedRow(row.getId())}
                                 setRowSelected={this.setRowSelected}

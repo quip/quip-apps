@@ -24,6 +24,7 @@ const TEMPLATE_THREAD_ID = "IrdIAvWi0VAp";
 
 export default class Row extends React.Component {
     static propTypes = {
+        isLoggedIn: React.PropTypes.bool.isRequired,
         record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,
     };
 
@@ -36,10 +37,9 @@ export default class Row extends React.Component {
     }
 
     componentDidMount = async () => {
-        const {record} = this.props;
+        const {isLoggedIn, record} = this.props;
         const threadId = record.get("thread_id");
-        const token = quip.apps.getUserPreferences().getForKey("token");
-        if (token && threadId) {
+        if (isLoggedIn && threadId) {
             this.updateThreadProperties(threadId);
         }
     };
@@ -167,7 +167,7 @@ export default class Row extends React.Component {
     };
 
     render() {
-        const {record, selected, setRowSelected} = this.props;
+        const {isLoggedIn, record, selected, setRowSelected} = this.props;
         const {loading} = this.state;
         const threadId = record.get("thread_id");
         const threadTitle = record.get("thread_title");
@@ -199,7 +199,7 @@ export default class Row extends React.Component {
                 ) : (
                     <div className={Styles.button}>
                         <button
-                            disabled={loading}
+                            disabled={loading || !isLoggedIn}
                             onClick={this.onClickGetFeedbackButton}>
                             {loading ? "Loading ..." : "Get feedback!"}
                         </button>
