@@ -18,7 +18,7 @@ export default class App extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            isLoggedIn: false,
+            isLoggedIn: !!quip.apps.getUserPreferences().getForKey("token"),
             selectedRowIds: [],
         };
     }

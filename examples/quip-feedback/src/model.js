@@ -18,7 +18,7 @@ class Root extends quip.apps.RootRecord {
     });
 
     static getDefaultProperties = () => ({
-        rows: [...Array(3)].map((__, index) => Row.getDefaultProperties(index)),
+        rows: [...Array(1)].map((__, index) => Row.getDefaultProperties(index)),
     });
 
     supportsComments() {

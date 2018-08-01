@@ -117,15 +117,18 @@ export default class Row extends React.Component {
             return;
         }
         const link = this.refs["person"].querySelector("a.content");
+        if (!link) {
+            console.error("no content in RTB");
+            return;
+        }
         const atMentionId = link.getAttribute("data-id");
         console.log({link, atMentionId});
         if (!atMentionId) {
-            alert("please @mention a user or a thread");
+            console.error("please @mention a user or a thread");
             return;
         }
         const isAThread =
             link.getAttribute("data-click") === "control-document";
-        console.log("YO", link.getAttribute("data-click"));
         if (isAThread) {
             const threadId = link.getAttribute("href").replace("/", "");
             console.log("isAThread!", threadId);
@@ -174,6 +177,36 @@ export default class Row extends React.Component {
         const threadCreatedUsec = record.get("thread_created_usec");
         const threadUpdatedUsec = record.get("thread_updated_usec");
         const dateFormat = "MM/DD/YYYY h:mma";
+
+        let content;
+        if (threadId) {
+            content = (
+                <div className={Styles.document}>
+                    <a href={`/${threadId}`} onClick={this.onClickThreadTitle}>
+                        {threadTitle}
+                    </a>
+                </div>
+            );
+        } else if (loading) {
+            content = (
+                <div className={Styles.document}>
+                    <span>Loading ...</span>
+                </div>
+            );
+        } else if (isLoggedIn) {
+            content = (
+                <div className={Styles.button}>
+                    <button
+                        disabled={!isLoggedIn}
+                        onClick={this.onClickGetFeedbackButton}>
+                        Get feedback!
+                    </button>
+                </div>
+            );
+        } else {
+            content = <div className={Styles.document}>^^ Login first ^^</div>;
+        }
+
         return (
             <div className={Styles.row}>
                 <div className={Styles.person} ref="person">
@@ -188,23 +221,7 @@ export default class Row extends React.Component {
                         ref="rtb"
                     />
                 </div>
-                {threadId ? (
-                    <div className={Styles.document}>
-                        <a
-                            href={`/${threadId}`}
-                            onClick={this.onClickThreadTitle}>
-                            {threadTitle}
-                        </a>
-                    </div>
-                ) : (
-                    <div className={Styles.button}>
-                        <button
-                            disabled={loading || !isLoggedIn}
-                            onClick={this.onClickGetFeedbackButton}>
-                            {loading ? "Loading ..." : "Get feedback!"}
-                        </button>
-                    </div>
-                )}
+                {content}
                 <div className={Styles.usec}>
                     {threadCreatedUsec
                         ? format(new Date(threadCreatedUsec / 1000), dateFormat)

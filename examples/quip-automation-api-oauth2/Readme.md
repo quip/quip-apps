@@ -1,4 +1,4 @@
-# Google Drive
+# Quip Automation API Auth example
 
 A simple demo for getting a Quip API token you can use in a proxy
 application to make requests using the Automation API

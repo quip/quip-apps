@@ -1,3 +1,3 @@
-# Poll
+# Quip Feedback
 
-Poll allows anyone on a document to vote on their favorite option or add a new one. This is a great example of using responsive sizing, commenting, posting messages to the activity log, offline support, rich text boxes, and using Quip user information.
+This is an app that calls out to external heroku server to copy a template and share with specific folks as specified.
