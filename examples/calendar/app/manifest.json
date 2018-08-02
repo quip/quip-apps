@@ -11,7 +11,7 @@
     "initial_width": 800,
     "initial_height": 403,
     "toolbar_color": "red",
-    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_icon": "calendar",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"]

@@ -123,3 +123,7 @@ export function formatNumber(value) {
 export function formatBoolean(value) {
     return value ? "True" : "False";
 }
+
+export function normalizeNewlines(str) {
+    return str.replace(/\r?\n|\r/g, "\n");
+}

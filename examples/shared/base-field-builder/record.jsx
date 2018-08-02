@@ -5,7 +5,6 @@ import {entityListener, arrayEqual} from "./utils.jsx";
 import ErrorPopover from "./error-popover.jsx";
 import Field from "./field.jsx";
 import FieldPicker from "./field-picker.jsx";
-import SearchIcon from "./icons/search.jsx";
 import Styles from "./record.less";
 import RecordEntity from "./model/record.js";
 import WarningIcon from "./icons/warning.jsx";
@@ -18,7 +17,6 @@ import {
 import {
     SortableContainer,
     SortableElement,
-    SortableHandle,
     arrayMove,
 } from "react-sortable-hoc";
 
@@ -453,7 +451,9 @@ class RecordHeader extends React.Component {
                     onClick={this.onClick_}>
                     {this.props.entity.getHeaderName()}
                 </div>
-                <div className={Styles.type}>{this.props.entity.getType()}</div>
+                <div className={Styles.type}>
+                    {this.props.entity.getLabelSingular()}
+                </div>
             </div>
             {demoIndicator}
             {errorIndicator}

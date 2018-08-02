@@ -11,7 +11,7 @@
     "initial_width": 800,
     "disable_app_level_comments": true,
     "toolbar_color": "violet",
-    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_icon": "project_tracker",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"]

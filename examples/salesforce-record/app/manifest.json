@@ -9,7 +9,7 @@
     "sizing_mode": "fill_container",
     "initial_height": 200,
     "toolbar_color": "blue",
-    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_icon": "salesforce_logo",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"],

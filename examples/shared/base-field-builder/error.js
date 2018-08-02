@@ -21,25 +21,9 @@ export class DefaultError extends Error {
 }
 
 export class TypeNotSupportedError extends DefaultError {
-    constructor(message = "Type Not Supported", id, type) {
+    constructor(message = "Type Not Supported") {
         super(message);
         Object.setPrototypeOf(this, TypeNotSupportedError.prototype);
-        this.dataId_ = id;
-        this.dataType_ = type;
-    }
-
-    getMessage() {
-        return (
-            this.message_ + ". Id: " + this.dataId + " Type: " + this.dataType_
-        );
-    }
-
-    getId() {
-        return this.dataId_;
-    }
-
-    getType() {
-        return this.type_;
     }
 }
 
@@ -140,17 +124,13 @@ export class GatewayTimeoutError extends HttpError {
     }
 }
 
-/**
- * Returns whether an error is an instance of an Error class derived from
- * DefaultError, but not DefaultError itself. Error objects that were not
- * constructed from a class derived from DefaultError will also be falsey (e.g.
- * null, POJSOs, strings).
- * @param {?DefaultError|Error|Object|string} maybeError
- * @return {boolean}
- */
-export function isNonDefaultError(maybeError) {
-    return (
-        maybeError instanceof DefaultError &&
-        maybeError.constructor !== DefaultError
-    );
+export function getErrorMessage(maybeError) {
+    if (typeof maybeError === "string") {
+        return maybeError;
+    }
+    if (typeof maybeError.message === "string") {
+        return maybeError.message;
+    }
+
+    return JSON.toString(maybeError);
 }

@@ -88,6 +88,22 @@ export class FieldBuilderMenu extends BaseMenu {
         quip.apps.showContextMenuFromButton(button, commands);
     }
 
+    showSearchFieldContextMenu(e, elm, searchFields, selectFn) {
+        const select = apiName => {
+            quip.apps.updateToolbar(this.allMenuCommands());
+            selectFn(apiName);
+        };
+
+        const menuCommands = searchFields.map(f => ({
+            id: f.apiName,
+            label: f.label,
+            handler: () => selectFn(f.apiName),
+        }));
+
+        quip.apps.updateToolbar({menuCommands});
+        quip.apps.showContextMenuFromButton(elm, menuCommands.map(c => c.id));
+    }
+
     getDisabledCommands_() {
         const disabledCommands = [];
         const selectedRecord = quip.apps.getRootEntity().getSelectedRecord();

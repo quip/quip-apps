@@ -2,10 +2,15 @@
 
 import {unescapeHTML} from "./utils.jsx";
 import IntlPolyfill from "intl";
+import {TypeNotSupportedError} from "../../shared/base-field-builder/error.js";
 
 if (!global.Intl) {
     global.Intl = IntlPolyfill;
 }
+
+// TODO: Really this entire file belongs in /salesforce-record. Jira only uses
+// parseFieldsData to initialize its Placeholder data and parseFieldValue which
+// should be broken out into a util file.
 
 export function parsePicklistOptions(response) {
     if (response && response.values && response.values.length > 0) {
@@ -34,17 +39,16 @@ export function parseFieldsData(response, schema) {
         }
         if (schemaFields[key].dataType === "Reference") {
             const relationshipName = schemaFields[key].relationshipName;
-            if (relationshipName) {
-                if (!fields[relationshipName]) {
-                    continue;
-                }
+            const relatedField = fields[relationshipName];
+            if (!relatedField) {
+                continue;
             }
             fieldData = {
                 key: key,
                 value: fields[key].value || null,
                 displayValue:
-                    unescapeHTML(fields[relationshipName].displayValue) ||
-                    fields[relationshipName].value,
+                    unescapeHTML(relatedField.displayValue) ||
+                    relatedField.value,
             };
         } else {
             let value = fields[key].value
@@ -94,58 +98,88 @@ export function parseListViews(response, recordType) {
     }));
 }
 
-export function parseSchema(response) {
-    const keys = new Set([
-        "calculated",
-        "dataType",
-        // Extra type info is required for differentiating between
-        // TextArea types
-        "extraTypeInfo",
-        "label",
-        "length",
-        "precision",
-        "referenceToInfos",
-        "relationshipName",
-        "required",
-        "scale",
-        "updateable",
-    ]);
-    const schema = {};
-    schema.themeInfo = response.themeInfo;
-    const fields = {};
-    for (let fieldKey in response.fields) {
-        const field = {};
-        for (let metadataKey in response.fields[fieldKey]) {
-            if (keys.has(metadataKey)) {
-                field[metadataKey] =
-                    response.fields[fieldKey][metadataKey] || null;
-            }
+export function parseSchema(
+    schema,
+    fullLayoutFields,
+    fieldSupportedFn,
+    nameFieldSupportedFn) {
+    // Filter nameFields to supported dataTypes
+    schema.nameFields = schema.nameFields.filter(f =>
+        nameFieldSupportedFn(schema.fields[f])
+    );
+    if (schema.nameFields.length === 0) {
+        throw new TypeNotSupportedError(
+            `In order for the ${schema.label} object to be used, it must ` +
+                `have at least one "name" field with a supported type.`);
+    }
+
+    schema.hasLastViewedDate =
+        "LastViewedDate" in schema.fields &&
+        schema.fields["LastViewedDate"].dataType == "DateTime";
+
+    const fieldSet = new Set(fullLayoutFields);
+
+    // Note which name fields aren't included in the full layout and must be
+    // fetched optionally.
+    schema.extraFields = schema.nameFields.filter(f => {
+        if (fieldSet.has(f)) {
+            return false;
         }
-        fields[fieldKey] = field;
-    }
-    schema.fields = fields;
-    if (response.defaultRecordTypeId) {
-        schema.recordTypeId = response.defaultRecordTypeId;
-    } else {
-        schema.recordTypeId = Object.keys(response.recordTypeInfos)[0];
-    }
+        fieldSet.add(f);
+        return true;
+    });
+
+    schema.unsupportedFields = Object.values(schema.fields)
+        .filter(f => fieldSet.has(f.apiName) && !fieldSupportedFn(f))
+        .reduce((fields, f) => {
+            fields[f.apiName] = f;
+            return fields;
+        }, {});
+
+    // Filter fields to those in fullLayout or name fields which will be fetched
+    // fetched optionally -- with a supported dataType.
+    schema.fields = Object.values(schema.fields)
+        .filter(f => fieldSet.has(f.apiName) && fieldSupportedFn(f))
+        .reduce((fields, f) => {
+            fields[f.apiName] = f;
+            return fields;
+        }, {});
+
+    schema.recordTypeId = schema.defaultRecordTypeId
+        ? schema.defaultRecordTypeId
+        : Object.keys(schema.recordTypeInfos)[0];
 
     return schema;
 }
 
-export function parseSoqlRecords(response, getNameField) {
+export function parseSoqlRecords(response, nameField) {
     if (!response.records) {
         throw response;
     }
 
     return response.records.map(record => {
-        const recordType = record.attributes.type;
-        const nameField = getNameField(recordType);
         return {
             name: record[nameField],
             id: record.Id,
         };
     });
+}
+
+export function parseLayout(layout) {
+    const layoutFields = {};
+    layout.sections.forEach(section =>
+        section.layoutRows.forEach(row =>
+            row.layoutItems.forEach(item =>
+                item.layoutComponents.forEach(component => {
+                    if (component.componentType === "Field") {
+                        layoutFields[component.apiName] = true;
+                    }
+                })
+            )
+        )
+    );
+
+    return Object.keys(layoutFields);
 }
 
 function parseFloatWithLocale(value, locale = "en-US") {

@@ -10,6 +10,7 @@ import {
     ReferenceFieldEntity,
     TextFieldEntity,
     TokenFieldEntity,
+    MultipicklistEntity,
 } from "./field.js";
 
 import {unescapeHTML} from "../utils.jsx";
@@ -29,7 +30,7 @@ export class RecordEntity extends quip.apps.Record {
         };
     }
 
-    supportedFieldTypes() {
+    fieldSupported(field) {
         throw Error("Unimplemented abstract method.");
     }
 
@@ -37,26 +38,18 @@ export class RecordEntity extends quip.apps.Record {
         const schema = this.getSchema();
         const visibleKeys = new Set(
             this.getFieldsDataArray().map(field => field.key));
-        return Object.keys(schema.fields)
-            .filter(fieldKey => {
-                const fieldSchema = schema.fields[fieldKey];
-                if (fieldSchema.dataType === "TextArea") {
-                    return fieldSchema.extraTypeInfo === "PlainTextArea";
-                }
-                return this.supportedFieldTypes().includes(
-                    fieldSchema.dataType);
-            })
-            .filter(fieldKey => {
-                return visibleKeys.has(fieldKey);
-            })
-            .map(fieldKey => {
-                const fieldSchema = schema.fields[fieldKey];
-                const label = unescapeHTML(fieldSchema.label);
-                const shortLabel = fieldSchema.shortLabel
-                    ? unescapeHTML(fieldSchema.shortLabel)
-                    : fieldSchema.shortLabel;
-                return {key: fieldKey, label: label, shortLabel: shortLabel};
-            });
+        return Object.values(schema.fields)
+            .filter(
+                field =>
+                    this.fieldSupported(field) &&
+                    visibleKeys.has(field.apiName))
+            .map(field => ({
+                key: field.apiName,
+                label: unescapeHTML(field.label),
+                shortLabel: field.shortLabel
+                    ? unescapeHTML(field.shortLabel)
+                    : field.shortLabel,
+            }));
     }
 
     static getDefaultProperties() {
@@ -156,6 +149,10 @@ export class RecordEntity extends quip.apps.Record {
         this.set("ownerId", ownerId);
     }
 
+    getLabelSingular() {
+        return this.getType();
+    }
+
     getType() {
         // TODO: Remove type for Jira once we have an alternative.
         throw Error("Unimplemented abstract method.");
@@ -239,6 +236,13 @@ export class RecordEntity extends quip.apps.Record {
                     autoCompleteUrl: fieldData.autoCompleteUrl,
                     options: fieldData.options,
                     serverKey: fieldData.serverKey,
+                };
+                break;
+            }
+            case "MultiPicklist": {
+                recordClass = MultipicklistEntity;
+                extras = {
+                    options: fieldData.options,
                 };
                 break;
             }
@@ -327,7 +331,7 @@ export class RecordEntity extends quip.apps.Record {
         throw Error("Unimplemented abstract method.");
     }
 
-    loadPlaceholderData(placeholerData) {
+    loadPlaceholderData(placeholderData) {
         throw Error("Unimplemented abstract method.");
     }
 
@@ -335,7 +339,7 @@ export class RecordEntity extends quip.apps.Record {
         throw Error("Unimplemented abstract method.");
     }
 
-    clear() {
+    clearRecord() {
         this.getFields().forEach(field => field.remove(false));
         this.delete();
     }

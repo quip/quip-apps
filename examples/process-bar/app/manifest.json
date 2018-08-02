@@ -12,7 +12,7 @@
     "initial_height": 43,
     "initial_width": 800,
     "toolbar_color": "violet",
-    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_icon": "process_bar",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"]

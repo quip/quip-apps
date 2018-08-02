@@ -371,7 +371,7 @@ export class UserRecord extends ListenerRecord {
 
 export const toJSON = record => {
     const acc = {};
-    if (!record.getData && !record.getRecords) return record;
+    if (!record || (!record.getData && !record.getRecords)) return record;
     acc.id = record.getId();
     if (record.toJSON) {
         // Defer to the custom serialize function.

@@ -305,8 +305,9 @@ quip.apps.initialize({
                         const cells = col.getCells();
                         cells.forEach(function(cell) {
                             const status = cell.getStatus();
-                            if (status) {
-                                cell.setStatus(migrationMap.get(status));
+                            const newStatus = migrationMap.get(status);
+                            if (status && newStatus) {
+                                cell.setStatus(newStatus);
                             }
                         });
                     }

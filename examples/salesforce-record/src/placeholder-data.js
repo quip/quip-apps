@@ -2,8 +2,11 @@
 
 export default class PlaceholderData {
     static recordId = "001000000000000000";
-    static type = "Account";
     static schema = {
+        "apiName": "Account",
+        "label": "Account",
+        "labelPlural": "Accounts",
+        "nameFields": ["Name"],
         "fields": {
             "Employees": {
                 "label": quiptext("Employees"),

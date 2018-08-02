@@ -25,6 +25,7 @@ import {
     DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
+    MultipicklistEntity,
     NumericFieldEntity,
     ReferenceFieldEntity,
     TextFieldEntity,
@@ -138,17 +139,23 @@ class Field extends React.Component {
         const label = nextProps.entity.getLabel();
         const key = nextProps.entity.getKey();
         const commentCount = nextProps.entity.getCommentCount();
+        const value = nextProps.entity.getValue();
+        const originalValue = nextProps.entity.getOriginalValue();
         if (!shallowEqual(this.state, nextState)) {
             return true;
         }
         if (this.renderedEntityProperties_.isDirty != isDirty ||
             this.renderedEntityProperties_.label != label ||
             this.renderedEntityProperties_.key != key ||
-            this.renderedEntityProperties_.commentCount != commentCount) {
+            this.renderedEntityProperties_.commentCount != commentCount ||
+            this.renderedEntityProperties_.value != value ||
+            this.renderedEntityProperties_.originalValue != originalValue) {
             this.renderedEntityProperties_.isDirty = isDirty;
             this.renderedEntityProperties_.label = label;
             this.renderedEntityProperties_.key = key;
             this.renderedEntityProperties_.commentCount = commentCount;
+            this.renderedEntityProperties_.value = value;
+            this.renderedEntityProperties_.originalValue = originalValue;
             return true;
         }
         return false;
@@ -179,6 +186,10 @@ class Field extends React.Component {
                 createDialog={fieldDialog => this.setState({fieldDialog})}
                 {...this.props}
                 onChangeFocus={this.onChangeFocus_}/>;
+        } else if (this.props.entity instanceof MultipicklistEntity) {
+            inputComponent = <Multipicklist
+                createDialog={fieldDialog => this.setState({fieldDialog})}
+                {...this.props}/>;
         } else if (this.props.entity instanceof NumericFieldEntity) {
             inputComponent = <NumericField
                 ref={node => (this.valueNode_ = node)}
@@ -565,11 +576,24 @@ class DateTimeField extends React.Component {
 
 class EnumDropdown extends React.Component {
     static propTypes = {
-        entity: React.PropTypes.instanceOf(EnumFieldEntity),
+        entity: React.PropTypes.oneOfType([
+            React.PropTypes.instanceOf(EnumFieldEntity),
+            React.PropTypes.instanceOf(MultipicklistEntity),
+        ]),
         options: React.PropTypes.array.isRequired,
         onRowClick: React.PropTypes.func.isRequired,
         showCheckmark: React.PropTypes.bool.isRequired,
+        selectedIndexes: React.PropTypes.array,
     };
+
+    constructor(props) {
+        super(props);
+        if (this.props.selectedIndexes) {
+            this.state = {
+                selectedIndexes: props.selectedIndexes,
+            };
+        }
+    }
 
     componentDidMount() {
         quip.apps.addDetachedNode(ReactDOM.findDOMNode(this));
@@ -578,6 +602,16 @@ class EnumDropdown extends React.Component {
     componentWillUnmount() {
         quip.apps.removeDetachedNode(ReactDOM.findDOMNode(this));
     }
+
+    onRowClick_ = (e, option) => {
+        if (this.props.selectedIndexes) {
+            const index = this.props.options.indexOf(option);
+            let selectedIndexes = this.state.selectedIndexes;
+            selectedIndexes[index] = !selectedIndexes[index];
+            this.setState({selectedIndexes: selectedIndexes});
+        }
+        this.props.onRowClick(e, option, true);
+    };
 
     renderRow_ = (option, isHighlighted) => {
         const classNames = [Styles.enumRow];
@@ -599,16 +633,26 @@ class EnumDropdown extends React.Component {
             checkmarkStyle = {
                 display: "none",
             };
-        } else if (this.props.entity &&
-            this.props.entity.getValue().id !== option.id) {
-            checkmarkStyle = {
-                visibility: "hidden",
-            };
+        } else if (this.props.entity) {
+            let showCheckmark = false;
+            if (this.props.selectedIndexes) {
+                const index = this.props.options.indexOf(option);
+                if (this.state.selectedIndexes[index]) {
+                    showCheckmark = true;
+                }
+            } else if (this.props.entity.getValue().id === option.id) {
+                showCheckmark = true;
+            }
+            if (!showCheckmark) {
+                checkmarkStyle = {
+                    visibility: "hidden",
+                };
+            }
         }
         return <div
             className={classNames.join(" ")}
             key={option.id}
-            onMouseDown={e => this.props.onRowClick(e, option, true)}>
+            onMouseDown={e => this.onRowClick_(e, option)}>
             <div className={Styles.checkmarkIcon} style={checkmarkStyle}>
                 <CheckmarkIcon/>
             </div>
@@ -864,6 +908,148 @@ export class EnumField extends React.Component {
                         !this.props.entity.isReadOnly() && <DropdownIcon/>}
                 </div>;
             }
+        }
+    }
+}
+
+export class Multipicklist extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(MultipicklistEntity).isRequired,
+        createDialog: React.PropTypes.func.isRequired,
+        width: React.PropTypes.number,
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            options: [],
+            selectedIndexes: [],
+            optionsLoadingStatus: LOADING_STATUS.UNLOADED,
+        };
+    }
+
+    componentDidMount() {
+        if (this.props.entity.isReadOnly()) {
+            return;
+        }
+        if (!this.props.entity.optionsHasLoaded()) {
+            this.setState({optionsLoadingStatus: LOADING_STATUS.LOADING});
+        }
+        this.props.entity
+            .getOptions()
+            .then(options => {
+                const selectedIndexes = this.getSelectedIndexes_(
+                    this.props.entity.getValue(),
+                    options);
+                this.setState({
+                    options: options,
+                    selectedIndexes: selectedIndexes,
+                    optionsLoadingStatus: LOADING_STATUS.LOADED,
+                });
+            })
+            .catch(error => {
+                this.props.entity.setError(error);
+                this.setState({optionsLoadingStatus: LOADING_STATUS.ERROR});
+            });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            selectedIndexes: this.getSelectedIndexes_(
+                nextProps.entity.getValue(),
+                this.state.options),
+        });
+    }
+
+    getSelectedIndexes_(value, options) {
+        let selectedIndexes = Array(options.length).fill(false);
+        const selectedOptions = value ? value.split(";") : [];
+        for (let i = 0; i < options.length; i++) {
+            if (selectedOptions.indexOf(options[i].id) !== -1) {
+                selectedIndexes[i] = true;
+            }
+        }
+        return selectedIndexes;
+    }
+
+    showDropdown_ = () => {
+        const boundingRect = this.fieldDom.getBoundingClientRect();
+        const node = <EnumDropdown
+            entity={this.props.entity}
+            options={this.state.options}
+            selectedIndexes={this.state.selectedIndexes}
+            onRowClick={(e, option) => this.onRowClick_(e, option, false)}
+            showCheckmark={true}/>;
+        const left = boundingRect.left - 12;
+        const top = boundingRect.bottom;
+        this.props.createDialog({node, left, top});
+    };
+
+    onClick_ = e => {
+        if (this.props.entity.isReadOnly() || quip.apps.isMobile()) {
+            return;
+        }
+        if (this.state.optionsLoadingStatus == LOADING_STATUS.LOADING ||
+            this.state.optionsLoadingStatus == LOADING_STATUS.ERROR) {
+            return;
+        }
+        this.props.entity
+            .getOptions()
+            .then(options => {
+                this.setState(
+                    {
+                        options: options,
+                    },
+                    this.showDropdown_);
+            })
+            .catch(error => {
+                this.setState({optionsLoadingStatus: LOADING_STATUS.ERROR});
+            });
+    };
+
+    onRowClick_ = (e, option, hide) => {
+        if (e) {
+            e.stopPropagation();
+        }
+        const index = this.state.options.indexOf(option);
+        let selectedIndexes = this.state.selectedIndexes;
+        selectedIndexes[index] = !selectedIndexes[index];
+        this.setState({selectedIndexes: selectedIndexes});
+        const newValue = this.state.options
+            .filter((option, i) => selectedIndexes[i])
+            .map(option => option.id)
+            .join(";");
+        this.setEntityValue({id: newValue || null});
+        if (hide) {
+            this.props.createDialog(null);
+        }
+    };
+
+    setEntityValue(option) {
+        this.props.entity.setValue(option.id);
+    }
+
+    render() {
+        if (this.state.optionsLoadingStatus == LOADING_STATUS.LOADING) {
+            const loading = <quip.apps.ui.Image.Placeholder
+                size={25}
+                loading={true}/>;
+            return <div className={Styles.enumField} onClick={this.onClick_}>
+                {loading}
+            </div>;
+        } else if (this.state.optionsLoadingStatus == LOADING_STATUS.ERROR) {
+            //TODO
+            return null;
+        } else {
+            return <div
+                className={Styles.enumField}
+                onClick={this.onClick_}
+                style={{width: this.props.width || "80%"}}
+                ref={el => (this.fieldDom = el)}>
+                <div>{this.props.entity.getDisplayValue()}</div>
+                {!quip.apps.isMobile() &&
+                    !this.props.entity.isReadOnly() && <DropdownIcon/>}
+            </div>;
         }
     }
 }

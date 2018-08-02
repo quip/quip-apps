@@ -2,22 +2,15 @@
 
 import {RecordEntity} from "../../../shared/base-field-builder/model/record.js";
 import {
-    parsePicklistOptions,
     parseFieldsData,
     parseFieldValue,
 } from "../../../shared/base-field-builder/response-handler.js";
 import {
     DefaultError,
-    TypeNotSupportedError,
     FieldsCannotBeUpdatedError,
     InvalidValueError,
     BadRequestError,
 } from "../../../shared/base-field-builder/error.js";
-import {
-    getDefaultFields,
-    getObjectTypeFromPrefix,
-    getHeaderFields,
-} from "../config.js";
 
 const FIELD_PREFERENCES_KEY = "initByFields";
 const PERSISTED_KEYS = new Set(["Name", "FirstName", "LastName"]);
@@ -28,6 +21,7 @@ const SUPPORTED_FIELD_TYPES = [
     "DateTime",
     "Double",
     "Int",
+    "MultiPicklist",
     "Percent",
     "Picklist",
     "Phone",
@@ -37,27 +31,36 @@ const SUPPORTED_FIELD_TYPES = [
     "Url",
 ];
 
+export function fieldSupportedFn(field) {
+    if (!SUPPORTED_FIELD_TYPES.includes(field.dataType)) {
+        return false;
+    }
+
+    if (field.dataType === "TextArea") {
+        return field.extraTypeInfo === "PlainTextArea";
+    }
+
+    return true;
+}
+
+export const SUPPORTED_NAME_FIELD_TYPES = ["String"];
+
+export function nameFieldSupportedFn(field) {
+    return SUPPORTED_NAME_FIELD_TYPES.includes(field.dataType);
+}
+
 export class SalesforceRecordEntity extends RecordEntity {
     static ID = "salesforceRecord";
 
     static getProperties() {
         const recordProperties = super.getProperties();
         const ownProperties = {
-            type: "string",
+            schema: "object",
         };
         return Object.assign(ownProperties, recordProperties);
     }
 
     initialize() {
-        // On record creation
-        if (this.getType() === undefined) {
-            try {
-                this.initTypeFromRecordId_(this.getRecordId());
-            } catch (e) {
-                // Show record type not supported in the UI
-                return;
-            }
-        }
         this.saveInProgress_ = false;
         this.error_ = null;
         this.cachedFieldsDataArray_ = [];
@@ -95,31 +98,33 @@ export class SalesforceRecordEntity extends RecordEntity {
         return "salesforce_record";
     }
 
+    getHeaderField() {
+        const schema = this.getSchema();
+        if (schema.nameFields.includes("Name")) {
+            return "Name";
+        }
+        return schema.nameFields[0];
+    }
+
     getHeaderName() {
-        const fallbackTitle = quiptext("Unknown");
-        const type = this.getType();
-        const headerFields = getHeaderFields(type);
-        return (
-            headerFields
-                .map(fieldName => {
-                    const field = this.getFieldData(fieldName);
-                    return (field && field.value) || "";
-                })
-                .join(" ")
-                .trim() || fallbackTitle
-        );
+        const field = this.getFieldData(this.getHeaderField());
+        return (field && field.value) || quiptext("Unknown");
+    }
+
+    getLabelSingular() {
+        return this.getSchema().label;
     }
 
     getType() {
-        return this.get("type");
+        return this.getSchema().apiName;
     }
 
-    setType(type) {
-        this.set("type", type);
+    setSchema(schema) {
+        this.set("schema", schema);
     }
 
     getSchema() {
-        return this.getParentRecord().getSchemaForType(this.getType());
+        return this.get("schema");
     }
 
     getClient() {
@@ -156,11 +161,10 @@ export class SalesforceRecordEntity extends RecordEntity {
         }
 
         return this.getClient()
-            .updateRecord(this.getRecordId(), {fields: updatedFields})
-            .then(response => {
-                const fieldsDataArray = parseFieldsData(
-                    response,
-                    this.getSchema());
+            .updateRecord(this.getRecordId(), this.getSchema(), {
+                fields: updatedFields,
+            })
+            .then(([fieldsDataArray, schema]) => {
                 const metricArgs = {
                     action: "saved_record",
                     record_type: this.getType(),
@@ -169,11 +173,11 @@ export class SalesforceRecordEntity extends RecordEntity {
                 const metricName = this.getMetricName();
                 quip.apps.recordQuipMetric(metricName, metricArgs);
 
-                this.setLastFetchedTime(Date.now());
                 this.error_ = null;
                 this.saveInProgress_ = false;
+                this.setSchema(schema);
                 this.setFieldsDataArray(fieldsDataArray);
-                const schema = this.getSchema();
+                this.setLastFetchedTime(Date.now());
                 const failedFieldKeys = [];
                 for (let fieldData of fieldsDataArray) {
                     const fieldEntity = this.getField(fieldData.key);
@@ -246,30 +250,18 @@ export class SalesforceRecordEntity extends RecordEntity {
         return this.error_;
     }
 
-    initTypeFromRecordId_(recordId) {
-        const recordIdPrefix = recordId.substring(0, 3);
-        const type = getObjectTypeFromPrefix(recordIdPrefix);
-        if (type) {
-            this.setType(type);
-        } else {
-            this.error_ = new TypeNotSupportedError(
-                quiptext("Record type not supported"),
-                recordId);
-            throw this.error_;
-        }
-    }
-
     fetchData(isInitialMount) {
         if (!this.isPlaceholder()) {
             return this.fetchRecordId_(this.getRecordId()).then(
                 fieldsDataArray => {
-                    this.initFieldsFromPreferences_();
-                    if (isInitialMount) {
-                        // On initial mount, update the stored fields in case the data
-                        // has been updated on the Salesforce end.
-                        const fieldsDataArray = this.getFieldsDataArray();
-                        this.updateFields_(fieldsDataArray);
-                    }
+                    this.initFieldsFromPreferences_().then(() => {
+                        if (isInitialMount) {
+                            // On initial mount, update the stored fields in case the data
+                            // has been updated on the Salesforce end.
+                            const fieldsDataArray = this.getFieldsDataArray();
+                            this.updateFields_(fieldsDataArray);
+                        }
+                    });
                 });
         }
         return Promise.resolve();
@@ -277,11 +269,9 @@ export class SalesforceRecordEntity extends RecordEntity {
 
     fetchRecordId_(recordId) {
         return this.getClient()
-            .fetchRecord(recordId)
-            .then(response => {
-                const fieldsDataArray = parseFieldsData(
-                    response,
-                    this.getSchema());
+            .fetchRecordAndSchema(recordId, this.getSchema())
+            .then(([fieldsDataArray, schema]) => {
+                this.setSchema(schema);
                 this.setFieldsDataArray(fieldsDataArray);
                 this.setLastFetchedTime(Date.now());
                 return fieldsDataArray;
@@ -292,10 +282,24 @@ export class SalesforceRecordEntity extends RecordEntity {
         const preferences = quip.apps.getUserPreferences();
         const initFieldsMap = JSON.parse(
             preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
-        const initFieldKeys =
-            initFieldsMap[this.getType()] || getDefaultFields(this.getType());
-        initFieldKeys.map(fieldKey => {
-            this.addField(fieldKey);
+        let initFieldKeysP;
+        if (initFieldsMap[this.getType()]) {
+            initFieldKeysP = Promise.resolve(initFieldsMap[this.getType()]);
+        } else {
+            initFieldKeysP = this.getClient()
+                .fetchLayoutFields(this.getType(), false)
+                .catch(e => {
+                    return [];
+                });
+        }
+
+        return initFieldKeysP.then(initFieldKeys => {
+            if (initFieldKeys.length === 0) {
+                initFieldKeys.push(this.getHeaderField());
+            }
+            initFieldKeys.map(fieldKey => {
+                this.addField(fieldKey);
+            });
         });
     }
 
@@ -332,13 +336,15 @@ export class SalesforceRecordEntity extends RecordEntity {
         this.setOwnerId(currentViewerId);
     }
 
-    loadPlaceholderData(placeholerData) {
-        const schema = this.getSchema();
+    loadPlaceholderData(placeholderData) {
+        const schema = placeholderData.schema;
+        this.setSchema(schema);
         const fieldsDataArray = parseFieldsData(
-            placeholerData.fieldsData,
+            placeholderData.fieldsData,
             schema);
+
         this.setFieldsDataArray(fieldsDataArray);
-        for (let key of placeholerData.fieldsOrder) {
+        for (let key of placeholderData.fieldsOrder) {
             this.addField(key);
         }
     }
@@ -354,8 +360,8 @@ export class SalesforceRecordEntity extends RecordEntity {
         return PERSISTED_KEYS;
     }
 
-    supportedFieldTypes() {
-        return SUPPORTED_FIELD_TYPES;
+    fieldSupported(field) {
+        return fieldSupportedFn(field);
     }
 
     fetchOptions(field) {
@@ -365,11 +371,10 @@ export class SalesforceRecordEntity extends RecordEntity {
             const fieldApiName = field.getKey();
             return this.getClient()
                 .fetchPicklistOptions(recordType, recordTypeId, fieldApiName)
-                .then(response => {
-                    const values = parsePicklistOptions(response);
-
+                .then(values => {
                     let retValues;
-                    if (field.isRequired()) {
+                    if (field.isRequired() ||
+                        field.getType() === "MultiPicklist") {
                         retValues = values;
                     } else {
                         retValues = [

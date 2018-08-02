@@ -2,7 +2,7 @@
 
 import {parseFieldValue} from "../response-handler.js";
 import {DefaultError, InvalidValueError} from "../error.js";
-import {formatNumber} from "../utils.jsx";
+import {formatNumber, normalizeNewlines} from "../utils.jsx";
 
 export class FieldEntity extends quip.apps.Record {
     static ID = "field";
@@ -304,7 +304,19 @@ export class TextFieldEntity extends FieldEntity {
     }
 
     isDirty() {
-        return super.isDirty() || this.getValue() !== this.getOriginalValue();
+        if (super.isDirty()) {
+            return true;
+        }
+        const originalValue = this.getOriginalValue();
+        const currentValue = this.getValue();
+        if (typeof originalValue === "string" &&
+            typeof currentValue === "string") {
+            return (
+                normalizeNewlines(originalValue) !==
+                normalizeNewlines(currentValue)
+            );
+        }
+        return originalValue !== currentValue;
     }
 
     isValid() {
@@ -479,6 +491,70 @@ export class EnumFieldEntity extends FieldEntity {
 
     isEqualToObject(value) {
         return this.getDisplayValue() === value.name;
+    }
+}
+
+export class MultipicklistEntity extends FieldEntity {
+    static ID = "multipicklist";
+
+    static getProperties() {
+        const fieldProperties = super.getProperties();
+        const ownProperties = {
+            originalValue: "object",
+            value: "string",
+            options: "array",
+        };
+        return Object.assign(fieldProperties, ownProperties);
+    }
+
+    getOriginalValue() {
+        return this.get("originalValue").value;
+    }
+
+    getOriginalDisplayValue() {
+        return this.getOriginalValue();
+    }
+
+    setOriginalValue(originalValue) {
+        originalValue = {value: originalValue};
+        this.set("originalValue", originalValue);
+    }
+
+    setValue(value) {
+        this.set("value", value);
+    }
+
+    getValue() {
+        return this.get("value");
+    }
+
+    getDisplayValue() {
+        return this.getValue();
+    }
+
+    getOptions() {
+        if (!this.optionsHasLoaded()) {
+            return this.getParentRecord()
+                .fetchOptions(this)
+                .then(options => {
+                    this.set("options", options);
+                    return options;
+                })
+                .catch(error => {
+                    // FIXME: setError here
+                    throw error;
+                });
+        } else {
+            return Promise.resolve(this.get("options"));
+        }
+    }
+
+    optionsHasLoaded() {
+        return !!this.get("options");
+    }
+
+    isDirty() {
+        return this.getValue() != this.getOriginalValue();
     }
 }
 

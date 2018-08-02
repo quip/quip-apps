@@ -11,7 +11,7 @@
     "initial_height": 96,
     "initial_width": 800,
     "toolbar_color": "yellow",
-    "toolbar_icon": "icons/toolbar.svg",
+    "toolbar_icon": "kanban",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"]

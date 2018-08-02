@@ -5,7 +5,6 @@ import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import Dialog from "../../shared/dialog/dialog.jsx";
 import {entityListener} from "../../shared/base-field-builder/utils.jsx";
 import {RecordPickerEntity} from "./model/record-picker.js";
-import PlaceholderData from "./placeholder-data.js";
 import Record from "../../shared/base-field-builder/record.jsx";
 import Styles from "./record-picker.less";
 import {UnauthenticatedError} from "../../shared/base-field-builder/error.js";
@@ -15,6 +14,7 @@ import {
     DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
+    MultipicklistEntity,
     NumericFieldEntity,
     ReferenceFieldEntity,
     TextFieldEntity,
@@ -37,6 +37,7 @@ quip.apps.registerClass(DateFieldEntity, DateFieldEntity.ID);
 quip.apps.registerClass(DateTimeFieldEntity, DateTimeFieldEntity.ID);
 quip.apps.registerClass(EnumFieldEntity, EnumFieldEntity.ID);
 quip.apps.registerClass(FieldEntity, FieldEntity.ID);
+quip.apps.registerClass(MultipicklistEntity, MultipicklistEntity.ID);
 quip.apps.registerClass(NumericFieldEntity, NumericFieldEntity.ID);
 quip.apps.registerClass(RecordPickerEntity, RecordPickerEntity.ID);
 quip.apps.registerClass(ReferenceFieldEntity, ReferenceFieldEntity.ID);
@@ -71,16 +72,21 @@ quip.apps.initialize({
                 .split("sObject/")[1]
                 .split("/view")[0];
             if (recordId.length == 18) {
-                rootRecord.fetchData().then(() => {
-                    rootRecord.setSelectedRecord(recordId);
-                });
+                salesforceClient
+                    .fetchRecordAndSchema(recordId)
+                    .then(([fields, schema]) => {
+                        rootRecord.setSelectedRecord(recordId, schema);
+                    });
             }
         } else if (params.isCreation) {
-            rootRecord.loadPlaceholderData(PlaceholderData);
+            rootRecord.loadPlaceholderData();
         } else if (quip.apps.CreationSource &&
             params.creationSource === quip.apps.CreationSource.TEMPLATE) {
-            rootRecord.clearData();
-            rootRecord.loadPlaceholderData(PlaceholderData);
+            rootRecord.loadPlaceholderData();
+        }
+
+        if (!params.isCreation) {
+            rootRecord.ensureCurrentDataVersion();
         }
 
         ReactDOM.render(
@@ -149,8 +155,8 @@ class Root extends React.Component {
         });
     }
 
-    selectRecord_ = selectedRecordId => {
-        this.props.entity.setSelectedRecord(selectedRecordId);
+    selectRecord_ = (selectedRecordId, schema) => {
+        this.props.entity.setSelectedRecord(selectedRecordId, schema);
         this.hideRecordPicker_();
     };
 
@@ -270,7 +276,8 @@ class Root extends React.Component {
             dialog = <RecordPicker
                 entity={entity}
                 onSelectRecord={this.selectRecord_}
-                onDismiss={this.hideRecordPicker_}/>;
+                onDismiss={this.hideRecordPicker_}
+                menuDelegate={this.props.menuDelegate}/>;
         }
 
         const selectedRecord = entity.getSelectedRecord();

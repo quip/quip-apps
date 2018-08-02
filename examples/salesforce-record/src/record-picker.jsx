@@ -1,19 +1,10 @@
 // Copyright 2017 Quip
-
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
-import ChevronIcon from "../../shared/base-field-builder/icons/chevron.jsx";
 import Dialog from "../../shared/dialog/dialog.jsx";
 import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-picker.less";
-import {
-    DefaultError,
-    UnauthenticatedError,
-    isNonDefaultError,
-} from "../../shared/base-field-builder/error.js";
-
-import {getDisplayName, getSupportedListViews} from "./config.js";
+import {getErrorMessage} from "../../shared/base-field-builder/error.js";
 import {RecordPickerEntity} from "./model/record-picker.js";
-import {getRecordComponent} from "./root.jsx";
 
 const LOADING_STATUS = {
     LOADING: 0,
@@ -21,21 +12,29 @@ const LOADING_STATUS = {
     ERROR: 2,
 };
 
+const recordDividerSentinal = {};
+const moreRecordsSentinal = {};
+
 export default class RecordPicker extends React.Component {
     static propTypes = {
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
+        menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
         onSelectRecord: React.PropTypes.func.isRequired,
         onDismiss: React.PropTypes.func.isRequired,
     };
 
     constructor(props) {
         super(props);
-        const recordTypes = props.entity.getSupportedRecordTypes();
         this.state = {
-            recordTypes,
-            selectedRecordType: recordTypes[0],
+            showAllTypes: false,
+            recordTypeLoadingStatus: LOADING_STATUS.LOADING,
+            recordTypeLoadingError: null,
+            recordTypes: [],
+            selectedRecordType: null,
+            nameFields: [],
+            searchField: null,
             listViews: [],
-            selectedListViewKey: null,
+            selectedListView: null,
             listViewsLoadingStatus: LOADING_STATUS.LOADING,
             listViewsLoadingError: null,
             sobjects: [],
@@ -47,10 +46,7 @@ export default class RecordPicker extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.entity.getClient().isLoggedIn() &&
-            this.props.entity.getClient().onSourceInstance()) {
-            this.fetchData_();
-        }
+        this.fetchRecordTypes_();
     }
 
     componentWillUnmount() {
@@ -59,12 +55,15 @@ export default class RecordPicker extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.selectedRecordType !== prevState.selectedRecordType) {
-            this.fetchListViews_();
+            this.setState({searchField: null}, () => {
+                this.fetchListViewsAndRecordFields_();
+            });
             return;
         }
 
         if (this.state.listViews !== prevState.listViews ||
-            this.state.selectedListViewKey !== prevState.selectedListViewKey) {
+            this.state.selectedListView !== prevState.selectedListView ||
+            this.state.searchField !== prevState.searchField) {
             this.setState(
                 {
                     query: "",
@@ -74,24 +73,102 @@ export default class RecordPicker extends React.Component {
         }
     }
 
-    fetchData_() {
-        // TODO: Remove this up-front fetch of all object list views.
-        this.setState({
-            listViewsLoadingStatus: LOADING_STATUS.LOADING,
-        });
-        this.props.entity
-            .fetchData()
-            .then(() => {
-                this.setState(
-                    {
-                        listViewsLoadingStatus: LOADING_STATUS.LOADED,
-                    },
-                    this.fetchListViews_);
+    showAllTypes_ = () => {
+        this.setState(
+            {
+                showAllTypes: true,
+                recordTypeLoadingStatus: LOADING_STATUS.LOADING,
+                listViewsLoadingStatus: LOADING_STATUS.LOADING,
+                sobjectsLoadingStatus: LOADING_STATUS.LOADING,
+            },
+            this.fetchRecordTypes_);
+    };
+
+    fetchRecordTypes_() {
+        const {showAllTypes} = this.state;
+        const client = this.props.entity.getClient();
+        const allObjectsP = client.fetchObjectTypes();
+        let selectedObjectsP = Promise.resolve([]);
+        if (!showAllTypes) {
+            selectedObjectsP = client.fetchSelectedAppEntityTypes();
+        }
+
+        Promise.all([allObjectsP, selectedObjectsP])
+            .then(([recordTypes, selectedObjects]) => {
+                recordTypes.sort((a, b) => {
+                    if (a.labelPlural < b.labelPlural) {
+                        return -1;
+                    }
+                    if (a.labelPlural > b.labelPlural) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                if (!showAllTypes) {
+                    const prevTypes = this.props.entity.getPreviouslySelectedObjectTypes();
+                    const prevRecordTypes = recordTypes.filter(
+                        object =>
+                            prevTypes.includes(object.apiName) &&
+                            !selectedObjects.includes(object.apiName));
+
+                    recordTypes = recordTypes.filter(object =>
+                        selectedObjects.includes(object.apiName)
+                    );
+
+                    recordTypes.push(recordDividerSentinal);
+                    if (prevRecordTypes.length) {
+                        recordTypes.push(...prevRecordTypes);
+                        recordTypes.push(recordDividerSentinal);
+                    }
+                    recordTypes.push(moreRecordsSentinal);
+                }
+
+                this.setState({
+                    recordTypes,
+                    selectedRecordType: recordTypes[0],
+                    recordTypeLoadingStatus: LOADING_STATUS.LOADED,
+                });
             })
             .catch(err => {
-                console.error(err);
-                // TODO: Remove circular dependency.
-                getRecordComponent().errorHandling(err);
+                this.setState({
+                    recordTypeLoadingStatus: LOADING_STATUS.ERROR,
+                    recordTypeLoadingError: err,
+                });
+            });
+    }
+
+    fetchListViewsAndRecordFields_() {
+        if (!this.state.selectedRecordType) {
+            return;
+        }
+
+        this.setState({listViewsLoadingStatus: LOADING_STATUS.LOADING});
+
+        const client = this.props.entity.getClient();
+
+        Promise.all([
+            client.fetchSchema(this.state.selectedRecordType.apiName),
+            client.fetchListViewsForType(this.state.selectedRecordType.apiName),
+        ])
+            .then(([schema, listViews]) => {
+                // TODO: Disable filtering if search field is non string
+                const searchField = schema.nameFields.includes("Name")
+                    ? schema.fields["Name"]
+                    : schema.fields[schema.nameFields[0]];
+
+                const nameFields = Object.values(schema.fields).filter(f =>
+                    schema.nameFields.includes(f.apiName)
+                );
+                this.setState({
+                    nameFields,
+                    searchField,
+                    listViewsLoadingStatus: LOADING_STATUS.LOADED,
+                    listViews,
+                    selectedListView: listViews[0],
+                });
+            })
+            .catch(err => {
                 this.setState({
                     listViewsLoadingStatus: LOADING_STATUS.ERROR,
                     listViewsLoadingError: err,
@@ -99,23 +176,18 @@ export default class RecordPicker extends React.Component {
             });
     }
 
-    fetchListViews_() {
-        // TODO: Make this dynamic.
-        if (!this.state.selectedRecordType ||
-            this.state.listViewsLoadingStatus !== LOADING_STATUS.LOADED) {
+    fetchRecordData_() {
+        const {
+            selectedListView,
+            selectedRecordType,
+            query,
+            searchField,
+        } = this.state;
+
+        if (!selectedRecordType || !selectedListView || !searchField) {
             return;
         }
 
-        const listViews = this.props.entity.getListViewsForType(
-            this.state.selectedRecordType);
-
-        this.setState({
-            listViews,
-            selectedListViewKey: listViews[0].key,
-        });
-    }
-
-    fetchRecordData_() {
         this.setState({sobjectsLoadingStatus: LOADING_STATUS.LOADING});
 
         // Sentinel value used so we only respond to latest search.
@@ -123,16 +195,19 @@ export default class RecordPicker extends React.Component {
         this.requestToken_ = requestToken;
 
         this.props.entity
+            .getClient()
             .fetchRecordDataForListView(
-                this.state.selectedRecordType,
-                this.state.selectedListViewKey,
-                this.state.query)
+                selectedRecordType.apiName,
+                selectedListView.id,
+                query,
+                searchField.apiName)
             .then(records => {
                 if (requestToken !== this.requestToken_) {
                     return;
                 }
                 this.setState({
                     sobjects: records,
+                    selectedObjectId: null,
                     sobjectsLoadingStatus: LOADING_STATUS.LOADED,
                 });
             })
@@ -164,14 +239,19 @@ export default class RecordPicker extends React.Component {
     };
 
     selectRecordType_ = (e, newlySelectedRecordType) => {
+        if (newlySelectedRecordType === moreRecordsSentinal) {
+            this.showAllTypes_();
+            return;
+        }
+
         this.setState({
             selectedRecordType: newlySelectedRecordType,
         });
     };
 
-    selectListView_ = (e, newlySelectedListView) => {
+    selectListView_ = (e, selectedListView) => {
         this.setState({
-            selectedListViewKey: newlySelectedListView.key,
+            selectedListView,
         });
     };
 
@@ -189,15 +269,26 @@ export default class RecordPicker extends React.Component {
             return;
         }
 
-        this.props.onSelectRecord(this.state.selectedObjectId);
+        this.props.entity
+            .getClient()
+            .fetchSchema(this.state.selectedRecordType.apiName)
+            .then(schema => {
+                this.props.onSelectRecord(this.state.selectedObjectId, schema);
+            });
+    };
+
+    selectSearchField = searchField => {
+        this.setState({searchField});
     };
 
     render() {
         const {
             recordTypes,
+            recordTypeLoadingStatus,
+            recordTypeLoadingError,
             selectedRecordType,
             listViews,
-            selectedListViewKey,
+            selectedListView,
             listViewsLoadingStatus,
             listViewsLoadingError,
             query,
@@ -205,15 +296,11 @@ export default class RecordPicker extends React.Component {
             sobjectsLoadingStatus,
             sobjectsLoadingError,
             selectedObjectId,
+            nameFields,
+            searchField,
         } = this.state;
 
-        const {onDismiss, entity} = this.props;
-        let recordFilterPlaceholder = quiptext("Search");
-        listViews.forEach(listView => {
-            if (listView.key === selectedListViewKey) {
-                recordFilterPlaceholder += " " + listView.label;
-            }
-        });
+        const {onDismiss, entity, menuDelegate} = this.props;
 
         return <Dialog onDismiss={onDismiss}>
             <div className={Styles.dialog}>
@@ -222,7 +309,9 @@ export default class RecordPicker extends React.Component {
                 </div>
                 <div className={Styles.picker}>
                     <RecordTypePicker
-                        selectedType={selectedRecordType}
+                        recordTypeLoadingStatus={recordTypeLoadingStatus}
+                        recordTypeLoadingError={recordTypeLoadingError}
+                        selectedRecordType={selectedRecordType}
                         types={recordTypes}
                         onClick={this.selectRecordType_}/>
                     <div className={Styles.columnGroup}>
@@ -230,7 +319,7 @@ export default class RecordPicker extends React.Component {
                             listViews={listViews}
                             listViewsLoadingStatus={listViewsLoadingStatus}
                             listViewsLoadingError={listViewsLoadingError}
-                            selectedListViewKey={selectedListViewKey}
+                            selectedListView={selectedListView}
                             onClick={this.selectListView_}/>
                         {listViewsLoadingStatus ===
                             LOADING_STATUS.LOADED && <RecordFilter
@@ -240,12 +329,15 @@ export default class RecordPicker extends React.Component {
                             sobjectsLoadingError={sobjectsLoadingError}
                             entity={entity}
                             selectedRecordType={selectedRecordType}
-                            selectedListViewKey={selectedListViewKey}
-                            searchPlaceholder={recordFilterPlaceholder}
+                            selectedListView={selectedListView}
                             selectedObjectId={selectedObjectId}
                             onClick={this.selectRecordId_}
                             onSubmit={this.selectRecord_}
-                            onUpdateQuery={this.setQuery_}/>}
+                            onUpdateQuery={this.setQuery_}
+                            nameFields={nameFields}
+                            searchField={searchField}
+                            onSearchFieldChanged={this.selectSearchField}
+                            menuDelegate={menuDelegate}/>}
                     </div>
                 </div>
                 <div className={Styles.actions}>
@@ -265,24 +357,50 @@ export default class RecordPicker extends React.Component {
 
 class RecordTypePicker extends React.Component {
     static propTypes = {
-        types: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-        selectedType: React.PropTypes.string.isRequired,
+        recordTypeLoadingStatus: React.PropTypes.number,
+        recordTypeLoadingError: React.PropTypes.instanceOf(Error),
+        types: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+        selectedRecordType: React.PropTypes.object,
         onClick: React.PropTypes.func.isRequired,
     };
 
     renderRow_ = (type, isHighlighted, index) => {
+        if (type === recordDividerSentinal) {
+            return <div className={Styles.recordTypesHR}>
+                <hr/>
+            </div>;
+        }
         const classNames = [Styles.recordTypeRow];
-        if (this.props.selectedType === type) {
+        if (type === moreRecordsSentinal) {
+            return <div
+                className={classNames.join(" ")}
+                onClick={e => this.props.onClick(e, type)}>
+                More{" "}
+                <svg className={Styles.chevronIcon} viewBox="0 0 18 10">
+                    <Chevron/>
+                </svg>
+            </div>;
+        }
+        if (this.props.selectedRecordType === type) {
             classNames.push(Styles.highlighted);
         }
         return <div
             className={classNames.join(" ")}
             onClick={e => this.props.onClick(e, type)}>
-            {getDisplayName(type) || type}
+            {type.labelPlural}
         </div>;
     };
 
     render() {
+        const {recordTypeLoadingStatus, recordTypeLoadingError} = this.props;
+
+        if (recordTypeLoadingStatus === LOADING_STATUS.LOADING) {
+            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
+        } else if (recordTypeLoadingError === LOADING_STATUS.ERROR) {
+            return <div className={Styles.errorLoading}>
+                {getErrorMessage(listViewsLoadingError)}
+            </div>;
+        }
         return <div className={Styles.recordTypePicker}>
             <RowContainer
                 rows={this.props.types}
@@ -298,14 +416,13 @@ class ListViewPicker extends React.Component {
         listViewsLoadingStatus: React.PropTypes.oneOf(
             Object.values(LOADING_STATUS)),
         listViewsLoadingError: React.PropTypes.instanceOf(Error),
-        selectedListViewKey: React.PropTypes.string,
+        selectedListView: React.PropTypes.object,
         onClick: React.PropTypes.func.isRequired,
     };
 
     renderRow_ = (listView, isHighlighted, index) => {
         const classNames = [Styles.listViewRow];
-        const selectedListViewKey = this.props.selectedListViewKey;
-        if (selectedListViewKey === listView.key) {
+        if (this.props.selectedListView === listView) {
             classNames.push(Styles.highlighted);
         }
         return <div
@@ -321,12 +438,8 @@ class ListViewPicker extends React.Component {
             return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
         }
         if (listViewsLoadingStatus === LOADING_STATUS.ERROR) {
-            const shouldShowSpecificErrorMessage = isNonDefaultError(
-                listViewsLoadingError);
             return <div className={Styles.errorLoading}>
-                {shouldShowSpecificErrorMessage
-                    ? listViewsLoadingError.message
-                    : quiptext("Could Not Connect")}
+                {getErrorMessage(listViewsLoadingError)}
             </div>;
         }
         return <div className={Styles.listViewPicker}>
@@ -341,17 +454,20 @@ class ListViewPicker extends React.Component {
 class RecordFilter extends React.Component {
     static propTypes = {
         query: React.PropTypes.string.isRequired,
-        sobjects: React.PropTypes.isRequired, // TODO:
+        sobjects: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
         sobjectsLoadingStatus: React.PropTypes.number.isRequired,
-        sobjectsLoadingError: React.PropTypes.string.isRequired,
+        sobjectsLoadingError: React.PropTypes.string,
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
-        selectedRecordType: React.PropTypes.string.isRequired,
-        selectedListViewKey: React.PropTypes.string,
+        selectedRecordType: React.PropTypes.object,
+        selectedListView: React.PropTypes.object,
         selectedObjectId: React.PropTypes.string,
         onClick: React.PropTypes.func.isRequired,
-        searchPlaceholder: React.PropTypes.string,
-        onSubmit: React.PropTypes.func,
-        onUpdateQuery: React.PropTypes.func,
+        onSubmit: React.PropTypes.func.isRequired,
+        onUpdateQuery: React.PropTypes.func.isRequired,
+        searchField: React.PropTypes.object,
+        nameFields: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+        onSearchFieldChanged: React.PropTypes.func.isRequired,
+        menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
     };
 
     constructor(props) {
@@ -364,7 +480,7 @@ class RecordFilter extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedRecordType !== this.props.selectedRecordType ||
-            nextProps.selectedListViewKey !== this.props.selectedListViewKey) {
+            nextProps.selectedListView !== this.props.selectedListView) {
             this.focusInput_();
         }
     }
@@ -384,17 +500,42 @@ class RecordFilter extends React.Component {
         return <div className={classNames.join(" ")}>{recordData.name}</div>;
     };
 
+    updateSearchField_ = apiName => {
+        const searchField = this.props.nameFields.find(
+            f => f.apiName === apiName);
+        this.props.onSearchFieldChanged(searchField);
+    };
+
+    showSearchFieldMenu_ = (e, elm) => {
+        this.props.menuDelegate.showSearchFieldContextMenu(
+            e,
+            elm,
+            this.props.nameFields,
+            this.updateSearchField_);
+    };
+
     render() {
         const {
             query,
             sobjects,
             sobjectsLoadingStatus,
             sobjectsLoadingError,
-            searchPlaceholder,
             onClick,
             onSubmit,
             onUpdateQuery,
+            selectedListView,
+            searchField,
         } = this.props;
+
+        const searchable =
+            selectedListView &&
+            searchField &&
+            (searchField.dataType === "String" ||
+                searchField.dataType === "Reference");
+
+        const searchPlaceholder = searchable
+            ? `${selectedListView.label} - ${searchField.label}`
+            : "";
 
         let recordsContent;
         const hasError = sobjectsLoadingStatus === LOADING_STATUS.ERROR;
@@ -403,12 +544,8 @@ class RecordFilter extends React.Component {
                 size={25}
                 loading={true}/>;
         } else if (hasError) {
-            const shouldShowSpecificErrorMessage = isNonDefaultError(
-                sobjectsLoadingError);
             recordsContent = <div className={Styles.errorLoading}>
-                {shouldShowSpecificErrorMessage
-                    ? sobjectsLoadingError.message
-                    : quiptext("Could Not Connect")}
+                {getErrorMessage(sobjectsLoadingError)}
             </div>;
         } else {
             if (sobjects.length == 0) {
@@ -427,15 +564,43 @@ class RecordFilter extends React.Component {
         }
         return <div className={Styles.recordFilter}>
             <div className={Styles.searchInput}>
+                <SearchIcon/>
+                <svg
+                    ref={node => (this.downChevron_ = node)}
+                    onClick={e =>
+                        this.showSearchFieldMenu_(e, this.downChevron_)
+                    }
+                    className={Styles.chevronIcon}
+                    viewBox="0 0 18 18">
+                    <Chevron/>
+                </svg>
                 <input
                     className={Styles.searchInputControl}
                     value={query}
                     onChange={e => onUpdateQuery(e.target.value)}
                     placeholder={searchPlaceholder}
                     ref={node => (this.searchInput_ = node)}
-                    disabled={hasError}/>
+                    disabled={hasError || !searchable}/>
             </div>
             {recordsContent}
         </div>;
+    }
+}
+
+class SearchIcon extends React.Component {
+    render() {
+        return <svg className={Styles.searchIcon} viewBox="0 0 18 18">
+            <path
+                className={Styles.svgPath}
+                d="M15.7,15.7a1.008,1.008,0,0,1-1.426,0l-3.811-3.811a6.029,6.029,0,1,1,1.426-1.426L15.7,14.273A1.008,1.008,0,0,1,15.7,15.7ZM7,3a4,4,0,1,0,4,4A4,4,0,0,0,7,3Z"/>
+        </svg>;
+    }
+}
+
+class Chevron extends React.Component {
+    render() {
+        return <path
+            className={Styles.svgPath}
+            d="M8.993,11.994A1,1,0,0,1,8.285,11.7L4.28,7.7A1,1,0,0,1,5.7,6.291l3.3,3.29,3.3-3.29A1,1,0,0,1,13.706,7.7L9.7,11.7A1,1,0,0,1,8.993,11.994Z"/>;
     }
 }

@@ -105,9 +105,14 @@
 .searchInput {
     border-bottom: 1px solid @borderColor;
     margin-bottom: 6px;
+    display: flex;
+    flex-direction: row;
+    min-height: 40px;
+    max-height: 40px;
+    align-items: center;
     input.searchInputControl {
+        flex: 1;
         border: none;
-        margin: 8px 10px;
         outline: none;
         width: 95%;
     }
@@ -172,4 +177,26 @@
             text-decoration: underline;
         }
     }
+}
+
+.searchIcon {
+    margin-left: 8px;
+    height: 18px;
+    width: 18px;
+}
+
+.chevronIcon {
+    height: 16px;
+    width: 16px;
+    margin-left: -2px;
+}
+
+.recordTypesHR {
+    padding-left: 8px;
+    padding-right: 8px;
+    height: 6px;
+}
+.svgPath {
+    fill: #353535;
+    fill-rule: evenodd;
 }
