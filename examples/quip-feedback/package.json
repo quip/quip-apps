@@ -1,7 +1,7 @@
 {
-  "name": "quip-poll",
+  "name": "quip-feedback",
   "version": "1.0.0",
-  "description": "Quip Poll Element",
+  "description": "Quip Feedback",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

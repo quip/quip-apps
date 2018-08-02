@@ -5,10 +5,6 @@ import quip from "quip";
 import ListenerRecord from "./listenerRecord";
 import {updateToolbar} from "./root.jsx";
 
-const defaultRowText = index =>
-    `Row${typeof index === "number" ? ` ${index + 1}` : ""}`;
-const matchDefaultRowText = text => (text.match(/^Row (\d+)$/) || [])[1];
-
 class Root extends quip.apps.RootRecord {
     static CONSTRUCTOR_KEY = "Root";
     static DATA_VERSION = 2;
@@ -108,27 +104,37 @@ export function login() {
     auth.login().then(
         () => {
             const token = auth.getTokenResponse();
-            let prefs = quip.apps.getUserPreferences();
+            console.debug("login token", {token});
+            const prefs = quip.apps.getUserPreferences();
             prefs.save({token});
             updateToolbar();
         },
         error => {
-            console.error("ERROR", error);
+            console.error("ERROR in login", error);
         }
     );
 }
 
+export async function refreshToken() {
+    const auth = quip.apps.auth("quip-automation-api");
+    await auth.refreshToken();
+    const token = auth.getTokenResponse();
+    console.debug("refreshToken", {token});
+    //const prefs = quip.apps.getUserPreferences();
+    //prefs.save({token});
+}
+
 export function logout() {
+    let prefs = quip.apps.getUserPreferences();
+    prefs.save({token: null});
     const auth = quip.apps.auth("quip-automation-api");
     auth.logout().then(
         () => {
-            let prefs = quip.apps.getUserPreferences();
-            prefs.save({token: null});
-
+            console.debug("ok, logged out");
             updateToolbar();
         },
         error => {
-            this.setState({error});
+            console.error("ERROR in logout", error);
         }
     );
 }

@@ -8,7 +8,7 @@ import format from "date-fns/format";
 
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 
-import {login} from "../model.js";
+import {login, refreshToken} from "../model.js";
 
 import Checkmark from "./Checkmark.jsx";
 import Chevron from "quip-apps-chevron";
@@ -40,18 +40,27 @@ export default class Row extends React.Component {
         const {isLoggedIn, record} = this.props;
         const threadId = record.get("thread_id");
         if (isLoggedIn && threadId) {
-            this.updateThreadProperties(threadId);
+            this.updateThreadProperties(threadId, true);
         }
     };
 
-    updateThreadProperties = async threadId => {
+    updateThreadProperties = async (threadId, retry = false) => {
+        console.debug("updateThreadProperties", threadId, retry);
         const {record} = this.props;
-        const thread = await this.getThread(threadId);
-        console.log("updateThreadProperties", {thread});
+        try {
+            const thread = await this.getThread(threadId);
+            console.log("updateThreadProperties", {thread});
 
-        record.set("thread_title", thread.title);
-        record.set("thread_created_usec", thread.created_usec);
-        record.set("thread_updated_usec", thread.updated_usec);
+            record.set("thread_title", thread.title);
+            record.set("thread_created_usec", thread.created_usec);
+            record.set("thread_updated_usec", thread.updated_usec);
+        } catch (err) {
+            console.error("ERR updateThreadProperties", {err});
+            if (retry) {
+                await refreshToken();
+                this.updateThreadProperties(threadId, false);
+            }
+        }
     };
 
     getThread = async threadId => {
@@ -62,6 +71,10 @@ export default class Row extends React.Component {
                 token.access_token
             }&thread_id=${threadId}`
         );
+        if (!rawResponse.ok) {
+            this.setState({loading: false});
+            throw Error(rawResponse.status);
+        }
         this.setState({loading: false});
         const response = await rawResponse.json();
         console.log({response});
@@ -110,12 +123,6 @@ export default class Row extends React.Component {
 
     onClickGetFeedbackButton = async () => {
         const {record} = this.props;
-        const token = quip.apps.getUserPreferences().getForKey("token");
-        if (!token) {
-            login();
-            alert("try again");
-            return;
-        }
         const link = this.refs["person"].querySelector("a.content");
         if (!link) {
             console.error("no content in RTB");
@@ -133,13 +140,27 @@ export default class Row extends React.Component {
             const threadId = link.getAttribute("href").replace("/", "");
             console.log("isAThread!", threadId);
             record.set("thread_id", threadId);
-            this.updateThreadProperties(threadId);
+            this.updateThreadProperties(threadId, true);
             return;
         }
+
+        try {
+            this.copyThread(atMentionId);
+        } catch (err) {
+            await refreshToken();
+            this.copyThread(atMentionId);
+        }
+    };
+
+    copyThread = async feedbackUserId => {
+        console.debug("copyThread");
         this.setState({loading: true});
 
+        const {documentMembers, record} = this.props;
+        const token = quip.apps.getUserPreferences().getForKey("token");
         const viewingUser = quip.apps.getViewingUser();
         const threadTitle = this.getTitle();
+        const documentMemberIds = documentMembers.map(p => p.getId());
         const rawResponse = await fetch(`${API_PROXY}/thread/copy`, {
             method: "POST",
             headers: {
@@ -150,9 +171,13 @@ export default class Row extends React.Component {
                 access_token: token.access_token,
                 template_thread_id: TEMPLATE_THREAD_ID,
                 title: threadTitle,
-                member_ids: [viewingUser.getId(), atMentionId],
+                member_ids: [...documentMemberIds, feedbackUserId],
             }),
         });
+        if (!rawResponse.ok) {
+            this.setState({loading: false});
+            throw Error(rawResponse.statusText);
+        }
         const response = await rawResponse.json();
 
         console.log({response});
@@ -166,7 +191,9 @@ export default class Row extends React.Component {
 
     onClickThreadTitle = e => {
         e.preventDefault();
-        quip.apps.openLink(`https://quip.com${e.target.getAttribute("href")}`);
+        quip.apps.openLink(
+            `https://corp.quip.com${e.target.getAttribute("href")}`
+        );
     };
 
     render() {
@@ -181,30 +208,22 @@ export default class Row extends React.Component {
         let content;
         if (threadId) {
             content = (
-                <div className={Styles.document}>
-                    <a href={`/${threadId}`} onClick={this.onClickThreadTitle}>
-                        {threadTitle}
-                    </a>
-                </div>
+                <a href={`/${threadId}`} onClick={this.onClickThreadTitle}>
+                    {threadTitle}
+                </a>
             );
         } else if (loading) {
-            content = (
-                <div className={Styles.document}>
-                    <span>Loading ...</span>
-                </div>
-            );
+            content = <span>Loading ...</span>;
         } else if (isLoggedIn) {
             content = (
-                <div className={Styles.button}>
-                    <button
-                        disabled={!isLoggedIn}
-                        onClick={this.onClickGetFeedbackButton}>
-                        Get feedback!
-                    </button>
-                </div>
+                <button
+                    disabled={!isLoggedIn}
+                    onClick={this.onClickGetFeedbackButton}>
+                    Get feedback!
+                </button>
             );
         } else {
-            content = <div className={Styles.document}>^^ Login first ^^</div>;
+            content = <span>"^^ Login first ^^</span>;
         }
 
         return (
@@ -217,11 +236,10 @@ export default class Row extends React.Component {
                         scrollable={false}
                         useDocumentTheme={false}
                         allowedStyles={[]}
-                        handleKeyEvent={this.handleKeyEvent}
                         ref="rtb"
                     />
                 </div>
-                {content}
+                <div className={Styles.document}>{content}</div>
                 <div className={Styles.usec}>
                     {threadCreatedUsec
                         ? format(new Date(threadCreatedUsec / 1000), dateFormat)
