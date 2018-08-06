@@ -1,0 +1,24 @@
+{
+    "id": "SfRAjASXAdo",
+    "manifest_version": 1,
+    "name": "Sticky Note and Comments and Giphys",
+    "disable_app_level_comments": true,
+    "version_name": "1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 300,
+    "initial_width": 300,
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"],
+    "other_resources": ["dist/*.gif"],
+    "csp_sources": {
+        "connect_srcs": ["https://api.giphy.com"],
+        "img_srcs": [
+            "https://giphy.com",
+            "https://media0.giphy.com",
+            "https://media1.giphy.com",
+            "https://media2.giphy.com",
+            "https://media3.giphy.com"
+        ]
+    }
+}
