@@ -60,13 +60,13 @@ def check_environment(yarn_or_npm):
 
 
 def init_app(app_dir_name):
-    yarn_or_npm = "yarn"
+    yarn_or_npm = "npm"
     try:
         FNULL = open(os.devnull, 'w')
         subprocess.check_call("%s --version" % yarn_or_npm, shell=True,
                               stdout=FNULL, stderr=subprocess.STDOUT)
     except:
-        yarn_or_npm = "npm"
+        yarn_or_npm = "yarn"
 
     if not check_environment(yarn_or_npm):
         logging.error("Initialization failed.")
