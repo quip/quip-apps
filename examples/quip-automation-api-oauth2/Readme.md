@@ -20,10 +20,13 @@ npm run build
 
 1. Go to [https://admin.quip.com/][]
 2. Find the section named "API Keys"
-  - If not present, be sure that the Site has "applications enabled".
+
+-   If not present, be sure that the Site has "applications enabled".
+
 3. Click on "Create API Key" and add an entry for this App
-  - This is where you'll get the Client ID and Client Secret for the Auth config
-  - Note that the service name here is not programmatically important
+
+-   This is where you'll get the Client ID and Client Secret for the Auth config
+-   Note that the service name here is not programmatically important
 
 ### 4. Configure Auth
 
@@ -31,11 +34,14 @@ npm run build
 2. Click on the app you just updated
 3. Go to the "Auth" section at the bottom, select OAUTH2 as the auth type and click on "Add"
 4. Fill out the Auth configuration (leave everything else blank):
-	- **Name**: `YourAppName`
+    - **Name**: `YourAppName`
     - You'll need to use the name you choose here in place of `quip-automation-api` when getting an instance of the Live Apps Auth instace (e.g. `quip.apps.auth("quip-automation-api")`)
-  - **Authorization URL**: `https://platform.quip.com/1/oauth/login`
-  - **Client ID**: Client ID from admin.quip.com
-  - **Client Secret**: Client Secret from admin.quip.com
-  - **Token URL**: `https://platform.quip.com/1/oauth/access_token`
+
+-   **Authorization URL**: `https://platform.quip.com/1/oauth/login`
+-   **Client ID**: Client ID from admin.quip.com
+-   **Client Secret**: Client Secret from admin.quip.com
+-   **Token URL**: `https://platform.quip.com/1/oauth/access_token`
+-   **Proxy API Domains**: `https://platform.quip.com/`
+
 5. Click on Update.
 6. Click on `Test Login`. It should work.
