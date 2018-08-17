@@ -138,3 +138,7 @@ export function logout() {
         }
     );
 }
+
+export function auth() {
+    return quip.apps.auth("quip-automation-api");
+}

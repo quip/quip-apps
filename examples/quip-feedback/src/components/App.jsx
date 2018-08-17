@@ -8,6 +8,7 @@ import Row, {HeaderRow} from "./Row.jsx";
 import Styles from "./App.less";
 
 import {setSelectedRowIds} from "../root.jsx";
+import {auth} from "../model";
 
 export default class App extends React.Component {
     static propTypes = {
@@ -18,8 +19,7 @@ export default class App extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            //isLoggedIn: !!quip.apps.getUserPreferences().getForKey("token"),
-            isLoggedIn: quip.apps.auth("quip-automation-api").isLoggedIn(),
+            isLoggedIn: auth().isLoggedIn(),
             documentMembers: quip.apps.getDocumentMembers(),
             selectedRowIds: [],
         };
@@ -39,9 +39,7 @@ export default class App extends React.Component {
             quip.apps.EventType.USER_PREFERENCE_UPDATE,
             () => {
                 this.setState({
-                    isLoggedIn: quip.apps
-                        .auth("quip-automation-api")
-                        .isLoggedIn(),
+                    isLoggedIn: auth().isLoggedIn(),
                 });
             }
         );

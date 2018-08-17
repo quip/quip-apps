@@ -8,7 +8,7 @@ import format from "date-fns/format";
 
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 
-import {login, refreshToken} from "../model.js";
+import {auth, login, refreshToken} from "../model.js";
 
 import Checkmark from "./Checkmark.jsx";
 import Chevron from "quip-apps-chevron";
@@ -17,9 +17,7 @@ import Styles from "./Row.less";
 const {RichTextBox, CommentsTrigger} = quip.apps.ui;
 
 const RETURN_KEY = 13;
-
-//const API_PROXY = "http://localhost:8080";
-const API_PROXY = "https://quip-platform-api-proxy.herokuapp.com";
+const API = "https://platform.quip.com/1";
 const TEMPLATE_THREAD_ID = "IrdIAvWi0VAp";
 
 export default class Row extends React.Component {
@@ -65,20 +63,20 @@ export default class Row extends React.Component {
 
     getThread = async threadId => {
         this.setState({loading: true});
-        const token = quip.apps.getUserPreferences().getForKey("token");
-        const rawResponse = await fetch(
-            `${API_PROXY}/thread/get?access_token=${
-                token.access_token
-            }&thread_id=${threadId}`
-        );
+        const rawResponse = await auth().request({
+            url: `${API}/threads/${threadId}`,
+        });
+        console.debug("getThread", {rawResponse});
+        this.setState({loading: false});
         if (!rawResponse.ok) {
-            this.setState({loading: false});
             throw Error(rawResponse.status);
         }
-        this.setState({loading: false});
         const response = await rawResponse.json();
         console.log({response});
-        return response.thread;
+        return {
+            ...response.thread,
+            html: response.html,
+        };
     };
 
     handleKeyEvent = e => {
@@ -153,47 +151,45 @@ export default class Row extends React.Component {
     };
 
     copyThread = async feedbackUserId => {
-        console.debug("copyThread");
-        this.setState({loading: true});
+        await this.setState({loading: true});
 
         const {documentMembers, record} = this.props;
         const token = quip.apps.getUserPreferences().getForKey("token");
         const viewingUser = quip.apps.getViewingUser();
-        const threadTitle = this.getTitle();
+        const title = this.getTitle();
         const documentMemberIds = documentMembers.map(p => p.getId());
-        const rawResponse = await fetch(`${API_PROXY}/thread/copy`, {
+
+        const threadToCopy = await this.getThread(TEMPLATE_THREAD_ID);
+        console.debug({threadToCopy});
+
+        const content = threadToCopy.html.replace(threadToCopy.title, title);
+        const rawResponse = await auth().request({
+            url: `${API}/threads/new-document`,
             method: "POST",
             headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: JSON.stringify({
-                access_token: token.access_token,
-                template_thread_id: TEMPLATE_THREAD_ID,
-                title: threadTitle,
-                member_ids: [...documentMemberIds, feedbackUserId],
-            }),
+            data: {
+                content,
+                member_ids: [...documentMemberIds, feedbackUserId].join(","),
+            },
         });
         if (!rawResponse.ok) {
-            this.setState({loading: false});
             throw Error(rawResponse.statusText);
         }
         const response = await rawResponse.json();
-
-        console.log({response});
+        console.log("copyThread", {response});
         const thread = response.thread;
         record.set("thread_id", thread.id);
-        record.set("thread_title", threadTitle);
+        record.set("thread_title", thread.title);
         record.set("thread_created_usec", thread.created_usec);
         record.set("thread_updated_usec", thread.updated_usec);
-        this.setState({loading: false});
+        await this.setState({loading: false});
     };
 
     onClickThreadTitle = e => {
         e.preventDefault();
-        quip.apps.openLink(
-            `https://corp.quip.com${e.target.getAttribute("href")}`
-        );
+        quip.apps.openLink(e.target.getAttribute("href"));
     };
 
     render() {
@@ -208,7 +204,9 @@ export default class Row extends React.Component {
         let content;
         if (threadId) {
             content = (
-                <a href={`/${threadId}`} onClick={this.onClickThreadTitle}>
+                <a
+                    href={`https://corp.quip.com/${threadId}`}
+                    onClick={this.onClickThreadTitle}>
                     {threadTitle}
                 </a>
             );
