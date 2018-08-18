@@ -20,21 +20,11 @@ export default class App extends React.Component {
         super();
         this.state = {
             isLoggedIn: auth().isLoggedIn(),
-            documentMembers: quip.apps.getDocumentMembers(),
             selectedRowIds: [],
         };
     }
 
     componentDidMount() {
-        quip.apps.addEventListener(
-            quip.apps.EventType.DOCUMENT_MEMBERS_LOADED,
-            () => {
-                this.setState({
-                    documentMembers: quip.apps.getDocumentMembers(),
-                });
-            }
-        );
-
         quip.apps.addEventListener(
             quip.apps.EventType.USER_PREFERENCE_UPDATE,
             () => {
@@ -67,7 +57,7 @@ export default class App extends React.Component {
 
     render() {
         const {rows, rootRecord} = this.props;
-        const {documentMembers, isLoggedIn} = this.state;
+        const {isLoggedIn} = this.state;
 
         return (
             <div className={Styles.app}>
@@ -79,27 +69,12 @@ export default class App extends React.Component {
                         .map((row, i, records) => (
                             <Row
                                 key={row.getId()}
-                                documentMembers={documentMembers}
                                 isLoggedIn={isLoggedIn}
                                 record={row}
                                 selected={this.isSelectedRow(row.getId())}
                                 setRowSelected={this.setRowSelected}
                             />
                         ))}
-                </div>
-                <div
-                    style={{
-                        color: "#999",
-                        fontSize: "75%",
-                        marginTop: 5,
-                    }}>
-                    Feedback docs will be shared with{" "}
-                    {documentMembers.map((p, i, arr) => (
-                        <span>
-                            {p.getName()}
-                            {i < arr.length - 1 ? " and " : null}
-                        </span>
-                    ))}
                 </div>
             </div>
         );

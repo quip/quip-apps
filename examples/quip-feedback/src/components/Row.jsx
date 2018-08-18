@@ -151,17 +151,15 @@ export default class Row extends React.Component {
     };
 
     copyThread = async feedbackUserId => {
-        await this.setState({loading: true});
-
-        const {documentMembers, record} = this.props;
+        const {record} = this.props;
         const token = quip.apps.getUserPreferences().getForKey("token");
         const viewingUser = quip.apps.getViewingUser();
         const title = this.getTitle();
-        const documentMemberIds = documentMembers.map(p => p.getId());
 
         const threadToCopy = await this.getThread(TEMPLATE_THREAD_ID);
         console.debug({threadToCopy});
 
+        this.setState({loading: true});
         const content = threadToCopy.html.replace(threadToCopy.title, title);
         const rawResponse = await auth().request({
             url: `${API}/threads/new-document`,
@@ -171,7 +169,7 @@ export default class Row extends React.Component {
             },
             data: {
                 content,
-                member_ids: [...documentMemberIds, feedbackUserId].join(","),
+                member_ids: [viewingUser.getId(), feedbackUserId].join(","),
             },
         });
         if (!rawResponse.ok) {
@@ -184,7 +182,7 @@ export default class Row extends React.Component {
         record.set("thread_title", thread.title);
         record.set("thread_created_usec", thread.created_usec);
         record.set("thread_updated_usec", thread.updated_usec);
-        await this.setState({loading: false});
+        this.setState({loading: false});
     };
 
     onClickThreadTitle = e => {
