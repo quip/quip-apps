@@ -1,0 +1,21 @@
+{
+    "name": "einstein-analytics",
+    "version": "0.0.1",
+    "description": "einstein-analytics Quip App",
+    "license": "UNLICENSED",
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
+    },
+    "author": "",
+    "devDependencies": {
+        "@salesforce/babel-preset-design-system-react": "^3.0.0",
+        "quip-apps-webpack-config": ">=0.0.29"
+    },
+    "dependencies": {
+        "@salesforce-ux/design-system": "^2.6.2",
+        "@salesforce/design-system-react": "^0.8.22",
+        "lodash.sortby": "^4.7.0",
+        "svg-react-loader": "^0.4.5"
+    }
+}
