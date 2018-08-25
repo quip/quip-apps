@@ -1,6 +1,6 @@
 {
     "name": "quip-apps-chevron",
-    "version": "0.0.34",
+    "version": "0.0.38",
     "description": "Quip Apps Chevron",
     "license": "Apache-2.0",
     "repository": "quip/quip-apps",
@@ -10,6 +10,6 @@
         "build": "NODE_ENV=production webpack --output-library-target umd"
     },
     "dependencies": {
-        "quip-apps-webpack-config": "^0.0.34"
+        "quip-apps-webpack-config": "^0.0.38"
     }
 }
