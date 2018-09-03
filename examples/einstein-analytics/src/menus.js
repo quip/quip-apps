@@ -1,5 +1,11 @@
 import {getAuth} from "./root.jsx";
 
+let AppContext;
+
+export function setAppContext(c) {
+    AppContext = c;
+}
+
 export function getAllMenuCommands() {
     return [
         {
@@ -13,9 +19,14 @@ export function getAllMenuCommands() {
             handler: logout,
         },
         {
-            id: "height",
+            id: "setHeight",
             label: quiptext("Height"),
-            handler: () => {},
+            handler: () => {
+                console.debug({AppContext});
+                if (AppContext) {
+                    AppContext.toggleDashboardHeightModalOpen();
+                }
+            },
         },
         {
             id: "clearDashboardId",
@@ -46,7 +57,7 @@ export function updateIsLoggedIn() {
 }
 export function updateToolbar() {
     const toolbarCommandIds = getToolbarCommandIds();
-    console.debug("updateToolbar", {toolbarCommandIds});
+    //console.debug("updateToolbar", {toolbarCommandIds});
     quip.apps.updateToolbar({toolbarCommandIds});
 }
 
@@ -56,6 +67,7 @@ export function getToolbarCommandIds() {
     let toolbarCommandIds = [];
     if (isLoggedIn && dashboardId) {
         toolbarCommandIds.push("clearDashboardId");
+        toolbarCommandIds.push("setHeight");
     }
     if (isLoggedIn) {
         toolbarCommandIds.push("logout");

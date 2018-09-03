@@ -1,14 +1,29 @@
-
 .App {
+    min-height: 300px;
     width: 800px;
+    padding-right: 40px;
 }
 
 .loginContainer {
     border: 1px solid #eee;
     border-radius: 7px;
-    width: 400px;
-    height: 200px;
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.loginLogoBackground {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    opacity: 0.3;
+}
+
+.loginButton {
+    position: relative;
 }

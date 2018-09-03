@@ -1,16 +1,26 @@
 import React from "react";
 import PropTypes from "prop-types";
+import sortBy from "lodash/sortby";
 
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
 import loadScript from "./loadScript";
-import {login, updateToolbar} from "./menus";
+import {login, logout, setAppContext, updateToolbar} from "./menus";
 
 import Dashboard from "./Dashboard.jsx";
+import DashboardHeightModal from "./DashboardHeightModal.jsx";
 import DashboardPicker from "./DashboardPicker.jsx";
 
 import "@salesforce-ux/design-system/assets/styles/salesforce-lightning-design-system.min.css";
+//import {IconSettings} from "@salesforce/design-system-react";
+
+import logoSrc from "./analytics-studio.png";
+
 import Styles from "./App.less";
+
+const DEFAULT_DASHBOARD_HEIGHT = 500;
+const DASHBOARDS_PAGE_SIZE = 50;
+
 export default class App extends React.Component {
     static propTypes = {
         dashboardId: PropTypes.string,
@@ -18,13 +28,17 @@ export default class App extends React.Component {
     };
     constructor(props) {
         super();
+        setAppContext(this);
         const isLoggedIn = getAuth().isLoggedIn();
         this.state = {
             dashboards: [],
+            dashboardHeightModalOpen: false,
             isLoggedIn,
+            isLoginValid: isLoggedIn,
             isLightningLoaded: false,
         };
         if (isLoggedIn) {
+            this.loadDashboards();
             this.loadLightning();
         }
     }
@@ -36,16 +50,24 @@ export default class App extends React.Component {
                 const isLoggedIn = getAuth().isLoggedIn();
                 const becameLoggedIn = !this.state.isLoggedIn && isLoggedIn;
                 if (becameLoggedIn) {
+                    this.loadDashboards();
                     this.loadLightning();
                 }
-                this.setState({isLoggedIn});
+                this.setState({isLoggedIn, isLoginValid: true});
             });
     }
 
-    componentWillUnmount() {}
+    componentWillUnmount() {
+        if (this.loadLightningTimeout_) {
+            window.clearTimeout(this.loadLightningTimeout_);
+        }
+        if (this.loadLightningInterval_) {
+            window.clearInterval(this.loadLightningInterval_);
+        }
+    }
 
-    setDashboards = dashboards => {
-        this.setState({dashboards});
+    setDashboardHeight = dashboardHeight => {
+        quip.apps.getRootRecord().set("dashboardHeight", dashboardHeight);
     };
 
     setDashboardId = dashboardId => {
@@ -53,33 +75,123 @@ export default class App extends React.Component {
         updateToolbar();
     };
 
+    toggleDashboardHeightModalOpen = () => {
+        this.setState({
+            dashboardHeightModalOpen: !this.state.dashboardHeightModalOpen,
+        });
+    };
+
     loadLightning() {
         const tokenResponse = getAuth().getTokenResponse();
         const src = `${lightningUrl(
             tokenResponse.instance_url)}/lightning/lightning.out.js`;
         loadScript(src, () => {
-            console.debug("window.$Lightning loaded?", window.$Lightning);
-            this.setState({isLightningLoaded: true});
+            // Adding a terrible timeout here to try to fix $A is not defined
+            this.loadLightningTimeout_ = window.setTimeout(
+                this.onLoadLightningimeout,
+                10000);
+            this.loadLightningInterval_ = window.setInterval(() => {
+                const isLightningLoaded = !!window.$Lightning;
+                console.debug(
+                    "isLightningLoaded",
+                    isLightningLoaded,
+                    "window.$Lightning",
+                    window.$Lightning,
+                    "window.$A",
+                    window.$A);
+                if (isLightningLoaded) {
+                    this.setState({isLightningLoaded});
+                    window.clearTimeout(this.loadLightningTimeout_);
+                    this.loadLightningTimeout_ = null;
+                    window.clearInterval(this.loadLightningInterval_);
+                    this.loadLightningInterval_ = null;
+                }
+            }, 100);
         });
+    }
+
+    onLoadLightningimeout() {
+        console.debug("onLoadLightningimeout");
+        window.clearInterval(this.loadLightningInterval_);
+        this.loadLightningInterval_ = null;
+        // give up on trying to load lightning :(
+        throw Error("Unable to load window.$Lightning");
+    }
+
+    loadDashboards(retry = true) {
+        const tokenResponse = getAuth().getTokenResponse();
+        // https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dashboards.htm
+        const url = `${
+            tokenResponse.instance_url
+        }/services/data/v43.0/wave/dashboards?pageSize=${DASHBOARDS_PAGE_SIZE}`;
+        getAuth()
+            .request({url})
+            .then(response => {
+                console.debug({response});
+                if (!response.ok && response.status === 401) {
+                    this.setState({isLoginValid: false});
+                    if (retry) {
+                        console.debug("RETRY AUTH refreshToken()");
+                        getAuth()
+                            .refreshToken()
+                            .then(() => {
+                                this.loadDashboards(false);
+                            })
+                            .catch(err => {
+                                console.debug({err});
+                                logout();
+                            });
+                    } else {
+                        logout();
+                    }
+                    return;
+                }
+                const json = response.json();
+                console.debug({json});
+                const dashboards = sortBy(json.dashboards, [
+                    "folder.label",
+                    "label",
+                ]);
+                this.setState({dashboards, isLoginValid: true});
+            })
+            .catch(err => {
+                console.debug("fetch dashboards error", {err});
+            });
     }
 
     render() {
         const {dashboardHeight, dashboardId} = this.props;
-        const {dashboards, isLightningLoaded, isLoggedIn} = this.state;
+        const {
+            dashboards,
+            dashboardHeightModalOpen,
+            isLightningLoaded,
+            isLoggedIn,
+            isLoginValid,
+        } = this.state;
+        const height = dashboardHeight || DEFAULT_DASHBOARD_HEIGHT;
         return <div className={Styles.App}>
             {!isLoggedIn && <div className={Styles.loginContainer}>
-                <button onClick={login}>Connect to Salesforce</button>
+                <img src={logoSrc} className={Styles.loginLogoBackground}/>
+                <button className={Styles.loginButton} onClick={login}>
+                    Connect to Salesforce
+                </button>
             </div>}
             {isLoggedIn &&
                 !dashboardId && <DashboardPicker
                     dashboards={dashboards}
-                    setDashboardId={this.setDashboardId}
-                    setDashboards={this.setDashboards}/>}
+                    setDashboardId={this.setDashboardId}/>}
+            {dashboardHeightModalOpen && <DashboardHeightModal
+                height={height}
+                setHeight={this.setDashboardHeight}
+                isOpen={dashboardHeightModalOpen}
+                toggleOpen={this.toggleDashboardHeightModalOpen}/>}
             {isLoggedIn &&
+                isLoginValid &&
                 isLightningLoaded &&
                 dashboardId && <Dashboard
+                    key={`${dashboardId}-${height}`}
                     dashboardId={dashboardId}
-                    height={dashboardHeight}/>}
+                    height={height}/>}
         </div>;
     }
 }

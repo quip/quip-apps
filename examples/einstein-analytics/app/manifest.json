@@ -1,39 +1,49 @@
 {
-  "id": "eWJAjAHhOXa",
-  "manifest_version": 1,
-  "name": "Einstein Analytics",
-  "version_name": "1.0",
-  "version_number": 1,
-  "sizing_mode": "fit_content",
-  "initial_height": 300,
-  "initial_width": 300,
-  "js_files": ["dist/app.js"],
-  "css_files": ["dist/app.css"],
-  "csp_sources": {
-    "script_srcs": [
-      "https://adx-dev-ed.my.salesforce.com",
-      "https://adx-dev-ed.lightning.force.com"
+    "id": "eWJAjAHhOXa",
+    "manifest_version": 1,
+    "name": "Einstein Analytics",
+    "version_name": "1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 300,
+    "initial_width": 300,
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"],
+    "toolbar_icon": "icons/toolbar.svg",
+    "thumbnail": "icons/thumbnail.svg",
+    "toolbar_color": "green",
+    "other_resources": [
+        "dist/*.png",
+        "dist/assets/fonts/webfonts/*",
+        "dist/assets/icons/*"
     ],
-    "connect_srcs": [
-      "https://adx-dev-ed.lightning.force.com",
-      "https://adx-dev-ed.my.salesforce.com"
-    ],
-    "style_srcs": [
-      "https://d2i1pl9gz4hwa7.cloudfront.net",
-      "https://adx-dev-ed.lightning.force.com"
-    ],
-    "font_srcs": [
-      "https://d2i1pl9gz4hwa7.cloudfront.net",
-      "https://adx-dev-ed.lightning.force.com",
-      "https://adx-dev-ed.my.salesforce.com"
-    ],
-    "frame_srcs": [
-      "https://adx-dev-ed.lightning.force.com",
-      "https://adx-dev-ed.my.salesforce.com"
-    ],
-    "image_srcs": [
-      "https://adx-dev-ed.lightning.force.com",
-      "https://adx-dev-ed.my.salesforce.com"
-    ]
-  }
+    "csp_sources": {
+        "script_srcs": [
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
+        "connect_srcs": [
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
+        "style_srcs": [
+            "https://quip-cdn.com",
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
+        "font_srcs": [
+            "https://quip-cdn.com",
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
+        "frame_srcs": [
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
+        "img_srcs": [
+            "https://quip-cdn.com",
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ]
+    }
 }

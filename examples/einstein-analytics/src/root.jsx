@@ -1,7 +1,7 @@
 import quip from "quip";
 import App from "./App.jsx";
 import Connect from "./connectRecord";
-import {getAllMenuCommands, getToolbarCommandIds, updateToolbar} from "./menus";
+import {getAllMenuCommands, updateToolbar} from "./menus";
 
 Object.prototype.isReactComponent;
 

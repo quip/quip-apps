@@ -4,8 +4,6 @@ import PropTypes from "prop-types";
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
 
-const DEFAULT_HEIGHT = 400;
-
 export default class Dashboard extends React.Component {
     static propTypes = {
         dashboardId: PropTypes.string,
@@ -13,10 +11,12 @@ export default class Dashboard extends React.Component {
     };
     constructor(props) {
         super();
-        console.debug("Dashboard constructor");
     }
     componentDidMount() {
         this.buildDashboard();
+    }
+    componentWillUnmount() {
+        quip.apps.clearEmbeddedIframe();
     }
     buildDashboard() {
         if (!window.$Lightning) {
@@ -30,13 +30,25 @@ export default class Dashboard extends React.Component {
         window.$Lightning.use(
             "c:loApp",
             e => {
+                //https://adx-dev-ed.lightning.force.com/auradocs/reference.app#reference?descriptor=wave:waveDashboard&
                 window.$Lightning.createComponent(
                     "wave:waveDashboard",
                     {
                         dashboardId,
-                        height: height || DEFAULT_HEIGHT,
+                        //showHeader: false,
+                        //showTitle: false,
+                        height: height,
                     },
-                    this.el);
+                    this.el,
+                    () => {
+                        const iframe = this.el.querySelector("iframe");
+                        console.debug({iframe});
+                        if (!iframe) {
+                            console.error("No iframe to register :(");
+                        } else {
+                            quip.apps.registerEmbeddedIframe(iframe);
+                        }
+                    });
             },
             baseUrl,
             accessToken);
