@@ -40,6 +40,10 @@
             "https://*.lightning.force.com",
             "https://*.my.salesforce.com"
         ],
+        "media_srcs": [
+            "https://*.lightning.force.com",
+            "https://*.my.salesforce.com"
+        ],
         "img_srcs": [
             "https://quip-cdn.com",
             "https://*.lightning.force.com",

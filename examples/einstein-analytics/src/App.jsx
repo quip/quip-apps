@@ -61,8 +61,8 @@ export default class App extends React.Component {
         if (this.loadLightningTimeout_) {
             window.clearTimeout(this.loadLightningTimeout_);
         }
-        if (this.loadLightningInterval_) {
-            window.clearInterval(this.loadLightningInterval_);
+        if (this.loadLightningInterval) {
+            window.clearInterval(this.loadLightningInterval);
         }
     }
 
@@ -81,42 +81,38 @@ export default class App extends React.Component {
         });
     };
 
-    loadLightning() {
+    loadLightning = () => {
         const tokenResponse = getAuth().getTokenResponse();
         const src = `${lightningUrl(
             tokenResponse.instance_url)}/lightning/lightning.out.js`;
+
+        this.loadLightningTimeout_ = window.setTimeout(
+            this.onLoadLightningTimeout,
+            10000);
         loadScript(src, () => {
-            // Adding a terrible timeout here to try to fix $A is not defined
-            this.loadLightningTimeout_ = window.setTimeout(
-                this.onLoadLightningimeout,
-                10000);
-            this.loadLightningInterval_ = window.setInterval(() => {
+            this.loadLightningInterval = window.setInterval(() => {
                 const isLightningLoaded = !!window.$Lightning;
                 console.debug(
                     "isLightningLoaded",
                     isLightningLoaded,
                     "window.$Lightning",
-                    window.$Lightning,
-                    "window.$A",
-                    window.$A);
+                    window.$Lightning);
                 if (isLightningLoaded) {
                     this.setState({isLightningLoaded});
                     window.clearTimeout(this.loadLightningTimeout_);
                     this.loadLightningTimeout_ = null;
-                    window.clearInterval(this.loadLightningInterval_);
-                    this.loadLightningInterval_ = null;
+                    window.clearInterval(this.loadLightningInterval);
+                    this.loadLightningInterval = null;
                 }
-            }, 100);
+            }, 10);
         });
-    }
+    };
 
-    onLoadLightningimeout() {
-        console.debug("onLoadLightningimeout");
-        window.clearInterval(this.loadLightningInterval_);
-        this.loadLightningInterval_ = null;
-        // give up on trying to load lightning :(
+    onLoadLightningTimeout = () => {
+        window.clearInterval(this.loadLightningInterval);
+        this.loadLightningInterval = null;
         throw Error("Unable to load window.$Lightning");
-    }
+    };
 
     loadDashboards(retry = true) {
         const tokenResponse = getAuth().getTokenResponse();
@@ -169,7 +165,7 @@ export default class App extends React.Component {
             isLoginValid,
         } = this.state;
         const height = dashboardHeight || DEFAULT_DASHBOARD_HEIGHT;
-        return <div className={Styles.App}>
+        return <div className={Styles.App} style={{minHeight: dashboardHeight}}>
             {!isLoggedIn && <div className={Styles.loginContainer}>
                 <img src={logoSrc} className={Styles.loginLogoBackground}/>
                 <button className={Styles.loginButton} onClick={login}>
