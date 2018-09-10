@@ -1,0 +1,11 @@
+html {
+    background-color: transparent !important;
+}
+
+.App {
+    min-width: 800px;
+}
+
+.CardContent {
+    padding: 10px;
+}

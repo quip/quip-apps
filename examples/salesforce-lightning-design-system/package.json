@@ -1,0 +1,18 @@
+{
+    "name": "salesforce-lightning-design-system",
+    "version": "0.0.1",
+    "description": "salesforce-lightning-design-system Quip App",
+    "license": "UNLICENSED",
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
+    },
+    "author": "",
+    "devDependencies": {
+        "quip-apps-webpack-config": "0.0.39"
+    },
+    "dependencies": {
+        "@salesforce-ux/design-system": "^2.6.2",
+        "@salesforce/design-system-react": "^0.8.22"
+    }
+}
