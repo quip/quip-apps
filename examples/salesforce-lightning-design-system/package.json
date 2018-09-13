@@ -9,10 +9,10 @@
     },
     "author": "",
     "devDependencies": {
-        "quip-apps-webpack-config": "0.0.39"
+        "quip-apps-webpack-config": ">=0.0.39"
     },
     "dependencies": {
-        "@salesforce-ux/design-system": "^2.6.2",
-        "@salesforce/design-system-react": "^0.8.22"
+        "@salesforce/design-system-react": "^0.8.24",
+        "@salesforce-ux/design-system": "^2.7.0"
     }
 }
