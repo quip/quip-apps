@@ -12,7 +12,7 @@
         "quip-apps-webpack-config": ">=0.0.39"
     },
     "dependencies": {
-        "@salesforce/design-system-react": "^0.8.24",
-        "@salesforce-ux/design-system": "^2.7.0"
+        "@salesforce-ux/design-system": "^2.7.1",
+        "@salesforce/design-system-react": "^0.8.25"
     }
 }

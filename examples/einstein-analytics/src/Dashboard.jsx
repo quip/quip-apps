@@ -3,6 +3,10 @@ import PropTypes from "prop-types";
 
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
+import "Dashboard.css";
+
+const CACHE_DASHBOARD_ID = "0FKB0000000DbxzOAC";
+import cacheImgSrc from "./assets/dashboard_0FKB0000000DbxzOAC.png";
 
 export default class Dashboard extends React.Component {
     static propTypes = {
@@ -12,6 +16,9 @@ export default class Dashboard extends React.Component {
 
     constructor(props) {
         super();
+        this.state = {
+            isLoading: props.dashboardId === CACHE_DASHBOARD_ID,
+        };
     }
 
     componentDidMount() {
@@ -30,6 +37,7 @@ export default class Dashboard extends React.Component {
         const tokenResponse = getAuth().getTokenResponse();
         const accessToken = tokenResponse.access_token;
         const baseUrl = lightningUrl(tokenResponse.instance_url);
+        console.debug("buildDashboard", baseUrl, accessToken);
         window.$Lightning.use(
             "c:loApp",
             () => {
@@ -60,31 +68,79 @@ export default class Dashboard extends React.Component {
 
     onAuraLoaded() {
         const {dashboardId, height} = this.props;
+        const tokenResponse = getAuth().getTokenResponse();
+        const accessToken = tokenResponse.access_token;
+        console.debug("$Lightning.createComponent", {dashboardId, height});
         //https://adx-dev-ed.lightning.force.com/auradocs/reference.app#reference?descriptor=wave:waveDashboard&
         window.$Lightning.createComponent(
             "wave:waveDashboard",
             {
                 dashboardId,
-                //showHeader: false,
-                //showTitle: false,
+                accessToken,
+                showHeader: false,
+                showTitle: false,
                 height: height,
             },
             this.el,
-            () => {
-                const iframe = this.el.querySelector("iframe");
-                console.debug("onAuraLoaded", {iframe});
-                if (!iframe) {
-                    console.error("No iframe to register :(");
-                } else {
-                    quip.apps.registerEmbeddedIframe(iframe);
+            (cmp, status, errorMessage) => {
+                // status is SUCCESS, INCOMPLETE, or ERROR
+                console.debug("callback", {cmp, status, errorMessage});
+                if (status !== "SUCCESS") {
+                    // TODO: consider logout() here?
+                    return;
                 }
+
+                // https://developer.salesforce.com/docs/component-library/overview/events
+                cmp.addEventHandler("aura:doneRendering", e => {
+                    /*
+                    quip.apps.clearEmbeddedIframe();
+                    const iframe = cmp.getElement().querySelector("iframe");
+                    quip.apps.registerEmbeddedIframe(iframe);
+                    */
+
+                    if (this.props.dashboardId === CACHE_DASHBOARD_ID) {
+                        const waveSpinner = cmp
+                            .getElement()
+                            .querySelector(".embeddedSpinner");
+                        const isLoading =
+                            !!waveSpinner && !!waveSpinner.offsetHeight;
+                        console.debug("aura:doneRendering!", {isLoading});
+                        this.setState({isLoading});
+                    }
+                });
             });
     }
 
+    onLoadCacheImg = e => {
+        console.debug("onLoadCacheImg", e);
+    };
+
+    onErrorCacheImg = err => {
+        console.debug("onErrorCacheImg", err);
+    };
+
     render() {
-        const {height} = this.props;
-        return <div>
-            <div ref={el => (this.el = el)} style={{minHeight: height}}/>
+        const {dashboardId, height} = this.props;
+        const {isLoading} = this.state;
+        console.debug("render isLoading", isLoading);
+        /*
+        let cacheImgSrc;
+        try {
+            cacheImgSrc = pathToCacheImgs(`dashboard_${dashboardId}.png`, true);
+        } catch (err) {
+            console.debug("error loading img", {err});
+        }
+        */
+        return <div className="Dashboard" style={{minHeight: height}}>
+            {isLoading ? (
+                <div className="cacheImg" style={{minHeight: height}}>
+                    <img src={cacheImgSrc} alt={quiptext("Loading...")}/>
+                </div>
+            ) : null}
+            <div
+                ref={el => (this.el = el)}
+                className="wave"
+                style={{minHeight: height}}/>
         </div>;
     }
 }

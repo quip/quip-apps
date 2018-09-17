@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import {
     Button,
-    //IconSettings,
     //Input,
     //Modal,
 } from "@salesforce/design-system-react";
@@ -45,7 +44,6 @@ export default class DashboardHeightModal extends React.Component {
         </div>;
         /*
         return <div>
-            <IconSettings iconPath="/assets/icons">
                 <Modal
                     dismissible
                     isOpen={isOpen}
@@ -64,7 +62,6 @@ export default class DashboardHeightModal extends React.Component {
                         type="number"
                         value={height}/>
                 </Modal>
-            </IconSettings>
         </div>;
         */
     }

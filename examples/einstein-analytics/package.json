@@ -10,13 +10,11 @@
     "author": "",
     "devDependencies": {
         "@salesforce/babel-preset-design-system-react": "^3.0.0",
-        "quip-apps-webpack-config": ">=0.0.29"
+        "quip-apps-webpack-config": ">=0.0.39"
     },
     "dependencies": {
-        "@salesforce-ux/design-system": "^2.6.2",
-        "@salesforce/design-system-react": "^0.8.22",
-        "iframe2image": "^0.2.1",
-        "lodash.sortby": "^4.7.0",
-        "svg-react-loader": "^0.4.5"
+        "@salesforce-ux/design-system": "^2.7.1",
+        "@salesforce/design-system-react": "^0.8.25",
+        "lodash.sortby": "^4.7.0"
     }
 }

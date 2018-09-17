@@ -1,7 +1,7 @@
 html {
     background-color: transparent !important;
 }
+
 .filter input:not([type="checkbox"]):not([type="radio"]) {
-    /*padding: 0 0 0 2rem;*/
-    padding: 0px 10px;
+    padding: 0 0 0 2rem;
 }

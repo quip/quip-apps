@@ -10,15 +10,8 @@ import {
     DataTable,
     DataTableCell,
     DataTableColumn,
-    IconSettings,
     Spinner,
 } from "@salesforce/design-system-react";
-
-import logoSrc from "./analytics-studio.png";
-import standardSprite from "./assets/icons/standard-sprite/svg/symbols.svg";
-import standardUtilitySprite from "./assets/icons/utility-sprite/svg/symbols.svg";
-//import standardSprite from "@salesforce-ux/design-system/assets/icons/standard-sprite/svg/symbols.svg";
-//import standardSprite from "!file-loader!@salesforce-ux/design-system/assets/icons/standard-sprite/svg/symbols.svg";
 
 const ClickableDataTableCell = ({children, ...props}) => <DataTableCell
     {...props}>
@@ -39,6 +32,8 @@ const FolderDataTableCell = ({children, ...props}) => <ClickableDataTableCell
     <a>{props.item.folder.label}</a>
 </ClickableDataTableCell>;
 FolderDataTableCell.displayName = DataTableCell.displayName;
+
+const HEIGHT = 500;
 
 export default class DashboardPicker extends React.Component {
     static propTypes = {
@@ -73,40 +68,38 @@ export default class DashboardPicker extends React.Component {
     };
 
     render() {
+        //<img src={logoSrc} style={{width: 30, height: 30}}/>
         const {dashboards, isFiltering} = this.props;
         const {filteredDashboards} = this.state;
 
         const isEmpty = dashboards.length === 0;
-        return <IconSettings iconPath="dist/assets/icons">
-            <Card
-                bodyClassName="slds-grow slds-scrollable--y"
-                className="slds-grid slds-grid--vertical"
-                filter={
-                    (!isEmpty || isFiltering) && <CardFilter
-                        className="filter"
-                        onChange={this.handleFilterChange}/>
-                }
-                heading={quiptext("Dashboards")}
-                icon={<img src={logoSrc} style={{width: 30, height: 30}}/>}
-                empty={
-                    isEmpty ? (
-                        <CardEmpty heading="Loading dashboards ...">
-                            <Spinner
-                                assistiveText={{label: quiptext("Loading")}}
-                                size="large"/>
-                        </CardEmpty>
-                    ) : null
-                }
-                style={{height: "350px"}}>
-                <DataTable items={filteredDashboards || dashboards} fixedLayout>
-                    <DataTableColumn label="App" property="id" sortable>
-                        <FolderDataTableCell onClick={this.onClickRow}/>
-                    </DataTableColumn>
-                    <DataTableColumn label="Name" property="label" sortable>
-                        <ClickableDataTableCell onClick={this.onClickRow}/>
-                    </DataTableColumn>
-                </DataTable>
-            </Card>
-        </IconSettings>;
+        return <Card
+            bodyClassName="slds-grow slds-scrollable--y"
+            className="slds-grid slds-grid--vertical"
+            filter={
+                (!isEmpty || isFiltering) && <CardFilter
+                    className="filter"
+                    onChange={this.handleFilterChange}/>
+            }
+            heading={quiptext("Dashboards")}
+            empty={
+                isEmpty ? (
+                    <CardEmpty heading="Loading ...">
+                        <Spinner
+                            assistiveText={{label: quiptext("Loading")}}
+                            size="large"/>
+                    </CardEmpty>
+                ) : null
+            }
+            style={{height: HEIGHT}}>
+            <DataTable items={filteredDashboards || dashboards} fixedLayout>
+                <DataTableColumn label="App" property="id" sortable>
+                    <FolderDataTableCell onClick={this.onClickRow}/>
+                </DataTableColumn>
+                <DataTableColumn label="Name" property="label" sortable>
+                    <ClickableDataTableCell onClick={this.onClickRow}/>
+                </DataTableColumn>
+            </DataTable>
+        </Card>;
     }
 }
