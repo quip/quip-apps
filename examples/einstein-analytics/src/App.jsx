@@ -20,7 +20,7 @@ import logoSrc from "./assets/analytics-studio.png";
 
 import Styles from "./App.less";
 
-const DEFAULT_DASHBOARD_HEIGHT = 500;
+const DEFAULT_DASHBOARD_HEIGHT = 600;
 const DASHBOARDS_PAGE_SIZE = 50;
 
 export default class App extends React.Component {

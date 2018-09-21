@@ -7,7 +7,7 @@
     "version_name": "1.0",
     "version_number": 2,
     "sizing_mode": "fit_content",
-    "initial_height": 575,
+    "initial_height": 600,
     "initial_width": 900,
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"],

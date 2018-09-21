@@ -86,7 +86,6 @@ export default class Dashboard extends React.Component {
                 // status is SUCCESS, INCOMPLETE, or ERROR
                 console.debug("callback", {cmp, status, errorMessage});
                 if (status !== "SUCCESS") {
-                    // TODO: consider logout() here?
                     return;
                 }
 
