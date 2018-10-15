@@ -49,6 +49,10 @@ quip.apps.initialize({
 
         const ConnectedApp = Connect(rootRecord, App);
         ReactDOM.render(<ConnectedApp />, rootNode);
+
+        setInterval(() => {
+            console.debug("THREADID", quip.apps.getThreadId());
+        }, 1000);
     },
     menuCommands: [
         {

@@ -1,7 +1,8 @@
 import React from "react";
+
 import "@salesforce-ux/design-system/assets/styles/salesforce-lightning-design-system.min.css";
-import "./App.css";
 import "./dsr-quip-mods.css";
+import "./App.css";
 
 import {Card, IconSettings} from "@salesforce/design-system-react";
 
@@ -12,6 +13,7 @@ import Alerts from "./Alerts.jsx";
 import Buttons from "./Buttons.jsx";
 import Cards from "./Cards.jsx";
 import Datepicker from "./Datepicker.jsx";
+import Modals from "./Modals.jsx";
 import Sliders from "./Sliders.jsx";
 import Spinners from "./Spinners.jsx";
 import Tabs from "./Tabs.jsx";
@@ -22,6 +24,7 @@ const components = {
     Cards,
     Buttons,
     Datepicker,
+    Modals,
     Sliders,
     Spinners,
     Tabs,
@@ -30,6 +33,8 @@ const components = {
 const componentNames = Object.keys(components);
 console.debug("componentNames", componentNames);
 export default class App extends React.Component {
+
+    
     handleNavClick = e => {
         e.preventDefault();
         const href = e.target.getAttribute("href").replace("#", "");
@@ -39,10 +44,7 @@ export default class App extends React.Component {
 
     render() {
         return (
-            <IconSettings
-                onRequestIconPath={({category, name}) => {
-                    return `#${name}`;
-                }}>
+            <IconSettings onRequestIconPath={({category, name}) => `#${name}`}>
                 <div className="App">
                     <UtilitySprite />
                     <div className="components-nav">

@@ -112,11 +112,13 @@ export default class Row extends React.Component {
         });
     };
 
-    getTitle() {
+    getTitle(feedbackUserId) {
         const {record} = this.props;
-        const shareWithUserName = record.get("person").getTextContent();
-        const viewingUser = quip.apps.getViewingUser();
-        return `Feedback for ${viewingUser.getName()} from ${shareWithUserName}`;
+        const viewingUserName = quip.apps.getViewingUser().getName();
+        const shareWithUserName = quip.apps
+            .getUserById(feedbackUserId)
+            .getName();
+        return `Feedback for ${viewingUserName} from ${shareWithUserName}`;
     }
 
     onClickGetFeedbackButton = async () => {
@@ -154,7 +156,7 @@ export default class Row extends React.Component {
         const {record} = this.props;
         const token = quip.apps.getUserPreferences().getForKey("token");
         const viewingUser = quip.apps.getViewingUser();
-        const title = this.getTitle();
+        const title = this.getTitle(feedbackUserId);
 
         const threadToCopy = await this.getThread(TEMPLATE_THREAD_ID);
         console.debug({threadToCopy});
