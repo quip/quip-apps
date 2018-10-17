@@ -1,6 +1,6 @@
 {
   "name": "quip-apps-compat",
-  "version": "0.0.31",
+  "version": "0.0.41",
   "description": "Compat library for Quip Apps",
   "license": "Apache-2.0",
   "repository": "quip/quip-apps",
