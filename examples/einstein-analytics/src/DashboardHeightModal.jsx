@@ -1,17 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {
-    Button,
-    //Input,
-    //Modal,
-} from "@salesforce/design-system-react";
+import {Button} from "@salesforce/design-system-react";
 
 import Styles from "./DashboardHeightModal.less";
 
 export default class DashboardHeightModal extends React.Component {
     static propTypes = {
         height: PropTypes.number,
-        isOpen: PropTypes.bool,
         setHeight: PropTypes.func,
         toggleOpen: PropTypes.func,
     };
@@ -20,6 +15,16 @@ export default class DashboardHeightModal extends React.Component {
         this.state = {
             height: props.height,
         };
+    }
+    componentDidMount() {
+        quip.apps.addEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
+            this.props.toggleOpen);
+    }
+    componentWillUnmount() {
+        quip.apps.removeEventListener(
+            quip.apps.EventType.ELEMENT_BLUR,
+            this.props.toggleOpen);
     }
     onChange = e => {
         const height = this.input.value;
@@ -30,39 +35,28 @@ export default class DashboardHeightModal extends React.Component {
         setHeight(this.state.height);
         toggleOpen();
     };
+    onClickBackdrop = e => {
+        const {toggleOpen} = this.props;
+        toggleOpen();
+    };
     render() {
         const {height} = this.state;
-        return <div className={Styles.DashboardHeightModal}>
-            <input
-                className={Styles.input}
-                ref={input => (this.input = input)}
-                value={height}
-                onChange={this.onChange}/>
-            <Button className={Styles.button} onClick={this.onClickSetHeight}>
-                Submit
-            </Button>
-        </div>;
-        /*
         return <div>
-                <Modal
-                    dismissible
-                    isOpen={isOpen}
-                    onRequestClose={toggleOpen}
-                    prompt="info"
-                    size="medium"
-                    parentSelector={() =>
-                        document.querySelector("#quip-element-root")
-                    }
-                    title={<span>Dashboard Height</span>}>
-                    <Input
-                        onChange={e => {
-                            console.debug("onChange", e.target.value);
-                        }}
-                        label="Height"
-                        type="number"
-                        value={height}/>
-                </Modal>
+            <div
+                className={Styles.DashboardHeightModalBackdrop}
+                onClick={this.onClickBackdrop}/>
+            <div className={Styles.DashboardHeightModal}>
+                <input
+                    className={Styles.input}
+                    ref={input => (this.input = input)}
+                    value={height}
+                    onChange={this.onChange}/>
+                <Button
+                    className={Styles.button}
+                    onClick={this.onClickSetHeight}>
+                    Submit
+                </Button>
+            </div>
         </div>;
-        */
     }
 }

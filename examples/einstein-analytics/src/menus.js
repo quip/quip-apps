@@ -43,7 +43,8 @@ export function getAllMenuCommands() {
 export function login() {
     getAuth()
         .login()
-        .then(updateIsLoggedIn);
+        .then(updateIsLoggedIn)
+        .catch(loginFailed);
 }
 export function logout() {
     getAuth()
@@ -55,6 +56,9 @@ export function updateIsLoggedIn() {
     quip.apps.getUserPreferences().save({"logged_in": getAuth().isLoggedIn()});
     updateToolbar();
 }
+
+export function loginFailed() {}
+
 export function updateToolbar() {
     const toolbarCommandIds = getToolbarCommandIds();
     //console.debug("updateToolbar", {toolbarCommandIds});

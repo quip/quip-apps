@@ -72,6 +72,7 @@ export default class Dashboard extends React.Component {
         const accessToken = tokenResponse.access_token;
         console.debug("$Lightning.createComponent", {dashboardId, height});
         //https://adx-dev-ed.lightning.force.com/auradocs/reference.app#reference?descriptor=wave:waveDashboard&
+
         window.$Lightning.createComponent(
             "wave:waveDashboard",
             {
@@ -84,18 +85,22 @@ export default class Dashboard extends React.Component {
             this.el,
             (cmp, status, errorMessage) => {
                 // status is SUCCESS, INCOMPLETE, or ERROR
-                console.debug("callback", {cmp, status, errorMessage});
+                console.debug("window.$Lightning.createComponent callback", {
+                    cmp,
+                    status,
+                    errorMessage,
+                });
                 if (status !== "SUCCESS") {
                     return;
                 }
 
                 // https://developer.salesforce.com/docs/component-library/overview/events
                 cmp.addEventHandler("aura:doneRendering", e => {
-                    /*
+                    // We need to registerEmbeddedIframe in order to keep the
+                    // Live App menu focus interaction working
                     quip.apps.clearEmbeddedIframe();
                     const iframe = cmp.getElement().querySelector("iframe");
                     quip.apps.registerEmbeddedIframe(iframe);
-                    */
 
                     if (this.props.dashboardId === CACHE_DASHBOARD_ID) {
                         const waveSpinner = cmp

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import sortBy from "lodash/sortby";
 
 import UtilitySprite from "@salesforce-ux/design-system/assets/icons/utility-sprite/svg/symbols.svg";
-import {IconSettings} from "@salesforce/design-system-react";
+import {Button, IconSettings} from "@salesforce/design-system-react";
 
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
@@ -39,6 +39,7 @@ export default class App extends React.Component {
             isLoginValid: isLoggedIn,
             isLightningLoaded: false,
         };
+        this.dashboardsCache = {};
         if (isLoggedIn) {
             this.loadDashboards();
             this.loadLightning();
@@ -116,12 +117,22 @@ export default class App extends React.Component {
         throw Error("Unable to load window.$Lightning");
     };
 
-    loadDashboards(retry = true) {
-        const tokenResponse = getAuth().getTokenResponse();
+    handleFilterChange = query => {
+        this.loadDashboards(query);
+    };
+
+    loadDashboards(query = "", retry = true) {
+        console.debug("loadDash", this.dashboardsCache, query);
+        if (this.dashboardsCache[query]) {
+            this.setState({dashboards: this.dashboardsCache[query]});
+            return;
+        }
+
         // https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dashboards.htm
-        const url = `${
+        const tokenResponse = getAuth().getTokenResponse();
+        let url = `${
             tokenResponse.instance_url
-        }/services/data/v43.0/wave/dashboards?pageSize=${DASHBOARDS_PAGE_SIZE}`;
+        }/services/data/v43.0/wave/dashboards?q=${query}&pageSize=${DASHBOARDS_PAGE_SIZE}`;
         getAuth()
             .request({url})
             .then(response => {
@@ -152,6 +163,7 @@ export default class App extends React.Component {
                     "label",
                 ]);
                 this.setState({dashboards, isLoginValid: true});
+                this.dashboardsCache[query] = dashboards;
             })
             .catch(err => {
                 console.debug("fetch dashboards error", {err});
@@ -169,27 +181,23 @@ export default class App extends React.Component {
         } = this.state;
         const height = dashboardHeight || DEFAULT_DASHBOARD_HEIGHT;
         return <IconSettings
-            actionSprite={"foioi"}
-            onRequestIconPath={({category, name}) => {
-                console.debug("onRequestIconPath", {category, name});
-                return `#${name}`;
-            }}>
+            onRequestIconPath={({category, name}) => `#${name}`}>
             <div className={Styles.App} style={{minHeight: dashboardHeight}}>
                 <UtilitySprite/>
-                {!isLoggedIn && <div className={Styles.loginContainer}>
+                {!isLoggedIn && <div
+                    className={Styles.loginContainer}
+                    onClick={login}>
                     <img src={logoSrc} className={Styles.loginLogoBackground}/>
-                    <button className={Styles.loginButton} onClick={login}>
-                        Connect to Salesforce
-                    </button>
+                    <Button onClick={login}>Connect to Salesforce</Button>
                 </div>}
                 {isLoggedIn &&
                     !dashboardId && <DashboardPicker
                         dashboards={dashboards}
-                        setDashboardId={this.setDashboardId}/>}
+                        setDashboardId={this.setDashboardId}
+                        handleFilterChange={this.handleFilterChange}/>}
                 {dashboardHeightModalOpen && <DashboardHeightModal
                     height={height}
                     setHeight={this.setDashboardHeight}
-                    isOpen={dashboardHeightModalOpen}
                     toggleOpen={this.toggleDashboardHeightModalOpen}/>}
                 {isLoggedIn &&
                     isLoginValid &&

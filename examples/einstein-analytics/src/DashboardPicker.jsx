@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import debounce from "lodash.debounce";
+
 import "./DashboardPicker.css";
 
 import {
@@ -40,26 +42,26 @@ export default class DashboardPicker extends React.Component {
         dashboards: PropTypes.array,
         isFiltering: PropTypes.bool,
         setDashboardId: PropTypes.func,
+        handleFilterChange: PropTypes.func,
     };
-    constructor() {
-        super();
+
+    constructor(props) {
+        super(props);
         this.state = {
-            filteredDashboards: null,
             isFiltering: false,
         };
+        this.handleFilterChangeDebounced = debounce(
+            this.props.handleFilterChange,
+            200);
     }
 
-    handleFilterChange = e => {
-        const {dashboards} = this.props;
+    onFilterChange = e => {
         if (e.target.value === "") {
-            this.setState({filteredDashboards: null, isFiltering: false});
+            this.setState({isFiltering: false});
             return;
         }
-        const filteredDashboards = dashboards.filter(item =>
-            RegExp(event.target.value, "i").test(
-                `${item.folder.label} ${item.label}`)
-        );
-        this.setState({filteredDashboards, isFiltering: true});
+        this.handleFilterChangeDebounced(e.target.value);
+        this.setState({isFiltering: true});
     };
 
     onClickRow = dashboard => {
@@ -68,22 +70,18 @@ export default class DashboardPicker extends React.Component {
     };
 
     render() {
-        //<img src={logoSrc} style={{width: 30, height: 30}}/>
-        const {dashboards, isFiltering} = this.props;
-        const {filteredDashboards} = this.state;
-
+        const {dashboards} = this.props;
+        const isFiltering = this.state;
         const isEmpty = dashboards.length === 0;
         return <Card
             bodyClassName="slds-grow slds-scrollable--y"
             className="slds-grid slds-grid--vertical"
             filter={
-                (!isEmpty || isFiltering) && <CardFilter
-                    className="filter"
-                    onChange={this.handleFilterChange}/>
+                <CardFilter className="filter" onChange={this.onFilterChange}/>
             }
             heading={quiptext("Dashboards")}
             empty={
-                isEmpty ? (
+                isEmpty && !isFiltering ? (
                     <CardEmpty heading="Loading ...">
                         <Spinner
                             assistiveText={{label: quiptext("Loading")}}
@@ -92,7 +90,7 @@ export default class DashboardPicker extends React.Component {
                 ) : null
             }
             style={{height: HEIGHT}}>
-            <DataTable items={filteredDashboards || dashboards} fixedLayout>
+            <DataTable items={dashboards} fixedLayout>
                 <DataTableColumn label="App" property="id" sortable>
                     <FolderDataTableCell onClick={this.onClickRow}/>
                 </DataTableColumn>
