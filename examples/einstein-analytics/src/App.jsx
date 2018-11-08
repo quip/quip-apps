@@ -1,22 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
-import sortBy from "lodash/sortby";
 
 import UtilitySprite from "@salesforce-ux/design-system/assets/icons/utility-sprite/svg/symbols.svg";
-import {Button, IconSettings} from "@salesforce/design-system-react";
+import {IconSettings} from "@salesforce/design-system-react";
 
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
 import loadScript from "./loadScript";
 import {login, logout, setAppContext, updateToolbar} from "./menus";
 
+import ButtonPrompt from "./ButtonPrompt.jsx";
 import Dashboard from "./Dashboard.jsx";
-import DashboardHeightModal from "./DashboardHeightModal.jsx";
+import DashboardHeight from "./DashboardHeight.jsx";
 import DashboardPicker from "./DashboardPicker.jsx";
 
 import "@salesforce-ux/design-system/assets/styles/salesforce-lightning-design-system.min.css";
-
-import logoSrc from "./assets/analytics-studio.png";
 
 import Styles from "./App.less";
 
@@ -38,6 +36,7 @@ export default class App extends React.Component {
             isLoggedIn,
             isLoginValid: isLoggedIn,
             isLightningLoaded: false,
+            filterQuery: "",
         };
         this.dashboardsCache = {};
         if (isLoggedIn) {
@@ -84,6 +83,12 @@ export default class App extends React.Component {
         });
     };
 
+    closeDashboardHeightModal = () => {
+        this.setState({
+            dashboardHeightModalOpen: false,
+        });
+    };
+
     loadLightning = () => {
         const tokenResponse = getAuth().getTokenResponse();
         const src = `${lightningUrl(
@@ -117,22 +122,51 @@ export default class App extends React.Component {
         throw Error("Unable to load window.$Lightning");
     };
 
-    handleFilterChange = query => {
-        this.loadDashboards(query);
+    handleFilterChange = filterQuery => {
+        // Reset nextPageUrl so we fetch dashboards based on the new query
+        this.setState({filterQuery: filterQuery, nextPageUrl: undefined});
+        this.loadDashboards();
     };
 
-    loadDashboards(query = "", retry = true) {
-        console.debug("loadDash", this.dashboardsCache, query);
-        if (this.dashboardsCache[query]) {
-            this.setState({dashboards: this.dashboardsCache[query]});
+    loadDashboards(retry = true) {
+        const {dashboards, filterQuery = "", nextPageUrl} = this.state;
+
+        // https://corp.quip.com/3LX4Ac0TYuKm/Einstein-Analytics-Live-App-Demo-Main-Collab-Doc#XeUACAjTSA6
+        // Proactively fixing this, but should send an diagnostic report
+        let sanitizedFilterQuery = filterQuery;
+        if (sanitizedFilterQuery == "false") {
+            // TODO: file report when encountering this error
+            console.warn("filterQuery in bad format", sanitizedFilterQuery);
+            sanitizedFilterQuery = "";
+        }
+        const tokenResponse = getAuth().getTokenResponse();
+        let url;
+        let existingDashboards;
+        if (nextPageUrl === undefined) {
+            // https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dashboards.htm
+            url = `${
+                tokenResponse.instance_url
+            }/services/data/v43.0/wave/dashboards?sort=Name&q=${sanitizedFilterQuery}&pageSize=${DASHBOARDS_PAGE_SIZE}`;
+            existingDashboards = [];
+        } else if (nextPageUrl === null) {
+            // If nextPageUrl is none, it means we have fetched all the results
+            // corresponding to the query.
+            return;
+        } else {
+            url = `${tokenResponse.instance_url}${nextPageUrl}`;
+            existingDashboards = dashboards;
+        }
+        console.debug("loadDash", this.dashboardsCache, url);
+        if (this.dashboardsCache[url]) {
+            this.setState({
+                dashboards: [
+                    ...existingDashboards,
+                    ...this.dashboardsCache[url]["dashboards"],
+                ],
+                nextPageUrl: this.dashboardsCache[url]["nextPageUrl"],
+            });
             return;
         }
-
-        // https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dashboards.htm
-        const tokenResponse = getAuth().getTokenResponse();
-        let url = `${
-            tokenResponse.instance_url
-        }/services/data/v43.0/wave/dashboards?q=${query}&pageSize=${DASHBOARDS_PAGE_SIZE}`;
         getAuth()
             .request({url})
             .then(response => {
@@ -158,22 +192,40 @@ export default class App extends React.Component {
                 }
                 const json = response.json();
                 console.debug({json});
-                const dashboards = sortBy(json.dashboards, [
-                    "folder.label",
-                    "label",
-                ]);
-                this.setState({dashboards, isLoginValid: true});
-                this.dashboardsCache[query] = dashboards;
+                const newDashboards = json.dashboards;
+                const combinedDashboards = [
+                    ...existingDashboards,
+                    ...newDashboards,
+                ];
+                this.setState({
+                    dashboards: combinedDashboards,
+                    isLoginValid: true,
+                    nextPageUrl: json.nextPageUrl,
+                    totalDashboardLength: parseInt(json.totalSize, 10),
+                });
+
+                this.dashboardsCache[url] = {
+                    "dashboards": newDashboards,
+                    "nextPageUrl": json.nextPageUrl,
+                };
             })
             .catch(err => {
                 console.debug("fetch dashboards error", {err});
             });
     }
 
+    onScrollDashboardPicker = e => {
+        const target = e.target;
+        if (target.scrollHeight - target.scrollTop === target.clientHeight) {
+            this.loadDashboards();
+        }
+    };
+
     render() {
         const {dashboardHeight, dashboardId} = this.props;
         const {
             dashboards,
+            totalDashboardLength,
             dashboardHeightModalOpen,
             isLightningLoaded,
             isLoggedIn,
@@ -182,23 +234,24 @@ export default class App extends React.Component {
         const height = dashboardHeight || DEFAULT_DASHBOARD_HEIGHT;
         return <IconSettings
             onRequestIconPath={({category, name}) => `#${name}`}>
-            <div className={Styles.App} style={{minHeight: dashboardHeight}}>
+            <div
+                className={Styles.App}
+                style={{minHeight: dashboardHeight}}
+                onScroll={this.onScrollDashboardPicker}>
                 <UtilitySprite/>
-                {!isLoggedIn && <div
-                    className={Styles.loginContainer}
-                    onClick={login}>
-                    <img src={logoSrc} className={Styles.loginLogoBackground}/>
-                    <Button onClick={login}>Connect to Salesforce</Button>
-                </div>}
+                {!isLoggedIn && <ButtonPrompt
+                    onClick={login}
+                    text={quiptext("Connect to Salesforce")}/>}
                 {isLoggedIn &&
                     !dashboardId && <DashboardPicker
                         dashboards={dashboards}
+                        totalDashboardLength={totalDashboardLength}
                         setDashboardId={this.setDashboardId}
                         handleFilterChange={this.handleFilterChange}/>}
-                {dashboardHeightModalOpen && <DashboardHeightModal
+                {dashboardHeightModalOpen && <DashboardHeight
                     height={height}
                     setHeight={this.setDashboardHeight}
-                    toggleOpen={this.toggleDashboardHeightModalOpen}/>}
+                    close={this.closeDashboardHeightModal}/>}
                 {isLoggedIn &&
                     isLoginValid &&
                     isLightningLoaded &&
