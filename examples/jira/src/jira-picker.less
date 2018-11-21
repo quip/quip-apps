@@ -1,0 +1,129 @@
+/* Copyright 2017 Quip */
+
+@import "../../shared/base-field-builder/common";
+
+.scrollableList {
+    &:first-child {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+.filterList {
+    display: flex;
+    width: 200px;
+    flex-direction: column;
+    background-color: #fafafa;
+    box-shadow: 1px 0 0 @borderColor;
+    .highlighted {
+        background-color: #eeeeee;
+    }
+}
+
+.filterRow {
+    padding: 5px 10px;
+}
+
+.issueList {
+    display: flex;
+    width: 400px;
+    flex-direction: column;
+    box-shadow: 1px 0 0 @borderColor;
+    .highlighted {
+        color: white;
+        background-color: #59b4ed;
+    }
+    .filterRow {
+        font-weight: bold;
+        margin-bottom: 5px;
+        position: relative;
+        flex-direction: column;
+        .liveDataIcon {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            top: 8px;
+            right: 10px;
+        }
+        &.highlighted .liveDataIcon path {
+            fill: white;
+        }
+    }
+    .liveDataByline {
+        font-weight: normal;
+        font-size: 12px;
+        padding: 2px 0 3px;
+    }
+}
+
+.issueDivider {
+    border-style: none;
+    margin: 6px 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.issueRow {
+    display: flex;
+    padding: 8px 10px;
+
+    svg {
+        flex: 0 0 auto;
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+    }
+
+    &:not(.highlighted) svg :global(.check) {
+        display: none;
+    }
+    &.highlighted {
+        background-color: #59b4ed;
+        color: white;
+        svg {
+            fill: white;
+        }
+    }
+}
+
+.keySpan {
+    font-weight: bold;
+    flex: 0 0 60px;
+    padding-right: 10px;
+    .highlighted {
+        color: white;
+    }
+}
+
+.searchBar {
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 0px !important;
+    border-radius: 0px !important;
+    margin-top: 10px !important;
+    padding: 12px !important;
+    width: 600px;
+    height: 46px;
+    outline: none;
+}
+
+.searchDisplay, .errorLoading {
+    align-items: center;
+    box-shadow: 1px 0 0 @borderColor;
+    color: #8c8c8c;
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    justify-content: center;
+    width: 400px;
+}
+
+.retry {
+    color: #25b4e9;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.pickerContainer :global(.parts-spinner) {
+    margin-left: 100px;
+}

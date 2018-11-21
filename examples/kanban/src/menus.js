@@ -86,9 +86,11 @@ export function showCardContextMenu(e, cardRecord, onDismiss) {
             "automatic-color",
             ...colors,
             quip.apps.DocumentMenuCommands.SEPARATOR,
-            "comment",
-            "delete-card",
         ];
+        if (quip.apps.viewerCanSeeComments()) {
+            commands.push("comment");
+        }
+        commands.push("delete-card");
     }
     quip.apps.showContextMenuFromButton(
         e,

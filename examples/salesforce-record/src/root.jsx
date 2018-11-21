@@ -91,6 +91,7 @@ quip.apps.initialize({
 
         ReactDOM.render(
             <WrappedRoot
+                isCreation={params.isCreation}
                 entity={rootRecord}
                 menuDelegate={menuDelegate}
                 ref={node => {
@@ -106,6 +107,7 @@ class Root extends React.Component {
     static propTypes = {
         entity: React.PropTypes.instanceOf(RecordPickerEntity).isRequired,
         menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
+        isCreation: React.PropTypes.bool.isRequired,
     };
 
     constructor(props) {
@@ -286,6 +288,7 @@ class Root extends React.Component {
             return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
         }
         const recordComponent = <Record
+            isCreation={this.props.isCreation}
             entity={selectedRecord}
             menuDelegate={menuDelegate}
             ref={node => (this.recordComponent_ = node)}/>;

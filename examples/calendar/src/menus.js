@@ -66,12 +66,11 @@ export function showEventContextMenu(
     onDismiss: Function) {
     selectedEvent = eventRecord;
 
-    const commands = [
-        ...colors,
-        quip.apps.DocumentMenuCommands.SEPARATOR,
-        "comment",
-        "delete-event",
-    ];
+    const commands = [...colors, quip.apps.DocumentMenuCommands.SEPARATOR];
+    if (quip.apps.viewerCanSeeComments()) {
+        commands.push("comment");
+    }
+    commands.push("delete-event");
 
     quip.apps.showContextMenuFromButton(
         e,

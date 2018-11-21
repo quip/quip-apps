@@ -484,15 +484,17 @@ const mapStateToProps = state => ({
     rootRecord: state.rootRecord,
     selectedEvent: state.selectedEvent,
 });
-export default connect(mapStateToProps, {
-    refreshEvents,
-    setDebugProp,
-    setFocusedEvent,
-    setIsSmallScreen,
-    setMouseCoordinates,
-    setMovingEvent,
-    setMovingEventOrder,
-    setMovingEventRectMap,
-    setResizingEvent,
-    setSelectedEvent,
-})(Calendar);
+export default connect(
+    mapStateToProps,
+    {
+        refreshEvents,
+        setDebugProp,
+        setFocusedEvent,
+        setIsSmallScreen,
+        setMouseCoordinates,
+        setMovingEvent,
+        setMovingEventOrder,
+        setMovingEventRectMap,
+        setResizingEvent,
+        setSelectedEvent,
+    })(Calendar);

@@ -34,4 +34,6 @@ class EventEndHandle extends React.Component<Props, null> {
     }
 }
 
-export default connect(null, {setResizingEvent})(EventEndHandle);
+export default connect(
+    null,
+    {setResizingEvent})(EventEndHandle);

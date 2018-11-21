@@ -61,6 +61,8 @@ class CalendarNavHeader extends React.Component<Props, null> {
 const mapHeaderStateToProps = state => ({
     displayMonth: state.displayMonth,
 });
-export default connect(mapHeaderStateToProps, {
-    setDisplayMonth,
-})(CalendarNavHeader);
+export default connect(
+    mapHeaderStateToProps,
+    {
+        setDisplayMonth,
+    })(CalendarNavHeader);

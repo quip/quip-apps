@@ -108,6 +108,22 @@ export class RootRecord extends quip.apps.RootRecord {
         this.setDataVersion(RootRecord.DATA_VERSION);
     }
 
+    // We found a case where a Project Tracker had null value where one
+    // of it's cells should have been which was causing it to fail to
+    // initialize. This function scans the RootRecord looking for cases
+    // where cells or missing and replaces them.
+    checkAndRepairNullCells() {
+        this.getColumns().map((col, ci) => {
+            col.getCells().map((cell, ri) => {
+                if (!cell) {
+                    this.getRows()[ri].addCell(
+                        col,
+                        Object.assign({columnId: col.getId()}));
+                }
+            });
+        });
+    }
+
     getColumns() {
         return this.get("columns").getRecords();
     }

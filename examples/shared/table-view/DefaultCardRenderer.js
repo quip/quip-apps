@@ -94,6 +94,9 @@ export const DefaultCardRenderer = () => {
                     availableWidth={width}
                     rowHeight={rowHeight}
                     record={record}
+                    ref={el =>
+                        record.setDom(el && ReactDOM.findDOMNode(el).parentNode)
+                    }
                     projectRecord={quip.apps.getRecordById(row.text.data[0].id)}
                     metricType={metricType}
                     showComments={showComments}/>;

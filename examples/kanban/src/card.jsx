@@ -7,7 +7,6 @@ import cx from "classnames";
 
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 
-import {kColumnWidth} from "./board.jsx";
 import {CardRecord, entityListener} from "./model.jsx";
 import {
     animateTo,
@@ -39,6 +38,7 @@ class Card extends React.Component {
         selected: React.PropTypes.bool.isRequired,
         setFocusedCard: React.PropTypes.func.isRequired,
         top: React.PropTypes.number.isRequired,
+        columnWidth: React.PropTypes.number.isRequired,
         isDraggingSomething: React.PropTypes.bool.isRequired,
         onCardRest: React.PropTypes.func.isRequired,
     };
@@ -100,6 +100,7 @@ class Card extends React.Component {
             focused,
             selected,
             top,
+            columnWidth,
             isDraggingSomething,
         } = this.props;
 
@@ -160,7 +161,7 @@ class Card extends React.Component {
                 zIndex,
             }) => {
                 let style = {
-                    width: kColumnWidth - kHorizontalMargin * 2,
+                    width: columnWidth - kHorizontalMargin * 2,
                     // Yosemite fix
                     WebkitTransform: `translate3d(${translateX}px,
                             ${translateY}px, 0) scale(${scale})`,

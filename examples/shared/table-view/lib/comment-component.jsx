@@ -2,13 +2,10 @@
 
 import cx from "classnames";
 import styles from "../Card.less";
-import {Card} from "../Card.less";
 
-import {COLUMN_TYPE, COMMENT_TRIGGER_MAKEUP} from "../../table-view/model.js";
 import {Y_BORDER} from "../../table-view/card.jsx";
 
 const COMMENT_TRIGGER_HEIGHT = 13;
-
 export class CommentToggle extends React.Component {
     static propTypes = {
         record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,

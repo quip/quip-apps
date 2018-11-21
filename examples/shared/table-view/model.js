@@ -279,9 +279,13 @@ export class PersonRecord extends CellRecord {
     }
 
     getUsers() {
+        // user.getUser() can return an array that contains null if the user
+        // that's been added to the spreadsheet is no longer in the document
+        // for some reason, so we filter those from the result.
         return this.get("users")
             .getRecords()
-            .map(user => user.getUser());
+            .map(user => user.getUser())
+            .filter(user => !!user);
     }
 }
 

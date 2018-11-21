@@ -1,7 +1,7 @@
 {
-  "name": "quip-field-builder",
+  "name": "quip-salesforce-record",
   "version": "1.0.0",
-  "description": "Quip Field Builder Element",
+  "description": "Quip Salesforce Record Element",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

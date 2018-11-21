@@ -115,7 +115,9 @@ class Column extends Component {
 
     columnDraggingDrop_ = () => {
         const {isDraggingColumn} = this.state;
-        if (!isDraggingColumn) return;
+        if (!isDraggingColumn) {
+            return;
+        }
 
         const {index, column, columnDragInProgress} = this.props;
         columnDragInProgress(false);

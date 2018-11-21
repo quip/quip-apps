@@ -65,7 +65,9 @@ export default class Option extends React.Component {
         };
         quip.apps.showContextMenuFromButton(
             e.currentTarget,
-            ["comment", "delete"],
+            quip.apps.viewerCanSeeComments()
+                ? ["comment", "delete"]
+                : ["delete"],
             [],
             [],
             () => {
@@ -99,7 +101,7 @@ export default class Option extends React.Component {
         } = this.props;
 
         const user = quip.apps.getViewingUser();
-        const progressPct = totalVotes ? votesCount / totalVotes * 100 : 0;
+        const progressPct = totalVotes ? (votesCount / totalVotes) * 100 : 0;
         var extraRichTextBoxProps = {};
         if (quip.apps.isApiVersionAtLeast("0.1.039")) {
             extraRichTextBoxProps.allowedInlineStyles = [

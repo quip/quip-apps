@@ -3,6 +3,7 @@
 
 import quip from "quip";
 import React from "react";
+import cx from "classnames";
 
 import Styles from "./App.less";
 
@@ -34,10 +35,31 @@ export default class App extends React.Component {
         quip.apps.recordQuipMetric("delete_step");
     };
 
+    componentDidMount() {
+        quip.apps.addEventListener(
+            quip.apps.EventType.CONTAINER_SIZE_UPDATE,
+            this.onContainerResize_);
+    }
+
+    componentWillUnmount() {
+        quip.apps.removeEventListener(
+            quip.apps.EventType.CONTAINER_SIZE_UPDATE,
+            this.onContainerResize_);
+    }
+
     render() {
         const {steps, selected, color} = this.props;
+        const inGridLayout = quip.apps.inGridLayout && quip.apps.inGridLayout();
+        let stepWidth;
+        if (inGridLayout) {
+            stepWidth = quip.apps.getContainerWidth() / steps.count();
+        }
 
-        return <div tabIndex="0" className={Styles.container}>
+        return <div
+            tabIndex="0"
+            className={cx(Styles.container, {
+                [Styles.fixedWidth]: !inGridLayout,
+            })}>
             {steps
                 .getRecords()
                 .map(step => <Step
@@ -45,8 +67,13 @@ export default class App extends React.Component {
                     selected={selected === step.getId()}
                     key={step.getId()}
                     record={step}
+                    width={stepWidth}
                     onSelected={this.setSelected}
                     onDelete={this.deleteStep}/>)}
         </div>;
     }
+
+    onContainerResize_ = () => {
+        this.forceUpdate();
+    };
 }

@@ -314,6 +314,7 @@ quip.apps.initialize({
                 });
                 rootRecord.setDataVersion(RootRecord.DATA_VERSION);
             }
+            rootRecord.checkAndRepairNullCells();
         }
 
         const Connected = connectEntity(rootRecord, Root, {

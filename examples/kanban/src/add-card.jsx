@@ -3,7 +3,6 @@
 import {Motion} from "react-motion";
 import cx from "classnames";
 import AddCardIcon from "./icons/add-card.jsx";
-import {kColumnWidth} from "./board.jsx";
 import {kHorizontalMargin} from "./card.jsx";
 import {ColumnRecord} from "./model.jsx";
 import {animateTo, focusCard} from "./root.jsx";
@@ -17,6 +16,7 @@ export default class AddCard extends React.Component {
         columnRecord: React.PropTypes.instanceOf(ColumnRecord).isRequired,
         top: React.PropTypes.number.isRequired,
         left: React.PropTypes.number.isRequired,
+        columnWidth: React.PropTypes.number.isRequired,
         columnSelected: React.PropTypes.bool.isRequired,
         columnDragging: React.PropTypes.bool.isRequired,
         cardDragging: React.PropTypes.bool.isRequired,
@@ -47,7 +47,7 @@ export default class AddCard extends React.Component {
         return <Motion style={motionStyle}>
             {({translateX, translateY, zIndex}) => {
                 const elementStyle = {
-                    width: kColumnWidth - kHorizontalMargin * 2,
+                    width: this.props.columnWidth - kHorizontalMargin * 2,
                     height: kAddCardHeight,
                     // Yosemite fix
                     WebkitTransform: `translate3d(${translateX}px,

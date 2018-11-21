@@ -5,6 +5,7 @@ import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-picker.less";
 import {getErrorMessage} from "../../shared/base-field-builder/error.js";
 import {RecordPickerEntity} from "./model/record-picker.js";
+import {DEFAULT_SELECTED_OBJECTS} from "./config.js";
 
 const LOADING_STATUS = {
     LOADING: 0,
@@ -106,6 +107,10 @@ export default class RecordPicker extends React.Component {
                 });
 
                 if (!showAllTypes) {
+                    if (selectedObjects.length === 0) {
+                        selectedObjects = DEFAULT_SELECTED_OBJECTS;
+                    }
+
                     const prevTypes = this.props.entity.getPreviouslySelectedObjectTypes();
                     const prevRecordTypes = recordTypes.filter(
                         object =>

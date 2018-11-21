@@ -3,7 +3,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-width: 180px;
     padding-right: 16px;
     padding-left: 20px;
     -webkit-clip-path: polygon(
@@ -19,6 +18,9 @@
 
     word-break: break-word;
 
+    &.fixedWidth {
+        min-width: 180px;
+    }
     &:last-child {
         margin-right: 0px;
     }

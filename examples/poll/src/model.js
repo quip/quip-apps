@@ -135,7 +135,7 @@ class Option extends ListenerRecord {
             currentVote.delete();
         }
 
-        if (!rtr.empty() && sendMessage) {
+        if (!rtr.empty() && value && sendMessage) {
             quip.apps.sendMessage(
                 quiptext("voted for %(option)s [snippet for a person]", {
                     "option": text,

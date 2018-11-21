@@ -180,9 +180,11 @@ const mapStateToProps = (state, ownProps) => {
         isSmallScreen: state.isSmallScreen,
     };
 };
-CalendarEvent = connect(mapStateToProps, {
-    setMovingEvent,
-    setSelectedEvent,
-})(CalendarEvent);
+CalendarEvent = connect(
+    mapStateToProps,
+    {
+        setMovingEvent,
+        setSelectedEvent,
+    })(CalendarEvent);
 
 export default CalendarEvent;

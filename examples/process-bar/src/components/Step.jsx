@@ -17,6 +17,7 @@ export default class Step extends React.Component {
     static propTypes = {
         record: React.PropTypes.instanceOf(quip.apps.RichTextRecord).isRequired,
         color: React.PropTypes.string.isRequired,
+        width: React.PropTypes.number,
         onSelected: React.PropTypes.func.isRequired,
         onDelete: React.PropTypes.func.isRequired,
         selected: React.PropTypes.bool,
@@ -44,7 +45,9 @@ export default class Step extends React.Component {
         this.setState({
             isContextMenuOpen: true,
         });
-        let menuCommandIds = ["comment", "deleteStep"];
+        let menuCommandIds = quip.apps.viewerCanSeeComments()
+            ? ["comment", "deleteStep"]
+            : ["deleteStep"];
         if (!this.props.selected) {
             menuCommandIds = [
                 "selectStepFromMenu",
@@ -89,7 +92,7 @@ export default class Step extends React.Component {
     };
 
     render() {
-        const {record, selected, color} = this.props;
+        const {record, selected, color, width} = this.props;
         var extraRichTextBoxProps = {};
         if (quip.apps.isApiVersionAtLeast("0.1.039")) {
             extraRichTextBoxProps.allowedInlineStyles = [
@@ -99,22 +102,27 @@ export default class Step extends React.Component {
                 quip.apps.RichTextRecord.InlineStyle.CODE,
             ];
         }
+        const style = {
+            backgroundColor: selected
+                ? quip.apps.ui.ColorMap[color].VALUE
+                : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+            borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
+            paddingTop: VERTICAL_PADDING,
+            paddingBottom: VERTICAL_PADDING,
+        };
+        if (width) {
+            style.width = width;
+        }
         return <div
             className={cx(Styles.step, {
                 [Styles.selected]: selected,
+                [Styles.fixedWidth]: !width,
             })}
             ref={node => {
                 this._node = node;
                 record.setDom(node);
             }}
-            style={{
-                backgroundColor: selected
-                    ? quip.apps.ui.ColorMap[color].VALUE
-                    : quip.apps.ui.ColorMap[color].VALUE_LIGHT,
-                borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
-                paddingTop: VERTICAL_PADDING,
-                paddingBottom: VERTICAL_PADDING,
-            }}>
+            style={style}>
             <div className={Styles.contents}>
                 <div className={Styles.label}>
                     <quip.apps.ui.RichTextBox

@@ -90,6 +90,7 @@ class Owner extends PureComponent {
 
     setMembers = () => {
         this.setState({members: quip.apps.getDocumentMembers()});
+        this.update_();
     };
 
     showPicker = () =>

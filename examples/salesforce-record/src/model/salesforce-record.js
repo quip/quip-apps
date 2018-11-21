@@ -56,6 +56,7 @@ export class SalesforceRecordEntity extends RecordEntity {
         const recordProperties = super.getProperties();
         const ownProperties = {
             schema: "object",
+            typesToFields: "string",
         };
         return Object.assign(ownProperties, recordProperties);
     }
@@ -86,8 +87,10 @@ export class SalesforceRecordEntity extends RecordEntity {
         });
         initFieldsMap[this.getType()] = fieldKeys;
         const newPreferences = {};
-        newPreferences[FIELD_PREFERENCES_KEY] = JSON.stringify(initFieldsMap);
+        const stringifiedFieldPreferences = JSON.stringify(initFieldsMap);
+        newPreferences[FIELD_PREFERENCES_KEY] = stringifiedFieldPreferences;
         preferences.save(newPreferences);
+        this.setTypesToFields(stringifiedFieldPreferences);
     }
 
     getSource() {
@@ -125,6 +128,14 @@ export class SalesforceRecordEntity extends RecordEntity {
 
     getSchema() {
         return this.get("schema");
+    }
+
+    setTypesToFields(typesToFields) {
+        this.set("typesToFields", typesToFields);
+    }
+
+    getTypesToFields() {
+        return this.get("typesToFields");
     }
 
     getClient() {
@@ -250,11 +261,11 @@ export class SalesforceRecordEntity extends RecordEntity {
         return this.error_;
     }
 
-    fetchData(isInitialMount) {
+    fetchData(isInitialMount, isCreation) {
         if (!this.isPlaceholder()) {
             return this.fetchRecordId_(this.getRecordId()).then(
                 fieldsDataArray => {
-                    this.initFieldsFromPreferences_().then(() => {
+                    this.initFieldsFromPreferences_(isCreation).then(() => {
                         if (isInitialMount) {
                             // On initial mount, update the stored fields in case the data
                             // has been updated on the Salesforce end.
@@ -278,10 +289,15 @@ export class SalesforceRecordEntity extends RecordEntity {
             });
     }
 
-    initFieldsFromPreferences_() {
-        const preferences = quip.apps.getUserPreferences();
-        const initFieldsMap = JSON.parse(
-            preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
+    initFieldsFromPreferences_(isCreation) {
+        let initFieldsMap;
+        if (isCreation) {
+            const preferences = quip.apps.getUserPreferences();
+            initFieldsMap = JSON.parse(
+                preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");
+        } else {
+            initFieldsMap = JSON.parse(this.getTypesToFields() || "{}");
+        }
         let initFieldKeysP;
         if (initFieldsMap[this.getType()]) {
             initFieldKeysP = Promise.resolve(initFieldsMap[this.getType()]);

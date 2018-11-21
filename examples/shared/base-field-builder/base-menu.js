@@ -3,7 +3,7 @@
 import moment from "moment";
 
 /**
- * Base class shared between the Field Builder and Jira element. Used to handle
+ * Base class shared between Salesforce Record and Jira element. Used to handle
  * menus.
  */
 export class BaseMenu {

@@ -37,6 +37,7 @@ class Record extends React.Component {
     static propTypes = {
         entity: React.PropTypes.instanceOf(RecordEntity).isRequired,
         menuDelegate: React.PropTypes.instanceOf(BaseMenu).isRequired,
+        isCreation: React.PropTypes.bool,
     };
 
     constructor(props) {
@@ -64,7 +65,7 @@ class Record extends React.Component {
         if (this.props.entity.isLoggedIn() &&
             this.props.entity.getClient().onSourceInstance()) {
             this.props.entity
-                .fetchData(true)
+                .fetchData(true, this.props.isCreation)
                 .then(() => {
                     this.updateToolbar_();
                     this.setState({
