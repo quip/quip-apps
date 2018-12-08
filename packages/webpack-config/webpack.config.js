@@ -1,91 +1,99 @@
-// Copyright 2017 Quip
+// Copyright 2018 Quip
 
+const webpack = require('webpack');
 const path = require("path");
-const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const Autoprefixer = require('autoprefixer');
 const cwd = process.cwd();
 
-function plugins() {
-    let plugins = [
-        new ExtractTextPlugin("app.css"),
-        new WriteFilePlugin()
-    ];
-    if (process.env.NODE_ENV != "development") {
-        plugins.push(
-            new webpack.optimize.UglifyJsPlugin({
-                mangle: { except: ["quiptext"] }
-            })
-        )
+const devMode = process.env.NODE_ENV !== 'production';
+
+function minimizers() {
+    let minimizers = [];
+    if (!devMode) {
+        minimizers = [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    mangle: {
+                        properties: {
+                            reserved: ["quip-text"]
+                        }
+                    }
+                }
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ];
     }
-    return plugins;
+    return minimizers;
 }
 
 module.exports = {
     devtool: "source-map",
-    entry: ["babel-polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
+    mode: devMode ? "development" : "production",
+    entry: ["@babel/polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
     output: {
         path: path.resolve(cwd, "./app/dist"),
         filename: "app.js",
         publicPath: "dist"
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
                 query: {
                     presets: [
-                        require.resolve("babel-preset-env"),
-                        require.resolve("babel-preset-react-app")
+                        require.resolve("@babel/preset-env"),
+                        require.resolve("@babel/preset-react")
+                    ],
+                    plugins: [
+                        require.resolve("@babel/plugin-proposal-class-properties")
                     ]
                 },
             },
             {
                 test: /\.less$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
-                            options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: "[name]__[local]"
-                            },
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            modules: true,
+                            importLoaders: 1,
+                            localIdentName: "[name]__[local]"
                         },
-                        {
-                            loader: "postcss-loader",
-                            options: {
-                                plugins: loader => [
-                                    Autoprefixer(),
-                                ]
-                            }
-                        },
-                        "less-loader"
-                    ],
-                }),
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            plugins: loader => [
+                                Autoprefixer(),
+                            ]
+                        }
+                    },
+                    "less-loader"
+                ]
             },
             {
                 test: /\.css$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
-                        },
-                        {
-                            loader: "postcss-loader",
-                            options: {
-                                plugins: loader => [
-                                    Autoprefixer(),
-                                ]
-                            }
-                        },
-                    ],
-                }),
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            plugins: loader => [
+                                Autoprefixer(),
+                            ]
+                        }
+                    },
+                ]
             },
             {
                 test: /\.svg/,
@@ -117,7 +125,18 @@ module.exports = {
             path.resolve(__dirname, "node_modules")
         ]
     },
-    plugins: plugins(),
+    optimization: {
+        minimizer: minimizers()
+    },
+    performance: {
+        hints: false
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "app.css"
+        }),
+        new WriteFilePlugin()
+    ],
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
