@@ -112,51 +112,45 @@ export default class Row extends React.Component {
         });
     };
 
-    getTitle(feedbackUserId) {
+    getTitle(atMentionUserName) {
+        console.debug("getTitle", {atMentionUserName});
         const {record} = this.props;
         const viewingUserName = quip.apps.getViewingUser().getName();
-        const shareWithUserName = quip.apps
-            .getUserById(feedbackUserId)
-            .getName();
-        return `Feedback for ${viewingUserName} from ${shareWithUserName}`;
+        return `Feedback for ${viewingUserName} from ${atMentionUserName}`;
     }
 
     onClickGetFeedbackButton = async () => {
         const {record} = this.props;
         const link = this.refs["person"].querySelector("a.content");
         if (!link) {
-            console.error("no content in RTB");
+            console.error("no content in RichTextBox");
             return;
         }
         const atMentionId = link.getAttribute("data-id");
-        console.log({link, atMentionId});
-        if (!atMentionId) {
-            console.error("please @mention a user or a thread");
-            return;
-        }
-        const isAThread =
-            link.getAttribute("data-click") === "control-document";
-        if (isAThread) {
-            const threadId = link.getAttribute("href").replace("/", "");
-            console.log("isAThread!", threadId);
-            record.set("thread_id", threadId);
-            this.updateThreadProperties(threadId, true);
+        const atMentionUserName = link.textContent.replace("@", "");
+        console.log("onClickGetFeedbackButton", {
+            link,
+            atMentionId,
+            atMentionUserName,
+        });
+        if (!atMentionId && atMentionUserName) {
+            console.error("please @mention a user ");
             return;
         }
 
         try {
-            this.copyThread(atMentionId);
+            this.copyThread(atMentionId, atMentionUserName);
         } catch (err) {
             await refreshToken();
-            this.copyThread(atMentionId);
+            this.copyThread(atMentionId, atMentionUserName);
         }
     };
 
-    copyThread = async feedbackUserId => {
+    copyThread = async (atMentionId, atMentionUserName) => {
         const {record} = this.props;
         const token = quip.apps.getUserPreferences().getForKey("token");
         const viewingUser = quip.apps.getViewingUser();
-        const title = this.getTitle(feedbackUserId);
+        const title = this.getTitle(atMentionUserName);
 
         const threadToCopy = await this.getThread(TEMPLATE_THREAD_ID);
         console.debug({threadToCopy});
@@ -171,7 +165,7 @@ export default class Row extends React.Component {
             },
             data: {
                 content,
-                member_ids: [viewingUser.getId(), feedbackUserId].join(","),
+                member_ids: [viewingUser.getId(), atMentionId].join(","),
             },
         });
         if (!rawResponse.ok) {
@@ -211,7 +205,7 @@ export default class Row extends React.Component {
                 </a>
             );
         } else if (loading) {
-            content = <span>Loading ...</span>;
+            content = <span>Copying template ...</span>;
         } else if (isLoggedIn) {
             content = (
                 <button

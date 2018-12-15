@@ -51,8 +51,8 @@ quip.apps.initialize({
         ReactDOM.render(<ConnectedApp />, rootNode);
 
         setInterval(() => {
-            console.debug("THREADID", quip.apps.getThreadId());
-        }, 1000);
+            console.debug("syncing title w/ threadId", quip.apps.getThreadId());
+        }, 5000);
     },
     menuCommands: [
         {
