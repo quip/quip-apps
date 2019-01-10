@@ -139,6 +139,10 @@ export default class JiraPicker extends React.Component {
                 }
             })
             .catch(error => {
+                window.setTimeout(() => {
+                    console.error(error);
+                    throw new Error(error);
+                }, 0);
                 if (filter === this.state.selectedFilter) {
                     if (this.mounted) {
                         this.setState({

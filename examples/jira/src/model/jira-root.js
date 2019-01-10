@@ -8,10 +8,7 @@ import {
 } from "./jira-record.js";
 import {COLUMN_TYPE, ColumnRecord} from "../../../shared/table-view/model.js";
 
-const READ_ONLY_INSTANCE = [
-    "jira-legacy-dev.airbnb.biz",
-    "jira-dev.airbnb.biz",
-];
+const READ_ONLY_INSTANCE = ["airbnb.biz"];
 
 export class JiraRootEntity extends quip.apps.RootRecord {
     static ID = "jiraRoot";

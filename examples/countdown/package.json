@@ -22,7 +22,7 @@
     },
     "dependencies": {
         "classnames": "^2.2.5",
-        "create-quip-app": "^0.0.34",
-        "quip-apps-webpack-config": "^0.0.34"
+        "create-quip-app": "^0.0.42",
+        "quip-apps-webpack-config": "^0.0.42"
     }
 }

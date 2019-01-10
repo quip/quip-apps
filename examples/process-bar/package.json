@@ -22,11 +22,11 @@
     },
     "dependencies": {
         "classnames": "^2.2.5",
+        "create-quip-app": "^0.0.42",
         "lodash.debounce": "^4.0.8",
         "lodash.omit": "^4.5.0",
-        "create-quip-app": "^0.0.34",
-        "quip-apps-chevron": "^0.0.34",
-        "quip-apps-webpack-config": "^0.0.34",
-        "quip-apps-handle-richtextbox-key-event-navigation": "^0.0.34"
+        "quip-apps-chevron": "^0.0.42",
+        "quip-apps-handle-richtextbox-key-event-navigation": "^0.0.42",
+        "quip-apps-webpack-config": "^0.0.42"
     }
 }
