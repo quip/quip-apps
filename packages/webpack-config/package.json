@@ -21,7 +21,7 @@
     "less-loader": "3.0.0",
     "moment": "^2.19.3",
     "postcss-loader": "2.0.6",
-    "quip-apps-compat": "^0.0.42",
+    "quip-apps-compat": "^0.0.43",
     "style-loader": "0.18.2",
     "svg-react-loader": "^0.4.6",
     "url-loader": "^0.6.2",
