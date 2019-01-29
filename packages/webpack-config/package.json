@@ -1,6 +1,6 @@
 {
   "name": "quip-apps-webpack-config",
-  "version": "0.0.43",
+  "version": "0.0.45",
   "description": "Quip Apps Webpack Config",
   "license": "Apache-2.0",
   "repository": "quip/quip-apps",
@@ -21,7 +21,7 @@
     "less-loader": "3.0.0",
     "moment": "^2.19.3",
     "postcss-loader": "2.0.6",
-    "quip-apps-compat": "^0.0.43",
+    "quip-apps-compat": "^0.0.45",
     "style-loader": "0.18.2",
     "svg-react-loader": "^0.4.6",
     "url-loader": "^0.6.2",
