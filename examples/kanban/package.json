@@ -22,9 +22,9 @@
     },
     "dependencies": {
         "classnames": "^2.2.5",
-        "create-quip-app": "^0.0.42",
-        "quip-apps-chevron": "^0.0.42",
-        "quip-apps-webpack-config": "^0.0.42",
-        "quip-apps-handle-richtextbox-key-event-navigation": "^0.0.42"
+        "create-quip-app": "0.0.45",
+        "quip-apps-chevron": "0.0.45",
+        "quip-apps-webpack-config": "0.0.45",
+        "quip-apps-handle-richtextbox-key-event-navigation": "0.0.45"
     }
 }

@@ -445,7 +445,7 @@ class PickerTable extends React.Component {
 
     render() {
         if (this.props.recordsLoadingStatus == LOADING_STATUS.LOADING) {
-            return <quip.apps.ui.Image.Placeholder
+            return <quip.apps.ui.Spinner
                 key={"picker-table-spinner"}
                 size={25}
                 loading={true}/>;

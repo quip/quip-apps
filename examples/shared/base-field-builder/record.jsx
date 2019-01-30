@@ -162,7 +162,7 @@ class Record extends React.Component {
         }
 
         if (!this.state.hasLoaded) {
-            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
+            return <quip.apps.ui.Spinner size={25} loading={true}/>;
         }
 
         let fieldPicker;

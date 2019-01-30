@@ -400,7 +400,7 @@ class RecordTypePicker extends React.Component {
         const {recordTypeLoadingStatus, recordTypeLoadingError} = this.props;
 
         if (recordTypeLoadingStatus === LOADING_STATUS.LOADING) {
-            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
+            return <quip.apps.ui.Spinner size={25} loading={true}/>;
         } else if (recordTypeLoadingError === LOADING_STATUS.ERROR) {
             return <div className={Styles.errorLoading}>
                 {getErrorMessage(listViewsLoadingError)}
@@ -440,7 +440,7 @@ class ListViewPicker extends React.Component {
     render() {
         const {listViewsLoadingStatus, listViewsLoadingError} = this.props;
         if (listViewsLoadingStatus === LOADING_STATUS.LOADING) {
-            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
+            return <quip.apps.ui.Spinner size={25} loading={true}/>;
         }
         if (listViewsLoadingStatus === LOADING_STATUS.ERROR) {
             return <div className={Styles.errorLoading}>
@@ -545,9 +545,7 @@ class RecordFilter extends React.Component {
         let recordsContent;
         const hasError = sobjectsLoadingStatus === LOADING_STATUS.ERROR;
         if (sobjectsLoadingStatus === LOADING_STATUS.LOADING) {
-            recordsContent = <quip.apps.ui.Image.Placeholder
-                size={25}
-                loading={true}/>;
+            recordsContent = <quip.apps.ui.Spinner size={25} loading={true}/>;
         } else if (hasError) {
             recordsContent = <div className={Styles.errorLoading}>
                 {getErrorMessage(sobjectsLoadingError)}

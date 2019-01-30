@@ -25,12 +25,6 @@ import {
     TokenFieldEntity,
 } from "../../shared/base-field-builder/model/field.js";
 
-// TODO (from Pedram): actually replace quip.apps.ui.Image.Placeholder with
-// quip.apps.ui.Spinner in code when enough clients have it.
-if (quip.apps.ui.Spinner) {
-    quip.apps.ui.Image.Placeholder = quip.apps.ui.Spinner;
-}
-
 quip.apps.registerClass(JiraRootEntity, JiraRootEntity.ID);
 quip.apps.registerClass(JiraRecentEntity, JiraRecentEntity.ID);
 quip.apps.registerClass(JiraRecordEntity, JiraRecordEntity.ID);
@@ -259,7 +253,7 @@ class Root extends React.Component {
         let content;
         if (this.state.step === Step.LOADING) {
             content = <div style={{width: this.props.loadingWidth}}>
-                <quip.apps.ui.Image.Placeholder
+                <quip.apps.ui.Spinner
                     key={"record-list-spinner"}
                     size={25}
                     loading={true}/>

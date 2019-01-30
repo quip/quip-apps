@@ -789,7 +789,7 @@ export default class RecordList extends React.Component {
                 </div>;
             } else {
                 return <div style={{width: this.props.loadingWidth}}>
-                    <quip.apps.ui.Image.Placeholder
+                    <quip.apps.ui.Spinner
                         key={"record-list-spinner"}
                         size={25}
                         loading={true}/>

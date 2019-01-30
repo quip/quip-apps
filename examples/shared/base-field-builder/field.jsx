@@ -885,9 +885,7 @@ export class EnumField extends React.Component {
         } else {
             let loading;
             if (this.state.optionsLoadingStatus == LOADING_STATUS.LOADING) {
-                loading = <quip.apps.ui.Image.Placeholder
-                    size={25}
-                    loading={true}/>;
+                loading = <quip.apps.ui.Spinner size={25} loading={true}/>;
                 return <div
                     className={Styles.enumField}
                     onClick={this.onClick_}>
@@ -1031,9 +1029,7 @@ export class Multipicklist extends React.Component {
 
     render() {
         if (this.state.optionsLoadingStatus == LOADING_STATUS.LOADING) {
-            const loading = <quip.apps.ui.Image.Placeholder
-                size={25}
-                loading={true}/>;
+            const loading = <quip.apps.ui.Spinner size={25} loading={true}/>;
             return <div className={Styles.enumField} onClick={this.onClick_}>
                 {loading}
             </div>;

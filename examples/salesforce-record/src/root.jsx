@@ -26,12 +26,6 @@ import RecordPicker from "./record-picker.jsx";
 import {FieldBuilderMenu} from "./menus.js";
 import {MismatchedInstanceError, SalesforceClient} from "./client.js";
 
-// TODO: actually replace quip.apps.ui.Image.Placeholder with
-// quip.apps.ui.Spinner in code when enough clients have it.
-if (quip.apps.ui.Spinner) {
-    quip.apps.ui.Image.Placeholder = quip.apps.ui.Spinner;
-}
-
 quip.apps.registerClass(BooleanFieldEntity, BooleanFieldEntity.ID);
 quip.apps.registerClass(DateFieldEntity, DateFieldEntity.ID);
 quip.apps.registerClass(DateTimeFieldEntity, DateTimeFieldEntity.ID);
@@ -285,7 +279,7 @@ class Root extends React.Component {
         const selectedRecord = entity.getSelectedRecord();
         // Should hit this only in url unfurling case
         if (!selectedRecord) {
-            return <quip.apps.ui.Image.Placeholder size={25} loading={true}/>;
+            return <quip.apps.ui.Spinner size={25} loading={true}/>;
         }
         const recordComponent = <Record
             isCreation={this.props.isCreation}
