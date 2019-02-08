@@ -1,5 +1,12 @@
-.Dashboard {
-    position: relative;
+.Dashboard .waveAsset .loading-analytics-container {
+    background-color: #efefef !important;
+    height: 100%;
+}
+
+.Dashboard .waveAsset,
+.Dashboard .waveAsset > div,
+.Dashboard .waveFrame {
+    height: 100% !important;
 }
 
 .cacheImg {

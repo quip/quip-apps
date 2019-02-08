@@ -1,4 +1,20 @@
+@import "../../shared/base-field-builder/common";
+@import "../../shared/base-field-builder/error-popover";
+@import "Common";
+
 .App {
-    min-height: 575px;
-    width: 920px;
+    background-color: @backgroundColor;
+}
+
+.loginRefreshing {
+    background-color: @backgroundColor !important;
+    border: 1px solid @borderColor;
+}
+
+.dashboardCachedImage {
+    img {
+        border: 1px solid @borderColor;
+        margin: 0 auto;
+        display: block;
+    }
 }

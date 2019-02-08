@@ -1,8 +1,9 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 
 import debounce from "lodash.debounce";
 import {decode} from "he";
+import moment from "moment";
 
 import ButtonPrompt from "./ButtonPrompt.jsx";
 import Dialog from "../../shared/dialog/dialog.jsx";
@@ -26,10 +27,34 @@ const ClickableDataTableCell = ({children, ...props}) => <DataTableCell
             props.onClick(props.item);
         }}
         style={{cursor: "pointer"}}>
-        <a>{decode(children)}</a>
+        <a>{children}</a>
     </div>
 </DataTableCell>;
 ClickableDataTableCell.displayName = DataTableCell.displayName;
+
+const LabelDataTableCell = ({children, ...props}) => <ClickableDataTableCell
+    {...props}>
+    <div
+        onClick={() => {
+            props.onClick(props.item);
+        }}
+        style={{cursor: "pointer"}}>
+        <a>{decode(props.item.label)}</a>
+    </div>
+</ClickableDataTableCell>;
+LabelDataTableCell.displayName = DataTableCell.displayName;
+
+const MomentDataTableCell = ({children, ...props}) => <ClickableDataTableCell
+    {...props}>
+    <div
+        onClick={() => {
+            props.onClick(props.item);
+        }}
+        style={{cursor: "pointer"}}>
+        <a>{decode(moment(props.item.lastModifiedDate).fromNow())}</a>
+    </div>
+</ClickableDataTableCell>;
+MomentDataTableCell.displayName = DataTableCell.displayName;
 
 const FolderDataTableCell = ({children, ...props}) => <ClickableDataTableCell
     {...props}
@@ -48,6 +73,7 @@ export default class DashboardPicker extends React.Component {
         isFiltering: PropTypes.bool,
         setDashboardId: PropTypes.func,
         handleFilterChange: PropTypes.func,
+        showUnavailableOnNativeError: PropTypes.func,
     };
 
     constructor(props) {
@@ -55,7 +81,7 @@ export default class DashboardPicker extends React.Component {
         this.state = {
             isFiltering: false,
             filterQuery: "",
-            showPicker: true,
+            showPicker: quip.apps.isAppFocused(),
         };
         this.handleFilterChangeDebounced = debounce(
             this.props.handleFilterChange,
@@ -76,21 +102,24 @@ export default class DashboardPicker extends React.Component {
         this.props.setDashboardId(dashboard.id);
     };
 
+    onButtonPromptClick = () => {
+        if (quip.apps.isNative()) {
+            this.props.showUnavailableOnNativeError();
+        } else {
+            this.setState({showPicker: true});
+        }
+    };
+
     render() {
         const {dashboards, totalDashboardLength} = this.props;
         const {isFiltering, filterQuery, showPicker} = this.state;
         const isEmpty = dashboards.length === 0;
         let loadMessage;
         if (totalDashboardLength !== undefined) {
-            loadMessage = `${totalDashboardLength} dashboards`;
-            if (dashboards.length) {
-                loadMessage = `${dashboards.length} out of ${loadMessage}`;
-            }
-            if (filterQuery != "") {
-                loadMessage = `${loadMessage} for ${filterQuery}`;
-            }
+            loadMessage = `${totalDashboardLength} dashboards found`;
         }
-        return <div>
+
+        return <div style={{height: "100%", minWidth: 600}}>
             {showPicker ? (
                 <Dialog onDismiss={() => this.setState({showPicker: false})}>
                     <Card
@@ -114,36 +143,28 @@ export default class DashboardPicker extends React.Component {
                                 </CardEmpty>
                             ) : null
                         }
-                        style={{height: HEIGHT, minWidth: 800}}>
-                        <DataTable items={dashboards} fixedLayout>
-                            <DataTableColumn label="Name" property="label">
-                                <ClickableDataTableCell
-                                    onClick={this.onClickRow}/>
+                        style={{height: HEIGHT}}>
+                        <div className="slds-text-align_center slds-text-body_small slds-text-color_small">
+                            {loadMessage}
+                        </div>
+                        <DataTable items={dashboards}>
+                            <DataTableColumn label="Folder" property="id">
+                                <FolderDataTableCell onClick={this.onClickRow}/>
                             </DataTableColumn>
-
-                            {
-                                // Not showing the App column to gather some feedback on how
-                                // the dashboard picker should look like, and what other info
-                                // are helpful.
-                                /* <DataTableColumn label="App" property="id">
-                    <FolderDataTableCell onClick={this.onClickRow}/>
-                </DataTableColumn> */
-                            }
+                            <DataTableColumn label="Name" property="label">
+                                <LabelDataTableCell onClick={this.onClickRow}/>
+                            </DataTableColumn>
                             <DataTableColumn
-                                label="Last Modified Time"
+                                label="Last Modified"
                                 property="lastModifiedDate">
-                                <ClickableDataTableCell
-                                    onClick={this.onClickRow}/>
+                                <MomentDataTableCell onClick={this.onClickRow}/>
                             </DataTableColumn>
                         </DataTable>
-                        <div className={Styles.textWrapper}>
-                            <div className={Styles.text}>{loadMessage}</div>
-                        </div>
                     </Card>
                 </Dialog>
             ) : (
                 <ButtonPrompt
-                    onClick={() => this.setState({showPicker: true})}
+                    onClick={this.onButtonPromptClick}
                     text={quiptext("Choose a Dashboard")}/>
             )}
         </div>;

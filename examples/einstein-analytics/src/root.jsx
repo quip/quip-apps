@@ -10,9 +10,15 @@ export function getAuth() {
 }
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, {isCreation}) {
+    initializationCallback: function(rootNode, {creationUrl, isCreation}) {
         const rootRecord = quip.apps.getRootRecord();
         const ConnectedApp = Connect(rootRecord, App);
+        console.debug("initializationCallback", {creationUrl, isCreation});
+        if (isCreation && creationUrl) {
+            const dashboardId = creationUrl.split("wave.apexp#dashboard/")[1];
+            console.debug("got creationUrl", {dashboardId});
+            rootRecord.set("dashboardId", dashboardId);
+        }
         ReactDOM.render(<ConnectedApp/>, rootNode);
         updateToolbar();
     },

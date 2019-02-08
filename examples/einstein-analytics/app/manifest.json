@@ -2,11 +2,10 @@
     "id": "eWJAjAHhOXa",
     "manifest_version": 1,
     "name": "Einstein Analytics",
-    "description":
-        "Make decisions faster with your Einstein Analytics dashboards",
+    "description": "Make decisions faster with your Einstein Analytics dashboards",
     "version_name": "1.0",
-    "version_number": 5,
-    "sizing_mode": "fit_content",
+    "version_number": 23,
+    "sizing_mode": "fill_container",
     "initial_height": 600,
     "initial_width": 900,
     "js_files": ["dist/app.js"],
@@ -20,36 +19,24 @@
         "dist/assets/icons/*"
     ],
     "csp_sources": {
-        "script_srcs": [
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
-        ],
-        "connect_srcs": [
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
-        ],
+        "script_srcs": ["https://*.force.com", "https://*.salesforce.com"],
+        "connect_srcs": ["https://*.force.com", "https://*.salesforce.com"],
         "style_srcs": [
             "https://quip-cdn.com",
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
+            "https://*.force.com",
+            "https://*.salesforce.com"
         ],
         "font_srcs": [
             "https://quip-cdn.com",
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
+            "https://*.force.com",
+            "https://*.salesforce.com"
         ],
-        "frame_srcs": [
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
-        ],
-        "media_srcs": [
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
-        ],
+        "frame_srcs": ["https://*.force.com", "https://*.salesforce.com"],
+        "media_srcs": ["https://*.force.com", "https://*.salesforce.com"],
         "img_srcs": [
             "https://quip-cdn.com",
-            "https://*.lightning.force.com",
-            "https://*.my.salesforce.com"
+            "https://*.force.com",
+            "https://*.salesforce.com"
         ]
     }
 }

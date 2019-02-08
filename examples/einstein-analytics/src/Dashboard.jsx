@@ -4,20 +4,20 @@ import PropTypes from "prop-types";
 import {getAuth} from "./root.jsx";
 import lightningUrl from "./lightningUrl";
 import "Dashboard.css";
-
-const CACHE_DASHBOARD_ID = "0FKB0000000DbxzOAC";
-import cacheImgSrc from "./assets/dashboard_0FKB0000000DbxzOAC.png";
+import Styles from "Dashboard.less";
 
 export default class Dashboard extends React.Component {
     static propTypes = {
         dashboardId: PropTypes.string,
-        height: PropTypes.number,
+        savedViewId: PropTypes.string,
+        dashboardImage: PropTypes.string,
+        onDashboardLoaded: PropTypes.func,
     };
 
     constructor(props) {
         super();
         this.state = {
-            isLoading: props.dashboardId === CACHE_DASHBOARD_ID,
+            isLoading: !!props.dashboardImage,
         };
     }
 
@@ -34,12 +34,15 @@ export default class Dashboard extends React.Component {
             console.error("window.$Lightning is not undefined");
             return;
         }
+        this.startDate = new Date();
         const tokenResponse = getAuth().getTokenResponse();
         const accessToken = tokenResponse.access_token;
         const baseUrl = lightningUrl(tokenResponse.instance_url);
         console.debug("buildDashboard", baseUrl, accessToken);
         window.$Lightning.use(
-            "c:loApp",
+            //"c:loApp",  // This is our custom app, hopefully we don't need it
+            //"wave:waveDashboard", // doesn't seem to work in many cases
+            "wave:waveApp",
             () => {
                 // Adding this check here to give extra time, in cases $A
                 // is not yet available.
@@ -67,20 +70,20 @@ export default class Dashboard extends React.Component {
     };
 
     onAuraLoaded() {
-        const {dashboardId, height} = this.props;
+        const {dashboardId, savedViewId} = this.props;
         const tokenResponse = getAuth().getTokenResponse();
         const accessToken = tokenResponse.access_token;
-        console.debug("$Lightning.createComponent", {dashboardId, height});
+        console.debug("$Lightning.createComponent", {dashboardId});
         //https://adx-dev-ed.lightning.force.com/auradocs/reference.app#reference?descriptor=wave:waveDashboard&
 
         window.$Lightning.createComponent(
             "wave:waveDashboard",
             {
                 dashboardId,
+                savedViewId,
                 accessToken,
                 showHeader: false,
                 showTitle: false,
-                height: height,
             },
             this.el,
             (cmp, status, errorMessage) => {
@@ -99,52 +102,40 @@ export default class Dashboard extends React.Component {
                     // We need to registerEmbeddedIframe in order to keep the
                     // Live App menu focus interaction working
                     quip.apps.clearEmbeddedIframe();
-                    const iframe = cmp.getElement().querySelector("iframe");
+                    const element = cmp.getElement();
+                    if (!element) {
+                        return;
+                    }
+
+                    const iframe = element.querySelector("iframe");
                     quip.apps.registerEmbeddedIframe(iframe);
 
-                    if (this.props.dashboardId === CACHE_DASHBOARD_ID) {
-                        const waveSpinner = cmp
-                            .getElement()
-                            .querySelector(".embeddedSpinner");
-                        const isLoading =
-                            !!waveSpinner && !!waveSpinner.offsetHeight;
-                        console.debug("aura:doneRendering!", {isLoading});
-                        this.setState({isLoading});
+                    const waveSpinner = element.querySelector(
+                        ".embeddedSpinner");
+                    const isLoading =
+                        !!waveSpinner && !!waveSpinner.offsetHeight;
+                    if (!isLoading && this.state.isLoading) {
+                        this.props.onDashboardLoaded();
+                        const doneDate = new Date();
+                        const timeSecs = Math.abs(
+                            (this.startDate.getTime() - doneDate.getTime()) /
+                                1000);
+                        console.debug("Render done in", timeSecs, "seconds");
                     }
+                    this.setState({isLoading});
                 });
             });
     }
 
-    onLoadCacheImg = e => {
-        console.debug("onLoadCacheImg", e);
-    };
-
-    onErrorCacheImg = err => {
-        console.debug("onErrorCacheImg", err);
-    };
-
     render() {
-        const {dashboardId, height} = this.props;
+        const className = `${Styles.Dashboard} Dashboard`;
+        const {dashboardImage} = this.props;
         const {isLoading} = this.state;
-        console.debug("render isLoading", isLoading);
-        /*
-        let cacheImgSrc;
-        try {
-            cacheImgSrc = pathToCacheImgs(`dashboard_${dashboardId}.png`, true);
-        } catch (err) {
-            console.debug("error loading img", {err});
-        }
-        */
-        return <div className="Dashboard" style={{minHeight: height}}>
-            {isLoading ? (
-                <div className="cacheImg" style={{minHeight: height}}>
-                    <img src={cacheImgSrc} alt={quiptext("Loading...")}/>
-                </div>
-            ) : null}
-            <div
-                ref={el => (this.el = el)}
-                className="wave"
-                style={{minHeight: height}}/>
+        const isHidden = isLoading && dashboardImage;
+        return <div
+            className={className}
+            style={{visibility: isHidden ? "hidden" : null}}>
+            <div ref={el => (this.el = el)} className={Styles.wave}/>
         </div>;
     }
 }
