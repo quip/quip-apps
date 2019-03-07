@@ -25,6 +25,7 @@
         ]
     },
     "intercept_url_patterns": [
-        "https://*.lightning.force.com/one/one.app#/sObject/*/view"
+        "https://*.lightning.force.com/one/one.app#/sObject/*/view*",
+        "https://*.lightning.force.com/lightning/r/*/*/view*"
     ]
 }

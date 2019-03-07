@@ -261,11 +261,11 @@ export class SalesforceRecordEntity extends RecordEntity {
         return this.error_;
     }
 
-    fetchData(isInitialMount, isCreation) {
-        if (!this.isPlaceholder()) {
+    fetchData(isInitialMount, isCreation, initialFields) {
+        if (!this.isPlaceholder() && quip.apps.isDocumentEditable()) {
             return this.fetchRecordId_(this.getRecordId()).then(
                 fieldsDataArray => {
-                    this.initFieldsFromPreferences_(isCreation).then(() => {
+                    this.initFields_(isCreation, initialFields).then(() => {
                         if (isInitialMount) {
                             // On initial mount, update the stored fields in case the data
                             // has been updated on the Salesforce end.
@@ -289,9 +289,14 @@ export class SalesforceRecordEntity extends RecordEntity {
             });
     }
 
-    initFieldsFromPreferences_(isCreation) {
+    initFields_(isCreation, initialFieldsOverride = null) {
         let initFieldsMap;
-        if (isCreation) {
+        if (initialFieldsOverride) {
+            let type = this.getType();
+            initFieldsMap = {
+                [type]: initialFieldsOverride,
+            };
+        } else if (isCreation) {
             const preferences = quip.apps.getUserPreferences();
             initFieldsMap = JSON.parse(
                 preferences.getForKey(FIELD_PREFERENCES_KEY) || "{}");

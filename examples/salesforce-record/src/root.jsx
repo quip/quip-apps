@@ -62,15 +62,50 @@ quip.apps.initialize({
         rootRecord.setClient(salesforceClient);
 
         if (params.isCreation && params.creationUrl) {
-            const recordId = params.creationUrl
-                .split("sObject/")[1]
-                .split("/view")[0];
-            if (recordId.length == 18) {
-                salesforceClient
-                    .fetchRecordAndSchema(recordId)
-                    .then(([fields, schema]) => {
-                        rootRecord.setSelectedRecord(recordId, schema);
-                    });
+            const regexeps = [
+                /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/one\/one\.app#\/sObject\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
+                /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/lightning\/r\/(?:[.\S]+?)\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
+            ];
+
+            const result = regexeps
+                .map(re => re.exec(params.creationUrl))
+                .find(result => result !== null);
+            if (result) {
+                const recordId = result[1];
+                const extraParams = result[2];
+                let userDefinedFields;
+                if (extraParams) {
+                    const params = extraParams
+                        .split("&")
+                        .map(p => p.split("="));
+
+                    const fieldData = params.find(
+                        param => param[0] == "fields");
+                    if (fieldData) {
+                        userDefinedFields = fieldData[1].split(",");
+                    }
+                }
+
+                if (recordId.length == 18) {
+                    salesforceClient
+                        .fetchRecordAndSchema(recordId)
+                        .then(([fields, schema]) => {
+                            if (userDefinedFields) {
+                                userDefinedFields = userDefinedFields.filter(
+                                    key => {
+                                        return (
+                                            fields.find(
+                                                field => field.key == key) !=
+                                            null
+                                        );
+                                    });
+                            }
+                            rootRecord.setSelectedRecord(
+                                recordId,
+                                schema,
+                                userDefinedFields);
+                        });
+                }
             }
         } else if (params.isCreation) {
             rootRecord.loadPlaceholderData();

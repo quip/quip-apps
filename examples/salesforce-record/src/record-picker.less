@@ -125,7 +125,7 @@
     border-left: 1px solid transparent;
     &.highlighted {
         color: white;
-        background-color: #59b4ed;
+        background-color: @blueColor;
     }
 }
 
@@ -134,7 +134,7 @@
 
     &.active,
     &:hover {
-        fill: #1ba2e3;
+        fill: @blueColor;
     }
 
     &.highlighted {
@@ -165,14 +165,14 @@
     left: 50%;
     margin-top: 94px;
     transform: translate(-50%, -50%);
-    background-color: #ffffff;
-    color: #353535;
+    background-color: white;
+    color: @textColorPrimary;
     z-index: 100;
     width: 500px;
     opacity: 1;
     text-align: center;
     a {
-        color: #29b6f2;
+        color: @blueColor;
         &:hover {
             text-decoration: underline;
         }
@@ -197,6 +197,6 @@
     height: 6px;
 }
 .svgPath {
-    fill: #353535;
+    fill: @textColorPrimary;
     fill-rule: evenodd;
 }

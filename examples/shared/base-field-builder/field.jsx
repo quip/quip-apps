@@ -505,7 +505,7 @@ class BooleanField extends React.Component {
     }
 
     onClick_ = e => {
-        const newValue = event.target.checked;
+        const newValue = e.target.checked;
         if (newValue !== this.state.value) {
             this.setState({value: newValue});
             this.props.entity.setValue(newValue);

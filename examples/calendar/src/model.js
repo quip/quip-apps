@@ -234,7 +234,7 @@ export class EventRecord extends quip.apps.Record {
 
     getDateRange(): DateRange {
         const {start, end} = JSON.parse(this.get("dateRange"));
-        // TODO(elsigh): update when we support time
+         
         return {
             start: parseAllDayStringToDate(start),
             end: parseAllDayStringToDate(end),
@@ -246,7 +246,7 @@ export class EventRecord extends quip.apps.Record {
             console.error("start", start, "end", end);
             throw new Error("start and end must both be Date types");
         }
-        // TODO(elsigh): update when we start using time
+         
         this.set(
             "dateRange",
             JSON.stringify({

@@ -287,12 +287,14 @@ export class TextFieldEntity extends FieldEntity {
     }
 
     setValue(value) {
-        const richTextRecord = this.get("value");
-        if (richTextRecord.replaceContent === undefined) {
-            return;
+        if (quip.apps.isDocumentEditable()) {
+            const richTextRecord = this.get("value");
+            if (richTextRecord.replaceContent === undefined) {
+                return;
+            }
+            const textValue = value !== null ? String(value) : "";
+            richTextRecord.replaceContent(textValue);
         }
-        const textValue = value !== null ? String(value) : "";
-        richTextRecord.replaceContent(textValue);
     }
 
     clearFocus() {

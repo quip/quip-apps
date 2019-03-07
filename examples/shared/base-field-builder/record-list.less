@@ -1,6 +1,6 @@
 /* Copyright 2017 Quip */
 
-@import "../../shared/base-field-builder/common";
+@import "common";
 @import "../../shared/dialog/common";
 
 .keyCell {
@@ -25,7 +25,7 @@
     svg {
         width: 18px;
         height: 18px;
-        fill: red;
+        fill: @redColor;
     }
 }
 
@@ -46,7 +46,7 @@
 }
 
 .draftIndicator {
-    background: #2ad352;
+    background: @greenColor;
     border-radius: 4px;
     color: white;
     cursor: pointer;
@@ -74,7 +74,7 @@
     font-size: 11px;
     font-weight: bold;
     padding-left: 5px;
-    background: #353535;
+    background: @textColorPrimary;
     border-radius: 20px;
     padding: 2px 10px;
     margin-left: -55px;
@@ -83,7 +83,7 @@
 }
 
 .retry {
-    color: #25b4e9;
+    color: @blueColor;
     &:hover {
         text-decoration: underline;
     }
@@ -97,35 +97,36 @@
     margin-right: 4px;
     cursor: pointer;
     .warningText {
-        color: red;
+        color: @redColor;
         padding-right: 5px;
     }
     svg {
         width: 18px;
         height: 18px;
-        fill: red;
+        fill: @redColor;
     }
 }
 
-.recordError, .globalError {
+.recordError,
+.globalError {
     right: 5px;
     top: 5px;
     width: 300px;
     background-color: white;
-    border: 1px solid red;
+    border: 1px solid @redColor;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     z-index: 10;
-    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
     padding: 10px;
     line-height: 25px;
-    color: red;
+    color: @redColor;
 }
 
 .empty {
-    border: 1px solid rgba(0,0,0,.12);
+    border: 1px solid rgba(0, 0, 0, 0.12);
     color: #8c8c8c;
     font-size: 1.25em;
     font-weight: bold;
@@ -160,7 +161,7 @@
         display: none;
     }
     &.highlighted {
-        background-color: #59b4ed;
+        background-color: @blueColor;
         color: white;
         svg {
             fill: white;
@@ -182,7 +183,7 @@
 }
 
 .errorBorder {
-    border: 1px solid red;
+    border: 1px solid @redColor;
     pointer-events: none;
     position: absolute;
     z-index: 99;
@@ -191,7 +192,7 @@
 .editColumnHeader {
     &:extend(.header);
     align-items: center;
-    border-bottom: 1px solid rgba(0,0,0,.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     flex: 0 0 auto;
 }
 

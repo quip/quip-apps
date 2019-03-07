@@ -45,7 +45,7 @@ function appReducer(state: AppState, action: Object) {
         case "SET_EVENTS":
             return {
                 ...state,
-                // TODO(elsigh): reduce to events for displayMonth here
+                 
                 events: action.events,
             };
         case "SET_FOCUSED_EVENT":

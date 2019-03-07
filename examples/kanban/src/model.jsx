@@ -11,7 +11,7 @@ export const kDefaultColumnColors = [
 ];
 
 const ACTIVITY_LOG_MESSAGES = {
-    // TODO translate with quiptext if we reenable.
+     
     ADD_COLUMN: () => {
         return "added a column.";
     },
@@ -33,7 +33,7 @@ export class BoardRecord extends quip.apps.RootRecord {
     static getProperties() {
         return {
             columns: quip.apps.RecordList.Type(ColumnRecord),
-            // TODO(elsigh): why not just compute this?
+             
             nextColumnColor: "string",
         };
     }

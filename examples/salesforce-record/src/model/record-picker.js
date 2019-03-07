@@ -130,7 +130,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.get("selectedRecord");
     }
 
-    setSelectedRecord(recordId, schema) {
+    setSelectedRecord(recordId, schema, initialFields = null) {
         this.clearSelectedRecord();
         // Update the schema and owner based on the current user's view.
         const ownerId = quip.apps.getViewingUser().getId();
@@ -141,7 +141,7 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         });
         this.setDataVersion(RecordPickerEntity.DATA_VERSION);
         this.getSelectedRecord().setSchema(schema);
-        this.getSelectedRecord().fetchData();
+        this.getSelectedRecord().fetchData(false, false, initialFields);
         const metricArgs = {
             action: "selected_record",
             record_type: this.getSelectedRecord().getType(),

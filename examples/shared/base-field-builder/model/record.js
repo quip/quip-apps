@@ -294,7 +294,7 @@ export class RecordEntity extends quip.apps.Record {
     }
 
     fetchData(isInitialMount) {
-        if (!this.isPlaceholder()) {
+        if (!this.isPlaceholder() && quip.apps.isDocumentEditable()) {
             return this.fetchRecordId_(this.getRecordId());
         } else {
             return Promise.resolve();

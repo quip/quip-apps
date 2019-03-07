@@ -238,7 +238,7 @@ class Root extends React.Component {
 
     isValidUrl_ = entered => {
         let urlRegex = /^(?:(?:https?):\/\/)?(?:(?:\.){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
-        // TODO(Joyce): Actually fix above regex, if possible
+         
         return (
             urlRegex.test(entered) &&
             !(
@@ -624,8 +624,7 @@ class Root extends React.Component {
                         } else {
                             this.setState({
                                 errorLink:
-                                    "https://quip.com/dev/liveapps/jira/config?jira_instance_url=" +
-                                    this.props.entity.getInstanceUrl(),
+                                    "https://quip.com/dev/liveapps/jira/config",
                                 errorMessage: quiptext(
                                     "To use this server, click here to set up an app connection to Quip."),
                             });

@@ -17,6 +17,8 @@ import {
 export const MAX_RECORDS_LIST = 120;
 export const MAX_RECORDS_SEARCH = 30;
 
+// We use the JIRA Cloud API.
+// https://developer.atlassian.com/cloud/jira/platform/rest/v3/?utm_source=%2Fcloud%2Fjira%2Fplatform%2Frest%2F&utm_medium=302
 const API_PATH = "rest/api/2";
 const AGILE_PATH = "rest/agile/1.0";
 const GREENHOPPER_PATH = "rest/greenhopper/1.0";

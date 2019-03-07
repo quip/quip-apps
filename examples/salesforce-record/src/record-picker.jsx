@@ -157,7 +157,7 @@ export default class RecordPicker extends React.Component {
             client.fetchListViewsForType(this.state.selectedRecordType.apiName),
         ])
             .then(([schema, listViews]) => {
-                // TODO: Disable filtering if search field is non string
+                 
                 const searchField = schema.nameFields.includes("Name")
                     ? schema.fields["Name"]
                     : schema.fields[schema.nameFields[0]];

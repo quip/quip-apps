@@ -390,7 +390,7 @@ export class SalesforceClient {
     }
 
     updateRecord(recordId, optExistingSchema, body = {}) {
-        // TODO: Prevent optimistic lock failure (provide "If-Modified-Since"
+         
         // header).
         // The response to this call won't include fields typically fetched as
         // optional, so we need to follow up immediately with a call to
@@ -416,7 +416,9 @@ export class SalesforceClient {
         // Debounce concurrent GET requests to the same resource. Ensure that
         // each caller gets a *copy* of the reponse JSON (on success);
         if (method === "GET" && this.inFlightGets_[url]) {
-            return this.inFlightGets_[url].then(response => response.json());
+            return this.inFlightGets_[url].then(response =>
+                response.json ? response.json() : response
+            );
         }
 
         const result = this.doRequest_(
@@ -431,7 +433,9 @@ export class SalesforceClient {
             this.inFlightGets_[url] = result;
         }
 
-        return result.then(response => response.json());
+        return result.then(response =>
+            response.json ? response.json() : response
+        );
     }
 
     doRequest_(method, url, body, tryRefreshToken) {
@@ -484,7 +488,7 @@ export class SalesforceClient {
             };
 
             fetcher = new Promise((resolve, reject) => {
-                // TODO: The UI API's caching seems to be broken as it does not
+                 
                 // update ETAGs after writes to objects. When/if this is fixed,
                 // send the etag in a "If-None-Match" request header and
                 // look for a 304.
