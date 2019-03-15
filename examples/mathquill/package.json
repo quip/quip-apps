@@ -14,6 +14,7 @@
     "quip-apps-webpack-config": ">=0.0.29"
   },
   "dependencies": {
-    "mathquill": "^0.10.1-a"
+    "mathquill": "^0.10.1-a",
+    "react-mathquill": "^0.1.3"
   }
 }
