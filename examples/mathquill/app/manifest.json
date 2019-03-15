@@ -3,7 +3,7 @@
   "manifest_version": 1,
   "name": "mathquill",
   "version_name": "1.0",
-  "version_number": 1,
+  "version_number": 2,
   "sizing_mode": "fit_content",
   "initial_height": 300,
   "initial_width": 300,
