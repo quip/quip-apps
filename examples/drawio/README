@@ -1,0 +1,50 @@
+Main
+====
+
+1. Install Node >= v6 and NPM >= v3 (check with node -v and npm -v)
+2. Run "(sudo) npm install -g create-quip-app"
+3. Run "npm install"
+4. Change port in node_modules/quip-app-webpack-config/webpack.config.js
+5. Run "npm start" to start the development server
+6. Check "Use Local Resources" in the Diagram menu under Developer
+
+On Windows 10, npm install should be run in a command prompt, but
+npm run build and npm start should be run on a Linux subsystem.
+
+Update
+======
+
+The following files must be copied manually from the draw.io project into
+app/dist _AND_ app/dist/dist (for local development):
+
+- integrate.min.js
+- grapheditor.css
+- common.css
+
+A copy of dia.txt is in the code stored in the defaultResources variable as a
+fallback when offline so this must be updated (and escaped) if there are any
+changes to the English resources. To escape, copy and paste the contents into
+
+eg. https://www.freeformatter.com/java-dotnet-escape.html
+
+then escape and replace all ' with \' in the resulting string.
+
+Deploy
+======
+
+1. Run "npm run build" to create app/app.ele for upload to production.
+
+2. Go to https://drawio.quip.com/dev/console/app/JTXAjAqkD1J, click on Upload
+   app.ele, select app/app.ele and click on Update. Then click Deploy.
+
+Content Security Policy
+=======================
+
+- Allowed connect sources are *.draw.io. Actually used domains for XHR are:
+  - www.draw.io: For loading resources, shapes and stencils
+  - exp.draw.io: For PDF export (and image export if MathJax is enabled)
+  - exp-plant.draw.io: For PlantUML integration
+- Allowed script and font sources: math.draw.io for MathJax
+- Allowed image sources are *.draw.io and *.iconfinder.com for clipart
+
+Note: No proxy is used to access icons on Iconfinder.

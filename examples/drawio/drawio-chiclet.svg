@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 232 131" width="232.0px" height="131.0px" preserveAspectRatio="xMidYMid" xmlns="http://www.w3.org/2000/svg"
+    version="1.0">
+    <rect fill="#fffadf" x="0" width="232" height="131" y="0" stroke="none"/>
+    <rect fill="#fee860" x="91" width="50" height="20" y="20" stroke="none"/>
+    <rect fill="#feee8a" x="20" width="50" height="20" y="55" stroke="none"/>
+    <rect fill="#feee8a" x="162" width="50" height="20" y="55" stroke="none"/>
+    <rect fill="#feee8a" x="162" width="50" height="20" y="85" stroke="none"/>
+    <rect fill="#feee8a" x="20" width="50" height="20" y="85" stroke="none"/>
+    <rect fill="#fee02b" x="115" width="2" height="56" y="40" stroke="none"/>
+    <rect fill="#fee02b" x="115" width="47" height="2" y="94" stroke="none"/>
+    <rect fill="#fee02b" x="115" width="47" height="2" y="64" stroke="none"/>
+    <rect fill="#fee02b" x="44" width="73" height="2" y="47" stroke="none"/>
+    <rect fill="#fee02b" x="44" width="2" height="8" y="47" stroke="none"/>
+    <rect fill="#fee02b" x="44" width="2" height="10" y="75" stroke="none"/>
+</svg>

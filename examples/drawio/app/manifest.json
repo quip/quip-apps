@@ -1,0 +1,38 @@
+{
+    "id": "JTXAjAqkD1J",
+    "manifest_version": 1,
+    "name": "draw.io Diagram",
+    "version_name": "1.6.3",
+    "version_number": 43,
+    "sizing_mode": "scale",
+    "initial_width": 800,
+    "initial_height": 64,
+    "allow_tiny_size": true,
+    "requires_external_account": false,
+    "js_files": [
+        "dist/app.js",
+        "dist/integrate.min.js"
+    ],
+    "css_files": [
+        "dist/common.css",
+        "dist/grapheditor.css"
+    ],
+	"csp_sources": {
+		"frame_srcs": [
+			"https://*.draw.io"
+		],
+        "connect_srcs": [
+			"https://*.draw.io"
+		],
+		"script_srcs": [
+			"https://math.draw.io"
+		],
+		"font_srcs": [
+			"https://math.draw.io"
+		],
+		"img_srcs": [
+			"https://*.draw.io",
+			"https://*.iconfinder.com"
+        ]
+	}
+}

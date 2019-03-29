@@ -1,0 +1,58 @@
+HIGH:
+
+Fix fullscreen, Shapes, Tags, Find, Outline, Layers dialog for Slides
+Fix hover icon drag in macOS app and Safari
+Fix click on page link in full screen mode starts panning
+Add support for URL paste, iframe for cloud files
+Fix editing on iOS and Android
+Fix math cannot be disabled once it was enabled
+Fix click on action link in preview
+Add double click for fullscreen in preview
+Fix partial data for proxied draw.io clipart PNG export
+Proxy images that are blocked by CSP in diagram (or allow https: as image-src)
+Handle custom fonts, CSS in PDF export (or use print)
+Add context menu with lock/unlock when locked on mobile
+Use lazy initMath to avoid cookie warnings
+Add Editor.editable setter for lock/unlock
+Use cursor keys for scrolling in fullscreen
+Add arrow format combo to detached nodes
+
+MEDIUM:
+
+Fix math support, shadow in scaled SVG snapshot
+Pass-through panning to scroll page for touch events
+Fix insert link/image should change selected text or cell
+Fix open VSSX via Shapes dialog, drag library to splash
+Force show sidebar if library is loaded
+Add gdrive connector live app for quip
+Reset moveHandler for remote change or store initial state
+Add scratchpad and shape serarch toggle in menu
+Add markup toggle in text format panel
+Fix focus element on right click
+Adds SVG for HoverIcons.refreshTarget
+Add DOCUMENT_EDITABLE listener for locked state
+Add realtime collaboration for scratchpad
+Store custom libraries in record
+Add UI and realtime for pageScale
+Disable cookies in Mathjax to avoid console errors
+How to remove listeners for quip.apps in window.unload
+Fix mxWindow with browser zoom
+
+LOW:
+
+Add comments on shapes and locations (showComment ignored with app_level_comments: false)
+Fix duplicate manifest resources for dev mode
+Disable Quip scrollbars (horizontal container, vertical page, flickering)
+Enable Blob API or use Quip Blob API for saving binary files
+quip.apps.isOnline() returns true in macos native app
+Use wrapper react component for lifecycle events to avoid memory leaks (?)
+
+QUIP:
+
+Set static SVG preview image
+Add *.quipelements.com CORS headers for attachments
+Allow for templates to be specified for live apps
+Allow for linking to existing diagram
+Add tooltips, icons for actions
+Add resize event for fullscreen mode
+Allow window.print, https: for image_src in CSP
