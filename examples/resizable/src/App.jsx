@@ -7,6 +7,7 @@ export default class App extends React.Component {
         this.rootRecord = quip.apps.getRootRecord();
         this.state = {
             height: window.parseInt(this.rootRecord.get("height"), 10) || 200,
+            isFullScreen: quip.apps.isAppFocused(),
             resizing: false,
         };
     }
@@ -31,6 +32,8 @@ export default class App extends React.Component {
         console.debug("onBlur");
         window.removeEventListener("mousemove", this.onMouseMove);
         window.removeEventListener("mouseup", this.onMouseUp);
+        this.setState({isFullScreen: false});
+        quip.apps.enableResizing();
     };
 
     onMouseDown = e => {
@@ -57,12 +60,42 @@ export default class App extends React.Component {
         this.rootRecord.set("height", height);
     };
 
+    toggleFullScreen = e => {
+        const isFullScreen = !this.state.isFullScreen;
+        this.setState({isFullScreen}, () => {
+            if (isFullScreen) {
+                quip.apps.disableResizing();
+            } else {
+                quip.apps.enableResizing();
+            }
+        });
+    };
+
     render() {
         // You could of course store height in the rootRecord to persist it.
-        const {height} = this.state;
+        let {height, isFullScreen} = this.state;
+        let top, left, width;
+        let position = "static";
+        if (isFullScreen) {
+            position = "absolute";
+            const dim = quip.apps.getViewportDimensions();
+            const rect = quip.apps.getBoundingClientRect();
+            top = -rect.top;
+            left = -rect.left;
+            width = dim.width;
+            height = dim.height;
+        }
+        console.debug({top, left, width, height, position});
         return (
-            <div style={{height}}>
+            <div
+                className={Styles.App}
+                style={{top, left, width, height, position}}>
                 Resize Me!
+                <div className={Styles.goFullScreen}>
+                    <button onClick={this.toggleFullScreen}>
+                        {isFullScreen ? "Minimize" : "Maximize"}
+                    </button>
+                </div>
                 <div
                     ref={el => (this.verticalHandle = el)}
                     className={Styles.verticalHandle}
