@@ -34,6 +34,7 @@ export default class App extends React.Component {
         window.removeEventListener("mouseup", this.onMouseUp);
         this.setState({isFullScreen: false});
         quip.apps.enableResizing();
+        quip.apps.dismissBackdrop();
     };
 
     onMouseDown = e => {
@@ -62,19 +63,21 @@ export default class App extends React.Component {
 
     toggleFullScreen = e => {
         const isFullScreen = !this.state.isFullScreen;
-        this.setState({isFullScreen}, () => {
-            if (isFullScreen) {
-                quip.apps.disableResizing();
-            } else {
-                quip.apps.enableResizing();
-            }
-        });
+
+        if (isFullScreen) {
+            quip.apps.disableResizing();
+            quip.apps.showBackdrop();
+        } else {
+            quip.apps.enableResizing();
+            quip.apps.dismissBackdrop();
+        }
+        this.setState({isFullScreen});
     };
 
     render() {
         // You could of course store height in the rootRecord to persist it.
-        let {height, isFullScreen} = this.state;
-        let top, left, width;
+        let {height, isFullScreen, resizing} = this.state;
+        let top, left, width, zIndex;
         let position = "static";
         if (isFullScreen) {
             position = "absolute";
@@ -84,23 +87,36 @@ export default class App extends React.Component {
             left = -rect.left;
             width = dim.width;
             height = dim.height;
+            zIndex = 302;
         }
         console.debug({top, left, width, height, position});
         return (
             <div
                 className={Styles.App}
-                style={{top, left, width, height, position}}>
-                Resize Me!
-                <div className={Styles.goFullScreen}>
-                    <button onClick={this.toggleFullScreen}>
-                        {isFullScreen ? "Minimize" : "Maximize"}
-                    </button>
+                style={{top, left, width, height, position, zIndex}}>
+                <div>
+                    {isFullScreen ? (
+                        <quip.apps.ui.Button
+                            onClick={() => console.log("CLICK")}
+                            text="Test click me"
+                        />
+                    ) : (
+                        "Resize Me!"
+                    )}
                 </div>
-                <div
-                    ref={el => (this.verticalHandle = el)}
-                    className={Styles.verticalHandle}
-                    onMouseDown={this.onMouseDown}
-                />
+                <div className={Styles.goFullScreen}>
+                    <quip.apps.ui.Button
+                        onClick={this.toggleFullScreen}
+                        text={isFullScreen ? "Minimize" : "Maximize"}
+                    />
+                </div>
+                {!isFullScreen && (
+                    <div
+                        ref={el => (this.verticalHandle = el)}
+                        className={Styles.verticalHandle}
+                        onMouseDown={this.onMouseDown}
+                    />
+                )}
             </div>
         );
     }
