@@ -1,7 +1,7 @@
 import Styles from "./Giphys.less";
 import loadingGiphyGif from "file-loader?publicPath=dist/!./giphy-loading.gif";
 
-const GIPHY_API_KEY = "rZ67xfXK0NvCo6RWyBaBYDkM8WhsIvD4";
+const GIPHY_API_KEY = "";
 const GIPHY_LIMIT = 4;
 const GIPHY_RATING = "PG-13";
 
