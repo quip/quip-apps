@@ -1,0 +1,13 @@
+{
+    "id": "${APP_ID}",
+    "manifest_version": 1,
+    "name": "Vue ToDo",
+    "version_name": "1.7",
+    "version_number": 7,
+    "sizing_mode": "scale",
+    "initial_height": 300,
+    "initial_width": 300,
+    "js_files": [
+        "dist/app.js"
+    ]
+}
