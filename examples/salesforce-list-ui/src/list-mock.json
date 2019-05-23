@@ -1,0 +1,1064 @@
+{
+  "eTag": "c15f775432158455ce41e3aecce1927a",
+  "info": {
+    "cloneable": true,
+    "createable": true,
+    "deletable": true,
+    "displayColumns": [
+      {
+        "fieldApiName": "Id",
+        "label": "Record ID",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "Name",
+        "label": "Product Name",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "MSRP__c",
+        "label": "MSRP",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "Description__c",
+        "label": "Description",
+        "sortable": false
+      },
+      {
+        "fieldApiName": "Category__c",
+        "label": "Category",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "Level__c",
+        "label": "Level",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "Picture_URL__c",
+        "label": "Picture URL",
+        "sortable": true
+      },
+      {
+        "fieldApiName": "Material__c",
+        "label": "Material",
+        "sortable": true
+      }
+    ],
+    "eTag": "ff8fc42944984f91b42e81d135066c08",
+    "filterLogicString": null,
+    "filteredByInfo": [],
+    "label": "ProductList",
+    "listReference": {
+      "id": "00B9A000001DNCgUAO",
+      "listViewApiName": "ProductList",
+      "objectApiName": "Product__c",
+      "type": "listView"
+    },
+    "orderedByInfo": [
+      {
+        "fieldApiName": "Id",
+        "isAscending": true,
+        "label": "Record ID"
+      }
+    ],
+    "updateable": true,
+    "userPreferences": {
+      "columnWidths": {
+        "Picture_URL__c": 298,
+        "Level__c": 99,
+        "MSRP__c": 80,
+        "Description__c": 297,
+        "Category__c": 102,
+        "Id": 183,
+        "Material__c": 100,
+        "Name": 172
+      },
+      "columnWrap": {
+        "Picture_URL__c": false,
+        "Level__c": false,
+        "MSRP__c": false,
+        "Description__c": false,
+        "Category__c": false,
+        "Id": false,
+        "Material__c": false,
+        "Name": false
+      }
+    },
+    "visibility": "Public",
+    "visibilityEditable": true
+  },
+  "records": {
+    "count": 16,
+    "currentPageToken": "0",
+    "currentPageUrl": "/services/data/v46.0/ui-api/list-records/00B9A000001DNCgUAO?pageSize=50&pageToken=0",
+    "listInfoETag": "ff8fc42944984f91b42e81d135066c08",
+    "nextPageToken": null,
+    "nextPageUrl": null,
+    "previousPageToken": null,
+    "previousPageUrl": null,
+    "records": [
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "bc0005e23aa3f86d6a9b74f5f970fa3e",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8iQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€2,500",
+            "value": 2500.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "FUSE X1"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/fusex1.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8iQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "9d93c1cfae5631e289ed8e868195e80b",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8jQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€2,600",
+            "value": 2600.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "FUSE X2"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/fusex2.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8jQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "dd691b2492d90f9125c8169bac2b609d",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8kQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€2,700",
+            "value": 2700.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "FUSE X3"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/fusex3.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8kQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "40838389c84a8e0be2c2f1b36adfdf7c",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8lQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€2,800",
+            "value": 2800.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "FUSE X4"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/fusex4.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8lQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "30ab275036351a1411cf858bba7f15bc",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8mQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Racer",
+            "value": "Racer"
+          },
+          "MSRP__c": {
+            "displayValue": "€7,000",
+            "value": 7000.0
+          },
+          "Material__c": {
+            "displayValue": "Carbon",
+            "value": "Carbon"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "DYNAMO X1"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/dynamox1.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8mQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "8279a25d1dfc70c9762a1d9e2711d83a",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8nQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Racer",
+            "value": "Racer"
+          },
+          "MSRP__c": {
+            "displayValue": "€7,200",
+            "value": 7200.0
+          },
+          "Material__c": {
+            "displayValue": "Carbon",
+            "value": "Carbon"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "DYNAMO X2"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/dynamox2.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8nQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "cef8da952020ad3fd79a3d9201273d85",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8oQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Racer",
+            "value": "Racer"
+          },
+          "MSRP__c": {
+            "displayValue": "€7,400",
+            "value": 7400.0
+          },
+          "Material__c": {
+            "displayValue": "Carbon",
+            "value": "Carbon"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "DYNAMO X3"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/dynamox3.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8oQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "dc7edb175390d9eb077d9723fe937a39",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8pQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Racer",
+            "value": "Racer"
+          },
+          "MSRP__c": {
+            "displayValue": "€7,800",
+            "value": 7800.0
+          },
+          "Material__c": {
+            "displayValue": "Carbon",
+            "value": "Carbon"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "DYNAMO X4"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/dynamox4.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8pQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "081c67a509b4affd3fb1670c6d590363",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8qQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Enthusiast",
+            "value": "Enthusiast"
+          },
+          "MSRP__c": {
+            "displayValue": "€4,000",
+            "value": 4000.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "ELECTRA X1"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/electrax1.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8qQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "efc75dd51861f2ea6dac0e3506b1246e",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8rQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Enthusiast",
+            "value": "Enthusiast"
+          },
+          "MSRP__c": {
+            "displayValue": "€4,300",
+            "value": 4300.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "ELECTRA X2"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/electrax2.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8rQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "74c61e793f5a39b619bc15b271e0e75d",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8sQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Enthusiast",
+            "value": "Enthusiast"
+          },
+          "MSRP__c": {
+            "displayValue": "€4,600",
+            "value": 4600.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "ELECTRA X3"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/electrax3.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8sQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "761d99775c7d5c7ce3bb207ecef7bcc8",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Mountain",
+            "value": "Mountain"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8tQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Enthusiast",
+            "value": "Enthusiast"
+          },
+          "MSRP__c": {
+            "displayValue": "€4,900",
+            "value": 4900.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "ELECTRA X4"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/electrax4.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8tQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "70a36438a3f160fd3ab3b54e4edb7490",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8uQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€1,200",
+            "value": 1200.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "VOLT X1"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/voltx1.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8uQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "abda7e75b1fdc3766a829a4d3a5ca61e",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8vQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€1,400",
+            "value": 1400.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "VOLT X2"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/voltx2.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8vQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "d09090ddeee6d16bba813cbd9bb1e269",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8wQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€1,800",
+            "value": 1800.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "VOLT X3"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/voltx3.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8wQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      },
+      {
+        "apiName": "Product__c",
+        "childRelationships": {},
+        "eTag": "e0b2b40878e631fba9b2926e55a3a366",
+        "fields": {
+          "Category__c": {
+            "displayValue": "Commuter",
+            "value": "Commuter"
+          },
+          "CreatedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Description__c": {
+            "displayValue": null,
+            "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          },
+          "Id": {
+            "displayValue": null,
+            "value": "a039A000000lu8xQAA"
+          },
+          "LastModifiedById": {
+            "displayValue": null,
+            "value": "0059A000001QzYnQAK"
+          },
+          "LastModifiedDate": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          },
+          "Level__c": {
+            "displayValue": "Beginner",
+            "value": "Beginner"
+          },
+          "MSRP__c": {
+            "displayValue": "€1,900",
+            "value": 1900.0
+          },
+          "Material__c": {
+            "displayValue": "Aluminum",
+            "value": "Aluminum"
+          },
+          "Name": {
+            "displayValue": null,
+            "value": "VOLT X4"
+          },
+          "Picture_URL__c": {
+            "displayValue": null,
+            "value": "https://s3-us-west-1.amazonaws.com/sfdc-demo/ebikes/voltx4.jpg"
+          },
+          "SystemModstamp": {
+            "displayValue": null,
+            "value": "2019-04-24T11:24:26.000Z"
+          }
+        },
+        "id": "a039A000000lu8xQAA",
+        "lastModifiedById": "0059A000001QzYnQAK",
+        "lastModifiedDate": "2019-04-24T11:24:26.000Z",
+        "recordTypeInfo": null,
+        "systemModstamp": "2019-04-24T11:24:26.000Z"
+      }
+    ]
+  }
+}

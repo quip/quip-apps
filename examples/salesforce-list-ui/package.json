@@ -1,0 +1,28 @@
+{
+    "name": "quip-related-lists",
+    "version": "0.0.1",
+    "description": "quip-related-lists Quip App",
+    "license": "UNLICENSED",
+    "scripts": {
+        "start": "NODE_ENV=development webpack-dev-server --https",
+        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
+    },
+    "author": "",
+    "devDependencies": {
+        "quip-apps-webpack-config": ">=0.0.29",
+        "@salesforce/design-system-react": "^0.8.25",
+        "@salesforce-ux/design-system": "^2.1.2",
+        "pug": "^2.0.1",
+        "q": "1.5.1",
+        "react-json-inspector": "7.1.0",
+        "react-json-pretty": "^1.2.1",
+        "react-modal-dialog": "4.0.7",
+        "react-redux": "^4.4.6",
+        "redux": "^3.6.0",
+        "redux-saga": "^0.13.0"
+    },
+    "dependencies": {
+        "he": "^1.2.0",
+        "moment": "^2.24.0"
+    }
+}
