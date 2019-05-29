@@ -12,13 +12,17 @@ import "./dsr-quip-mods.css";
 import {getAllMenuCommands, updateToolbar} from "./menus";
 
 // This is a hardcoded object ID for the TrailheaDX19 demo.
-const DEFAULT_RECORD_ID = "00B9A000001DNCgUAO";
+const DEFAULT_RECORD_ID = "00B5E000001vOcBUAU";
 
 quip.apps.initialize({
     initializationCallback: function(rootNode, {creationUrl, isCreation}) {
         const rootRecord = quip.apps.getRootRecord();
         const ConnectedApp = Connect(rootRecord, App);
-        console.debug("initializationCallback", {creationUrl, isCreation});
+        console.debug("initializationCallback", {
+            creationUrl,
+            isCreation,
+            rootRecord: rootRecord.getData(),
+        });
 
         if (isCreation) {
             let recordId = DEFAULT_RECORD_ID;

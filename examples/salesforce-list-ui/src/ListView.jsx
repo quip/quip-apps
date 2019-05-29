@@ -20,13 +20,19 @@ export default class ListView extends React.Component {
     };
 
     handleRowChange = (event, {selection}) => {
-        console.debug("handleRowChange", selection);
         quip.apps.getRootRecord().set("selection", selection);
+
+        const {data} = this.props;
+        const noun = event.target.checked ? "Added" : "Removed";
+        const recordId = event.target.id.split("-")[2];
+        const item = this.getItems().find(obj => obj.id === recordId);
+        const firstFieldName = data.info.displayColumns[0].fieldApiName;
+        quip.apps.sendMessage(`${noun} ${item[firstFieldName]}`);
     };
 
-    render() {
-        const {data, selection} = this.props;
-        const items = data.records.records.map(record => {
+    getItems() {
+        const {data} = this.props;
+        return data.records.records.map(record => {
             let data = {id: record.id};
             Object.keys(record.fields).map(key => {
                 data[key] =
@@ -34,6 +40,11 @@ export default class ListView extends React.Component {
             });
             return data;
         });
+    }
+
+    render() {
+        const {data, selection} = this.props;
+        const items = this.getItems();
         const columns = data.info.displayColumns.map(col => {
             const property = col.fieldApiName;
             let cell;
@@ -51,7 +62,12 @@ export default class ListView extends React.Component {
             );
         });
         return (
-            <div style={{maxWidth: 800}}>
+            <Card
+                bodyClassName="slds-grow slds-scrollable--y"
+                className="slds-grid slds-grid--vertical"
+                filter={false}
+                heading={quiptext(data.info.label)}
+                empty={false}>
                 <DataTable
                     items={items}
                     fixedLayout
@@ -60,7 +76,7 @@ export default class ListView extends React.Component {
                     onRowChange={this.handleRowChange}>
                     {columns}
                 </DataTable>
-            </div>
+            </Card>
         );
     }
 }

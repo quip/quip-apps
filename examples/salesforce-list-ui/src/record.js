@@ -20,12 +20,14 @@ quip.apps.registerClass(MyRecord, "my-record");
 
 class RootRecord extends quip.apps.RootRecord {
     static getProperties = () => ({
+        recordId: "string",
         myRecords: quip.apps.RecordList.Type(MyRecord),
         listViewData: "object",
         selection: "array",
     });
 
     static getDefaultProperties = () => ({
+        recordId: "",
         myRecords: [],
         selection: [],
         listViewData: {},

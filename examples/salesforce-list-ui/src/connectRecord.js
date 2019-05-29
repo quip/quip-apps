@@ -69,7 +69,6 @@ export default (
 
         render() {
             const rootRecordData = rootRecord.getData() || {};
-            console.debug("connect", rootRecordData);
             return (
                 <WrappedComponent
                     {...this.state}
