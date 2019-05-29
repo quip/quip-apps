@@ -1,5 +1,4 @@
 // Copyright 2017 Quip
-/* @flow */
 
 import quip from "quip";
 import React from "react";
@@ -12,10 +11,7 @@ export function getAuth() {
     return quip.apps.auth("oauth2");
 }
 
-export default (
-    rootRecord: quip.apps.RootRecord,
-    WrappedComponent: React.Component
-) => {
+export default (rootRecord, WrappedComponent) => {
     class RecordComponent extends React.Component {
         constructor(props) {
             super();

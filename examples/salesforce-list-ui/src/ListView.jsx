@@ -1,22 +1,19 @@
 import React from "react";
 
-import {decode} from "he";
-import moment from "moment";
-
 import {
     Card,
-    CardEmpty,
-    CardFilter,
     DataTable,
     DataTableCell,
     DataTableColumn,
-    Spinner,
 } from "@salesforce/design-system-react";
+
+import {getAuth} from "./connectRecord";
 
 export default class ListView extends React.Component {
     onClickName = item => {
         console.debug("onClickName", item.id);
-        // TODO use quip.apps.openLink to open in Salesforce.
+        const url = `${getAuth().getTokenResponse().instance_url}/${item.id}`;
+        quip.apps.openLink(url);
     };
 
     handleRowChange = (event, {selection}) => {
