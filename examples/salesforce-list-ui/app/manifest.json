@@ -10,25 +10,12 @@
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"],
     "csp_sources": {
-        "script_srcs": ["https://*.force.com", "https://*.salesforce.com"],
-        "connect_srcs": ["https://*.force.com", "https://*.salesforce.com"],
-        "style_srcs": [
-            "https://quip-cdn.com",
-            "https://*.force.com",
-            "https://*.salesforce.com"
-        ],
-        "font_srcs": [
-            "https://quip-cdn.com",
-            "https://*.force.com",
-            "https://*.salesforce.com"
-        ],
-        "frame_srcs": ["https://*.force.com", "https://*.salesforce.com"],
-        "media_srcs": ["https://*.force.com", "https://*.salesforce.com"],
-        "img_srcs": [
-            "https://quip-cdn.com",
-            "https://*.force.com",
-            "https://*.salesforce.com",
-            "https://s3-us-west-1.amazonaws.com"
-        ]
+        "script_srcs": [],
+        "connect_srcs": [],
+        "style_srcs": [],
+        "font_srcs": [],
+        "frame_srcs": [],
+        "media_srcs": [],
+        "img_srcs": []
     }
 }

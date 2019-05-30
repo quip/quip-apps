@@ -1,9 +1,13 @@
 import React from "react";
 
+import {Button, Card} from "@salesforce/design-system-react";
+
 import ListView from "./ListView.jsx";
 
 import {DEFAULT_API_VERSION, getAuth} from "./connectRecord";
 import {setAppContext} from "./menus";
+
+import Styles from "./App.less";
 
 const LOAD_LISTVIEWDATA_TIMEOUT = 5000;
 
@@ -125,8 +129,14 @@ export default class App extends React.Component {
         if (isLoggedIn && listViewData) {
             el = <ListView data={listViewData} selection={selection} />;
         } else {
-            el = <button onClick={this.login}>login</button>;
+            el = (
+                <Card heading={quiptext("Salesforce List UI")}>
+                    <div style={{padding: "10px 20px"}}>
+                        <Button onClick={this.login}>Sign In</Button>
+                    </div>
+                </Card>
+            );
         }
-        return <div style={{maxWidth: 800}}>{el}</div>;
+        return <div className={Styles.App}>{el}</div>;
     }
 }

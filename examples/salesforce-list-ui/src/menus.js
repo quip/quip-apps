@@ -2,7 +2,7 @@ import {getAuth} from "./connectRecord";
 
 const lightningUrl = url => `${url.split(".")[0]}.lightning.force.com`;
 
-let AppContext;
+let AppContext = {};
 
 export function setAppContext(c) {
     AppContext = c;
@@ -13,12 +13,12 @@ export function getAllMenuCommands() {
         {
             id: "login",
             label: quiptext("Sign in"),
-            handler: login,
+            handler: () => AppContext.login(),
         },
         {
             id: "logout",
             label: quiptext("Sign out"),
-            handler: logout,
+            handler: () => AppContext.logout(),
         },
         {
             id: "clearRecordId",
@@ -45,14 +45,6 @@ export function getAllMenuCommands() {
     ];
 
     return commands;
-}
-
-export function login() {
-    AppContext.login();
-}
-
-export function logout() {
-    AppContext.logout();
 }
 
 export function updateToolbar() {
