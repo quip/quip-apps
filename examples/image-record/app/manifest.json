@@ -1,0 +1,12 @@
+{
+    "id": "UNAAjAf74ps",
+    "manifest_version": 1,
+    "name": "image-record",
+    "version_name": "1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 300,
+    "initial_width": 300,
+    "js_files": ["dist/app.js"],
+    "css_files": []
+}

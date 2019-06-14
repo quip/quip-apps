@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Button, Card} from "@salesforce/design-system-react";
+import {Button, Card, Spinner} from "@salesforce/design-system-react";
 
 import ListView from "./ListView.jsx";
 
@@ -126,8 +126,18 @@ export default class App extends React.Component {
         const {isLoggedIn, listViewData, selection} = this.props;
 
         let el;
-        if (isLoggedIn && listViewData) {
-            el = <ListView data={listViewData} selection={selection} />;
+        if (isLoggedIn) {
+            if (listViewData) {
+                el = <ListView data={listViewData} selection={selection} />;
+            } else {
+                el = (
+                    <Spinner
+                        size="medium"
+                        variant="base"
+                        assistiveText={{label: "Loading"}}
+                    />
+                );
+            }
         } else {
             el = (
                 <Card heading={quiptext("Salesforce List UI")}>
