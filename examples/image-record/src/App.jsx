@@ -5,7 +5,7 @@ export default class App extends Component {
 
     imageClickHandler = e => {
         const imageRecord = this.props.image;
-        if (!imageRecord) {
+        if (!imageRecord.hasImage()) {
             return;
         }
         this.imageNode.addCommentAtPoint(e.clientX, e.clientY);
