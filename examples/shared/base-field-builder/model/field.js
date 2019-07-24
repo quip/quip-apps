@@ -365,6 +365,9 @@ export class NumericFieldEntity extends TextFieldEntity {
         }
         const displayValue = this.getOriginalDisplayValue();
         if (typeof displayValue === "string" && displayValue.length > 0) {
+            if (isNaN(parseInt(displayValue.charAt(1)))) {
+              return displayValue.substring(0,3);
+            }
             return displayValue.charAt(0);
         }
         return null;
