@@ -1,15 +1,23 @@
 // Copyright 2018 Quip
 
-const webpack = require('webpack');
+const fs = require("fs");
+const webpack = require("webpack");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const Autoprefixer = require('autoprefixer');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const Autoprefixer = require("autoprefixer");
 const cwd = process.cwd();
+const devMode = process.env.NODE_ENV === "development";
 
-const devMode = process.env.NODE_ENV !== 'production';
+function babelrcOptions() {
+    const babelrcPath = path.resolve(process.cwd(), ".babelrc");
+    if (fs.existsSync(babelrcPath)) {
+        return JSON.parse(fs.readFileSync(babelrcPath));
+    }
+    return {presets: ["@babel/preset-env", "@babel/preset-react"]};
+}
 
 function minimizers() {
     let minimizers = [];
@@ -19,12 +27,12 @@ function minimizers() {
                 uglifyOptions: {
                     mangle: {
                         properties: {
-                            reserved: ["quip-text"]
-                        }
-                    }
-                }
+                            reserved: ["quip-text"],
+                        },
+                    },
+                },
             }),
-            new OptimizeCSSAssetsPlugin({})
+            new OptimizeCSSAssetsPlugin({}),
         ];
     }
     return minimizers;
@@ -33,11 +41,15 @@ function minimizers() {
 module.exports = {
     devtool: "source-map",
     mode: devMode ? "development" : "production",
-    entry: ["@babel/polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
+    entry: [
+        "core-js/stable",
+        "regenerator-runtime/runtime",
+        path.resolve(cwd, "./src/root.jsx"),
+    ],
     output: {
         path: path.resolve(cwd, "./app/dist"),
         filename: "app.js",
-        publicPath: "dist"
+        publicPath: "dist",
     },
     module: {
         rules: [
@@ -45,15 +57,7 @@ module.exports = {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
-                query: {
-                    presets: [
-                        require.resolve("@babel/preset-env"),
-                        require.resolve("@babel/preset-react")
-                    ],
-                    plugins: [
-                        require.resolve("@babel/plugin-proposal-class-properties")
-                    ]
-                },
+                options: babelrcOptions(),
             },
             {
                 test: /\.less$/,
@@ -62,21 +66,20 @@ module.exports = {
                     {
                         loader: "css-loader",
                         options: {
-                            modules: true,
+                            modules: {
+                                localIdentName: "[name]__[local]",
+                            },
                             importLoaders: 1,
-                            localIdentName: "[name]__[local]"
                         },
                     },
                     {
                         loader: "postcss-loader",
                         options: {
-                            plugins: loader => [
-                                Autoprefixer(),
-                            ]
-                        }
+                            plugins: loader => [Autoprefixer()],
+                        },
                     },
-                    "less-loader"
-                ]
+                    "less-loader",
+                ],
             },
             {
                 test: /\.css$/,
@@ -88,12 +91,10 @@ module.exports = {
                     {
                         loader: "postcss-loader",
                         options: {
-                            plugins: loader => [
-                                Autoprefixer(),
-                            ]
-                        }
+                            plugins: loader => [Autoprefixer()],
+                        },
                     },
-                ]
+                ],
             },
             {
                 test: /\.svg/,
@@ -101,53 +102,52 @@ module.exports = {
                     {
                         loader: "svg-react-loader",
                         options: {
-                            jsx: true
+                            jsx: true,
                         },
-                    }
+                    },
                 ],
             },
             {
                 test: /\.png$/,
-                use: "url-loader"
-            }
+                use: "url-loader",
+            },
         ],
     },
     resolve: {
         modules: [
             path.resolve(cwd, "src"),
             path.resolve(cwd, "node_modules"),
-            path.resolve(__dirname, "node_modules")
-        ]
+            path.resolve(__dirname, "node_modules"),
+        ],
     },
     resolveLoader: {
         modules: [
             path.resolve(cwd, "node_modules"),
-            path.resolve(__dirname, "node_modules")
-        ]
+            path.resolve(__dirname, "node_modules"),
+        ],
     },
     optimization: {
-        minimizer: minimizers()
+        minimizer: minimizers(),
     },
     performance: {
-        hints: false
+        hints: false,
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "app.css"
+            filename: "app.css",
         }),
-        new WriteFilePlugin()
+        new WriteFilePlugin(),
     ],
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
         quip: "quip",
-        quiptext: "quiptext"
+        quiptext: "quiptext",
     },
     devServer: {
         contentBase: path.resolve(cwd, "app/dist"),
         // host: "docker.qa",
         port: 8888,
-        inline: false
-    }
+        inline: false,
+    },
 };
-
