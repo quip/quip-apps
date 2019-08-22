@@ -100,12 +100,16 @@ export function unescapeHTML(str) {
     const HTML_UNESCAPE_AMP_RE_ = /\&amp;/g;
     const HTML_UNESCAPE_LT_RE_ = /\&lt;/g;
     const HTML_UNESCAPE_GT_RE_ = /\&gt;/g;
+    const HTML_UNESCAPE_QUOTE_ = /\&quot;/g;
+    const HTML_UNESCAPE_SINGLE_QUOTE_ = /\&#39;/g;
     if (!str || str.indexOf("&") == -1) {
         return str;
     }
     str = str.replace(HTML_UNESCAPE_LT_RE_, "<");
     str = str.replace(HTML_UNESCAPE_GT_RE_, ">");
     str = str.replace(HTML_UNESCAPE_AMP_RE_, "&");
+    str = str.replace(HTML_UNESCAPE_QUOTE_, '"');
+    str = str.replace(HTML_UNESCAPE_SINGLE_QUOTE_, "'");
     return str;
 }
 
