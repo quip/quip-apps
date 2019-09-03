@@ -2,7 +2,7 @@
   "name": "quiptext",
   "version": "0.1.0",
   "description": "shim for Quip Live Apps string internationalization",
-  "main": "quiptext.js",
+  "main": "index.js",
   "scripts": {
     "test": "tape test/**/*.test.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
@@ -18,9 +18,6 @@
     "url": "https://github.com/quip/quip-apps/issues"
   },
   "homepage": "https://github.com/quip/quip-apps#readme",
-  "dependencies": {
-    "global": "^4.4.0"
-  },
   "peerDependencies": {
     "react": "*"
   },
