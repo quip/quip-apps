@@ -18,6 +18,7 @@
   "dependencies": {},
   "scripts": {
     "build": "lerna run build",
-    "release": "lerna run build && lerna publish"
+    "release": "lerna run build && lerna publish",
+    "release:next": "lerna run build && lerna publish prerelease --npm-tag next"
   }
 }
