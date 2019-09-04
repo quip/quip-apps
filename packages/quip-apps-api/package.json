@@ -1,0 +1,31 @@
+{
+  "name": "quip-apps-api",
+  "version": "0.1.0",
+  "description": "Quip Live Apps API",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/**/*.test.js",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "lcov": "nyc npm test && nyc report --reporter=lcov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quip/quip-apps.git"
+  },
+  "author": "Quip",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/quip/quip-apps/issues"
+  },
+  "homepage": "https://github.com/quip/quip-apps#readme",
+  "peerDependencies": {
+    "react": ">=15.0.0"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.6",
+    "import-fresh": "^3.1.0",
+    "nyc": "^14.1.1",
+    "react": "^16.9.0",
+    "tape": "^4.11.0"
+  }
+}
