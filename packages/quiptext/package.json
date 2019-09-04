@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/quip/quip-apps#readme",
   "peerDependencies": {
-    "react": "*"
+    "react": ">=15.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.6",
