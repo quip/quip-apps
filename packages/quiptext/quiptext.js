@@ -1,5 +1,4 @@
 // Copyright 2019 Quip
-const global = require("global");
 const React = require("React");
 
 /**
@@ -9,7 +8,7 @@ const React = require("React");
  * a global, import this library explicitly and it will handle shimming when needed.
  */
 
-const quiptext = function(text, placeholders) {
+function quiptext(text, placeholders) {
     if (text[text.length - 1] == "]" && text.lastIndexOf(" [") != -1) {
         // Remove translation comments
         text = text.substr(0, text.lastIndexOf(" ["));
@@ -70,7 +69,6 @@ const quiptext = function(text, placeholders) {
             : localeReplace(text, placeholders);
     }
     return text;
-};
+}
 
-module.exports =
-    global["quiptext"] === undefined ? quiptext : global["quiptext"];
+module.exports = quiptext;

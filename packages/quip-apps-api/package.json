@@ -1,7 +1,7 @@
 {
-  "name": "quiptext",
+  "name": "quip-apps-api",
   "version": "0.1.0",
-  "description": "shim for Quip Live Apps string internationalization",
+  "description": "Quip Live Apps API",
   "main": "index.js",
   "scripts": {
     "test": "tape test/**/*.test.js",

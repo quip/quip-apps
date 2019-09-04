@@ -1,91 +1,100 @@
-// Copyright 2017 Quip
+// Copyright 2018 Quip
 
-const path = require("path");
+const fs = require("fs");
 const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
-const Autoprefixer = require('autoprefixer');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const Autoprefixer = require("autoprefixer");
 const cwd = process.cwd();
+const devMode = process.env.NODE_ENV === "development";
 
-function plugins() {
-    let plugins = [
-        new ExtractTextPlugin("app.css"),
-        new WriteFilePlugin()
-    ];
-    if (process.env.NODE_ENV != "development") {
-        plugins.push(
-            new webpack.optimize.UglifyJsPlugin({
-                mangle: { except: ["quiptext"] }
-            })
-        )
+function babelrcOptions() {
+    const babelrcPath = path.resolve(process.cwd(), ".babelrc");
+    if (fs.existsSync(babelrcPath)) {
+        return JSON.parse(fs.readFileSync(babelrcPath));
     }
-    return plugins;
+    return {presets: ["@babel/preset-env", "@babel/preset-react"]};
+}
+
+function minimizers() {
+    let minimizers = [];
+    if (!devMode) {
+        minimizers = [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    mangle: {
+                        properties: {
+                            reserved: ["quip-text"],
+                        },
+                    },
+                },
+            }),
+            new OptimizeCSSAssetsPlugin({}),
+        ];
+    }
+    return minimizers;
 }
 
 module.exports = {
     devtool: "source-map",
-    entry: ["babel-polyfill", "quip-apps-compat", path.resolve(cwd, "./src/root.jsx")],
+    mode: devMode ? "development" : "production",
+    entry: [
+        "core-js/stable",
+        "regenerator-runtime/runtime",
+        path.resolve(cwd, "./src/root.jsx"),
+    ],
     output: {
         path: path.resolve(cwd, "./app/dist"),
         filename: "app.js",
-        publicPath: "dist"
+        publicPath: "dist",
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
-                query: {
-                    presets: [
-                        require.resolve("babel-preset-env"),
-                        require.resolve("babel-preset-react-app")
-                    ]
-                },
+                options: babelrcOptions(),
             },
             {
                 test: /\.less$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
-                            options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: "[name]__[local]"
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            modules: {
+                                localIdentName: "[name]__[local]",
                             },
+                            importLoaders: 1,
                         },
-                        {
-                            loader: "postcss-loader",
-                            options: {
-                                plugins: loader => [
-                                    Autoprefixer(),
-                                ]
-                            }
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            plugins: loader => [Autoprefixer()],
                         },
-                        "less-loader"
-                    ],
-                }),
+                    },
+                    "less-loader",
+                ],
             },
             {
                 test: /\.css$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            plugins: loader => [Autoprefixer()],
                         },
-                        {
-                            loader: "postcss-loader",
-                            options: {
-                                plugins: loader => [
-                                    Autoprefixer(),
-                                ]
-                            }
-                        },
-                    ],
-                }),
+                    },
+                ],
             },
             {
                 test: /\.svg/,
@@ -93,42 +102,52 @@ module.exports = {
                     {
                         loader: "svg-react-loader",
                         options: {
-                            jsx: true
+                            jsx: true,
                         },
-                    }
+                    },
                 ],
             },
             {
                 test: /\.png$/,
-                use: "url-loader"
-            }
+                use: "url-loader",
+            },
         ],
     },
     resolve: {
         modules: [
             path.resolve(cwd, "src"),
             path.resolve(cwd, "node_modules"),
-            path.resolve(__dirname, "node_modules")
-        ]
+            path.resolve(__dirname, "node_modules"),
+        ],
     },
     resolveLoader: {
         modules: [
             path.resolve(cwd, "node_modules"),
-            path.resolve(__dirname, "node_modules")
-        ]
+            path.resolve(__dirname, "node_modules"),
+        ],
     },
-    plugins: plugins(),
+    optimization: {
+        minimizer: minimizers(),
+    },
+    performance: {
+        hints: false,
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "app.css",
+        }),
+        new WriteFilePlugin(),
+    ],
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
         quip: "quip",
-        quiptext: "quiptext"
+        quiptext: "quiptext",
     },
     devServer: {
         contentBase: path.resolve(cwd, "app/dist"),
         // host: "docker.qa",
         port: 8888,
-        inline: false
-    }
+        inline: false,
+    },
 };
-
