@@ -6,7 +6,7 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const Autoprefixer = require("autoprefixer");
 const cwd = process.cwd();
 const devMode = process.env.NODE_ENV === "development";
@@ -23,15 +23,15 @@ function minimizers() {
     let minimizers = [];
     if (!devMode) {
         minimizers = [
-            new UglifyJsPlugin({
-                uglifyOptions: {
+            new TerserPlugin({
+                terserOptions: {
                     mangle: {
                         properties: {
                             reserved: ["quip-text"],
                         },
                     },
                 },
-            }),
+            });,
             new OptimizeCSSAssetsPlugin({}),
         ];
     }
