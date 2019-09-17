@@ -1,5 +1,5 @@
 // Copyright 2019 Quip
-const React = require("React");
+const React = require("react");
 
 /**
  * @fileoverview This is a shim for quip's internal translation mechanism - this
