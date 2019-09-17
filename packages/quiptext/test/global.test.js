@@ -1,6 +1,5 @@
 // Copyright 2019 Quip
 const test = require("tape");
-const global = require("global");
 const importFresh = require("import-fresh");
 
 test("global quiptext", t => {
