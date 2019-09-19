@@ -1,9 +1,10 @@
 {
   "name": "quip-apps-compat",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.2",
   "description": "Compat library for Quip Apps",
   "license": "Apache-2.0",
   "repository": "quip/quip-apps",
   "main": "index.js",
-  "author": "Quip"
+  "author": "Quip",
+  "gitHead": "9a70ba439d116d751949ef12978d30667f7a5397"
 }

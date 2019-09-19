@@ -1,6 +1,6 @@
 {
   "name": "quip-apps-webpack-config",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Quip Apps Webpack Config",
   "license": "Apache-2.0",
   "repository": "quip/quip-apps",
@@ -25,5 +25,6 @@
     "url-loader": "^2.1.0",
     "webpack": "^4.39.2",
     "write-file-webpack-plugin": "^4.5.1"
-  }
+  },
+  "gitHead": "9a70ba439d116d751949ef12978d30667f7a5397"
 }

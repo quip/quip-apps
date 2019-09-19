@@ -1,6 +1,6 @@
 {
     "name": "quip-apps-chevron",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0-alpha.2",
     "description": "Quip Apps Chevron",
     "license": "Apache-2.0",
     "repository": "quip/quip-apps",
@@ -11,5 +11,6 @@
     },
     "dependencies": {
         "quip-apps-webpack-config": "^0.0.45"
-    }
+    },
+    "gitHead": "9a70ba439d116d751949ef12978d30667f7a5397"
 }
