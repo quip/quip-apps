@@ -1,6 +1,6 @@
 {
   "name": "quiptext",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "shim for Quip Live Apps string internationalization",
   "main": "index.js",
   "scripts": {
