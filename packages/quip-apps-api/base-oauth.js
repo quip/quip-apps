@@ -39,10 +39,7 @@ class HttpResponse {
         this.url = options.url || "";
         this.status = options.status === undefined ? 200 : options.status;
         this.statusText = options.statusText || "OK";
-        this.headers =
-            options.headers instanceof HttpHeaders
-                ? options.headers
-                : new HttpHeaders(options.headers);
+        this.headers = options.headers;
         this.body_ = options.body || "";
         this.ok = this.ok = this.status >= 200 && this.status < 300;
     }
@@ -59,7 +56,7 @@ class HttpResponse {
             body: this.body_,
             status: this.status,
             statusText: this.statusText,
-            headers: this.headers.map_,
+            headers: this.headers,
         });
     }
 }
