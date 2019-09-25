@@ -26,5 +26,5 @@
     "webpack": "^4.39.2",
     "write-file-webpack-plugin": "^4.5.1"
   },
-  "gitHead": "9a70ba439d116d751949ef12978d30667f7a5397"
+  "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1"
 }
