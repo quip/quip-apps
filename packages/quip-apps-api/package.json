@@ -2,11 +2,13 @@
   "name": "quip-apps-api",
   "version": "1.0.0-alpha.3",
   "description": "Quip Live Apps API",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "tape test/**/*.test.js",
+    "build": "tsc",
+    "test": "npm run build && tape test/**/*.test.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "lcov": "nyc npm test && nyc report --reporter=lcov"
+    "lcov": "nyc npm test && nyc report --reporter=lcov",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,8 @@
     "import-fresh": "^3.1.0",
     "nyc": "^14.1.1",
     "react": "^16.9.0",
-    "tape": "^4.11.0"
+    "tape": "^4.11.0",
+    "typescript": "^3.6.3"
   },
   "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1"
 }
