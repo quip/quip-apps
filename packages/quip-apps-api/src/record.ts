@@ -1,10 +1,35 @@
 // Copyright 2019 Quip
 
-const RecordList = require("./record-list");
-const ClientError = require("./client-error");
+import RecordList from "./record-list";
+import ClientError from "./client-error";
+import Client from "./client";
 
-class Record {
-    constructor() {
+export default abstract class Record {
+    public values: {
+        id: string;
+        uniqueId: string;
+        isDeleted: boolean;
+        childrenIndex: number;
+        position: string;
+        dataVersion: number;
+        parentId: string;
+        parent?: Record;
+        parentRecord?: Record;
+        containingList?: RecordList;
+        previousSibling?: Record;
+        nextSibling?: Record;
+        commentCount: number;
+        children: Array<Record>;
+    };
+    protected data_: {[key: string]: any};
+    static getProperties(): {[property: string]: string} {
+        return {};
+    }
+    static getDefaultProperties(): {[property: string]: any} {
+        return {};
+    }
+
+    constructor(client: Client, pb: Object, schema: any) {
         // These values are public so that consumers can set these in tests
         // directly.
         this.values = {
@@ -15,18 +40,14 @@ class Record {
             position: "aaa",
             dataVersion: 1,
             parentId: "parent-record-id",
-            parent: null, // Record
-            parentRecord: null, // Record
-            containingList: null, // RecordList
-            previousSibling: null,
-            nextSibling: null,
             commentCount: 0,
-            children: [], // Records
+            children: [],
         };
-        const propTypes = this.constructor.getProperties();
-        let defaultProps = {};
+        const statics = this.constructor as typeof Record;
+        const propTypes = statics.getProperties();
+        let defaultProps: {[property: string]: any} = {};
         if ("getDefaultProperties" in this.constructor) {
-            defaultProps = this.constructor.getDefaultProperties();
+            defaultProps = statics.getDefaultProperties();
         }
         this.data_ = {};
         for (const key in propTypes) {
@@ -187,5 +208,3 @@ class Record {
     }
     unlistenToComments(listener) {}
 }
-
-module.exports = Record;

@@ -1,9 +1,9 @@
 // Copyright 2019 Quip
 
-const Record = require("./record");
-const ClientError = require("./client-error");
+import Record from "./record";
+import ClientError from "./client-error";
 
-class RootRecord extends Record {
+export default class RootRecord extends Record {
     getParent() {
         throw new ClientError(
             "getParent() is not supported on the root record."
@@ -64,5 +64,3 @@ class RootRecord extends Record {
         );
     }
 }
-
-module.exports = RootRecord;

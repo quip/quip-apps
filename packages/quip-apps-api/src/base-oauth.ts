@@ -1,32 +1,47 @@
 // Copyright 2019 Quip
 
-const Auth = require("./auth");
+import Auth from "./auth";
+import Client from "./client";
 
-class BaseOAuth extends Auth {
-    constructor(...args) {
-        super(...args);
+export default class BaseOAuth extends Auth {
+    public values!: {
+        tokenResponse: {
+            [key: string]: string;
+        };
+        nextHttpResponse: HttpResponse;
+    };
+    constructor(client: Client, authConfig: Object, preferences: Preferences) {
+        super(client, authConfig);
         this.values.tokenResponse = {};
         this.values.nextHttpResponse = new HttpResponse();
     }
     getTokenResponse() {
         return this.values.tokenResponse;
     }
-    getTokenResponseParam(param) {
+    getTokenResponseParam(param: string): string {
         return this.values.tokenResponse[param];
     }
     isLoggedIn() {
         return !!this.getTokenResponseParam("access_token");
     }
-    login() {}
-    logout() {}
-    request(params) {
+    login(params: Object) {
+        return Promise.resolve();
+    }
+    logout(): Promise<HttpResponse> {
+        return Promise.resolve(new HttpResponse());
+    }
+    request(params: Object): Promise<HttpResponse> {
         return Promise.resolve(this.values.nextHttpResponse);
     }
 }
 
-module.exports = BaseOAuth;
-
 class HttpResponse {
+    public url: string;
+    public status: number;
+    public statusText: string;
+    public headers?: {[key: string]: string};
+    private body_: string;
+    public ok: boolean;
     constructor(
         options = {
             url: undefined,
@@ -37,11 +52,11 @@ class HttpResponse {
         }
     ) {
         this.url = options.url || "";
-        this.status = options.status === undefined ? 200 : options.status;
+        this.status = options.status || 200;
         this.statusText = options.statusText || "OK";
         this.headers = options.headers;
         this.body_ = options.body || "";
-        this.ok = this.ok = this.status >= 200 && this.status < 300;
+        this.ok = this.status >= 200 && this.status < 300;
     }
     text() {
         return this.body_;

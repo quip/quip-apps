@@ -1,11 +1,11 @@
 // Copyright 2019 Quip
-const pkg = require("./package.json");
-const Blob = require("./blob");
-const RootRecord = require("./root-record");
-const Preferences = require("./preferences");
-const User = require("./user");
+import pkg from "../package.json";
+import Blob from "./blob";
+import RootRecord from "./root-record";
+import Preferences from "./preferences";
+import User from "./user";
 
-class Client {
+export default class Client {
     constructor() {
         // In production, these values will be dynamic. In this mock, they will
         // be whatever you set them to. You can set these values by setting them
@@ -316,5 +316,3 @@ Client.MenuIcons = {
 };
 
 Client.RootEntityConstructor = class {};
-
-module.exports = Client;

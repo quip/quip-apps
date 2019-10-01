@@ -1,11 +1,18 @@
 // Copyright 2019 Quip
 
-class Blob {
-    constructor() {
+import Client from "./client";
+
+export default class Blob {
+    public values: {
+        data?: ArrayBuffer;
+        filename?: string;
+        id?: string;
+        hasLoadedData: boolean;
+        imageHeight: number;
+        imageWidth: number;
+    };
+    constructor(client: Client, filePb: Object) {
         this.values = {
-            data: null, // ArrayBuffer
-            filename: null,
-            id: null,
             hasLoadedData: false,
             imageHeight: 0,
             imageWidth: 0,
@@ -39,11 +46,15 @@ class Blob {
     imageWidth() {
         return this.values.imageWidth;
     }
-    onDataLoaded(loadedCallback, failedCallback) {}
+    onDataLoaded(
+        loadedCallback: (blob: Blob) => void,
+        failedCallback?: (blob: Blob) => void
+    ) {}
     openInLightbox() {}
     url() {
-        return URL.createObjectURL(new window.Blob([this.values.data]));
+        // TODO: not sure this type coercion is always safe
+        return URL.createObjectURL(
+            new window.Blob([this.values.data as BlobPart])
+        );
     }
 }
-
-module.exports = Blob;

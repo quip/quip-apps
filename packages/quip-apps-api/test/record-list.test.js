@@ -1,7 +1,7 @@
 // Copyright 2019 Quip
 const test = require("tape");
-const RecordList = require("../record-list");
-const Record = require("../record");
+const RecordList = require("../dist/record-list");
+const Record = require("../dist/record");
 
 test("Adding a record to a list", t => {
     t.plan(4);
