@@ -1,28 +1,20 @@
 // Copyright 2019 Quip
 
-const Record = require("./record");
-
-class CanvasRecord extends Record {
-    constructor(...args) {
-        super(...args);
-    }
-    commitCrop() {}
-}
+import Record from "./record";
 
 class CanvasRecordCommentAnchorRecord extends Record {
-    constructor(...args) {
-        super(...args);
-        this.values.xFraction = 0;
-        this.values.yFraction = 0;
-    }
+    public xFractionValue: number = 0;
+    public yFractionValue: number = 0;
+
     getXFraction() {
-        return this.values.xFraction;
+        return this.xFractionValue;
     }
     getYFraction() {
-        return this.values.yFraction;
+        return this.yFractionValue;
     }
 }
 
-CanvasRecord.CommentAnchorRecord = CanvasRecordCommentAnchorRecord;
-
-module.exports = CanvasRecord;
+export default class CanvasRecord extends Record {
+    public static CommentAnchorRecord = CanvasRecordCommentAnchorRecord;
+    commitCrop() {}
+}

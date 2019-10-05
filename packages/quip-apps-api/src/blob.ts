@@ -3,23 +3,15 @@
 import Client from "./client";
 
 export default class Blob {
-    public values: {
-        data?: ArrayBuffer;
-        filename?: string;
-        id?: string;
-        hasLoadedData: boolean;
-        imageHeight: number;
-        imageWidth: number;
-    };
-    constructor(client: Client, filePb: Object) {
-        this.values = {
-            hasLoadedData: false,
-            imageHeight: 0,
-            imageWidth: 0,
-        };
-    }
+    public dataValue?: ArrayBuffer;
+    public filenameValue?: string;
+    public idValue?: string;
+    public hasLoadedDataValue: boolean = false;
+    public imageHeightValue: number = 0;
+    public imageWidthValue: number = 0;
+
     getId() {
-        return this.values.id;
+        return this.idValue;
     }
     id() {
         return this.getId();
@@ -28,23 +20,23 @@ export default class Blob {
         return this.getData();
     }
     getData() {
-        return this.values.data;
+        return this.dataValue;
     }
     downloadAsFile() {}
     filename() {
         return this.getFilename();
     }
     getFilename() {
-        return this.values.filename;
+        return this.filenameValue;
     }
     hasLoadedData() {
-        return this.values.hasLoadedData;
+        return this.hasLoadedDataValue;
     }
     imageHeight() {
-        return this.values.imageHeight;
+        return this.imageHeightValue;
     }
     imageWidth() {
-        return this.values.imageWidth;
+        return this.imageWidthValue;
     }
     onDataLoaded(
         loadedCallback: (blob: Blob) => void,
@@ -54,7 +46,7 @@ export default class Blob {
     url() {
         // TODO: not sure this type coercion is always safe
         return URL.createObjectURL(
-            new window.Blob([this.values.data as BlobPart])
+            new window.Blob([this.dataValue as BlobPart])
         );
     }
 }

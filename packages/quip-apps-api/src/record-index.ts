@@ -1,20 +1,16 @@
 // Copyright 2019 Quip
 
-class RecordIndex {
-    constructor() {
-        this.values = {
-            id: "mock-record-index",
-            entries: [],
-        };
-    }
+import Record from "./record";
+
+export default class RecordIndex<T extends Record> {
+    public idValue: string = "mock-record-index";
+    public entriesValue: T[] = [];
     count() {
-        return this.values.entries.length;
+        return this.entriesValue.length;
     }
     id() {
-        return this.values.id;
+        return this.idValue;
     }
-    listen(listener) {}
-    unlisten(listener) {}
+    listen(listener: (recordIndex: RecordIndex<T>) => void) {}
+    unlisten(listener: (recordIndex: RecordIndex<T>) => void) {}
 }
-
-module.exports = RecordIndex;

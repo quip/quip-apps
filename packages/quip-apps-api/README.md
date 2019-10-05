@@ -36,16 +36,17 @@ does not exist.
 
 In general, this libarary tries to make it easy to create fake envronments
 without having to perform realistic data manipulation. This is acheived by
-exposing a `values` property on all classes, which corresponds to the various
-getters on that class. For example, if you want your test to have a record in a
-specific state, instead of calling application methods that produce that state,
-you can just set it directly on the record:
+exposing all editable properties on all classes via `[propertyName]Value`
+properties, which correspond to the various getters on that class. For example,
+if you want your test to have a record in a specific state, instead of calling
+application methods that produce that state, you can just set it directly on the
+record:
 
 ```
 test("deleted record is not rendered", () => {
   const record = new CustomRecord()
   // you can just set these values directly to mock them.
-  record.values.isDeleted = true
+  record.isDeletedValue = true
   const wrapper = shallow(<RecordView record={record}>)
   expect(wrapper).toMatchSnapshot()
 })

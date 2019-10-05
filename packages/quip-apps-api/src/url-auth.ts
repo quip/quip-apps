@@ -1,7 +1,5 @@
 // Copyright 2019 Quip
 
-const Auth = require("./auth");
+import Auth from "./auth";
 
-class UrlAuth extends Auth {}
-
-module.exports = UrlAuth;
+export default class UrlAuth extends Auth {}

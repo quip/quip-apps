@@ -1,17 +1,29 @@
 // Copyright 2019 Quip
 
-class Preferences {
-    constructor() {
-        this.values = {preferences: {}};
-    }
+import Client, {ElementsEventType} from "./client";
+
+enum PreferenceType {
+    USER = 0,
+    SITE = 1,
+}
+
+export default class Preferences {
+    constructor(
+        client?: Client,
+        preferenceType?: PreferenceType,
+        eventType?: ElementsEventType,
+        rateLimiter?: any, // RateLimiter,
+        sizeLimit?: {entries: number; size: number}
+    ) {}
+    public preferencesValue: {[key: string]: any} = {};
     clear() {}
     getAll() {
-        return this.values.preferences;
+        return this.preferencesValue;
     }
-    getForKey(key) {
-        return this.values.preferences[key];
+    getForKey(key: string) {
+        return this.preferencesValue[key];
     }
-    save() {}
+    save(prefs: {[key: string]: any}) {}
 }
 
 module.exports = Preferences;

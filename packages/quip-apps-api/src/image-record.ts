@@ -1,35 +1,38 @@
 // Copyright 2019 Quip
 
-const Record = require("./record");
-const CanvasRecord = require("./canvas-record");
+import Record from "./record";
+import CanvasRecord from "./canvas-record";
+import {BlobWithThumbnails} from "./client";
 
-class ImageRecord extends Record {
-    constructor(...args) {
-        super(...args);
-        this.values.canvasRecord = new CanvasRecord();
-        this.values.originalImageHeight = 0;
-        this.values.originalImageWidth = 0;
-        this.values.hasImage = false;
-    }
+export default class ImageRecord extends Record {
+    public canvasRecordValue: CanvasRecord = new CanvasRecord();
+    public originalImageHeightValue: number = 0;
+    public originalImageWidthValue: number = 0;
+    public hasImageValue: boolean = false;
+
     chooseFile() {}
-    commitCrop() {}
+    commitCrop(
+        fractionLeft: number,
+        fractionTop: number,
+        fractionWidth: number,
+        fractionHeight: number,
+        cropInitiatedKey?: number
+    ) {}
     downloadOriginal() {}
     getCanvasRecord() {
-        return this.values.canvasRecord;
+        return this.canvasRecordValue;
     }
     getOriginalImageHeight() {
-        return this.values.originalImageHeight;
+        return this.originalImageHeightValue;
     }
     getOriginalImageWidth() {
-        return this.values.originalImageWidth;
+        return this.originalImageWidthValue;
     }
-    handleShowFilePickerAction() {}
+    handleShowFilePickerAction(blobsWithThumbnails: BlobWithThumbnails[]) {}
     handleShowFilePickerActionStarted() {}
     hasImage() {
-        return this.values.hasImage;
+        return this.hasImageValue;
     }
     openInLightbox() {}
-    uploadFile() {}
+    uploadFile(blob: Blob) {}
 }
-
-module.exports = ImageRecord;

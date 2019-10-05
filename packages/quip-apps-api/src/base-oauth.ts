@@ -4,22 +4,16 @@ import Auth from "./auth";
 import Client from "./client";
 
 export default class BaseOAuth extends Auth {
-    public values!: {
-        tokenResponse: {
-            [key: string]: string;
-        };
-        nextHttpResponse: HttpResponse;
-    };
-    constructor(client: Client, authConfig: Object, preferences: Preferences) {
-        super(client, authConfig);
-        this.values.tokenResponse = {};
-        this.values.nextHttpResponse = new HttpResponse();
-    }
+    public tokenResponseValue: {
+        [key: string]: string;
+    } = {};
+    public nextHttpResponseValue: HttpResponse = new HttpResponse();
+
     getTokenResponse() {
-        return this.values.tokenResponse;
+        return this.tokenResponseValue;
     }
     getTokenResponseParam(param: string): string {
-        return this.values.tokenResponse[param];
+        return this.tokenResponseValue[param];
     }
     isLoggedIn() {
         return !!this.getTokenResponseParam("access_token");
@@ -31,11 +25,11 @@ export default class BaseOAuth extends Auth {
         return Promise.resolve(new HttpResponse());
     }
     request(params: Object): Promise<HttpResponse> {
-        return Promise.resolve(this.values.nextHttpResponse);
+        return Promise.resolve(this.nextHttpResponseValue);
     }
 }
 
-class HttpResponse {
+export class HttpResponse {
     public url: string;
     public status: number;
     public statusText: string;

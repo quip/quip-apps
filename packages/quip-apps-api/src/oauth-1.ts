@@ -1,7 +1,5 @@
 // Copyright 2019 Quip
 
-const BaseOAuth = require("./base-oauth");
+import BaseOAuth from "./base-oauth";
 
-class OAuth1 extends BaseOAuth {}
-
-module.exports = OAuth1;
+export default class OAuth1 extends BaseOAuth {}

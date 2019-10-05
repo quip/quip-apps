@@ -1,94 +1,103 @@
 // Copyright 2019 Quip
 
-class RecordList {
-    constructor(_, RecordConstructor) {
-        this.values = {
-            id: "mock-record-list",
-            records: [],
-            isDeleted: false,
+import Record from "./record";
+import Client from "./client";
+
+export default class RecordList<T extends Record> {
+    public idValue: string = "mock-record-list";
+    public recordsValue: Record[] = [];
+    public isDeletedValue: boolean = false;
+
+    public static TYPE_SENTINAL = {};
+    public static Type<T>(RecordConstructor: {new (): T}) {
+        return {
+            TYPE_SENTINAL: RecordList.TYPE_SENTINAL,
+            RecordConstructor,
         };
+    }
+
+    private recordConstructor_: {new (): T};
+
+    constructor(client: Client | null, RecordConstructor: {new (): T}) {
         this.recordConstructor_ = RecordConstructor;
     }
 
     getId() {
-        return this.values.id;
+        return this.idValue;
     }
 
     getRecords() {
-        return this.values.records;
+        return this.recordsValue;
     }
 
     count() {
-        return this.values.records.length;
+        return this.recordsValue.length;
     }
 
-    add(value, index) {
+    // TODO: can this conform to valid props for this classes of type T?
+    // Probably would need to deprecate getProperties in favor of static
+    // properties definition
+    add(value: {[key: string]: any}, index?: number) {
         const RecordConstructor = this.recordConstructor_;
         const item = new RecordConstructor();
-        item.parent_ = this;
+        item.containingListValue = this;
         for (const key in value) {
             item.set(key, value[key]);
         }
         if (index === undefined) {
-            this.values.records.push(item);
+            this.recordsValue.push(item);
         } else {
-            this.values.records.splice(index, 0, item);
+            this.recordsValue.splice(index, 0, item);
         }
         return item;
     }
 
-    contains(item) {
-        return !!this.values.records.find(i => i === item);
+    contains(item: T) {
+        return !!this.recordsValue.find(i => i === item);
     }
 
     delete() {
-        this.values.isDeleted = true;
+        this.isDeletedValue = true;
     }
 
-    get(index) {
-        return this.values.records[index];
+    get(index: number) {
+        return this.recordsValue[index];
     }
 
-    indexOf(item) {
-        return this.values.records.findIndex(i => i === item);
+    indexOf(item: T) {
+        return this.recordsValue.findIndex(i => i === item);
     }
 
     isDeleted() {
-        this.values.isDeleted;
+        this.isDeletedValue;
     }
 
-    move(item, index) {
-        const parent = item.parent_;
+    move(item: T, index: number) {
+        const parent = item.containingListValue;
         if (index < 0) {
             return false;
         }
         if (parent) {
             parent.remove(item);
-            this.values.records.splice(index, 0, item);
+            this.recordsValue.splice(index, 0, item);
         }
         return true;
     }
 
-    remove(item) {
+    remove(item: T) {
         const idx = this.indexOf(item);
         if (idx > -1) {
-            this.values.records.splice(idx, 1);
+            this.recordsValue.splice(idx, 1);
             return true;
         }
         return false;
     }
 
-    listen(listener) {}
-    unlisten(listener) {}
+    listen(listener: (list: RecordList<T>) => void) {}
+    unlisten(listener: (list: RecordList<T>) => void) {}
 }
 
-RecordList.TYPE_SENTINAL = {};
-
-RecordList.Type = RecordConstructor => {
-    return {
-        TYPE_SENTINAL: RecordList.TYPE_SENTINAL,
-        RecordConstructor,
-    };
+export type listPropertyType<T> = {
+    TYPE_SENTINAL: Object;
+    RecordConstructor: {new (): T};
 };
-
-module.exports = RecordList;

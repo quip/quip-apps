@@ -1,28 +1,28 @@
 // Copyright 2019 Quip
 
-const Auth = require("./auth");
-const BaseOAuth = require("./base-oauth");
-const Blob = require("./blob");
-const CanvasRecord = require("./canvas-record");
-const Client = require("./client");
-const ClientError = require("./client-error");
-const ImageRecord = require("./image-record");
-const OAuth1 = require("./oauth-1");
-const OAuth2 = require("./oauth-2");
-const Preferences = require("./preferences");
-const Record = require("./record");
-const RecordIndex = require("./record-index");
-const RichTextRecord = require("./rich-text-record");
-const RootRecord = require("./root-record");
-const RecordList = require("./record-list");
-const UrlAuth = require("./url-auth");
-const User = require("./user");
-const ui = require("./ui");
+import Auth from "./auth";
+import BaseOAuth from "./base-oauth";
+import Blob from "./blob";
+import CanvasRecord from "./canvas-record";
+import Record from "./record";
+import ClientError from "./client-error";
+import ImageRecord from "./image-record";
+import OAuth1 from "./oauth-1";
+import OAuth2 from "./oauth-2";
+import Preferences from "./preferences";
+import RecordIndex from "./record-index";
+import RootRecord from "./root-record";
+import RecordList from "./record-list";
+import Client from "./client";
+import RichTextRecord from "./rich-text-record";
+import UrlAuth from "./url-auth";
+import User from "./user";
+import * as ui from "./ui";
 
 const client = new Client();
 const quip = {apps: client, elements: client};
 
-const exportSymbol = (symbol, value) => {
+const exportSymbol = (symbol: string, value: any) => {
     quip.apps[symbol] = value;
     quip.elements[symbol] = value;
 };

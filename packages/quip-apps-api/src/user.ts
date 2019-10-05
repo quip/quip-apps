@@ -1,28 +1,25 @@
 // Copyright 2019 Quip
 
-class User {
-    constructor() {
-        this.values = {
-            firstName: "Mock",
-            id: "mock-user",
-            name: "Mock User",
-            language: "en",
-        };
-    }
+export default class User {
+    firstNameValue: string = "Mock";
+    idValue: string = "mock-user";
+    nameValue: string = "Mock User";
+    languageValue: string = "en";
+
     id() {
         return this.getId();
     }
     getId() {
-        return this.values.id;
+        return this.idValue;
     }
     getFirstName() {
-        return this.values.firstName;
+        return this.firstNameValue;
     }
     getLanguage() {
-        return this.values.language;
+        return this.languageValue;
     }
     getName() {
-        return this.values.name;
+        return this.nameValue;
     }
 }
 

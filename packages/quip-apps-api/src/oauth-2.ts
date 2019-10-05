@@ -1,9 +1,10 @@
 // Copyright 2019 Quip
 
-const BaseOAuth = require("./base-oauth");
+import BaseOAuth, {HttpResponse} from "./base-oauth";
 
-class OAuth2 extends BaseOAuth {
-    refreshToken() {}
+export default class OAuth2 extends BaseOAuth {
+    public refreshTokenResponseValue: HttpResponse = new HttpResponse();
+    refreshToken(): Promise<HttpResponse> {
+        return Promise.resolve(this.refreshTokenResponseValue);
+    }
 }
-
-module.exports = OAuth2;
