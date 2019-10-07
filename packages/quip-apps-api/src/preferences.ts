@@ -25,5 +25,3 @@ export default class Preferences {
     }
     save(prefs: {[key: string]: any}) {}
 }
-
-module.exports = Preferences;

@@ -22,5 +22,3 @@ export default class User {
         return this.nameValue;
     }
 }
-
-module.exports = User;
