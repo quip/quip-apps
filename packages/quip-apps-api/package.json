@@ -2,7 +2,7 @@
   "name": "quip-apps-api",
   "version": "1.0.0-alpha.3",
   "description": "Quip Live Apps API",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && tape test/**/*.test.js",

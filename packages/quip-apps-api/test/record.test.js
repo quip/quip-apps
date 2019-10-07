@@ -1,7 +1,7 @@
 // Copyright 2019 Quip
 const test = require("tape");
-const Record = require("../dist/record");
-const RecordList = require("../dist/record-list");
+const Record = require("../dist/record").default;
+const RecordList = require("../dist/record-list").default;
 
 test("Default Properties", t => {
     t.plan(4);

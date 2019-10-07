@@ -1,5 +1,4 @@
 // Copyright 2019 Quip
-import pkg from "../package.json";
 import ClientBlob from "./blob";
 import Auth from "./auth";
 import Record, {RecordConstructor} from "./record";
@@ -94,6 +93,54 @@ interface InitOptions {
     ) => void;
 }
 
+export const CreationSource = {
+    INSERT: 1,
+    COPY_DOCUMENT: 2,
+    PASTE: 3,
+    TEMPLATE: 4,
+};
+
+export const DocumentMenuActions = {SHOW_FILE_PICKER: 1};
+
+export const DocumentMenuCommands = {
+    SEPARATOR: 1,
+    MENU_MAIN: 2,
+    COPY_ANCHOR_LINK: 3,
+    CUT_ELEMENT: 4,
+    COPY_ELEMENT: 5,
+    DELETE_ELEMENT: 6,
+    DELETE_APP: 7,
+};
+
+export const EventType = {
+    ELEMENT_BLUR: 1,
+    BLUR: 2,
+    DOCUMENT_THEME_UPDATE: 3,
+    CONTAINER_SIZE_UPDATE: 4,
+    WINDOW_SIZE_UPDATE: 5,
+    DOCUMENT_SIZE_UPDATE: 6,
+    USER_PREFERENCE_UPDATE: 7,
+    SITE_PREFERENCE_UPDATE: 8,
+    ELEMENT_FOCUS: 9,
+    FOCUS: 10,
+    DOCUMENT_MEMBERS_LOADED: 11,
+    WHITELISTED_USERS_LOADED: 12,
+    DOCUMENT_EDITABLE_CHANGED: 13,
+    ONLINE_STATUS_CHANGED: 14,
+    WIDTH_UPDATE: 15,
+};
+
+export const MenuIcons = {
+    COMMENT_INLINE: 1,
+    FULL_SCREEN: 2,
+    CROP: 3,
+    SALESFORCE_LOGO: 4,
+    SYNCING: 5,
+    JIRA: 6,
+};
+
+export const RootEntityConstructor = class {};
+
 export default class Client {
     public authsValue: {[name: string]: Auth} = {};
     public blobsValue: {[id: string]: ClientBlob} = {};
@@ -164,55 +211,15 @@ export default class Client {
 
     private rootRecord_?: RootRecord;
 
-    static CreationSource = {
-        INSERT: 1,
-        COPY_DOCUMENT: 2,
-        PASTE: 3,
-        TEMPLATE: 4,
-    };
+    private version_: string = "UNSET";
 
-    static DocumentMenuActions = {SHOW_FILE_PICKER: 1};
-
-    static DocumentMenuCommands = {
-        SEPARATOR: 1,
-        MENU_MAIN: 2,
-        COPY_ANCHOR_LINK: 3,
-        CUT_ELEMENT: 4,
-        COPY_ELEMENT: 5,
-        DELETE_ELEMENT: 6,
-        DELETE_APP: 7,
-    };
-
-    static EventType = {
-        ELEMENT_BLUR: 1,
-        BLUR: 2,
-        DOCUMENT_THEME_UPDATE: 3,
-        CONTAINER_SIZE_UPDATE: 4,
-        WINDOW_SIZE_UPDATE: 5,
-        DOCUMENT_SIZE_UPDATE: 6,
-        USER_PREFERENCE_UPDATE: 7,
-        SITE_PREFERENCE_UPDATE: 8,
-        ELEMENT_FOCUS: 9,
-        FOCUS: 10,
-        DOCUMENT_MEMBERS_LOADED: 11,
-        WHITELISTED_USERS_LOADED: 12,
-        DOCUMENT_EDITABLE_CHANGED: 13,
-        ONLINE_STATUS_CHANGED: 14,
-        WIDTH_UPDATE: 15,
-    };
-
-    static MenuIcons = {
-        COMMENT_INLINE: 1,
-        FULL_SCREEN: 2,
-        CROP: 3,
-        SALESFORCE_LOGO: 4,
-        SYNCING: 5,
-        JIRA: 6,
-    };
-
-    static RootEntityConstructor = class {};
-
-    constructor() {
+    constructor(
+        elementConfigId: string,
+        elementId: string,
+        elementLocalId: string,
+        window: Window,
+        bridgeToken: string
+    ) {
         // In production, these values will be dynamic. In this mock, they will
         // be whatever you set them to. You can set these values by setting them
         // directly on quip.apps.values[valueName].
@@ -221,6 +228,10 @@ export default class Client {
         this.usersValue[viewingUser.id()] = viewingUser;
         this.viewingUserValue = viewingUser;
         this.documentMembersValue.push(viewingUser);
+    }
+
+    setVersion(version: string) {
+        this.version_ = version;
     }
 
     addDetachedNode(node: Node) {}
@@ -244,7 +255,7 @@ export default class Client {
     }
     forceUpdateDimensions() {}
     getApiVersion() {
-        return `MOCK-${pkg.version}`;
+        return `MOCK-${this.version_}`;
     }
     getBlobById(id: string) {
         return this.blobsValue[id];

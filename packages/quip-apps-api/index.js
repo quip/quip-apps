@@ -18,5 +18,10 @@ if (typeof window !== "undefined") {
 } else {
     global_ = this || {};
 }
-module.exports =
-    global_["quip"] === undefined ? require("./quip") : global_["quip"];
+
+let quip = global_["quip"];
+if (quip === undefined) {
+    quip = require("./dist/quip").default;
+    quip.apps.setVersion(require("./package.json").version);
+}
+module.exports = quip;
