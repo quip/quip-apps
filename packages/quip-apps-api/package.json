@@ -8,7 +8,7 @@
     "test": "npm run build && tape test/**/*.test.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lcov": "nyc npm test && nyc report --reporter=lcov",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
