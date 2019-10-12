@@ -3,13 +3,13 @@
   "version": "1.0.0-alpha.3",
   "description": "Quip Live Apps API",
   "main": "index.js",
-  "types": "./dist/quip.d.ts",
+  "types": "dist/quip.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && tape test/**/*.test.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lcov": "nyc npm test && nyc report --reporter=lcov",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "react": ">=15.0.0"
   },
   "devDependencies": {
-    "@types/react": "^16.9.5",
+    "@types/react": "15.6.27",
     "coveralls": "^3.0.6",
     "import-fresh": "^3.1.0",
     "nyc": "^14.1.1",

@@ -2,7 +2,7 @@
 
 import Record from "./record";
 
-class CanvasRecordCommentAnchorRecord extends Record {
+export class CanvasRecordCommentAnchorRecord extends Record {
     public xFractionValue: number = 0;
     public yFractionValue: number = 0;
 

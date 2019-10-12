@@ -63,7 +63,7 @@ enum QuipIcon {
     JIRA = 13,
 }
 
-interface MenuCommand {
+export interface MenuCommand {
     id: string;
     label?: string;
     sublabel?: string;
@@ -86,7 +86,7 @@ interface ToolbarState {
 
 interface InitOptions {
     menuCommands?: MenuCommand[];
-    toolbarCommandIds?: Array<string> | undefined;
+    toolbarCommandIds?: string[] | undefined;
     initializationCallback?: (
         element: Element,
         parameters: InitializationParameters
@@ -100,16 +100,16 @@ export const CreationSource = {
     TEMPLATE: 4,
 };
 
-export const DocumentMenuActions = {SHOW_FILE_PICKER: 1};
+export const DocumentMenuActions = {SHOW_FILE_PICKER: "1"};
 
 export const DocumentMenuCommands = {
-    SEPARATOR: 1,
-    MENU_MAIN: 2,
-    COPY_ANCHOR_LINK: 3,
-    CUT_ELEMENT: 4,
-    COPY_ELEMENT: 5,
-    DELETE_ELEMENT: 6,
-    DELETE_APP: 7,
+    SEPARATOR: "1",
+    MENU_MAIN: "2",
+    COPY_ANCHOR_LINK: "3",
+    CUT_ELEMENT: "4",
+    COPY_ELEMENT: "5",
+    DELETE_ELEMENT: "6",
+    DELETE_APP: "7",
 };
 
 export const EventType = {

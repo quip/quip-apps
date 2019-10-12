@@ -5,7 +5,7 @@ import Client from "./client";
 
 export default class RecordList<T extends Record> {
     public idValue: string = "mock-record-list";
-    public recordsValue: Record[] = [];
+    public recordsValue: T[] = [];
     public isDeletedValue: boolean = false;
 
     public static TYPE_SENTINAL = {};

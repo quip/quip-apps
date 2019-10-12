@@ -2,7 +2,7 @@
 const test = require("tape");
 const React = require("react");
 const e = React.createElement;
-const _ = require("..");
+const _ = require("..").default;
 
 test("react: [comment] strings", t => {
     t.plan(1);
