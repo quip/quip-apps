@@ -9,19 +9,19 @@
  */
 
 let global_;
-if (typeof window !== "undefined") {
-    global_ = window;
-} else if (typeof global !== "undefined") {
+if (typeof global !== "undefined") {
     global_ = global;
 } else if (typeof self !== "undefined") {
     global_ = self;
+} else if (typeof window !== "undefined") {
+    global_ = window;
 } else {
     global_ = this || {};
 }
 
 let quip = global_["quip"];
 if (quip === undefined) {
-    quip = require("./dist/quip").default;
+    quip = require("./dist/quip");
     quip.apps.setVersion(require("./package.json").version);
 }
 module.exports = quip;
