@@ -18,26 +18,32 @@ export default class BaseOAuth extends Auth {
     isLoggedIn() {
         return !!this.getTokenResponseParam("access_token");
     }
-    login(params: Object) {
-        return Promise.resolve();
+    login(params: Object): Promise<boolean> {
+        return Promise.resolve(true);
     }
     logout(): Promise<HttpResponse> {
         return Promise.resolve(new HttpResponse());
     }
-    request(params: Object): Promise<HttpResponse> {
-        return Promise.resolve(this.nextHttpResponseValue);
+    request<T = Object>(params: Object): Promise<HttpResponse<T>> {
+        return Promise.resolve(this.nextHttpResponseValue as HttpResponse<T>);
     }
 }
 
-export class HttpResponse {
+export class HttpResponse<T = Object> {
     public url: string;
     public status: number;
     public statusText: string;
-    public headers?: {[key: string]: string};
+    public headers: HttpHeaders;
     private body_: string;
     public ok: boolean;
     constructor(
-        options = {
+        options: {
+            url?: string;
+            body?: string;
+            status?: number;
+            statusText?: string;
+            headers?: HttpHeaders | {[name: string]: string};
+        } = {
             url: undefined,
             body: undefined,
             status: undefined,
@@ -48,14 +54,17 @@ export class HttpResponse {
         this.url = options.url || "";
         this.status = options.status || 200;
         this.statusText = options.statusText || "OK";
-        this.headers = options.headers;
+        this.headers =
+            options.headers instanceof HttpHeaders
+                ? options.headers
+                : new HttpHeaders(options.headers);
         this.body_ = options.body || "";
         this.ok = this.status >= 200 && this.status < 300;
     }
     text() {
         return this.body_;
     }
-    json() {
+    json(): T {
         return JSON.parse(this.body_);
     }
 
@@ -67,5 +76,26 @@ export class HttpResponse {
             statusText: this.statusText,
             headers: this.headers,
         });
+    }
+}
+
+export class HttpHeaders {
+    private map_ = new Map();
+    constructor(headers?: {[name: string]: string}) {
+        if (headers) {
+            Object.getOwnPropertyNames(headers).forEach(name => {
+                this.append_(name, headers[name]);
+            });
+        }
+    }
+    append_(name: string, value: string) {
+        const oldValue = this.map_.get(name);
+        this.map_.set(name, oldValue ? `${oldValue},${value}` : value);
+    }
+    get(name: string) {
+        return this.has(name) ? this.map_.get(name) : null;
+    }
+    has(name: string) {
+        return this.map_.has(name);
     }
 }
