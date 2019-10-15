@@ -15,7 +15,7 @@ export class Button extends Component<{
     primary?: boolean;
     text: string;
     type?: string;
-    disabled: boolean;
+    disabled?: boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.Button");
