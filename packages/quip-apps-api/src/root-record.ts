@@ -1,22 +1,23 @@
 // Copyright 2019 Quip
 
-const Record = require("./record");
-const ClientError = require("./client-error");
+import Record, {RecordParams} from "./record";
+import ClientError from "./client-error";
+import RecordList from "./record-list";
 
-class RootRecord extends Record {
-    getParent() {
+export default class RootRecord extends Record {
+    getParent(): Record | undefined {
         throw new ClientError(
             "getParent() is not supported on the root record."
         );
     }
 
-    getParentRecord() {
+    getParentRecord(): Record | undefined {
         throw new ClientError(
             "getParentRecord() is not supported on the root record."
         );
     }
 
-    getContainingList() {
+    getContainingList(): RecordList<any> | undefined {
         throw new ClientError(
             "getContainingList() is not supported on the root record."
         );
@@ -28,41 +29,27 @@ class RootRecord extends Record {
         );
     }
 
-    setPosition(position) {
-        throw new ClientError(
-            "setPosition() is not supported on the root record."
-        );
-    }
-
-    setParentIds(parentIds) {
-        throw new ClientError(
-            "setParentIds() is not supported on the root record."
-        );
-    }
-
-    getPreviousSibling() {
+    getPreviousSibling(): Record | undefined {
         throw new ClientError(
             "getPreviousSibling() is not supported on the root record."
         );
     }
 
-    getNextSibling() {
+    getNextSibling(): Record | undefined {
         throw new ClientError(
             "getNextSibling() is not supported on the root record."
         );
     }
 
-    createSiblingAfter(recordParams) {
+    createSiblingAfter(recordParams: RecordParams): Record {
         throw new ClientError(
             "createSiblingAfter() is not supported on the root record."
         );
     }
 
-    createSiblingBefore(recordParams) {
+    createSiblingBefore(recordParams: RecordParams): Record {
         throw new ClientError(
             "createSiblingBefore() is not supported on the root record."
         );
     }
 }
-
-module.exports = RootRecord;

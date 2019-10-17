@@ -1,5 +1,5 @@
 // Copyright 2019 Quip
-const React = require("react");
+import React, {ReactNode} from "react";
 
 /**
  * @fileoverview This is a shim for quip's internal translation mechanism - this
@@ -8,12 +8,19 @@ const React = require("react");
  * a global, import this library explicitly and it will handle shimming when needed.
  */
 
-function quiptext(text, placeholders) {
+function quiptext(
+    text: string,
+    placeholders?: {[key: string]: string | ReactNode}
+) {
     if (text[text.length - 1] == "]" && text.lastIndexOf(" [") != -1) {
         // Remove translation comments
         text = text.substr(0, text.lastIndexOf(" ["));
     }
-    const replaceAll = function(str, substr, replacement) {
+    const replaceAll = function(
+        str: string,
+        substr: string,
+        replacement: string
+    ) {
         return str.replace(
             new RegExp(
                 substr.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"),
@@ -22,31 +29,36 @@ function quiptext(text, placeholders) {
             replacement
         );
     };
-    const localeReplace = function(text, placeholders) {
+    const localeReplace = function(
+        text: string,
+        placeholders: {[key: string]: string}
+    ) {
         for (const key in placeholders) {
             text = replaceAll(text, "%(" + key + ")s", placeholders[key]);
         }
         return text;
     };
-    const reactLocaleReplace = function(text, placeholders) {
+    const reactLocaleReplace = function(
+        text: string,
+        placeholders: {[key: string]: string | ReactNode}
+    ) {
         let start;
-        let expanded = [text];
+        let expanded: (string | ReactNode)[] = [text];
         for (const key in placeholders) {
             start = expanded;
             expanded = [];
             for (let i = 0; i < start.length; i++) {
-                if (typeof start[i] == "string") {
+                const chunk = start[i];
+                if (typeof chunk === "string") {
                     const keyStr = "%(" + key + ")s";
-                    const parts = start[i].split(keyStr);
-                    let replaced = [];
+                    const parts = chunk.split(keyStr);
+                    let replaced: (string | ReactNode)[] = [];
                     for (let j = 0; j < parts.length - 1; j++) {
                         replaced.push(parts[j]);
                         replaced.push(placeholders[key]);
                     }
                     replaced.push(parts[parts.length - 1]);
-                    replaced = replaced.filter(function(str) {
-                        return str != "";
-                    });
+                    replaced = replaced.filter(str => str && str !== "");
                     expanded.push.apply(expanded, replaced);
                 } else {
                     expanded.push(start[i]);
@@ -59,16 +71,15 @@ function quiptext(text, placeholders) {
         let hasReactElements = false;
         for (const key in placeholders) {
             const val = placeholders[key];
-            if (typeof val !== "string" && React.isValidElement(val)) {
+            if (typeof val !== "string" && val && React.isValidElement(val)) {
                 hasReactElements = true;
                 break;
             }
         }
         return hasReactElements
             ? reactLocaleReplace(text, placeholders)
-            : localeReplace(text, placeholders);
+            : localeReplace(text, placeholders as {[key: string]: string});
     }
     return text;
 }
-
-module.exports = quiptext;
+export = quiptext;
