@@ -217,8 +217,8 @@ export default class Client {
         elementConfigId: string,
         elementId: string,
         elementLocalId: string,
-        window: Window,
-        bridgeToken: string
+        window?: Window,
+        bridgeToken?: string
     ) {
         // In production, these values will be dynamic. In this mock, they will
         // be whatever you set them to. You can set these values by setting them

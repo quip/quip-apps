@@ -20,7 +20,7 @@ import UrlAuth_ from "./url-auth";
 import User_ from "./user";
 import * as ui from "./ui";
 
-const client = new Client_("", "", "", window, "");
+const client = new Client_("", "", "");
 const api = Object.assign(client, clientExports, {
     Auth: Auth_,
     BaseOAuth: BaseOAuth_,
