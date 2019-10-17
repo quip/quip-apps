@@ -1,27 +1,27 @@
 // Copyright Quip 2019
 
-import Auth_ from "./src/auth";
+import Auth_ from "./dist/auth";
 import BaseOAuth_, {
     HttpResponse as HttpResponse_,
     HttpHeaders as HttpHeaders_,
-} from "./src/base-oauth";
-import Blob_ from "./src/blob";
+} from "./dist/base-oauth";
+import Blob_ from "./dist/blob";
 import CanvasRecord_, {
     CanvasRecordCommentAnchorRecord as CanvasRecordCommentAnchorRecord_,
-} from "./src/canvas-record";
+} from "./dist/canvas-record";
 import Record_, {
     RecordConstructor as RecordConstructor_,
     RecordType as RecordType_,
     RecordParams as RecordParams_,
-} from "./src/record";
-import ClientError_ from "./src/client-error";
-import ImageRecord_ from "./src/image-record";
-import OAuth1_ from "./src/oauth-1";
-import OAuth2_ from "./src/oauth-2";
-import Preferences_ from "./src/preferences";
-import RecordIndex_ from "./src/record-index";
-import RootRecord_ from "./src/root-record";
-import RecordList_ from "./src/record-list";
+} from "./dist/record";
+import ClientError_ from "./dist/client-error";
+import ImageRecord_ from "./dist/image-record";
+import OAuth1_ from "./dist/oauth-1";
+import OAuth2_ from "./dist/oauth-2";
+import Preferences_ from "./dist/preferences";
+import RecordIndex_ from "./dist/record-index";
+import RootRecord_ from "./dist/root-record";
+import RecordList_ from "./dist/record-list";
 import Client_, {
     ElementsEventType as ElementsEventType_,
     BlobWithThumbnails as BlobWithThumbnails_,
@@ -31,12 +31,12 @@ import Client_, {
     EventType as EventType_,
     MenuIcons as MenuIcons_,
     RootEntityConstructor as RootEntityConstructor_,
-} from "./src/client";
-import * as clientExports from "./src/client";
-import RichTextRecord_ from "./src/rich-text-record";
-import UrlAuth_ from "./src/url-auth";
-import User_ from "./src/user";
-import * as ui from "./src/ui";
+} from "./dist/client";
+import * as clientExports from "./dist/client";
+import RichTextRecord_ from "./dist/rich-text-record";
+import UrlAuth_ from "./dist/url-auth";
+import User_ from "./dist/user";
+import * as ui from "./dist/ui";
 
 declare type QuipAPI = Client_ &
     typeof clientExports & {
