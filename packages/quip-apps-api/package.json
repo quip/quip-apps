@@ -4,6 +4,11 @@
   "description": "Quip Live Apps API",
   "main": "index.js",
   "types": "index.d.ts",
+  "files": [
+    "dist",
+    "index.d.ts",
+    "index.js"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "npm run build && tape test/**/*.test.js",

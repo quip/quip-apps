@@ -4,6 +4,10 @@
   "description": "shim for Quip Live Apps string internationalization",
   "main": "index.js",
   "types": "./dist/quiptext.d.ts",
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "npm run build && tape test/**/*.test.js",
