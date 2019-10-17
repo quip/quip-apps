@@ -40,27 +40,6 @@ const api = Object.assign(client, clientExports, {
     User: User_,
     ui,
 });
-const quip = {apps: api, elements: api};
-namespace quip {
-    export namespace apps {
-        export type Auth = Auth_;
-        export type BaseOAuth = BaseOAuth_;
-        export type Blob = Blob_;
-        export type CanvasRecord = CanvasRecord_;
-        export type Record = Record_;
-        export type ClientError = ClientError_;
-        export type ImageRecord = ImageRecord_;
-        export type OAuth1 = OAuth1_;
-        export type OAuth2 = OAuth2_;
-        export type Preferences = Preferences_;
-        export type RecordIndex<T extends Record> = RecordIndex_<T>;
-        export type RootRecord = RootRecord_;
-        export type RecordList<T extends Record> = RecordList_<T>;
-        export type RichTextRecord = RichTextRecord_;
-        export type UrlAuth = UrlAuth_;
-        export type User = User_;
 
-        export type MenuCommand = clientExports.MenuCommand;
-    }
-}
+const quip = {apps: api, elements: api};
 export = quip;

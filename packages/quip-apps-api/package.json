@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.3",
   "description": "Quip Live Apps API",
   "main": "index.js",
-  "types": "dist/quip.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && tape test/**/*.test.js",

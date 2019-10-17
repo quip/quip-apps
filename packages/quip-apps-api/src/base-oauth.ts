@@ -1,7 +1,6 @@
 // Copyright 2019 Quip
 
 import Auth from "./auth";
-import Client from "./client";
 
 export default class BaseOAuth extends Auth {
     public tokenResponseValue: {

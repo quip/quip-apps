@@ -1,7 +1,5 @@
 // Copyright 2019 Quip
 
-import Client from "./client";
-
 export default class Blob {
     public dataValue?: ArrayBuffer;
     public filenameValue?: string;
