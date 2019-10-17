@@ -1,6 +1,6 @@
 // Copyright 2019 Quip
 const test = require("tape");
-const _ = require("..").default;
+const _ = require("..");
 
 test("Inputs", t => {
     t.plan(2);

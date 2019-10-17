@@ -8,7 +8,7 @@ import React, {ReactNode} from "react";
  * a global, import this library explicitly and it will handle shimming when needed.
  */
 
-export default function quiptext(
+function quiptext(
     text: string,
     placeholders?: {[key: string]: string | ReactNode}
 ) {
@@ -82,3 +82,4 @@ export default function quiptext(
     }
     return text;
 }
+export = quiptext;

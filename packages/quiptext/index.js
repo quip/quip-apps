@@ -12,5 +12,5 @@ if (typeof window !== "undefined") {
 }
 module.exports =
     global_["quiptext"] === undefined
-        ? require("./dist/quiptext").default
+        ? require("./dist/quiptext")
         : global_["quiptext"];
