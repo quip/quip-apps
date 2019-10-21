@@ -15,6 +15,7 @@ import Cards from "./Cards.jsx";
 import Datepicker from "./Datepicker.jsx";
 import Modals from "./Modals.jsx";
 import Sliders from "./Sliders.jsx";
+import ProgressIndicators from "./ProgressIndicators.jsx";
 import Spinners from "./Spinners.jsx";
 import Tabs from "./Tabs.jsx";
 
@@ -25,6 +26,7 @@ const components = {
     Buttons,
     Datepicker,
     Modals,
+    ProgressIndicators,
     Sliders,
     Spinners,
     Tabs,
@@ -33,8 +35,6 @@ const components = {
 const componentNames = Object.keys(components);
 console.debug("componentNames", componentNames);
 export default class App extends React.Component {
-
-    
     handleNavClick = e => {
         e.preventDefault();
         const href = e.target.getAttribute("href").replace("#", "");

@@ -2,6 +2,12 @@ import React from "react";
 
 import {Button, Combobox, Lookup, Modal} from "@salesforce/design-system-react";
 
+import ProgressIndicators from "./ProgressIndicators.jsx";
+
+// SLDS Modal does not work in Quip Live Apps so we'll also show how to use
+// the Quip dialog code.
+import Dialog from "../../shared/dialog/dialog.jsx";
+
 const leadSourceOptions = [
     {id: 1, label: "Third Party Program", value: "A0"},
     {id: 2, label: "Cold Call", value: "B0"},
@@ -23,6 +29,7 @@ export default class Example extends React.Component {
         super();
         this.state = {
             isOpen: false,
+            isQuipDialogOpen: false,
             leadSourceSelection: [leadSourceOptions[0]],
             opportunityTypeSelection: [opportunityTypeOptions[0]],
         };
@@ -40,13 +47,33 @@ export default class Example extends React.Component {
         this.setState({isOpen: !this.state.isOpen});
     };
 
+    toggleQuipDialogOpen = () => {
+        this.setState({isQuipDialogOpen: !this.state.isQuipDialogOpen});
+    };
+
     render() {
+        const {isQuipDialogOpen} = this.state;
         return (
             <div>
                 <Button
-                    label="Open modal with menu contents"
+                    label="Open SLDS Modal (testing)"
                     onClick={this.toggleOpen}
                 />
+
+                <Button
+                    label="Open Quip Dialog"
+                    onClick={this.toggleQuipDialogOpen}
+                />
+
+                <p style={{color: "red"}}>
+                    <b>Note</b>: SLDS Modal does not currently work in Quip Live
+                    Apps, see the Dialog demo.
+                </p>
+
+                {isQuipDialogOpen && (
+                    <QuipDialogExample close={this.toggleQuipDialogOpen} />
+                )}
+
                 <Modal
                     ariaHideApp={false}
                     isOpen={this.state.isOpen}
@@ -194,6 +221,24 @@ export default class Example extends React.Component {
                     </section>
                 </Modal>
             </div>
+        );
+    }
+}
+
+class QuipDialogExample extends React.Component {
+    render() {
+        const {close} = this.props;
+        return (
+            <Dialog onDismiss={close} top={"50%"} left={"50%"}>
+                <section
+                    className="slds-p-around--large"
+                    style={{minWidth: 450}}>
+                    <h3>Dialog Demo</h3>
+                    <br />
+                    <br />
+                    <ProgressIndicators />
+                </section>
+            </Dialog>
         );
     }
 }
