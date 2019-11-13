@@ -1,5 +1,7 @@
 // Copyright 2017 Quip
 
+import React from "react";
+
 export default class SVG extends React.Component {
     static propTypes = {
         viewBox: React.PropTypes.string.isRequired,

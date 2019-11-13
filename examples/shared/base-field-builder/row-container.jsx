@@ -1,5 +1,7 @@
 // Copyright 2017 Quip
 
+import React from "react";
+
 export default class RowContainer extends React.Component {
     static propTypes = {
         rows: React.PropTypes.array.isRequired,
@@ -8,6 +10,7 @@ export default class RowContainer extends React.Component {
         isActive: React.PropTypes.bool,
         onSubmitSelectedRow: React.PropTypes.func,
         onSelectionChange: React.PropTypes.func,
+        onScroll: React.PropTypes.func,
         selectOnHover: React.PropTypes.bool,
         defaultSelectedRowIndex: React.PropTypes.number,
     };
@@ -133,8 +136,9 @@ export default class RowContainer extends React.Component {
         return <div
             className={this.props.containerClassName}
             onWheel={this.onWheel_}
+            onScroll={this.props.onScroll}
             onMouseMove={this.onMouseMove_}
-            ref={node => (this.containerNode_ = node)}>
+            ref={node => (this.domNode = node)}>
             {this.props.rows.map((row, index) => {
                 const isHighlighted = index === this.state.selectedRowIndex;
                 return <div

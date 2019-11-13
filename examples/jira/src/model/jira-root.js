@@ -43,31 +43,12 @@ export class JiraRootEntity extends quip.apps.RootRecord {
             isPlaceholder: true,
             records: [],
             recentRecords: [],
-            columns: this.createColumns_(BLANK_STATE_FIELDS.slice()),
+            columns: createColumns(BLANK_STATE_FIELDS.slice()),
             widths: {},
-            placeholderColumns: this.createColumns_(
-                PLACEHOLDER_STATE_FIELDS.slice()),
+            placeholderColumns: createColumns(PLACEHOLDER_STATE_FIELDS.slice()),
             placeholderRecords: [],
             placeholderWidths: {},
         };
-    }
-
-    static createColumns_(columns) {
-        columns.splice(0, 0, {key: "key", name: quiptext("Key")});
-        columns = columns.map(field => {
-            return {
-                name: field.key,
-                type: COLUMN_TYPE.CUSTOM,
-                contents: {
-                    RichText_defaultText: field.name,
-                },
-                deletable: field.key != "key",
-                draggable: field.key != "key",
-                titleEditable: false,
-                visible: true,
-            };
-        });
-        return columns;
     }
 
     initialize() {
@@ -290,4 +271,22 @@ export class JiraRootEntity extends quip.apps.RootRecord {
         }
         return Promise.resolve(this.issueLinkTypes_);
     }
+}
+
+function createColumns(columns) {
+    columns.splice(0, 0, {key: "key", name: quiptext("Key")});
+    columns = columns.map(field => {
+        return {
+            name: field.key,
+            type: COLUMN_TYPE.CUSTOM,
+            contents: {
+                RichText_defaultText: field.name,
+            },
+            deletable: field.key != "key",
+            draggable: field.key != "key",
+            titleEditable: false,
+            visible: true,
+        };
+    });
+    return columns;
 }

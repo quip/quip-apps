@@ -11,12 +11,12 @@
 }
 
 .sortableList {
-    >:first-child {
+    > :first-child {
         div {
             border-top-color: @borderColor;
         }
     }
-    >:last-child {
+    > :last-child {
         div {
             margin-bottom: 0px;
         }
@@ -94,7 +94,7 @@ select {
 }
 
 .name {
-    max-width: 300px;
+    max-width: 720px;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -104,8 +104,16 @@ select {
     font-weight: 300;
 }
 
+.name:hover,
+.name:focus {
+    overflow: visible;
+    white-space: normal;
+    height: auto;
+}
+
 .hoverableLink {
-    &:hover {
+    &:hover,
+    &:focus {
         text-decoration: underline;
         cursor: pointer;
     }

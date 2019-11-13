@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import Card from "../table-view/Card.less";
 import Checkbox from "../../shared/base-field-builder/icons/checkbox.jsx";
@@ -23,8 +24,8 @@ import {
 
 import {COLUMN_TYPE, toJSON} from "../table-view/model.js";
 import {CommentToggle} from "../table-view/lib/comment-component.jsx";
-import {DateField, EnumField, TokenField} from "./field.jsx";
-import {DateFieldEntity} from "./model/field.js";
+import {DeprecatedDateField, EnumField, TokenField} from "./field.jsx";
+import {DeprecatedDateFieldEntity} from "./model/field.js";
 import {RecordEntity} from "./model/record.js";
 import {Y_BORDER} from "../table-view/card.jsx";
 
@@ -702,8 +703,8 @@ export default class RecordList extends React.Component {
                     {lockIcon}
                     {draft}
                 </div>
-                {entity instanceof DateFieldEntity ? (
-                    <DateField entity={entity} width={fixedWidth}/>
+                {entity instanceof DeprecatedDateFieldEntity ? (
+                    <DeprecatedDateField entity={entity} width={fixedWidth}/>
                 ) : (
                     <quip.apps.ui.RichTextBox
                         minHeight={LINE_HEIGHT}

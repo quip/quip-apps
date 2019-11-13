@@ -1,5 +1,7 @@
 // Copyright 2017 Quip
 
+import React from "react";
+import ReactDOM from "react-dom";
 import RecordEntity from "./model/record.js";
 import Styles from "./error-popover.less";
 

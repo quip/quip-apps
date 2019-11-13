@@ -63,7 +63,8 @@
         height: 14px;
         width: 14px;
     }
-    &:hover .draftText {
+    &:hover .draftText,
+    &:focus .draftText {
         display: block;
     }
 }
@@ -84,7 +85,8 @@
 
 .retry {
     color: @blueColor;
-    &:hover {
+    &:hover,
+    &:focus {
         text-decoration: underline;
     }
 }
@@ -176,7 +178,8 @@
 }
 
 .hoverableLink {
-    &:hover {
+    &:hover,
+    &:focus {
         text-decoration: underline;
         cursor: pointer;
     }

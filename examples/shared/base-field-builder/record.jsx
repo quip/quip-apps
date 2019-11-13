@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import {entityListener, arrayEqual} from "./utils.jsx";
 import ErrorPopover from "./error-popover.jsx";
@@ -93,8 +94,8 @@ class Record extends React.Component {
                 showAddFieldRow: false,
             });
         }
-        if (!nextProps.entity.hasLoaded()) {
-            this.setState({hasLoaded: false});
+        this.setState({hasLoaded: nextProps.entity.hasLoaded()});
+        if (!nextProps.entity.hasLoaded() && !nextProps.entity.isLoading()) {
             nextProps.entity
                 .fetchData()
                 .then(() => {
@@ -413,14 +414,19 @@ class RecordHeader extends React.Component {
     };
 
     render() {
-        const demoWarning = this.props.entity.getDemoText();
+        const {
+            entity,
+            showErrorPopover,
+            errorMessage,
+            onMouseEnterError,
+            onMouseLeaveError,
+        } = this.props;
+        const demoWarning = entity.getDemoText();
         let errorPopover;
-        if (this.props.showErrorPopover) {
-            errorPopover = <ErrorPopover
-                errorMessage={this.props.errorMessage}/>;
+        if (showErrorPopover) {
+            errorPopover = <ErrorPopover errorMessage={errorMessage}/>;
         }
-        const hasError =
-            this.props.errorMessage && this.props.errorMessage.length > 0;
+        const hasError = errorMessage && errorMessage.length > 0;
         let errorIndicator;
         let demoIndicator;
         const isExplorerTemplate = quip.apps.isExplorerTemplate
@@ -429,8 +435,8 @@ class RecordHeader extends React.Component {
         if (hasError && !isExplorerTemplate && !quip.apps.isMobile()) {
             errorIndicator = <div
                 className={Styles.warning}
-                onMouseEnter={this.props.onMouseEnterError}
-                onMouseLeave={this.props.onMouseLeaveError}>
+                onMouseEnter={onMouseEnterError}
+                onMouseLeave={onMouseLeaveError}>
                 <div className={Styles.warningText}>{quiptext("Error")}</div>
                 <WarningIcon/>
                 {errorPopover}
@@ -442,7 +448,7 @@ class RecordHeader extends React.Component {
         }
 
         const recordNameClassNames = [Styles.name];
-        if (!this.props.entity.isPlaceholder()) {
+        if (!entity.isPlaceholder()) {
             recordNameClassNames.push(Styles.hoverableLink);
         }
         return <div className={Styles.header}>
@@ -450,11 +456,9 @@ class RecordHeader extends React.Component {
                 <div
                     className={recordNameClassNames.join(" ")}
                     onClick={this.onClick_}>
-                    {this.props.entity.getHeaderName()}
+                    {entity.getHeaderName()}
                 </div>
-                <div className={Styles.type}>
-                    {this.props.entity.getLabelSingular()}
-                </div>
+                <div className={Styles.type}>{entity.getLabelSingular()}</div>
             </div>
             {demoIndicator}
             {errorIndicator}

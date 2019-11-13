@@ -3,6 +3,9 @@
 import {parseFieldValue} from "../response-handler.js";
 import {DefaultError, InvalidValueError} from "../error.js";
 import {formatNumber, normalizeNewlines} from "../utils.jsx";
+import moment from "moment";
+
+export const DATE_FORMAT = "YYYY-MM-DD";
 
 export class FieldEntity extends quip.apps.Record {
     static ID = "field";
@@ -207,7 +210,7 @@ export class FieldEntity extends quip.apps.Record {
 
 export class TextFieldEntity extends FieldEntity {
     static ID = "textField";
-    static PLACEHOLDER_TEXT = "Enter value";
+    static PLACEHOLDER_TEXT = quiptext("Enter value");
 
     static getProperties() {
         const fieldProperties = super.getProperties();
@@ -331,6 +334,8 @@ export class TextFieldEntity extends FieldEntity {
             case "Website":
             case "TextArea":
             case "Date": // For backwards compatibility where date was text.
+            case "Email":
+            case "EncryptedString":
                 return true;
             default:
                 valid = false;
@@ -346,7 +351,7 @@ export class TextFieldEntity extends FieldEntity {
 
 export class NumericFieldEntity extends TextFieldEntity {
     static ID = "numericField";
-    static PLACEHOLDER_TEXT = "Enter value";
+    static PLACEHOLDER_TEXT = quiptext("Enter value");
 
     format() {
         const type = this.getType();
@@ -365,8 +370,8 @@ export class NumericFieldEntity extends TextFieldEntity {
         }
         const displayValue = this.getOriginalDisplayValue();
         if (typeof displayValue === "string" && displayValue.length > 0) {
-            if (isNaN(parseInt(displayValue.charAt(1)))) {
-              return displayValue.substring(0,3);
+            if (isNaN(displayValue.charAt(1))) {
+                return displayValue.substring(0, 3);
             }
             return displayValue.charAt(0);
         }
@@ -665,7 +670,26 @@ export class DateTimeFieldEntity extends FieldEntity {
     }
 }
 
-export class DateFieldEntity extends FieldEntity {
+export class DateFieldEntity extends TextFieldEntity {
+    static ID = "readWriteDateField";
+    static PLACEHOLDER_TEXT = quiptext("Enter date");
+
+    format() {
+        const value = this.getValue();
+        const formatted = value ? moment(value).format(DATE_FORMAT) : value;
+        this.setValue(formatted);
+    }
+
+    isValid() {
+        const value = this.getValue();
+        if (!value) {
+            return true;
+        }
+        return moment(value).isValid();
+    }
+}
+
+export class DeprecatedDateFieldEntity extends FieldEntity {
     static ID = "dateField";
 
     static getProperties() {

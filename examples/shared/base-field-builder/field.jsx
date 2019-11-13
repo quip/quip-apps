@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import Styles from "./field.less";
 import {
     entityListener,
@@ -22,6 +23,7 @@ import ErrorPopover from "./error-popover.jsx";
 import {
     BooleanFieldEntity,
     DateFieldEntity,
+    DeprecatedDateFieldEntity,
     DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
@@ -134,6 +136,15 @@ class Field extends React.Component {
         this.setState({showErrorPopover: false});
     };
 
+    isRichTextField_() {
+        const {entity} = this.props;
+        return (
+            entity.getType() === "TextArea" &&
+            entity.getSchema() &&
+            entity.getSchema().extraTypeInfo === "RichTextArea"
+        );
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         const isDirty = nextProps.entity.isDirty();
         const label = nextProps.entity.getLabel();
@@ -162,69 +173,110 @@ class Field extends React.Component {
     }
 
     render() {
-        const showComments =
-            this.state.commentHover || this.props.entity.getCommentCount() > 0;
+        const {entity, source} = this.props;
+        const {
+            fieldDialog,
+            commentHover,
+            isFocused,
+            showErrorPopover,
+        } = this.state;
+
+        const showComments = commentHover || entity.getCommentCount() > 0;
 
         const newValueClassNames = [Styles.newValue];
         const originalValueClassNames = [Styles.originalValue];
-        if (this.props.entity.isReadOnly()) {
+        if (entity.isReadOnly() ||
+            entity.getType() === "EncryptedString" ||
+            this.isRichTextField_()) {
             newValueClassNames.push(Styles.readOnly);
-        } else if (this.props.entity.isDirty()) {
+        } else if (entity.isDirty()) {
             newValueClassNames.push(Styles.dirty);
             originalValueClassNames.push(Styles.visible);
         }
 
         let inputComponent;
-        if (this.props.entity instanceof TokenFieldEntity) {
-            inputComponent = <TokenField
-                createDialog={fieldDialog => this.setState({fieldDialog})}
-                focused={this.state.isFocused}
-                {...this.props}
-                onChangeFocus={this.onChangeFocus_}/>;
-        } else if (this.props.entity instanceof EnumFieldEntity) {
-            inputComponent = <EnumField
-                createDialog={fieldDialog => this.setState({fieldDialog})}
-                {...this.props}
-                onChangeFocus={this.onChangeFocus_}/>;
-        } else if (this.props.entity instanceof MultipicklistEntity) {
-            inputComponent = <Multipicklist
-                createDialog={fieldDialog => this.setState({fieldDialog})}
-                {...this.props}/>;
-        } else if (this.props.entity instanceof NumericFieldEntity) {
-            inputComponent = <NumericField
-                ref={node => (this.valueNode_ = node)}
-                {...this.props}
-                onValidation={this.validationError}/>;
-        } else if (this.props.entity instanceof TextFieldEntity) {
-            inputComponent = <TextField
-                ref={node => (this.valueNode_ = node)}
-                {...this.props}
-                onValidation={this.validationError}
-                onChangeFocus={this.onChangeFocus_}/>;
-        } else if (this.props.entity instanceof BooleanFieldEntity) {
-            inputComponent = <BooleanField
-                {...this.props}
-                onChangeFocus={this.onChangeFocus_}/>;
-        } else if (this.props.entity instanceof ReferenceFieldEntity) {
-            inputComponent = <ReferenceField {...this.props}/>;
-        } else if (this.props.entity instanceof DateFieldEntity) {
-            inputComponent = <DateField {...this.props}/>;
-        } else if (this.props.entity instanceof DateTimeFieldEntity) {
-            inputComponent = <DateTimeField {...this.props}/>;
-        } else {
-            return null;
+        switch (entity.constructor) {
+            case TokenFieldEntity: {
+                inputComponent = <TokenField
+                    createDialog={fieldDialog => this.setState({fieldDialog})}
+                    focused={isFocused}
+                    {...this.props}
+                    onChangeFocus={this.onChangeFocus_}/>;
+                break;
+            }
+            case EnumFieldEntity: {
+                inputComponent = <EnumField
+                    createDialog={fieldDialog => this.setState({fieldDialog})}
+                    {...this.props}
+                    onChangeFocus={this.onChangeFocus_}/>;
+                break;
+            }
+            case MultipicklistEntity: {
+                inputComponent = <Multipicklist
+                    createDialog={fieldDialog => this.setState({fieldDialog})}
+                    {...this.props}/>;
+                break;
+            }
+            case NumericFieldEntity: {
+                inputComponent = <NumericField
+                    ref={node => (this.valueNode_ = node)}
+                    {...this.props}
+                    onValidation={this.validationError}/>;
+                break;
+            }
+            case BooleanFieldEntity: {
+                inputComponent = <BooleanField
+                    {...this.props}
+                    onChangeFocus={this.onChangeFocus_}/>;
+                break;
+            }
+            case ReferenceFieldEntity: {
+                inputComponent = <ReferenceField {...this.props}/>;
+                break;
+            }
+            case DeprecatedDateFieldEntity: {
+                inputComponent = <DeprecatedDateField {...this.props}/>;
+                break;
+            }
+            case DateFieldEntity: {
+                inputComponent = <DateField
+                    {...this.props}
+                    onValidation={this.validationError}
+                    onChangeFocus={this.onChangeFocus_}/>;
+                break;
+            }
+            case DateTimeFieldEntity: {
+                inputComponent = <DateTimeField {...this.props}/>;
+                break;
+            }
+            case TextFieldEntity: {
+                if (entity.getType() === "EncryptedString") {
+                    inputComponent = <EncryptedTextField {...this.props}/>;
+                } else if (this.isRichTextField_()) {
+                    inputComponent = <RichTextField {...this.props}/>;
+                } else {
+                    inputComponent = <TextField
+                        ref={node => (this.valueNode_ = node)}
+                        {...this.props}
+                        onValidation={this.validationError}
+                        onChangeFocus={this.onChangeFocus_}/>;
+                }
+                break;
+            }
+            default: {
+                return null;
+            }
         }
 
         let saveError;
-        if (!this.state.isFocused &&
-            ((this.props.entity instanceof TextFieldEntity &&
-                !this.props.entity.isValid()) ||
-                (!(this.props.entity instanceof TextFieldEntity) &&
-                    this.props.entity.hasSaveError()))) {
+        if (!isFocused &&
+            ((entity instanceof TextFieldEntity && !entity.isValid()) ||
+                (!(entity instanceof TextFieldEntity) &&
+                    entity.hasSaveError()))) {
             let errorPopover;
-            if (this.state.showErrorPopover) {
+            if (showErrorPopover) {
                 errorPopover = <ErrorPopover
-                    errorMessage={this.props.entity.getError().getMessage()}/>;
+                    errorMessage={entity.getError().getMessage()}/>;
             }
             saveError = <div
                 onMouseEnter={this.onMouseEnterError_}
@@ -235,31 +287,31 @@ class Field extends React.Component {
         }
 
         let currencySign;
-        if (this.props.entity.getType() === "Currency") {
+        if (entity.getType() === "Currency") {
             currencySign = <div className={Styles.currencySign}>
-                {this.props.entity.getCurrencySign()}
+                {entity.getCurrencySign()}
             </div>;
         }
 
-        let originalValue = this.props.entity.getOriginalDisplayValue();
-        if (this.props.entity instanceof NumericFieldEntity) {
-            originalValue = this.props.entity.getOriginalValue();
+        let originalValue = entity.getOriginalDisplayValue();
+        if (entity instanceof NumericFieldEntity) {
+            originalValue = entity.getOriginalValue();
             originalValue = formatNumber(originalValue);
-        } else if (this.props.entity instanceof BooleanFieldEntity) {
-            originalValue = this.props.entity.getOriginalValue();
+        } else if (entity instanceof BooleanFieldEntity) {
+            originalValue = entity.getOriginalValue();
             originalValue = formatBoolean(originalValue);
         }
 
         let dialog;
-        if (this.state.fieldDialog) {
+        if (fieldDialog) {
             const rect = this.rootNode_.getBoundingClientRect();
             dialog = <Dialog
                 ref={node => (this.fieldDialog_ = ReactDOM.findDOMNode(node))}
                 showBackdrop={false}
-                onDismiss={this.state.fieldDialog.onDismiss}
-                left={this.state.fieldDialog.left - rect.left}
-                top={this.state.fieldDialog.top - rect.top}>
-                {this.state.fieldDialog.node}
+                onDismiss={fieldDialog.onDismiss}
+                left={fieldDialog.left - rect.left}
+                top={fieldDialog.top - rect.top}>
+                {fieldDialog.node}
             </Dialog>;
         }
         return <div
@@ -267,12 +319,10 @@ class Field extends React.Component {
             className={Styles.field}
             onMouseEnter={this.onMouseEnter_}
             onMouseLeave={this.onMouseLeave_}>
-            <div
-                className={Styles.label}
-                ref={node => (this.props.entity.domNode = node)}>
+            <div className={Styles.label} ref={node => (entity.domNode = node)}>
                 <div className={Styles.labelText}>
                     <DragHandle/>
-                    {this.props.entity.getLabel()}
+                    {entity.getLabel()}
                 </div>
                 <div
                     ref={node => (this.menuButton_ = node)}
@@ -293,7 +343,7 @@ class Field extends React.Component {
                             }>
                             <quip.apps.ui.CommentsTrigger
                                 className={Styles.commentsTrigger}
-                                entity={this.props.entity}
+                                entity={entity}
                                 showEmpty={true}/>
                         </div>
                         <div
@@ -323,7 +373,7 @@ class Field extends React.Component {
                         {currencySign}
                         {originalValue}
                     </div>
-                    <div className={Styles.badge}>{this.props.source}</div>
+                    <div className={Styles.badge}>{source}</div>
                 </div>
             </div>
             {dialog}
@@ -402,6 +452,39 @@ class TextField extends React.Component {
     }
 }
 
+class EncryptedTextField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(FieldEntity).isRequired,
+    };
+
+    render() {
+        return <div className={Styles.encryptedTextField}>
+            <quip.apps.ui.RichTextBox
+                width="100%"
+                minHeight={20}
+                maxHeight={300}
+                entity={this.props.entity.get("value")}
+                allowedStyles={[quip.apps.RichTextEntity.Style.TEXT_PLAIN]}
+                readOnly={true}/>
+        </div>;
+    }
+}
+
+class RichTextField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(FieldEntity).isRequired,
+    };
+
+    render() {
+        return <div className={Styles.encryptedTextField}>
+            <div
+                dangerouslySetInnerHTML={{
+                    __html: this.props.entity.getOriginalDisplayValue(),
+                }}/>
+        </div>;
+    }
+}
+
 class NumericField extends React.Component {
     static propTypes = {
         entity: React.PropTypes.instanceOf(FieldEntity).isRequired,
@@ -423,7 +506,6 @@ class NumericField extends React.Component {
     }
 
     handleKeyEvent_ = e => {
-        const maxLength = this.props.entity.getMaxLength();
         const whitelistedKeys = new Set([",", ".", "Backspace"]);
         // Keyboard and keypad numbers
         if ((e.keyCode >= 48 && e.keyCode <= 57) ||
@@ -547,17 +629,92 @@ class ReferenceField extends React.Component {
     }
 }
 
-export class DateField extends React.Component {
+export class DeprecatedDateField extends React.Component {
     static propTypes = {
-        entity: React.PropTypes.instanceOf(DateFieldEntity).isRequired,
+        entity: React.PropTypes.instanceOf(DeprecatedDateFieldEntity)
+            .isRequired,
         width: React.PropTypes.number,
     };
 
     render() {
         return <div
-            className={Styles.dateField}
+            className={Styles.deprecatedDateField}
             style={{width: this.props.width}}>
             {this.props.entity.getDisplayValue()}
+        </div>;
+    }
+}
+
+export class DateField extends React.Component {
+    static propTypes = {
+        entity: React.PropTypes.instanceOf(DateFieldEntity).isRequired,
+        width: React.PropTypes.number,
+        handleKeyEvent: React.PropTypes.func.isRequired,
+        onValidation: React.PropTypes.func,
+        onChangeFocus: React.PropTypes.func,
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            commentHover: false,
+        };
+    }
+
+    handleKeyEvent_ = e => {
+        const allowlistedKeys = new Set(["/", "Backspace", "-"]);
+        // Keyboard and keypad numbers
+        if ((e.keyCode >= 48 && e.keyCode <= 57) ||
+            (e.keyCode >= 96 && e.keyCode <= 105) ||
+            allowlistedKeys.has(e.key)) {
+            return this.props.handleKeyEvent(e);
+        } else {
+            return true;
+        }
+    };
+
+    focus = () => {
+        this.props.entity.focus();
+    };
+
+    onFocus_ = e => {
+        if (this.props.onChangeFocus) {
+            this.props.onChangeFocus(true);
+        }
+    };
+
+    onBlur_ = e => {
+        const {entity, onChangeFocus, onValidation} = this.props;
+        if (onChangeFocus) {
+            onChangeFocus(false);
+        }
+        const isValid = this.props.entity.isValid();
+        if (!isValid) {
+            const message = quiptext("Not valid field value.");
+            onValidation(message);
+        } else {
+            onValidation(null);
+            entity.format();
+        }
+    };
+
+    render() {
+        return <div
+            className={Styles.textField}
+            style={{width: this.props.width}}>
+            <quip.apps.ui.RichTextBox
+                width="100%"
+                minHeight={20}
+                maxHeight={25}
+                entity={this.props.entity.get("value")}
+                allowedStyles={[quip.apps.RichTextEntity.Style.TEXT_PLAIN]}
+                handleKeyEvent={this.handleKeyEvent_}
+                readOnly={this.props.entity.isReadOnly()}
+                disableAutocomplete={true}
+                disableInlineMenus={true}
+                disableLinkification={true}
+                onBlur={this.onBlur_}
+                onFocus={this.onFocus_}/>
         </div>;
     }
 }

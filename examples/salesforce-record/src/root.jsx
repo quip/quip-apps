@@ -3,14 +3,19 @@
 import {AUTH_CONFIG_NAMES} from "./config.js";
 import BaseMenu from "../../shared/base-field-builder/base-menu.js";
 import Dialog from "../../shared/dialog/dialog.jsx";
-import {entityListener} from "../../shared/base-field-builder/utils.jsx";
+import {
+    entityListener,
+    parseRecordFromUrl,
+} from "../../shared/base-field-builder/utils.jsx";
 import {RecordPickerEntity} from "./model/record-picker.js";
 import Record from "../../shared/base-field-builder/record.jsx";
 import Styles from "./record-picker.less";
 import {UnauthenticatedError} from "../../shared/base-field-builder/error.js";
+import PlaceholderData from "./placeholder-data.js";
 import {
     BooleanFieldEntity,
     DateFieldEntity,
+    DeprecatedDateFieldEntity,
     DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
@@ -20,14 +25,20 @@ import {
     TextFieldEntity,
 } from "../../shared/base-field-builder/model/field.js";
 
-import {SalesforceRecordEntity} from "./model/salesforce-record.js";
+import {SalesforceRecordEntity} from "../../shared/salesforce/model/salesforce-record.js";
 
 import RecordPicker from "./record-picker.jsx";
 import {FieldBuilderMenu} from "./menus.js";
-import {MismatchedInstanceError, SalesforceClient} from "./client.js";
+import {
+    MismatchedInstanceError,
+    SalesforceClient,
+} from "../../shared/salesforce/client.js";
 
 quip.apps.registerClass(BooleanFieldEntity, BooleanFieldEntity.ID);
 quip.apps.registerClass(DateFieldEntity, DateFieldEntity.ID);
+quip.apps.registerClass(
+    DeprecatedDateFieldEntity,
+    DeprecatedDateFieldEntity.ID);
 quip.apps.registerClass(DateTimeFieldEntity, DateTimeFieldEntity.ID);
 quip.apps.registerClass(EnumFieldEntity, EnumFieldEntity.ID);
 quip.apps.registerClass(FieldEntity, FieldEntity.ID);
@@ -60,55 +71,74 @@ quip.apps.initialize({
                 : AUTH_CONFIG_NAMES.PRODUCTION);
         const salesforceClient = new SalesforceClient(auth);
         rootRecord.setClient(salesforceClient);
+        const initOptions = JSON.parse(params.initOptions || null);
+
+        // Connect to the recordId if user has logged in. If not then
+        // set the intended record as fallbackRecord so the next time
+        // the user connects to Salesforce it will automatically connect
+        // to the fallbackRecord.
+        const maybeConnect = recordInfo => {
+            if (salesforceClient.isLoggedIn()) {
+                rootRecord.fetchRecord(
+                    recordInfo.recordId,
+                    recordInfo.userDefinedFields);
+            } else {
+                const placeholderData = PlaceholderData;
+                if (recordInfo.placeholderRecordName) {
+                    placeholderData.fieldsData["fields"]["Name"]["value"] =
+                        recordInfo.placeholderRecordName;
+                }
+                if (recordInfo.placeholderRecordType) {
+                    placeholderData.schema["label"] =
+                        recordInfo.placeholderRecordType;
+                    placeholderData.schema["labelPlural"] =
+                        recordInfo.placeholderRecordType;
+                }
+                rootRecord.loadPlaceholderData(placeholderData);
+                rootRecord.setFallbackRecordInfo(recordInfo);
+            }
+        };
 
         if (params.isCreation && params.creationUrl) {
-            const regexeps = [
-                /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/one\/one\.app#\/sObject\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
-                /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/lightning\/r\/(?:[.\S]+?)\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
-            ];
-
-            const result = regexeps
-                .map(re => re.exec(params.creationUrl))
-                .find(result => result !== null);
-            if (result) {
-                const recordId = result[1];
-                const extraParams = result[2];
-                let userDefinedFields;
-                if (extraParams) {
-                    const params = extraParams
-                        .split("&")
-                        .map(p => p.split("="));
-
-                    const fieldData = params.find(
-                        param => param[0] == "fields");
-                    if (fieldData) {
-                        userDefinedFields = fieldData[1].split(",");
-                    }
-                }
-
-                if (recordId.length == 18) {
-                    salesforceClient
-                        .fetchRecordAndSchema(recordId)
-                        .then(([fields, schema]) => {
-                            if (userDefinedFields) {
-                                userDefinedFields = userDefinedFields.filter(
-                                    key => {
-                                        return (
-                                            fields.find(
-                                                field => field.key == key) !=
-                                            null
-                                        );
-                                    });
-                            }
-                            rootRecord.setSelectedRecord(
-                                recordId,
-                                schema,
-                                userDefinedFields);
-                        });
-                }
+            const recordInfo = parseRecordFromUrl(params.creationUrl);
+            if (recordInfo.recordId) {
+                maybeConnect(recordInfo);
+            } else {
+                rootRecord.loadPlaceholderData();
             }
         } else if (params.isCreation) {
             rootRecord.loadPlaceholderData();
+        } else if (initOptions &&
+            initOptions["record_id"] &&
+            !rootRecord.getHasBeenRedirected()) {
+            let previousFields = null;
+            const previousRecord = rootRecord.getSelectedRecord();
+            if (previousRecord && !previousRecord.isPlaceholder()) {
+                previousFields = previousRecord
+                    .getFields()
+                    .map(f => f.getKey());
+            }
+            // By using the SRLA API call from html_import, we can specify the
+            // JSON fields to pass in for the call. Users can pass in a list
+            // of defined_fields, which specify which fields they would like
+            // to be visible in the Salesforce Record. If the user does not
+            // specify any defined_fields, all the previousFields from the
+            // previousRecord would appear. If the user does specify
+            // defined_fields, the previousFields variable would be overwritten
+            // by the defined_fields.
+            if (initOptions["user_defined_fields"]) {
+                previousFields = initOptions["user_defined_fields"];
+            }
+            const recordInfo = {
+                "recordId": initOptions["record_id"],
+                "placeholderRecordName": initOptions["record_name"],
+                "placeholderRecordType": initOptions["record_type"],
+                "placeholderOrg": initOptions["org_name"],
+                "userDefinedFields": previousFields,
+            };
+            maybeConnect(recordInfo);
+            quip.apps.recordQuipMetric("redirect_via_init_options");
+            rootRecord.setHasBeenRedirected(true);
         } else if (quip.apps.CreationSource &&
             params.creationSource === quip.apps.CreationSource.TEMPLATE) {
             rootRecord.loadPlaceholderData();
@@ -149,10 +179,15 @@ class Root extends React.Component {
     }
 
     componentDidMount() {
-        this.props.menuDelegate.refreshToolbar();
+        const {entity, menuDelegate} = this.props;
+        menuDelegate.refreshToolbar();
         quip.apps.addEventListener(
             quip.apps.EventType.ELEMENT_BLUR,
             this.hideRecordPicker_);
+
+        if (entity.getClient().isLoggedIn()) {
+            this.doesConnectToFallbackRecordOnLoggedIn_();
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -169,14 +204,35 @@ class Root extends React.Component {
         return this.recordComponent_.getWrappedComponent();
     }
 
-    showRecordPicker_ = e => {
+    onConnect_ = e => {
         e.preventDefault();
         this.ensureLoggedIn().then(() => {
+            if (this.doesConnectToFallbackRecordOnLoggedIn_()) {
+                return;
+            }
             this.props.menuDelegate.updateToolbar(
                 this.props.entity.getSelectedRecord());
             this.setState({showRecordPicker: true});
         });
     };
+
+    doesConnectToFallbackRecordOnLoggedIn_() {
+        const rootRecord = this.props.entity;
+        const fallbackRecordInfo = rootRecord.getFallbackRecordInfo();
+        if (fallbackRecordInfo) {
+             
+            // user connects to, display an error message and don't clear out
+            // the fallbackRecordInfo yet.
+            rootRecord.fetchRecord(
+                fallbackRecordInfo.recordId,
+                fallbackRecordInfo.userDefinedFields);
+            rootRecord.setFallbackRecordInfo(null);
+            this.props.menuDelegate.updateToolbar(
+                this.props.entity.getSelectedRecord());
+            return true;
+        }
+        return false;
+    }
 
     showMismatchedInstanceErrorDialog_(prevMenuCommand) {
         this.hideRecordPicker_();
@@ -187,7 +243,17 @@ class Root extends React.Component {
     }
 
     selectRecord_ = (selectedRecordId, schema) => {
-        this.props.entity.setSelectedRecord(selectedRecordId, schema);
+        const previousRecord = this.props.entity.getSelectedRecord();
+        let previousFields = null;
+        if (previousRecord &&
+            !previousRecord.isPlaceholder() &&
+            previousRecord.getType() === schema.apiName) {
+            previousFields = previousRecord.getFields().map(f => f.getKey());
+        }
+        this.props.entity.setSelectedRecord(
+            selectedRecordId,
+            schema,
+            previousFields);
         this.hideRecordPicker_();
     };
 
@@ -285,7 +351,7 @@ class Root extends React.Component {
             <a
                 onClick={e => e.stopPropagation()}
                 target="_blank"
-                href="https://www.quipsupport.com/hc/en-us/articles/115001166766-How-do-I-integrate-Quip-and-Salesforce-">
+                href="https://www.quipsupport.com/hc/en-us/articles/360022156351-Quip-Salesforce-Integration-Summary">
                 {quiptext("already set up the integration")}
             </a>
             <span>
@@ -310,12 +376,11 @@ class Root extends React.Component {
                 onDismiss={this.hideRecordPicker_}
                 menuDelegate={this.props.menuDelegate}/>;
         }
-
-        const selectedRecord = entity.getSelectedRecord();
-        // Should hit this only in url unfurling case
-        if (!selectedRecord) {
+        if (entity.fetchingRecord()) {
+            // Should hit this only in url unfurling case
             return <quip.apps.ui.Spinner size={25} loading={true}/>;
         }
+        const selectedRecord = entity.getSelectedRecord();
         const recordComponent = <Record
             isCreation={this.props.isCreation}
             entity={selectedRecord}
@@ -332,9 +397,18 @@ class Root extends React.Component {
             if (!loggedIn) {
                 contextInstructions = this.loginHelpDiv();
             }
+            let org = "Salesforce";
+            const fallbackRecordInfo = entity.getFallbackRecordInfo();
+            if (fallbackRecordInfo) {
+                if (fallbackRecordInfo.placeholderOrg) {
+                    org = fallbackRecordInfo.placeholderOrg;
+                }
+            }
             const actionText = loggedIn
                 ? quiptext("Select Record…")
-                : quiptext("Connect to Salesforce…");
+                : quiptext("Connect to %(org)s", {
+                      "org": org,
+                  });
             recordContainerClassNames.push(Styles.placeholder);
             chooseRecordButton = <div className={Styles.openPicker}>
                 <quip.apps.ui.Button
@@ -342,7 +416,7 @@ class Root extends React.Component {
                     text={actionText}/>
             </div>;
             placeholderOverlay = <div className={Styles.placeholderOverlay}/>;
-            recordContainerOnclick = this.showRecordPicker_;
+            recordContainerOnclick = this.onConnect_;
         }
         return <div className={Styles.root}>
             <div

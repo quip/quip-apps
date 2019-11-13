@@ -123,11 +123,6 @@ export class FieldBuilderMenu extends BaseMenu {
             disabledCommands.push("save-data");
             disabledCommands.push("open-in-salesforce");
         } else {
-            if (selectedRecord.isPlaceholder() ||
-                (quip.apps.getViewingUser() !== null &&
-                    selectedRecord.getOwnerId() ===
-                        quip.apps.getViewingUser().getId())) {
-            }
             if (!selectedRecord.isDirty() || selectedRecord.saveInProgress()) {
                 disabledCommands.push("save-data");
             }

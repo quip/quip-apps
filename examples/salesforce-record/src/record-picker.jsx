@@ -13,8 +13,8 @@ const LOADING_STATUS = {
     ERROR: 2,
 };
 
-const recordDividerSentinal = {};
-const moreRecordsSentinal = {};
+const recordDividerSentinel = {};
+const moreRecordsSentinel = {};
 
 export default class RecordPicker extends React.Component {
     static propTypes = {
@@ -121,12 +121,12 @@ export default class RecordPicker extends React.Component {
                         selectedObjects.includes(object.apiName)
                     );
 
-                    recordTypes.push(recordDividerSentinal);
+                    recordTypes.push(recordDividerSentinel);
                     if (prevRecordTypes.length) {
                         recordTypes.push(...prevRecordTypes);
-                        recordTypes.push(recordDividerSentinal);
+                        recordTypes.push(recordDividerSentinel);
                     }
-                    recordTypes.push(moreRecordsSentinal);
+                    recordTypes.push(moreRecordsSentinel);
                 }
 
                 this.setState({
@@ -244,7 +244,7 @@ export default class RecordPicker extends React.Component {
     };
 
     selectRecordType_ = (e, newlySelectedRecordType) => {
-        if (newlySelectedRecordType === moreRecordsSentinal) {
+        if (newlySelectedRecordType === moreRecordsSentinel) {
             this.showAllTypes_();
             return;
         }
@@ -370,13 +370,13 @@ class RecordTypePicker extends React.Component {
     };
 
     renderRow_ = (type, isHighlighted, index) => {
-        if (type === recordDividerSentinal) {
+        if (type === recordDividerSentinel) {
             return <div className={Styles.recordTypesHR}>
                 <hr/>
             </div>;
         }
         const classNames = [Styles.recordTypeRow];
-        if (type === moreRecordsSentinal) {
+        if (type === moreRecordsSentinel) {
             return <div
                 className={classNames.join(" ")}
                 onClick={e => this.props.onClick(e, type)}>
