@@ -1,3 +1,6 @@
+// Copyright 2019 Quip
+
+import React from "react";
 import IntlPolyfill from "intl";
 import en from "intl/locale-data/jsonp/en.js";
 
@@ -130,4 +133,29 @@ export function formatBoolean(value) {
 
 export function normalizeNewlines(str) {
     return str.replace(/\r?\n|\r/g, "\n");
+}
+
+export function parseRecordFromUrl(url) {
+    const regexeps = [
+        /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/one\/one\.app#\/sObject\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
+        /https:\/\/(?:[.\S]+?)\.lightning\.force\.com\/lightning\/r\/(?:[.\S]+?)\/([A-z0-9]+?)\/view(?:\?(.*))*/g,
+    ];
+    const result = regexeps
+        .map(re => re.exec(url))
+        .find(result => result !== null);
+    const recordInfo = {};
+    if (result) {
+        if (result[1].length === 18) {
+            recordInfo.recordId = result[1];
+        }
+        const extraParams = result[2];
+        if (extraParams) {
+            const params = extraParams.split("&").map(p => p.split("="));
+            const fieldData = params.find(param => param[0] == "fields");
+            if (fieldData) {
+                recordInfo.userDefinedFields = fieldData[1].split(",");
+            }
+        }
+    }
+    return recordInfo;
 }

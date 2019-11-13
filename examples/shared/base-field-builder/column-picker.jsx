@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import Checkbox from "../../shared/base-field-builder/icons/checkbox.jsx";
 import RowContainer from "../../shared/base-field-builder/row-container.jsx";
 import Styles from "./record-list.less";

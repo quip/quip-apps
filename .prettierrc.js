@@ -6,6 +6,6 @@ module.exports = {
     jsxBracketSameLine: true,
     trailingComma: "es5",
     bracketSpacing: false,
-    preserveObjectKeyQuotes: true,
+    quoteProps: "preserve",
     parensSameLine: true,
 };

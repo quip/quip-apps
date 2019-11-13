@@ -3,6 +3,7 @@
 import {
     BooleanFieldEntity,
     DateFieldEntity,
+    DeprecatedDateFieldEntity,
     DateTimeFieldEntity,
     EnumFieldEntity,
     FieldEntity,
@@ -11,8 +12,10 @@ import {
     TextFieldEntity,
     TokenFieldEntity,
     MultipicklistEntity,
+    DATE_FORMAT,
 } from "./field.js";
 
+import moment from "moment";
 import {unescapeHTML} from "../utils.jsx";
 import {parseFieldValue} from "../response-handler.js";
 
@@ -81,7 +84,16 @@ export class RecordEntity extends quip.apps.Record {
     }
 
     getFields() {
-        return this.getFieldsListEntity().getRecords();
+        const records = this.getFieldsListEntity().getRecords();
+        const keyDict = {};
+        records.forEach(fieldEntity => {
+            if (fieldEntity.getKey() in keyDict) {
+                fieldEntity.remove(false);
+            } else {
+                keyDict[fieldEntity.getKey()] = true;
+            }
+        });
+        return records;
     }
 
     getFieldsListEntity() {
@@ -210,6 +222,8 @@ export class RecordEntity extends quip.apps.Record {
                 }
                 break;
             }
+            case "Email":
+            case "EncryptedString":
             case "Phone":
             case "String":
             case "TextArea":
@@ -259,7 +273,23 @@ export class RecordEntity extends quip.apps.Record {
                 break;
             }
             case "Date": {
-                recordClass = DateFieldEntity;
+                if (this.getSource() === "Salesforce") {
+                    recordClass = DateFieldEntity;
+                    defaultText = value
+                        ? moment(value).format(DATE_FORMAT)
+                        : value;
+                    if (defaultText === "" && !isReadOnly) {
+                        value = {
+                            RichText_placeholderText:
+                                DateFieldEntity.PLACEHOLDER_TEXT,
+                        };
+                    } else {
+                        value = {RichText_defaultText: defaultText};
+                    }
+                } else {
+                    // Jira
+                    recordClass = DeprecatedDateFieldEntity;
+                }
                 break;
             }
             case "DateTime": {
@@ -325,6 +355,10 @@ export class RecordEntity extends quip.apps.Record {
 
     reload() {
         this.fetchRecordId_(this.getRecordId());
+    }
+
+    isLoading() {
+        throw Error("Unimplemented abstract method.");
     }
 
     hasLoaded() {

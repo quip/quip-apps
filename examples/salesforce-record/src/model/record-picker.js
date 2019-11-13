@@ -1,8 +1,9 @@
 // Copyright 2017 Quip
-import {SalesforceRecordEntity} from "./salesforce-record.js";
+import {SalesforceRecordEntity} from "../../../shared/salesforce/model/salesforce-record.js";
 import {AUTH_CONFIG_NAMES} from "../config.js";
-import {SalesforceClient} from "../client.js";
+import {SalesforceClient} from "../../../shared/salesforce/client.js";
 import PlaceholderData from "../placeholder-data.js";
+import {DeprecatedDateFieldEntity} from "../../../shared/base-field-builder/model/field.js";
 
 /** @typedef {{schema: Object, listViewsData: Object}} RecordTypeData */
 
@@ -10,7 +11,7 @@ const OBJECT_PREFERENCES_KEY = "insertedObjectTypes";
 
 export class RecordPickerEntity extends quip.apps.RootRecord {
     static ID = "recordPicker";
-    static DATA_VERSION = 1;
+    static DATA_VERSION = 2;
 
     static getProperties() {
         return {
@@ -18,6 +19,8 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             selectedRecord: SalesforceRecordEntity,
             useSandbox: "boolean",
             instanceUrl: "string",
+            fallbackRecordInfo: "object",
+            hasBeenRedirected: "boolean",
         };
     }
 
@@ -25,7 +28,9 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return {useSandbox: false};
     }
 
-    initialize() {}
+    initialize() {
+        this.fetchingRecord_ = false;
+    }
 
     ensureCurrentDataVersion() {
         const dataVersion = this.getDataVersion();
@@ -57,10 +62,37 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
                 .getFields()
                 .map(fieldEntity => fieldEntity.getKey());
 
-            this.setDataVersion(RecordPickerEntity.DATA_VERSION);
+            this.setDataVersion(1);
             selectedRecord.set("schema", schema);
             selectedRecord.clear("type");
             this.clear("recordTypes");
+        }
+
+        if (dataVersion === 1) {
+            // Upgrade from 1 -> 2
+            const dateFieldIndexMap = new Map();
+            selectedRecord.getFields().forEach((field, i) => {
+                if (field instanceof DeprecatedDateFieldEntity) {
+                    dateFieldIndexMap.set(i, field);
+                }
+            });
+            // Remove DeprecatedDateFieldEntities and add DateFieldEntities
+            dateFieldIndexMap.forEach(function(value, key, map) {
+                value.remove(false);
+                const data = {
+                    key: value.getKey(),
+                    value: value.getValue(),
+                    displayValue: value.getDisplayValue(),
+                };
+                selectedRecord.getCachedFieldsDataArray_().push(data);
+                selectedRecord.addField(value.getKey());
+            });
+            // Reorder by moving all DateFieldEntities to new indexes
+            dateFieldIndexMap.forEach(function(value, key, map) {
+                const newField = selectedRecord.getField(value.getKey());
+                selectedRecord.getFieldsListEntity().move(newField, key);
+            });
+            this.setDataVersion(RecordPickerEntity.DATA_VERSION);
             return;
         }
 
@@ -123,6 +155,22 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         return this.get("instanceUrl");
     }
 
+    setFallbackRecordInfo(fallbackRecordInfo) {
+        this.set("fallbackRecordInfo", fallbackRecordInfo);
+    }
+
+    getFallbackRecordInfo() {
+        return this.get("fallbackRecordInfo");
+    }
+
+    setHasBeenRedirected(hasBeenRedirected) {
+        this.set("hasBeenRedirected", hasBeenRedirected);
+    }
+
+    getHasBeenRedirected() {
+        return this.get("hasBeenRedirected");
+    }
+
     /**
      * @return {SalesforceRecordEntity}
      */
@@ -141,7 +189,10 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         });
         this.setDataVersion(RecordPickerEntity.DATA_VERSION);
         this.getSelectedRecord().setSchema(schema);
-        this.getSelectedRecord().fetchData(false, false, initialFields);
+        this.getSelectedRecord().fetchData(
+            /* isInitialMount */ false,
+            /* isCreation */ false,
+            initialFields);
         const metricArgs = {
             action: "selected_record",
             record_type: this.getSelectedRecord().getType(),
@@ -173,11 +224,13 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
             selectedRecord.clearData();
         }
 
+        const useSandbox = this.useSandbox();
         this.clearData();
         this.set("selectedRecord", {
             recordId: PlaceholderData.recordId,
             isPlaceholder: true,
         });
+        this.setUseSandbox(useSandbox);
         this.setDataVersion(RecordPickerEntity.DATA_VERSION);
         this.getSelectedRecord().loadPlaceholderData(PlaceholderData);
     }
@@ -217,5 +270,37 @@ export class RecordPickerEntity extends quip.apps.RootRecord {
         types.push(apiName);
         const preferences = quip.apps.getUserPreferences();
         preferences.save({[OBJECT_PREFERENCES_KEY]: JSON.stringify(types)});
+    }
+
+    fetchRecord(recordId, userDefinedFields) {
+        const previousRecord = this.getSelectedRecord();
+        this.fetchingRecord_ = true;
+        this.salesforceClient_.fetchRecordAndSchema(recordId).then(
+            ([fields, schema]) => {
+                // Use the defined fields if the live app is being created, or
+                // we're switching from a placeholding record, or
+                // changing from record of the same type.
+                const shouldUseDefinedFields =
+                    !previousRecord ||
+                    previousRecord.isPlaceholder() ||
+                    previousRecord.getType() === schema.apiName;
+                if (shouldUseDefinedFields && userDefinedFields) {
+                    userDefinedFields = userDefinedFields.filter(key => {
+                        return fields.find(field => field.key == key) != null;
+                    });
+                } else {
+                    userDefinedFields = null;
+                }
+                this.setSelectedRecord(recordId, schema, userDefinedFields);
+                this.fetchingRecord_ = false;
+            },
+            () => {
+                this.loadPlaceholderData();
+                this.fetchingRecord_ = false;
+            });
+    }
+
+    fetchingRecord() {
+        return this.fetchingRecord_;
     }
 }

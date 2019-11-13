@@ -160,14 +160,15 @@
     height: 100%;
 }
 
-.textField {
+.textField,
+.encryptedTextField {
     display: flex;
     max-width: 280px;
     width: 100%;
 }
 
 .currencySign {
-    margin-right: 5px;
+    margin-right: 2px;
 }
 
 .autocompleteField {
@@ -284,7 +285,8 @@
 .enumRow.selectable {
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: @blueColor;
         color: white;
         svg {
@@ -390,6 +392,7 @@
         display: flex;
     }
 
+    .deprecatedDateField,
     .dateField,
     .enumField,
     .tokenField {

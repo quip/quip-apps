@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import PageIndicator from "./page-indicator.jsx";
 
 import {RecordEntity} from "./model/record.js";

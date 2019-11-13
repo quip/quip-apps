@@ -33,7 +33,7 @@ class EventRichTextBox extends React.Component<Props, null> {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         if (this.props.focused && !prevProps.focused) {
             this.props.titleRecord.focus();
         }

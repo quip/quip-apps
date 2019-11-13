@@ -31,7 +31,7 @@
     box-shadow: 1px 0 0 @borderColor;
     .highlighted {
         color: white;
-        background-color: #59b4ed;
+        background-color: @blueColor;
     }
     .filterRow {
         font-weight: bold;
@@ -77,7 +77,7 @@
         display: none;
     }
     &.highlighted {
-        background-color: #59b4ed;
+        background-color: @blueColor;
         color: white;
         svg {
             fill: white;
@@ -106,7 +106,8 @@
     outline: none;
 }
 
-.searchDisplay, .errorLoading {
+.searchDisplay,
+.errorLoading {
     align-items: center;
     box-shadow: 1px 0 0 @borderColor;
     color: #8c8c8c;
@@ -118,7 +119,7 @@
 }
 
 .retry {
-    color: #25b4e9;
+    color: @blueColor;
     &:hover {
         text-decoration: underline;
     }

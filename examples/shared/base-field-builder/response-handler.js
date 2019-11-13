@@ -117,7 +117,7 @@ export function parseSchema(
         "LastViewedDate" in schema.fields &&
         schema.fields["LastViewedDate"].dataType == "DateTime";
 
-    const fieldSet = new Set(fullLayoutFields);
+    const fieldSet = new Set(fullLayoutFields.map(f => f.apiName));
 
     // Note which name fields aren't included in the full layout and must be
     // fetched optionally.
@@ -172,14 +172,15 @@ export function parseLayout(layout) {
             row.layoutItems.forEach(item =>
                 item.layoutComponents.forEach(component => {
                     if (component.componentType === "Field") {
-                        layoutFields[component.apiName] = true;
+                        const {apiName, label} = component;
+                        layoutFields[component.apiName] = {apiName, label};
                     }
                 })
             )
         )
     );
 
-    return Object.keys(layoutFields);
+    return Object.values(layoutFields);
 }
 
 function parseFloatWithLocale(value, locale = "en-US") {

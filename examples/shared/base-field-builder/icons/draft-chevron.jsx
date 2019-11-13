@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import SVG from "../../../shared/base-field-builder/icons/svg.jsx";
 
 export default class DraftIcon extends React.Component {

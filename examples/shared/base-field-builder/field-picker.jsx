@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import CheckmarkIcon from "./icons/checkmark.jsx";
 import RecordEntity from "./model/record.js";
 import Styles from "./field-picker.less";

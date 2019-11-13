@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import Chevron from "./icons/draft-chevron.jsx";
 import Styles from "./page-indicator.less";
 

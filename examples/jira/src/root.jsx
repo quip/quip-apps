@@ -18,7 +18,7 @@ import {ColumnRecord, StatusTypeRecord} from "../../shared/table-view/model.js";
 
 import {
     BooleanFieldEntity,
-    DateFieldEntity,
+    DeprecatedDateFieldEntity,
     EnumFieldEntity,
     FieldEntity,
     TextFieldEntity,
@@ -30,7 +30,9 @@ quip.apps.registerClass(JiraRecentEntity, JiraRecentEntity.ID);
 quip.apps.registerClass(JiraRecordEntity, JiraRecordEntity.ID);
 quip.apps.registerClass(BooleanFieldEntity, BooleanFieldEntity.ID);
 quip.apps.registerClass(ColumnRecord, ColumnRecord.CONSTRUCTOR_KEY);
-quip.apps.registerClass(DateFieldEntity, DateFieldEntity.ID);
+quip.apps.registerClass(
+    DeprecatedDateFieldEntity,
+    DeprecatedDateFieldEntity.ID);
 quip.apps.registerClass(EnumFieldEntity, EnumFieldEntity.ID);
 quip.apps.registerClass(FieldEntity, FieldEntity.ID);
 quip.apps.registerClass(StatusTypeRecord, StatusTypeRecord.CONSTRUCTOR_KEY);
@@ -120,7 +122,7 @@ class Root extends React.Component {
         this.setState({containerWidth: quip.apps.getContainerWidth()});
     };
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         this.props.menuDelegate.refreshToolbar();
     }
 

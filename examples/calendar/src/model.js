@@ -102,7 +102,8 @@ export class RootRecord extends quip.apps.RootRecord {
 
     getNextIndexForStartDate(
         startDate: Date,
-        excludeEvent: ?EventRecord): number {
+        excludeEvent: ?EventRecord
+    ): number {
         let nextIndex = 0;
         let events = this.getEvents();
         if (excludeEvent) {
@@ -216,6 +217,9 @@ export class EventRecord extends quip.apps.Record {
         if (!eventForWeek) {
             this.domNodesEvent = {};
             return;
+        }
+        if (!this.domNodesEvent) {
+            this.domNodesEvent = {};
         }
         const {el, weekStartTime} = eventForWeek;
         this.domNodesEvent[weekStartTime] = el;

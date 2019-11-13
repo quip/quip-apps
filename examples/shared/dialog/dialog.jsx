@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import React from "react";
 import Styles from "./dialog.less";
 
 export default class Dialog extends React.Component {

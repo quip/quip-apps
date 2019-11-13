@@ -366,11 +366,11 @@ export class JiraRecordEntity extends RecordEntity {
                     options = [];
                 }
             }
-            options = options.map(
-                option =>
-                    key === "status"
-                        ? this.parseTransitionObject_(option)
-                        : this.parseGenericObject_(option));
+            options = options.map(option =>
+                key === "status"
+                    ? this.parseTransitionObject_(option)
+                    : this.parseGenericObject_(option)
+            );
             extras.options = options;
             if (key in editmeta.fields) {
                 extras.autoCompleteUrl = editmeta.fields[key].autoCompleteUrl;
@@ -729,6 +729,10 @@ export class JiraRecordEntity extends RecordEntity {
 
     isDirty() {
         return this.hasSchemaLoaded() && super.isDirty();
+    }
+
+    isLoading() {
+        return false;
     }
 
     hasLoaded() {
