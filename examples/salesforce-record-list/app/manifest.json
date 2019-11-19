@@ -1,0 +1,25 @@
+{
+    "id": "QYUAjAGNxIo",
+    "manifest_version": 1,
+    "name": "Salesforce List",
+    "description": "Embed, update, and collaborate on Salesforce lists. (Admin setup may be required.)",
+    "version_name": "0.2.14",
+    "version_number": 19,
+    "sizing_mode": "fit_content",
+    "initial_height": 200,
+    "initial_width": 800,
+    "disable_app_level_comments": true,
+    "toolbar_color": "blue",
+    "toolbar_icon": "salesforce_logo",
+    "thumbnail": "icons/thumbnail.svg",
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"],
+    "csp_sources": {
+        "img_srcs": ["http://localhost:8080"],
+        "frame_srcs": ["http://localhost:8080"],
+        "connect_srcs": ["http://localhost:8080"]
+    },
+    "intercept_url_patterns": [
+        "https://*.lightning.force.com/lightning/o/*/list*"
+    ]
+}
