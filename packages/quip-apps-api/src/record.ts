@@ -31,6 +31,10 @@ export type RecordParams = {
     requestedThumbnailWidths?: number[];
 };
 
+export interface RecordPropertyDefinition {
+    [property: string]: string | RecordConstructor | listPropertyType<any>;
+}
+
 export default abstract class Record {
     public idValue: string = "test-id";
     public uniqueIdValue: string = "test-unique-id";
@@ -49,9 +53,7 @@ export default abstract class Record {
     public isHighlightHiddenValue?: boolean;
 
     protected data_: {[key: string]: any};
-    static getProperties(): {
-        [property: string]: string | RecordConstructor | listPropertyType<any>;
-    } {
+    static getProperties(): RecordPropertyDefinition {
         return {};
     }
     static getDefaultProperties(): {[property: string]: any} {

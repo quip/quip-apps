@@ -13,6 +13,7 @@ import Record_, {
     RecordConstructor as RecordConstructor_,
     RecordType as RecordType_,
     RecordParams as RecordParams_,
+    RecordPropertyDefinition as RecordPropertyDefinition_,
 } from "./dist/record";
 import ClientError_ from "./dist/client-error";
 import ImageRecord_ from "./dist/image-record";
@@ -98,6 +99,7 @@ declare namespace quip {
     export type MenuIcons = typeof MenuIcons_;
     export type RootEntityConstructor = typeof RootEntityConstructor_;
     export type RecordConstructor = RecordConstructor_;
-    export type RecordType = RecordType_;
     export type RecordParams = RecordParams_;
+    export type RecordPropertyDefinition = RecordPropertyDefinition_;
+    export type RecordType = RecordType_;
 }
