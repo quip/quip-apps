@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "downlevelIteration": true,
+        "baseUrl": ".",
+        "paths": {
+            "react": ["node_modules/@types/react"]
+        }
+    },
+    "include": ["./src/**/*", "custom.d.ts"]
+}

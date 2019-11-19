@@ -1,0 +1,5 @@
+# jest coverage output
+coverage
+
+# typescript
+dist

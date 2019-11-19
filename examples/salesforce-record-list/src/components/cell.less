@@ -1,0 +1,92 @@
+/* Copyright 2019 Quip */
+
+@import "../../shared/dialog/common";
+
+.cell {
+    position: relative;
+    // Compensate for horrible child pattern in SLDS's datepicker, which will
+    // wrap our top child with an arbitrary outer element
+    & > :first-child {
+        position: static;
+        display: flex;
+        white-space: normal;
+        word-break: break-word;
+        align-items: center;
+        & > span {
+            width: 100%;
+            min-height: 18px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+}
+
+// This seems like an accessibility oversight but what do I know
+:global(.slds-button:focus .slds-button__icon_edit) {
+    opacity: 1 !important;
+}
+
+.content {
+    white-space: pre-wrap;
+}
+
+.cellIcon {
+    position: absolute;
+    right: 10px;
+    svg {
+        background-color: #fff;
+    }
+}
+
+.hasComments > :first-child::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 12px 12px 0;
+    border-color: transparent @yellowColor transparent transparent;
+}
+
+.lockedCell {
+    svg {
+        opacity: 0;
+    }
+    &:hover svg {
+        opacity: 1;
+    }
+}
+
+.referenceLink {
+    background: @blueColor;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.addCommentOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0px;
+    bottom: 0;
+    &:hover,
+    &:focus {
+        box-shadow: inset 0px 0px 0px 3px @yellowColor;
+    }
+}
+
+.datePicker {
+     
+    // date picker, so .slds-table td cascades into (and because of import order
+    // overrides) .slds-datepicker td, causing some visual glitches. This allows
+    // us to patch noticed errors, but datepicker should either use wormhole or
+    // slds should not use raw tag selectors (or both) to actually fix this.
+    // Alternatively, we could explore manually specifying css import order.
+    td {
+        padding: 0.25rem !important;
+    }
+}
