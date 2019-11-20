@@ -1,6 +1,6 @@
 // Copyright 2019 Quip
 
-import React, {Component} from "react";
+import React, {Component, ReactNode} from "react";
 import {CanvasRecordCommentAnchorRecord} from "./canvas-record";
 import Record from "./record";
 import User from "./user";
@@ -13,7 +13,7 @@ export class Button extends Component<{
     className?: string;
     onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
     primary?: boolean;
-    text: string;
+    text: ReactNode;
     type?: string;
     disabled?: boolean;
 }> {
