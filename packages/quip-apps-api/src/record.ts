@@ -77,7 +77,6 @@ export default abstract class Record {
                 this.set(key, value);
             }
         }
-        this.initialize();
     }
 
     initialize() {}

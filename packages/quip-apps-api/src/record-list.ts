@@ -40,6 +40,7 @@ export default class RecordList<T extends Record> {
     add(value: {[key: string]: any}, index?: number) {
         const RecordConstructor = this.recordConstructor_;
         const item = new RecordConstructor();
+        item.initialize();
         item.containingListValue = this;
         for (const key in value) {
             item.set(key, value[key]);
