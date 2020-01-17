@@ -14,7 +14,6 @@ export enum ElementsEventType {
     DOCUMENT_THEME_UPDATE = "DOCUMENT_THEME_UPDATE",
     CONTAINER_SIZE_UPDATE = "CONTAINER_SIZE_UPDATE",
     WINDOW_SIZE_UPDATE = "WINDOW_SIZE_UPDATE",
-    // Temporary alias
     DOCUMENT_SIZE_UPDATE = "DOCUMENT_SIZE_UPDATE",
     USER_PREFERENCE_UPDATE = "USER_PREFERENCE_UPDATE",
     SITE_PREFERENCE_UPDATE = "SITE_PREFERENCE_UPDATE",
@@ -61,6 +60,7 @@ enum QuipIcon {
     COUNTDOWN = 11,
     PROJECT_TRACKER = 12,
     JIRA = 13,
+    COMMENT_MENU_ITEM = 14,
 }
 
 export interface MenuCommand {
@@ -93,51 +93,53 @@ interface InitOptions {
     ) => void;
 }
 
-export const CreationSource = {
-    INSERT: 1,
-    COPY_DOCUMENT: 2,
-    PASTE: 3,
-    TEMPLATE: 4,
-};
+export enum CreationSource {
+    INSERT = "INSERT",
+    COPY_DOCUMENT = "COPY_DOCUMENT",
+    PASTE = "PASTE",
+    TEMPLATE = "TEMPLATE",
+}
 
-export const DocumentMenuActions = {SHOW_FILE_PICKER: "1"};
+export enum DocumentMenuActions {
+    SHOW_FILE_PICKER = "SHOW_FILE_PICKER",
+}
 
-export const DocumentMenuCommands = {
-    SEPARATOR: "1",
-    MENU_MAIN: "2",
-    COPY_ANCHOR_LINK: "3",
-    CUT_ELEMENT: "4",
-    COPY_ELEMENT: "5",
-    DELETE_ELEMENT: "6",
-    DELETE_APP: "7",
-};
+export enum DocumentMenuCommands {
+    SEPARATOR = "SEPARATOR",
+    MENU_MAIN = "MENU_MAIN",
+    COPY_ANCHOR_LINK = "COPY_ANCHOR_LINK",
+    CUT_ELEMENT = "CUT_ELEMENT",
+    COPY_ELEMENT = "COPY_ELEMENT",
+    DELETE_ELEMENT = "DELETE_ELEMENT",
+    DELETE_APP = "DELETE_APP",
+}
 
-export const EventType = {
-    ELEMENT_BLUR: 1,
-    BLUR: 2,
-    DOCUMENT_THEME_UPDATE: 3,
-    CONTAINER_SIZE_UPDATE: 4,
-    WINDOW_SIZE_UPDATE: 5,
-    DOCUMENT_SIZE_UPDATE: 6,
-    USER_PREFERENCE_UPDATE: 7,
-    SITE_PREFERENCE_UPDATE: 8,
-    ELEMENT_FOCUS: 9,
-    FOCUS: 10,
-    DOCUMENT_MEMBERS_LOADED: 11,
-    WHITELISTED_USERS_LOADED: 12,
-    DOCUMENT_EDITABLE_CHANGED: 13,
-    ONLINE_STATUS_CHANGED: 14,
-    WIDTH_UPDATE: 15,
-};
+export enum EventType {
+    ELEMENT_BLUR = "ELEMENT_BLUR",
+    BLUR = "BLUR",
+    DOCUMENT_THEME_UPDATE = "DOCUMENT_THEME_UPDATE",
+    CONTAINER_SIZE_UPDATE = "CONTAINER_SIZE_UPDATE",
+    WINDOW_SIZE_UPDATE = "WINDOW_SIZE_UPDATE",
+    DOCUMENT_SIZE_UPDATE = "DOCUMENT_SIZE_UPDATE",
+    USER_PREFERENCE_UPDATE = "USER_PREFERENCE_UPDATE",
+    SITE_PREFERENCE_UPDATE = "SITE_PREFERENCE_UPDATE",
+    ELEMENT_FOCUS = "ELEMENT_FOCUS",
+    FOCUS = "FOCUS",
+    DOCUMENT_MEMBERS_LOADED = "DOCUMENT_MEMBERS_LOADED",
+    WHITELISTED_USERS_LOADED = "WHITELISTED_USERS_LOADED",
+    DOCUMENT_EDITABLE_CHANGED = "DOCUMENT_EDITABLE_CHANGED",
+    ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
+    WIDTH_UPDATE = "WIDTH_UPDATE",
+}
 
-export const MenuIcons = {
-    COMMENT_INLINE: 1,
-    FULL_SCREEN: 2,
-    CROP: 3,
-    SALESFORCE_LOGO: 4,
-    SYNCING: 5,
-    JIRA: 6,
-};
+export enum MenuIcons {
+    COMMENT_INLINE = "COMMENT_INLINE",
+    FULL_SCREEN = "FULL_SCREEN",
+    CROP = "CROP",
+    SALESFORCE_LOGO = "SALESFORCE_LOGO",
+    SYNCING = "SYNCING",
+    JIRA = "JIRA",
+}
 
 export const RootEntityConstructor = class {};
 
@@ -236,7 +238,7 @@ export default class Client {
 
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
-    addEventListener(type: ElementsEventType, listener: () => void) {}
+    addEventListener(type: ElementsEventType | EventType, listener: () => void) {}
     addWhitelistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];

@@ -203,7 +203,7 @@ export class RichTextBox extends Component<{
     disableSelection?: boolean;
     onFocus?: () => void;
     onBlur?: () => void;
-    handleKeyEvent?: (e: Event) => void;
+    handleKeyEvent?: (e: React.KeyboardEvent<any>) => void;
     color?: keyof typeof ColorMap;
 }> {
     render() {
