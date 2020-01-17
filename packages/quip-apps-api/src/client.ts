@@ -238,7 +238,10 @@ export default class Client {
 
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
-    addEventListener(type: ElementsEventType | EventType, listener: () => void) {}
+    addEventListener(
+        type: ElementsEventType | EventType,
+        listener: () => void
+    ) {}
     addWhitelistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];
@@ -411,7 +414,10 @@ export default class Client {
     registerEmbeddedIframe(node: Node) {}
     removeDetachedNode(node: Node) {}
     removeDraggableNode(node: Node) {}
-    removeEventListener(node: Node) {}
+    removeEventListener(
+        type: ElementsEventType | EventType,
+        listener: () => void
+    ) {}
     searchPeople(searchString: string, callback: (users: User[]) => void) {
         callback(this.peopleToSearchForValue);
     }
