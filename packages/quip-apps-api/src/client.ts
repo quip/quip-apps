@@ -74,7 +74,7 @@ export interface MenuCommand {
     actionId?: string;
     actionParams?: Object;
     actionStarted?: () => void;
-    quipIcon?: QuipIcon;
+    quipIcon?: QuipIcon | MenuIcons;
 }
 
 interface ToolbarState {
