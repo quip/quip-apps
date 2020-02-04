@@ -19,6 +19,7 @@ import RichTextRecord_ from "./rich-text-record";
 import UrlAuth_ from "./url-auth";
 import User_ from "./user";
 import * as ui from "./ui";
+import applySnapshot from "./test-utils/apply-snapshot";
 
 const client = new Client_("", "", "");
 const api = Object.assign(client, clientExports, {
@@ -46,5 +47,11 @@ const api = Object.assign(client, clientExports, {
     ui,
 });
 
-const quip = {apps: api, elements: api};
+const quip = {
+    apps: api,
+    elements: api,
+    testUtils: {
+        applySnapshot,
+    },
+};
 export = quip;

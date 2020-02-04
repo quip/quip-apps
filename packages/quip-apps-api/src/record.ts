@@ -130,6 +130,9 @@ export default abstract class Record {
         const statics = this.constructor as typeof Record;
         const propTypes = statics.getProperties();
         const Type = propTypes[key];
+        if (!Type) {
+            throw new Error(`property ${key} not found.`);
+        }
         if (
             typeof Type !== "string" &&
             "prototype" in Type &&
