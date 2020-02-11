@@ -1,4 +1,5 @@
 // Copyright 2019 Quip
+import {ReactNode} from "react";
 import ClientBlob from "./blob";
 import Auth from "./auth";
 import Record, {RecordConstructor} from "./record";
@@ -65,7 +66,7 @@ enum QuipIcon {
 
 export interface MenuCommand {
     id: string;
-    label?: string;
+    label?: string | ReactNode[];
     sublabel?: string;
     // TODO: unsure what this type actually is
     handler?: (command: string, params: Object) => void;
