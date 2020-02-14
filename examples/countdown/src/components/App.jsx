@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import quip from "quip";
 import React from "react";
 import moment from "moment";
@@ -22,10 +23,10 @@ const INTERVAL_MS = 200;
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
-        deadline: React.PropTypes.number,
-        color: React.PropTypes.string.isRequired,
-        setRootInstance: React.PropTypes.func.isRequired,
+        rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
+        deadline: PropTypes.number,
+        color: PropTypes.string.isRequired,
+        setRootInstance: PropTypes.func.isRequired,
     };
 
     constructor(props) {

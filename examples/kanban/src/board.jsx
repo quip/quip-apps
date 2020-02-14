@@ -1,11 +1,11 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import AddCard, {kAddCardHeight} from "./add-card.jsx";
 import Card from "./card.jsx";
 import {showCardContextMenu} from "./menus.js";
 import {BoardRecord, entityListener} from "./model.jsx";
 import getClosest from "./getClosest";
-
 import styles from "./board.less";
 
 export const kDefaultColumnWidth = 269; // 800 / 3 columns
@@ -16,9 +16,9 @@ const minDragXYDiff = 15;
 
 class Board extends React.Component {
     static propTypes = {
-        entity: React.PropTypes.instanceOf(BoardRecord).isRequired,
-        onSelectedCardChanged: React.PropTypes.func.isRequired,
-        focusOnMount: React.PropTypes.bool.isRequired,
+        entity: PropTypes.instanceOf(BoardRecord).isRequired,
+        onSelectedCardChanged: PropTypes.func.isRequired,
+        focusOnMount: PropTypes.bool.isRequired,
     };
 
     constructor(props) {
@@ -142,7 +142,8 @@ class Board extends React.Component {
         columnDragging,
         draggingCard,
         dropTargetIndex,
-        isDraggingSomething) {
+        isDraggingSomething
+    ) {
         const {
             selectedCard,
             dragStartX,
@@ -539,7 +540,7 @@ export default entityListener(Board);
 
 class ColumnDropTarget extends React.Component {
     static propTypes = {
-        left: React.PropTypes.number.isRequired,
+        left: PropTypes.number.isRequired,
     };
 
     render() {
@@ -551,9 +552,9 @@ class ColumnDropTarget extends React.Component {
 
 class CardDropTarget extends React.Component {
     static propTypes = {
-        top: React.PropTypes.number.isRequired,
-        left: React.PropTypes.number.isRequired,
-        columnWidth: React.PropTypes.number.isRequired,
+        top: PropTypes.number.isRequired,
+        left: PropTypes.number.isRequired,
+        columnWidth: PropTypes.number.isRequired,
     };
 
     render() {

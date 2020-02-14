@@ -2,11 +2,10 @@
 
 /* eslint react/no-find-dom-node:0 */
 
+import PropTypes from "prop-types";
 import {Motion} from "react-motion";
 import cx from "classnames";
-
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
-
 import {CardRecord, entityListener} from "./model.jsx";
 import {
     animateTo,
@@ -26,21 +25,21 @@ const kPaddingBetweenCards = 12; // 8
 
 class Card extends React.Component {
     static propTypes = {
-        cardDraggableAreaHeight: React.PropTypes.number.isRequired,
-        columnDragging: React.PropTypes.bool.isRequired,
-        dragging: React.PropTypes.bool.isRequired,
-        entity: React.PropTypes.instanceOf(CardRecord).isRequired,
-        focused: React.PropTypes.bool.isRequired,
-        left: React.PropTypes.number.isRequired,
-        onContextMenu: React.PropTypes.func.isRequired,
-        onHeightChanged: React.PropTypes.func.isRequired,
-        onMouseDown: React.PropTypes.func.isRequired,
-        selected: React.PropTypes.bool.isRequired,
-        setFocusedCard: React.PropTypes.func.isRequired,
-        top: React.PropTypes.number.isRequired,
-        columnWidth: React.PropTypes.number.isRequired,
-        isDraggingSomething: React.PropTypes.bool.isRequired,
-        onCardRest: React.PropTypes.func.isRequired,
+        cardDraggableAreaHeight: PropTypes.number.isRequired,
+        columnDragging: PropTypes.bool.isRequired,
+        dragging: PropTypes.bool.isRequired,
+        entity: PropTypes.instanceOf(CardRecord).isRequired,
+        focused: PropTypes.bool.isRequired,
+        left: PropTypes.number.isRequired,
+        onContextMenu: PropTypes.func.isRequired,
+        onHeightChanged: PropTypes.func.isRequired,
+        onMouseDown: PropTypes.func.isRequired,
+        selected: PropTypes.bool.isRequired,
+        setFocusedCard: PropTypes.func.isRequired,
+        top: PropTypes.number.isRequired,
+        columnWidth: PropTypes.number.isRequired,
+        isDraggingSomething: PropTypes.bool.isRequired,
+        onCardRest: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -172,9 +171,7 @@ class Card extends React.Component {
                 };
 
                 if (!isHeader) {
-                    style.boxShadow += `, inset 0px 0px 0px 1px ${
-                        quip.elements.ui.ColorMap[entityColor].VALUE_STROKE
-                    }`;
+                    style.boxShadow += `, inset 0px 0px 0px 1px ${quip.elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
                     style.backgroundColor = selected
                         ? quip.apps.ui.ColorMap[entityColor].VALUE
                         : quip.apps.ui.ColorMap[entityColor].VALUE_LIGHT;

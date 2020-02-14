@@ -1,11 +1,10 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import React from "react";
 import quip from "quip";
 import cx from "classnames";
-
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
-
 import Chevron from "quip-apps-chevron";
 import Styles from "./Option.less";
 
@@ -22,22 +21,21 @@ const Checkmark = ({checked}) => <svg
 </svg>;
 
 Checkmark.propTypes = {
-    checked: React.PropTypes.bool,
+    checked: PropTypes.bool,
 };
 
 export default class Option extends React.Component {
     static propTypes = {
-        color: React.PropTypes.string.isRequired,
-        isLast: React.PropTypes.bool,
-        multiple: React.PropTypes.bool,
-        onDelete: React.PropTypes.func.isRequired,
-        onSelect: React.PropTypes.func.isRequired,
-        record: React.PropTypes.instanceOf(quip.apps.Record).isRequired,
-        selected: React.PropTypes.bool,
-        textRecord: React.PropTypes.instanceOf(quip.apps.RichTextRecord)
-            .isRequired,
-        totalVotes: React.PropTypes.number,
-        votesCount: React.PropTypes.number,
+        color: PropTypes.string.isRequired,
+        isLast: PropTypes.bool,
+        multiple: PropTypes.bool,
+        onDelete: PropTypes.func.isRequired,
+        onSelect: PropTypes.func.isRequired,
+        record: PropTypes.instanceOf(quip.apps.Record).isRequired,
+        selected: PropTypes.bool,
+        textRecord: PropTypes.instanceOf(quip.apps.RichTextRecord).isRequired,
+        totalVotes: PropTypes.number,
+        votesCount: PropTypes.number,
     };
 
     constructor(props) {
@@ -112,31 +110,29 @@ export default class Option extends React.Component {
             ];
         }
         return <div className={Styles.root} ref={node => record.setDom(node)}>
-            {user &&
-                multiple && <div
-                    className={cx(Styles.inputCheckbox, {
-                        [Styles.selected]: selected,
-                    })}
-                    onClick={() => this.selectOption(!selected)}
-                    style={{
-                        backgroundColor: selected
-                            ? quip.apps.ui.ColorMap[color].VALUE
-                            : "",
-                    }}>
-                    {selected && <Checkmark/>}
-                </div>}
+            {user && multiple && <div
+                className={cx(Styles.inputCheckbox, {
+                    [Styles.selected]: selected,
+                })}
+                onClick={() => this.selectOption(!selected)}
+                style={{
+                    backgroundColor: selected
+                        ? quip.apps.ui.ColorMap[color].VALUE
+                        : "",
+                }}>
+                {selected && <Checkmark/>}
+            </div>}
 
-            {user &&
-                !multiple && <div
-                    className={cx(Styles.inputCircle, {
-                        [Styles.selected]: selected,
-                    })}
-                    onClick={() => this.selectOption(!selected)}
-                    style={{
-                        backgroundColor: selected
-                            ? quip.apps.ui.ColorMap[color].VALUE
-                            : "",
-                    }}/>}
+            {user && !multiple && <div
+                className={cx(Styles.inputCircle, {
+                    [Styles.selected]: selected,
+                })}
+                onClick={() => this.selectOption(!selected)}
+                style={{
+                    backgroundColor: selected
+                        ? quip.apps.ui.ColorMap[color].VALUE
+                        : "",
+                }}/>}
 
             <div className={Styles.optionContainer}>
                 <div
@@ -201,9 +197,7 @@ export default class Option extends React.Component {
                     style={{
                         backgroundColor:
                             quip.apps.ui.ColorMap[color].VALUE_LIGHT,
-                        boxShadow: `-1px 0 0 ${
-                            quip.apps.ui.ColorMap[color].VALUE_LIGHT
-                        } inset`,
+                        boxShadow: `-1px 0 0 ${quip.apps.ui.ColorMap[color].VALUE_LIGHT} inset`,
                         right: `${100 - progressPct}%`,
                         borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
                     }}/>

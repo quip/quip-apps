@@ -1,17 +1,17 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
 import quip from "quip";
-
 import Option from "./Option.jsx";
 
 export default class App extends React.Component {
     static propTypes = {
-        color: React.PropTypes.string.isRequired,
+        color: PropTypes.string.isRequired,
          
-        options: React.PropTypes.any.isRequired,
-        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
+        options: PropTypes.any.isRequired,
+        rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
     };
 
     componentDidMount() {

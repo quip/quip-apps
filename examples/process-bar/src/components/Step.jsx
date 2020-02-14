@@ -1,12 +1,11 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import React from "react";
 import quip from "quip";
 import cx from "classnames";
-
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 import {setFocusedStep} from "../menus";
-
 import Styles from "./Step.less";
 import Chevron from "quip-apps-chevron";
 
@@ -15,12 +14,12 @@ const INPUT_HEIGHT = 19;
 
 export default class Step extends React.Component {
     static propTypes = {
-        record: React.PropTypes.instanceOf(quip.apps.RichTextRecord).isRequired,
-        color: React.PropTypes.string.isRequired,
-        width: React.PropTypes.number,
-        onSelected: React.PropTypes.func.isRequired,
-        onDelete: React.PropTypes.func.isRequired,
-        selected: React.PropTypes.bool,
+        record: PropTypes.instanceOf(quip.apps.RichTextRecord).isRequired,
+        color: PropTypes.string.isRequired,
+        width: PropTypes.number,
+        onSelected: PropTypes.func.isRequired,
+        onDelete: PropTypes.func.isRequired,
+        selected: PropTypes.bool,
     };
 
     constructor(props) {

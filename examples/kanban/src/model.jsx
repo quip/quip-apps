@@ -1,6 +1,8 @@
 // Copyright 2017 Quip
 //import quip from "quip";
 
+import PropTypes from "prop-types";
+
 export const kDefaultColumnColors = [
     quip.apps.ui.ColorMap.RED.KEY,
     quip.apps.ui.ColorMap.YELLOW.KEY,
@@ -327,7 +329,7 @@ CardRecord.CONSTRUCTOR_KEY = "kanban-card";
 export function entityListener(WrappedComponent) {
     return class RecordListenerComponent extends React.Component {
         static propTypes = {
-            entity: React.PropTypes.instanceOf(quip.apps.Record),
+            entity: PropTypes.instanceOf(quip.apps.Record),
         };
 
         componentDidMount() {
