@@ -1,9 +1,9 @@
 // Copyright 2019 Quip
 
-import RecordList, {listPropertyType} from "./record-list";
-import RecordIndex from "./record-index";
-import ClientError from "./client-error";
 import Client from "./client";
+import ClientError from "./client-error";
+import RecordIndex from "./record-index";
+import RecordList, {listPropertyType} from "./record-list";
 
 const RECORD_SENTINAL = {};
 export const isRecord = (obj: any): obj is Record =>
@@ -52,7 +52,7 @@ export default abstract class Record {
     public childrenValue: Record[] = [];
     public isHighlightHiddenValue?: boolean;
 
-    protected data_: {[key: string]: any};
+    protected data_: {[key: string]: any} = {};
     static getProperties(): RecordPropertyDefinition {
         return {};
     }
@@ -70,7 +70,6 @@ export default abstract class Record {
         if ("getDefaultProperties" in this.constructor) {
             defaultProps = statics.getDefaultProperties();
         }
-        this.data_ = {};
         for (const key in propTypes) {
             const value = defaultProps[key];
             if (value !== undefined) {
@@ -129,10 +128,7 @@ export default abstract class Record {
     set(key: string, value: any) {
         const statics = this.constructor as typeof Record;
         const propTypes = statics.getProperties();
-        const Type = propTypes[key];
-        if (!Type) {
-            throw new Error(`property ${key} not found.`);
-        }
+        const Type = propTypes[key] || "UNKNOWN";
         if (
             typeof Type !== "string" &&
             "prototype" in Type &&

@@ -1,6 +1,6 @@
 // Copyright 2020 Quip
-import RootRecord from "../root-record";
 import Record from "../record";
+import RootRecord from "../root-record";
 
 enum PropertyType {
     PRIMITIVE = 0,
@@ -21,20 +21,20 @@ interface Snapshot {
 }
 
 function applyRecordSnapshot(record: Record, data: SnapshotNode) {
-    for (let key in data) {
+    const statics = record.constructor as typeof Record;
+    // Don't allow new defaults to exist on old records.
+    // @ts-ignore since we break encapsulation on purpose.
+    record.data_ = {};
+    const properties = statics.getProperties();
+    for (const key in data) {
         const node = data[key];
-        if (node.t === PropertyType.PRIMITIVE) {
-            // Not sure if there's a way to allow deprecation of records and
-            // lists, but for primitives you can just delete the key and it
-            // should still snapshot ok
-            // @ts-ignore since we intentionally violate encapsulation
-            record.data_[key] = node.v;
-        } else if (node.t === PropertyType.RECORD) {
+        const hasType = !!properties[key];
+        if (hasType && node && node.t === PropertyType.RECORD) {
             record.clear(key);
             record.set(key, {});
             const child = record.get(key);
             applyRecordSnapshot(child, node.v);
-        } else if (node.t === PropertyType.RECORD_LIST) {
+        } else if (hasType && node && node.t === PropertyType.RECORD_LIST) {
             record.clear(key);
             record.set(key, []);
             const list = record.get(key);
@@ -45,6 +45,8 @@ function applyRecordSnapshot(record: Record, data: SnapshotNode) {
                     applyRecordSnapshot(child, childData);
                 });
             }
+        } else {
+            record.set(key, node ? node.v : undefined);
         }
     }
 }
