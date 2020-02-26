@@ -1,5 +1,5 @@
 // Copyright 2020 Quip
-import Record from "../record";
+import Record, {RecordPropertyDefinition} from "../record";
 import RootRecord from "../root-record";
 
 enum PropertyType {
@@ -20,12 +20,19 @@ interface Snapshot {
     data: SnapshotNode;
 }
 
-function applyRecordSnapshot(record: Record, data: SnapshotNode) {
+function applyRecordSnapshot(
+    record: Record,
+    data: SnapshotNode,
+    legacyTypes: RecordPropertyDefinition = {}
+) {
     const statics = record.constructor as typeof Record;
     // Don't allow new defaults to exist on old records.
     // @ts-ignore since we break encapsulation on purpose.
     record.data_ = {};
-    const properties = statics.getProperties();
+    const properties: RecordPropertyDefinition = {
+        ...statics.getProperties(),
+        ...legacyTypes,
+    };
     for (const key in data) {
         const node = data[key];
         const hasType = !!properties[key];
@@ -45,7 +52,7 @@ function applyRecordSnapshot(record: Record, data: SnapshotNode) {
                     applyRecordSnapshot(child, childData);
                 });
             }
-        } else {
+        } else if (!node || node.t !== PropertyType.RECORD_LIST) {
             record.set(key, node ? node.v : undefined);
         }
     }
