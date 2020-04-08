@@ -1,20 +1,19 @@
 // Copyright 2017 Quip
 /* @flow */
 
+import PropTypes from "prop-types";
 import quip from "quip";
 import React from "react";
 import cx from "classnames";
-
 import Styles from "./App.less";
-
 import Step from "./Step.jsx";
 
 export default class App extends React.Component {
     static propTypes = {
-        rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
-        steps: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
-        color: React.PropTypes.string.isRequired,
-        selected: React.PropTypes.string,
+        rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
+        steps: PropTypes.instanceOf(quip.apps.RecordList).isRequired,
+        color: PropTypes.string.isRequired,
+        selected: PropTypes.string,
     };
 
     setSelected = record => {

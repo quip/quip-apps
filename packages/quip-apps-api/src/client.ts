@@ -1,12 +1,12 @@
 // Copyright 2019 Quip
 import {ReactNode} from "react";
-import ClientBlob from "./blob";
 import Auth from "./auth";
+import ClientBlob from "./blob";
+import Preferences from "./preferences";
 import Record, {RecordConstructor} from "./record";
 import RecordList from "./record-list";
-import RootRecord from "./root-record";
 import RichTextRecord from "./rich-text-record";
-import Preferences from "./preferences";
+import RootRecord from "./root-record";
 import User from "./user";
 
 export enum ElementsEventType {
@@ -78,7 +78,7 @@ export interface MenuCommand {
     quipIcon?: QuipIcon | MenuIcons;
 }
 
-interface ToolbarState {
+export interface ToolbarState {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[];
     disabledCommandIds?: string[];

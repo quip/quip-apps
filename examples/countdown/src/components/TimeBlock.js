@@ -1,5 +1,7 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
+
 import quip from "quip";
 import React, {Component} from "react";
 import cx from "classnames";
@@ -9,9 +11,9 @@ import Styles from "./TimeBlock.less";
 
 class TimeBlock extends Component {
     static propTypes = {
-        number: React.PropTypes.number,
-        unit: React.PropTypes.string,
-        color: React.PropTypes.string.isRequired,
+        number: PropTypes.number,
+        unit: PropTypes.string,
+        color: PropTypes.string.isRequired,
     };
 
     render() {

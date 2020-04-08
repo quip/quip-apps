@@ -21,6 +21,21 @@ test("Adding a record to a list", t => {
     );
 });
 
+test("Getting all records from a list", t => {
+    t.plan(3);
+    class MyRecord extends Record {}
+    MyRecord.getProperties = () => ({aString: "string"});
+    class List extends RecordList {}
+    const instance = new List(null, MyRecord);
+    instance.add({aString: "bork"});
+    instance.add({aString: "beak"});
+    const records = instance.getRecords();
+    t.equal(records.length, 2);
+    const secondRecord = records[1];
+    t.ok(secondRecord instanceof MyRecord, "item 2 the right type");
+    t.equal(secondRecord.get("aString"), "beak", "item 2 is the right item");
+});
+
 test("Adding a record to a list at an index", t => {
     t.plan(3);
     class MyRecord extends Record {}

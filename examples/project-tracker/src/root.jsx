@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import debounce from "lodash.debounce";
 import shallowEqual from "shallowequal";
 import connectEntity from "./lib/connectEntity";
@@ -22,12 +23,12 @@ import {TableView} from "../../shared/table-view/table-view.jsx";
 
 class Root extends React.Component {
     static propTypes = {
-        record: React.PropTypes.instanceOf(RootRecord).isRequired,
-        columns: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
-        rows: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
-        rowCount: React.PropTypes.number.isRequired,
-        columnCount: React.PropTypes.number.isRequired,
-        widths: React.PropTypes.object.isRequired,
+        record: PropTypes.instanceOf(RootRecord).isRequired,
+        columns: PropTypes.instanceOf(quip.apps.RecordList).isRequired,
+        rows: PropTypes.instanceOf(quip.apps.RecordList).isRequired,
+        rowCount: PropTypes.number.isRequired,
+        columnCount: PropTypes.number.isRequired,
+        widths: PropTypes.object.isRequired,
     };
 
     constructor(props) {
@@ -104,7 +105,9 @@ class Root extends React.Component {
     getMinPersonWidth = id => {
         const record = quip.apps.getRecordById(id);
         const users = record.getCells();
-        const max = Math.max.apply(null, users.map(u => u.getUsers().length));
+        const max = Math.max.apply(
+            null,
+            users.map(u => u.getUsers().length));
         if (max > 4) return 150;
         /* From here we start at 128 (removed the `+N`) and
           subtract (Picture width (30 at time of writing) - negative

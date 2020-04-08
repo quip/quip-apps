@@ -1,5 +1,6 @@
 // Copyright 2017 Quip
 
+import PropTypes from "prop-types";
 import {Motion} from "react-motion";
 import cx from "classnames";
 import AddCardIcon from "./icons/add-card.jsx";
@@ -13,15 +14,15 @@ export const kAddCardHeight = 34;
 
 export default class AddCard extends React.Component {
     static propTypes = {
-        columnRecord: React.PropTypes.instanceOf(ColumnRecord).isRequired,
-        top: React.PropTypes.number.isRequired,
-        left: React.PropTypes.number.isRequired,
-        columnWidth: React.PropTypes.number.isRequired,
-        columnSelected: React.PropTypes.bool.isRequired,
-        columnDragging: React.PropTypes.bool.isRequired,
-        cardDragging: React.PropTypes.bool.isRequired,
-        hidden: React.PropTypes.bool.isRequired,
-        isDraggingSomething: React.PropTypes.bool.isRequired,
+        columnRecord: PropTypes.instanceOf(ColumnRecord).isRequired,
+        top: PropTypes.number.isRequired,
+        left: PropTypes.number.isRequired,
+        columnWidth: PropTypes.number.isRequired,
+        columnSelected: PropTypes.bool.isRequired,
+        columnDragging: PropTypes.bool.isRequired,
+        cardDragging: PropTypes.bool.isRequired,
+        hidden: PropTypes.bool.isRequired,
+        isDraggingSomething: PropTypes.bool.isRequired,
     };
 
     render() {

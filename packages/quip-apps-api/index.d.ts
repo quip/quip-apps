@@ -2,42 +2,43 @@
 
 import Auth_ from "./dist/auth";
 import BaseOAuth_, {
-    HttpResponse as HttpResponse_,
     HttpHeaders as HttpHeaders_,
+    HttpResponse as HttpResponse_,
 } from "./dist/base-oauth";
 import Blob_ from "./dist/blob";
 import CanvasRecord_, {
     CanvasRecordCommentAnchorRecord as CanvasRecordCommentAnchorRecord_,
 } from "./dist/canvas-record";
-import Record_, {
-    RecordConstructor as RecordConstructor_,
-    RecordType as RecordType_,
-    RecordParams as RecordParams_,
-    RecordPropertyDefinition as RecordPropertyDefinition_,
-} from "./dist/record";
+import * as clientExports from "./dist/client";
+import Client_, {
+    BlobWithThumbnails as BlobWithThumbnails_,
+    CreationSource as CreationSource_,
+    DocumentMenuCommands as DocumentMenuCommands_,
+    ElementsEventType as ElementsEventType_,
+    EventType as EventType_,
+    MenuCommand as MenuCommand_,
+    MenuIcons as MenuIcons_,
+    RootEntityConstructor as RootEntityConstructor_,
+    ToolbarState as ToolbarState_,
+} from "./dist/client";
 import ClientError_ from "./dist/client-error";
 import ImageRecord_ from "./dist/image-record";
 import OAuth1_ from "./dist/oauth-1";
 import OAuth2_ from "./dist/oauth-2";
 import Preferences_ from "./dist/preferences";
+import Record_, {
+    RecordConstructor as RecordConstructor_,
+    RecordParams as RecordParams_,
+    RecordPropertyDefinition as RecordPropertyDefinition_,
+    RecordType as RecordType_,
+} from "./dist/record";
 import RecordIndex_ from "./dist/record-index";
-import RootRecord_ from "./dist/root-record";
 import RecordList_ from "./dist/record-list";
-import Client_, {
-    ElementsEventType as ElementsEventType_,
-    BlobWithThumbnails as BlobWithThumbnails_,
-    MenuCommand as MenuCommand_,
-    CreationSource as CreationSource_,
-    DocumentMenuCommands as DocumentMenuCommands_,
-    EventType as EventType_,
-    MenuIcons as MenuIcons_,
-    RootEntityConstructor as RootEntityConstructor_,
-} from "./dist/client";
-import * as clientExports from "./dist/client";
 import RichTextRecord_ from "./dist/rich-text-record";
+import RootRecord_ from "./dist/root-record";
+import * as ui from "./dist/ui";
 import UrlAuth_ from "./dist/url-auth";
 import User_ from "./dist/user";
-import * as ui from "./dist/ui";
 
 declare type QuipAPI = Client_ &
     typeof clientExports & {
@@ -93,6 +94,7 @@ declare namespace quip {
     export type ElementsEventType = ElementsEventType_;
     export type BlobWithThumbnails = BlobWithThumbnails_;
     export type MenuCommand = MenuCommand_;
+    export type ToolbarState = ToolbarState_;
     export type CreationSource = typeof CreationSource_;
     export type DocumentMenuCommands = typeof DocumentMenuCommands_;
     export type EventType = typeof EventType_;
