@@ -38,6 +38,7 @@ interface InitializationParameters {
     isCreation: boolean;
     creationUrl?: string;
     initOptions?: string;
+    initOptionsSource?: string;
     creationBlobs?: Blob[];
     creationSource: string;
 }
