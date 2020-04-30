@@ -9,7 +9,7 @@ import Option from "./Option.jsx";
 export default class App extends React.Component {
     static propTypes = {
         color: PropTypes.string.isRequired,
-         
+        // TODO(elsigh): type for RecordList?
         options: PropTypes.any.isRequired,
         rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
     };
@@ -36,7 +36,7 @@ export default class App extends React.Component {
 
         return <div
             style={{
-                 
+                // TODO(elsigh): fixes being above custom scroller
                 marginBottom: 20,
             }}>
             {options

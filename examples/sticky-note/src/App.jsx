@@ -14,15 +14,12 @@ export default class App extends React.Component {
             boxShadow: "0 2px 5px 5px rgba(0, 0, 0, 0.1)",
             padding: 10,
         };
-        return (
-            <div className={Styles.hello} style={style}>
-                <quip.apps.ui.RichTextBox
-                    record={this.props.richTextRecord}
-                    width={280}
-                    minHeight={280}
-                    maxHeight={280}
-                />
-            </div>
-        );
+        return <div className={Styles.hello} style={style}>
+            <quip.apps.ui.RichTextBox
+                record={this.props.richTextRecord}
+                width={280}
+                minHeight={280}
+                maxHeight={280}/>
+        </div>;
     }
 }

@@ -36,8 +36,7 @@ quip.apps.initialize({
             rootRecord.set("stickyNote", {});
         }
         ReactDOM.render(
-            <App richTextRecord={rootRecord.get("stickyNote")} />,
-            rootNode,
-        );
+            <App richTextRecord={rootRecord.get("stickyNote")}/>,
+            rootNode);
     },
 });

@@ -10,10 +10,7 @@
     "toolbar_color": "green",
     "js_files": ["dist/app.js"],
     "csp_sources": {
-        "frame_srcs": [
-            "https://open.spotify.com",
-            "https://embed.spotify.com"
-        ]
+        "frame_srcs": ["https://open.spotify.com", "https://embed.spotify.com"]
     },
     "intercept_url_patterns": [
         "https://open.spotify.com/track/",

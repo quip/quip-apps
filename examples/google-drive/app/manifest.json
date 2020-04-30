@@ -10,8 +10,6 @@
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"],
     "csp_sources": {
-        "img_srcs": [
-            "https://drive-thirdparty.googleusercontent.com/"
-        ]
+        "img_srcs": ["https://drive-thirdparty.googleusercontent.com/"]
     }
 }

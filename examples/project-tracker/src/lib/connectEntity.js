@@ -1,4 +1,4 @@
- 
+// TODO: replace isV2 parameter with record.getDataVersion() === 2 once that works
 export default (
     record,
     WrappedComponent,

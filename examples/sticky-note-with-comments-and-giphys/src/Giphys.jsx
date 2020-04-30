@@ -59,9 +59,7 @@ export default class Giphys extends React.Component {
         this.setState({loadingGiphy: true});
         const response = await fetch(
             `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(
-                text
-            )}&api_key=${GIPHY_API_KEY}&limit=${GIPHY_LIMIT}&rating=${GIPHY_RATING}`
-        );
+                text)}&api_key=${GIPHY_API_KEY}&limit=${GIPHY_LIMIT}&rating=${GIPHY_RATING}`);
         this.setState({loadingGiphy: false});
         if (!response.ok) {
             console.error("ERROR", {response});
@@ -74,27 +72,19 @@ export default class Giphys extends React.Component {
 
     render() {
         const {giphys, loadingGiphy} = this.state;
-        return (
-            <div className={Styles.giphys}>
-                {loadingGiphy && (
-                    <img
-                        alt="Loading..."
-                        className={Styles.loading}
-                        src={loadingGiphyGif}
-                    />
-                )}
-                {giphys.map(g => (
-                    <img
-                        className={Styles.giphy}
-                        src={g.images.fixed_width.url}
-                        alt={g.title}
-                        title={g.title}
-                        style={{
-                            width: g.images.fixed_width.width,
-                        }}
-                    />
-                ))}
-            </div>
-        );
+        return <div className={Styles.giphys}>
+            {loadingGiphy && <img
+                alt="Loading..."
+                className={Styles.loading}
+                src={loadingGiphyGif}/>}
+            {giphys.map(g => <img
+                className={Styles.giphy}
+                src={g.images.fixed_width.url}
+                alt={g.title}
+                title={g.title}
+                style={{
+                    width: g.images.fixed_width.width,
+                }}/>)}
+        </div>;
     }
 }

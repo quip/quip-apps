@@ -3,45 +3,40 @@ import App from "./App.jsx";
 
 export class Root extends React.Component {
     static propTypes = {
-        auth: React.PropTypes.instanceOf(quip.apps.Auth).isRequired
+        auth: React.PropTypes.instanceOf(quip.apps.Auth).isRequired,
     };
     constructor(props) {
         super(props);
         this.state = {
             isLoggedIn: props.auth.isLoggedIn(),
-            error: null
+            error: null,
         };
     }
     render() {
         const { auth } = this.props;
         const { isLoggedIn, error } = this.state;
-        return (
-            <div>
-                {isLoggedIn && <App auth={auth} forceLogin={this.forceLogin} />}
-                {!isLoggedIn &&
-                    <button onClick={this.onLoginClick}>
-                        Login
-                    </button>}
-                {error && <div>We encountered an error. Please try again</div>}
-            </div>
-        );
+        return <div>
+            {isLoggedIn && <App auth={auth} forceLogin={this.forceLogin}/>}
+            {!isLoggedIn && <button onClick={this.onLoginClick}>Login</button>}
+            {error && <div>We encountered an error. Please try again</div>}
+        </div>;
     }
     onLoginClick = () => {
         this.props.auth
             .login({
                 access_type: "offline",
-                prompt: "consent"
+                prompt: "consent",
             })
             .then(
                 () => {
                     this.setState({
                         isLoggedIn: this.props.auth.isLoggedIn(),
-                        error: null
+                        error: null,
                     });
                 },
                 error => {
                     this.setState({ error });
-                }
+                },
             );
     };
     forceLogin = () => {
@@ -51,6 +46,6 @@ export class Root extends React.Component {
 
 quip.apps.initialize({
     initializationCallback: function(rootNode, params) {
-        ReactDOM.render(<Root auth={quip.apps.auth("gdrive")} />, rootNode);
-    }
+        ReactDOM.render(<Root auth={quip.apps.auth("gdrive")}/>, rootNode);
+    },
 });

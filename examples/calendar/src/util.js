@@ -1,7 +1,7 @@
 // Copyright 2017 Quip
 // @flow
 
- 
+// TODO(elsigh): import here breaks util.test.js - jest complains about module
 // $FlowIssueQuipModule
 // import quip from "quip";
 

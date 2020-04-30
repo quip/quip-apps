@@ -90,34 +90,27 @@ export default class App extends React.Component {
             zIndex = 302;
         }
         console.debug({top, left, width, height, position});
-        return (
-            <div
-                className={Styles.App}
-                style={{top, left, width, height, position, zIndex}}>
-                <div>
-                    {isFullScreen ? (
-                        <quip.apps.ui.Button
-                            onClick={() => console.log("CLICK")}
-                            text="Test click me"
-                        />
-                    ) : (
-                        "Resize Me!"
-                    )}
-                </div>
-                <div className={Styles.goFullScreen}>
+        return <div
+            className={Styles.App}
+            style={{top, left, width, height, position, zIndex}}>
+            <div>
+                {isFullScreen ? (
                     <quip.apps.ui.Button
-                        onClick={this.toggleFullScreen}
-                        text={isFullScreen ? "Minimize" : "Maximize"}
-                    />
-                </div>
-                {!isFullScreen && (
-                    <div
-                        ref={el => (this.verticalHandle = el)}
-                        className={Styles.verticalHandle}
-                        onMouseDown={this.onMouseDown}
-                    />
+                        onClick={() => console.log("CLICK")}
+                        text="Test click me"/>
+                ) : (
+                    "Resize Me!"
                 )}
             </div>
-        );
+            <div className={Styles.goFullScreen}>
+                <quip.apps.ui.Button
+                    onClick={this.toggleFullScreen}
+                    text={isFullScreen ? "Minimize" : "Maximize"}/>
+            </div>
+            {!isFullScreen && <div
+                ref={el => (this.verticalHandle = el)}
+                className={Styles.verticalHandle}
+                onMouseDown={this.onMouseDown}/>}
+        </div>;
     }
 }

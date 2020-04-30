@@ -1,5 +1,0 @@
-# Minimal standalone version of workshop
-
-In this directory run `python -m SimpleHTTPServer`
-
-then visit `localhost:8000` in your browser =)

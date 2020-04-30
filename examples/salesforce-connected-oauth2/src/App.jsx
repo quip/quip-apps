@@ -46,14 +46,12 @@ export default class App extends React.Component {
         const {isLoggedIn} = this.state;
         const fn = !isLoggedIn ? this.login : this.logout;
         const text = !isLoggedIn ? "Log in" : "Log out";
-        return (
+        return <div>
             <div>
-                <div>
-                    <button onClick={fn}>{text}</button>
-                </div>
-                {isLoggedIn && <ApiTest />}
+                <button onClick={fn}>{text}</button>
             </div>
-        );
+            {isLoggedIn && <ApiTest/>}
+        </div>;
     }
 }
 
@@ -89,38 +87,35 @@ class ApiTest extends React.Component {
 
     render() {
         const {endpoint, responseEndpoint, responseJson} = this.state;
-        return (
-            <div style={{marginTop: 20}}>
-                <h2>API Test</h2>
-                <div style={{alignItems: "center", display: "flex"}}>
-                    <div>
-                        <label style={{alignItems: "center", display: "flex"}}>
-                            <div style={{marginRight: 10}}>Endpoint</div>
-                            <input
-                                value={endpoint}
-                                style={{width: 250}}
-                                onChange={e =>
-                                    this.setState({endpoint: e.target.value})}
-                            />
-                        </label>
-                    </div>
-                    <div style={{marginLeft: 20}}>
-                        <button onClick={this.onSubmit}>Submit</button>
-                    </div>
-                </div>
-                <hr style={{margin: "20px 0"}} />
-                <h2>
-                    Response{" "}
-                    {responseEndpoint && <span>from {responseEndpoint}</span>}
-                </h2>
+        return <div style={{marginTop: 20}}>
+            <h2>API Test</h2>
+            <div style={{alignItems: "center", display: "flex"}}>
                 <div>
-                    <textarea
-                        readOnly
-                        value={responseJson}
-                        style={{minWidth: 800, minHeight: 400}}
-                    />
+                    <label style={{alignItems: "center", display: "flex"}}>
+                        <div style={{marginRight: 10}}>Endpoint</div>
+                        <input
+                            value={endpoint}
+                            style={{width: 250}}
+                            onChange={e =>
+                                this.setState({endpoint: e.target.value})
+                            }/>
+                    </label>
+                </div>
+                <div style={{marginLeft: 20}}>
+                    <button onClick={this.onSubmit}>Submit</button>
                 </div>
             </div>
-        );
+            <hr style={{margin: "20px 0"}}/>
+            <h2>
+                Response{" "}
+                {responseEndpoint && <span>from {responseEndpoint}</span>}
+            </h2>
+            <div>
+                <textarea
+                    readOnly
+                    value={responseJson}
+                    style={{minWidth: 800, minHeight: 400}}/>
+            </div>
+        </div>;
     }
 }

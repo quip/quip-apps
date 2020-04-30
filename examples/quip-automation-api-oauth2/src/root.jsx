@@ -27,23 +27,21 @@ export class Root extends React.Component {
         const { auth } = this.props;
         const { isLoggedIn, error } = this.state;
         console.log("state", this.state);
-        return (
-            <div>
-                {isLoggedIn ? (
-                    <div>
-                        <div style={{ padding: "30px 0" }}>
-                            <button onClick={this.onClickTrySomething}>
-                                Get recent threads
-                            </button>
-                        </div>
-                        <button onClick={this.onLogoutClick}>Logout</button>
+        return <div>
+            {isLoggedIn ? (
+                <div>
+                    <div style={{ padding: "30px 0" }}>
+                        <button onClick={this.onClickTrySomething}>
+                            Get recent threads
+                        </button>
                     </div>
-                ) : (
-                    <button onClick={this.onLoginClick}>Login</button>
-                )}
-                {error && <div>We encountered an error. Please try again</div>}
-            </div>
-        );
+                    <button onClick={this.onLogoutClick}>Logout</button>
+                </div>
+            ) : (
+                <button onClick={this.onLoginClick}>Login</button>
+            )}
+            {error && <div>We encountered an error. Please try again</div>}
+        </div>;
     }
     onLoginClick = () => {
         this.props.auth.login().then(
@@ -82,7 +80,7 @@ export class Root extends React.Component {
 quip.apps.initialize({
     initializationCallback: function(rootNode, params) {
         ReactDOM.render(
-            <Root auth={quip.apps.auth("quip-automation-api")} />,
+            <Root auth={quip.apps.auth("quip-automation-api")}/>,
             rootNode,
         );
     },
