@@ -1,36 +1,47 @@
 import arg from "arg";
 import pkg from "../package.json";
+import {init, initArgs} from "./init";
+import {CLIArgs} from "./types";
 
-let args: arg.Result<any> = {_: []};
+const commandMap: {
+    [name: string]: (args: CLIArgs) => void | Promise<void>;
+} = {
+    "init": init,
+};
+
+let args: CLIArgs = {_: []};
 try {
-    args = arg(
-        {
-            // Types
-            "--help": Boolean,
-            "--version": Boolean,
-            "-v": "--version",
-            "--verbose": arg.COUNT, // Counts the number of times --verbose is passed
-            "--port": Number, // --port <number> or --port=<number>
-            "--name": String, // --name <string> or --name=<string>
-            "--tag": [String], // --tag <string> or --tag=<string>
-        },
-        {permissive: false, argv: process.argv.slice(2)}
-    );
+    args = arg({
+        "--help": Boolean,
+        "-h": "--help",
+        "--version": Boolean,
+        "-v": "--version",
+        ...initArgs,
+    });
 } catch (err) {
     if (err.code === "ARG_UNKNOWN_OPTION") {
-        console.log(err.message);
+        console.error(err.message);
+        process.exit(1);
     } else {
         throw err;
     }
 }
 
+const cmdName = args._.length && args._[0];
+const command = commandMap[cmdName];
 if (args["--version"]) {
-    process.stdout.write(pkg.version);
-} else if (args["--help"] || args._.length === 0) {
-    process.stdout.write(`
-quip-cli version ${pkg.version}
+    console.log(pkg.version);
+} else if (args["--help"] || !command) {
+    process.stdout.write(`quip-cli version ${pkg.version}
 usage:
     qla init
-    qla deploy
 `);
+} else {
+    const promise = command(args);
+    if (promise) {
+        promise.catch(err => {
+            console.error(err.message);
+            process.exit(1);
+        });
+    }
 }
