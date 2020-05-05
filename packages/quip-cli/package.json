@@ -1,0 +1,47 @@
+{
+    "name": "quip-cli",
+    "version": "1.0.0-alpha.16",
+    "description": "A Command Line Interface for the Quip Live Apps platform",
+    "main": "dist/qla",
+    "files": [
+        "dist"
+    ],
+    "bin": {
+        "quip-cli": "dist/qla",
+        "qla": "dist/qla"
+    },
+    "scripts": {
+        "build": "./build.sh",
+        "build:watch": "onchange src/**/*.ts -- npm run build",
+        "test": "tape test/**/*.test.js",
+        "test:watch": "npm run build && concurrently 'npm run build:watch' 'tape-watch test/**/*.test.js'",
+        "prepare": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/quip/quip-apps.git"
+    },
+    "keywords": [
+        "quip",
+        "live",
+        "apps"
+    ],
+    "author": "Quip",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/quip/quip-apps/issues"
+    },
+    "homepage": "https://github.com/quip/quip-apps#readme",
+    "devDependencies": {
+        "@types/node": "^13.13.5",
+        "@zeit/ncc": "^0.22.1",
+        "concurrently": "^5.2.0",
+        "onchange": "^7.0.2",
+        "tape": "^5.0.0",
+        "tape-watch": "^2.3.0",
+        "typescript": "^3.8.3"
+    },
+    "dependencies": {
+        "arg": "^4.1.3"
+    }
+}
