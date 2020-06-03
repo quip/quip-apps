@@ -1,7 +1,7 @@
 {
-    "name": "",
+    "name": "quip-cli",
     "version": "1.0.0-alpha.16",
-    "description": "",
+    "description": "A Command Line Interface for the Quip Live Apps platform",
     "main": "dist/qla",
     "files": [
         "dist"
