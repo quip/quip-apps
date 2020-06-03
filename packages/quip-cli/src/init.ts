@@ -1,10 +1,28 @@
 import {Result, Spec} from "arg";
 import inquirer from "inquirer";
 import path from "path";
+import fs from "fs";
+import {ncp} from "ncp";
 
 export const initArgs: Spec = {};
+interface QliInitOptions {
+    name: string;
+    description: string;
+    typescript: boolean;
+    bundler: string;
+    manifest?: Manifest;
+}
 
-export const init = async (args: Result<typeof initArgs>) => {
+interface Manifest {
+    version_name: string;
+    toolbar_color: string;
+    diable_app_level_comments: boolean;
+    sizing_mode: string;
+    initial_width: number;
+    initial_height: number;
+}
+
+const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
     console.log("Creating a new Quip Live App");
     const defaultName = path
         .basename(process.cwd())
@@ -21,7 +39,7 @@ export const init = async (args: Result<typeof initArgs>) => {
             default: defaultName,
         },
     ]);
-    const basics = await inquirer.prompt([
+    const basics: QliInitOptions = await inquirer.prompt([
         {
             type: "input",
             name: "name",
@@ -102,4 +120,56 @@ export const init = async (args: Result<typeof initArgs>) => {
         ]);
         console.log(manifest);
     }
+    return basics;
+};
+
+export const init = async (args: Result<typeof initArgs>) => {
+    // // initial app options from user
+    const basics = await promptInitialAppConfig(args);
+    await copyTemplateToCWD(basics);
+    mangleBoilerplate(basics);
+};
+
+const copyTemplateToCWD = (basics: QliInitOptions) => {
+    const {typescript, bundler, name} = basics;
+    // get lib path
+    const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
+    const templatePath = path.join(__dirname, "../templates", templateName);
+    const options = {
+        dereference: true,
+        filter: (fileName: string) =>
+            fileName.indexOf("node_modules") === -1 &&
+            fileName.indexOf(".git/") === -1,
+    };
+
+    return new Promise((resolve, reject) =>
+        ncp(templatePath, path.join(process.cwd(), name), options, error => {
+            if (error) {
+                console.log(error);
+                reject(error);
+            }
+            resolve();
+        })
+    );
+};
+
+const mangleBoilerplate = (basics: QliInitOptions) => {
+    const {name, description, manifest} = basics;
+    const packagePath = path.join(process.cwd(), name, "package.json");
+    mangleJsonConfig(packagePath, {name, description});
+    const manifestPath = path.join(process.cwd(), name, "manifest.json");
+    const updates = manifest
+        ? {name, description, ...manifest}
+        : {name, description};
+    mangleJsonConfig(manifestPath, updates);
+};
+
+const mangleJsonConfig = (
+    configPath: string,
+    updates: {[key: string]: string | number | boolean}
+) => {
+    const configStr = fs.readFileSync(configPath);
+    const config = JSON.parse(configStr.toString());
+    Object.assign(config, updates);
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 };

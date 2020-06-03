@@ -2,11 +2,13 @@ import arg from "arg";
 import pkg from "../package.json";
 import {init, initArgs} from "./init";
 import {CLIArgs} from "./types";
+import {publish} from "./publish";
 
 const commandMap: {
     [name: string]: (args: CLIArgs) => void | Promise<void>;
 } = {
     "init": init,
+    "publish": publish,
 };
 
 let args: CLIArgs = {_: []};
@@ -34,7 +36,16 @@ if (args["--version"]) {
 } else if (args["--help"] || !command) {
     process.stdout.write(`quip-cli version ${pkg.version}
 usage:
-    qla init
+    qla <command>
+
+commands:
+    init
+    publish
+
+options:
+    -h, --help      Show this message
+    -v, --version   Show package version
+
 `);
 } else {
     const promise = command(args);
