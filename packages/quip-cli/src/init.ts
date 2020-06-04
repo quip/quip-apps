@@ -5,21 +5,22 @@ import fs from "fs";
 import {ncp} from "ncp";
 
 export const initArgs: Spec = {};
-interface QliInitOptions {
+interface PackageOptions {
     name: string;
     description: string;
     typescript: boolean;
     bundler: string;
-    manifest?: Manifest;
 }
 
-interface Manifest {
-    version_name: string;
-    toolbar_color: string;
-    diable_app_level_comments: boolean;
-    sizing_mode: string;
-    initial_width: number;
-    initial_height: number;
+interface ManifestOptions {
+    name: string;
+    description?: string;
+    version_name?: string;
+    toolbar_color?: string;
+    diable_app_level_comments?: boolean;
+    sizing_mode?: string;
+    initial_width?: number;
+    initial_height?: number;
 }
 
 const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
@@ -30,21 +31,22 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
         .replace(/(:?^|\s)(\w)/g, c => c.toUpperCase());
     const validateNumber: (input: any) => true | string = val =>
         !isNaN(parseInt(val, 10)) || "Please enter a number";
-    const name = await inquirer.prompt([
+    const manifestOptions: ManifestOptions = await inquirer.prompt([
         {
             type: "input",
-            name: "manifest_name",
+            name: "name",
             message:
                 "What is the name of this app?\n(This is what users will see when inserting your app)\n",
             default: defaultName,
         },
     ]);
-    const basics: QliInitOptions = await inquirer.prompt([
+
+    const packageOptions: PackageOptions = await inquirer.prompt([
         {
             type: "input",
             name: "name",
             message: "Choose a package name",
-            default: name.manifest_name.toLowerCase().replace(/\s+/g, "-"),
+            default: manifestOptions.name.toLowerCase().replace(/\s+/g, "-"),
             filter: val => val.toLowerCase(),
         },
         {
@@ -64,18 +66,22 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
             message: "Which bundler do you want to use?",
             choices: ["parcel", "webpack"],
         },
+    ]);
+
+    const {addManifestConfig} = await inquirer.prompt([
         {
             type: "confirm",
-            name: "manifest",
+            name: "addManifestConfig",
             message:
                 "Would you like to customize your manifest.json now?\n(see: https://corp.quip.com/dev/liveapps/documentation#app-manifest)\n",
             default: true,
         },
     ]);
-    if (basics.manifest) {
-        const manifest = await inquirer.prompt([
+
+    if (addManifestConfig) {
+        const extraManifestOptions = await inquirer.prompt([
             {
-                type: "number",
+                type: "string",
                 name: "version_name",
                 message: "Choose an initial version string",
                 default: "1.0.0-alpha.0",
@@ -104,7 +110,7 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
                 name: "initial_height",
                 message:
                     "Specify an initial height for your app\nThis will be the height of the app while it is loading.\n",
-                default: 200,
+                default: 300,
                 validate: validateNumber,
                 filter: Number,
             },
@@ -118,20 +124,31 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
                 filter: val => (val === "none" ? -1 : val),
             },
         ]);
-        console.log(manifest);
+        Object.assign(manifestOptions, extraManifestOptions);
     }
-    return basics;
+
+    console.log(packageOptions);
+    console.log(manifestOptions);
+
+    manifestOptions.description = packageOptions.description;
+    return {packageOptions, manifestOptions};
 };
 
 export const init = async (args: Result<typeof initArgs>) => {
     // // initial app options from user
-    const basics = await promptInitialAppConfig(args);
-    await copyTemplateToCWD(basics);
-    mangleBoilerplate(basics);
+    const {packageOptions, manifestOptions} = await promptInitialAppConfig(
+        args
+    );
+    await copyTemplateToCWD(packageOptions);
+    mangleBoilerplate(packageOptions, manifestOptions);
+
+    console.log(
+        `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
+    );
 };
 
-const copyTemplateToCWD = (basics: QliInitOptions) => {
-    const {typescript, bundler, name} = basics;
+const copyTemplateToCWD = (packageOptions: PackageOptions) => {
+    const {typescript, bundler, name} = packageOptions;
     // get lib path
     const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
     const templatePath = path.join(__dirname, "../templates", templateName);
@@ -153,23 +170,22 @@ const copyTemplateToCWD = (basics: QliInitOptions) => {
     );
 };
 
-const mangleBoilerplate = (basics: QliInitOptions) => {
-    const {name, description, manifest} = basics;
+const mangleBoilerplate = (
+    packageOptions: PackageOptions,
+    manifestOptions: ManifestOptions
+) => {
+    const {name, description} = packageOptions;
     const packagePath = path.join(process.cwd(), name, "package.json");
     mangleJsonConfig(packagePath, {name, description});
     const manifestPath = path.join(process.cwd(), name, "manifest.json");
-    const updates = manifest
-        ? {name, description, ...manifest}
-        : {name, description};
-    mangleJsonConfig(manifestPath, updates);
+    mangleJsonConfig(manifestPath, manifestOptions);
 };
 
 const mangleJsonConfig = (
     configPath: string,
-    updates: {[key: string]: string | number | boolean}
+    updates: PackageOptions | ManifestOptions
 ) => {
-    const configStr = fs.readFileSync(configPath);
-    const config = JSON.parse(configStr.toString());
+    const config = JSON.parse(fs.readFileSync(configPath).toString());
     Object.assign(config, updates);
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 };
