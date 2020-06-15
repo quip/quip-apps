@@ -81,7 +81,7 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
     if (addManifestConfig) {
         const extraManifestOptions = await inquirer.prompt([
             {
-                type: "string",
+                type: "input",
                 name: "version_name",
                 message: "Choose an initial version string",
                 default: "1.0.0-alpha.0",

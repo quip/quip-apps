@@ -2,13 +2,16 @@ import arg from "arg";
 import pkg from "../package.json";
 import {init, initArgs} from "./init";
 import {CLIArgs} from "./types";
-import {publish} from "./publish";
+import {login, publish, version, whoami} from "./commands";
 
 const commandMap: {
     [name: string]: (args: CLIArgs) => void | Promise<void>;
 } = {
     "init": init,
+    "login": login,
     "publish": publish,
+    "version": version,
+    "whoami": whoami,
 };
 
 let args: CLIArgs = {_: []};
@@ -39,8 +42,11 @@ usage:
     qla <command>
 
 commands:
-    init
-    publish
+    init           Initialize a new Live App Project
+    login          Authenticate to your Quip team site
+    publish        Publish Live App to Quip
+    version        Update this Live App version
+    whoami         Display your Quip username
 
 options:
     -h, --help      Show this message
