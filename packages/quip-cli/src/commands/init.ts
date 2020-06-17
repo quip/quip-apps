@@ -1,10 +1,10 @@
-import {Result, Spec} from "arg";
+import {Command, flags} from "@oclif/command";
+
 import inquirer from "inquirer";
 import path from "path";
 import fs from "fs";
 import {ncp} from "ncp";
 
-export const initArgs: Spec = {};
 interface PackageOptions {
     name: string;
     description: string;
@@ -23,7 +23,7 @@ interface ManifestOptions {
     initial_height?: number;
 }
 
-const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
+const promptInitialAppConfig = async () => {
     console.log("Creating a new Quip Live App");
     const defaultName = path
         .basename(process.cwd())
@@ -134,24 +134,11 @@ const promptInitialAppConfig = async (args: Result<typeof initArgs>) => {
     return {packageOptions, manifestOptions};
 };
 
-export const init = async (args: Result<typeof initArgs>) => {
-    // // initial app options from user
-    const {packageOptions, manifestOptions} = await promptInitialAppConfig(
-        args
-    );
-    await copyTemplateToCWD(packageOptions);
-    mangleBoilerplate(packageOptions, manifestOptions);
-
-    console.log(
-        `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
-    );
-};
-
 const copyTemplateToCWD = (packageOptions: PackageOptions) => {
     const {typescript, bundler, name} = packageOptions;
     // get lib path
     const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
-    const templatePath = path.join(__dirname, "../templates", templateName);
+    const templatePath = path.join(__dirname, "../../templates", templateName);
     const options = {
         dereference: true,
         filter: (fileName: string) =>
@@ -189,3 +176,27 @@ const mangleJsonConfig = (
     Object.assign(config, updates);
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 };
+
+const init = async () => {
+    // // initial app options from user
+    const {packageOptions, manifestOptions} = await promptInitialAppConfig();
+    await copyTemplateToCWD(packageOptions);
+    mangleBoilerplate(packageOptions, manifestOptions);
+
+    console.log(
+        `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
+    );
+};
+
+export default class Init extends Command {
+    static description = "Initialize a new Live App Project";
+
+    static flags = {
+        help: flags.help({char: "h"}),
+    };
+
+    async run() {
+        this.parse(Init);
+        init();
+    }
+}

@@ -1,23 +1,24 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-.DS_Store
-
 # Coverage directory used by tools like istanbul
-coverage
-
-# nyc test coverage
-.nyc_output
-
 # Dependency directories
-node_modules
-
-# Optional npm cache directory
-.npm
-
+# Logs
 # Optional REPL history
-.node_repl_history
-
+# Optional npm cache directory
+# nyc test coverage
 # typescript
+*-debug.log
+*-error.log
+*.log
+.DS_Store
+.node_repl_history
+.npm
+.nyc_output
+/.nyc_output
+/dist
+/lib
+/tmp
+/yarn.lock
+coverage
 dist
+logs
+node_modules
+npm-debug.log*
