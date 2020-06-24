@@ -9,24 +9,6 @@ import RichTextRecord from "./rich-text-record";
 import RootRecord from "./root-record";
 import User from "./user";
 
-export enum ElementsEventType {
-    ELEMENT_BLUR = "BLUR",
-    BLUR = "BLUR",
-    DOCUMENT_THEME_UPDATE = "DOCUMENT_THEME_UPDATE",
-    CONTAINER_SIZE_UPDATE = "CONTAINER_SIZE_UPDATE",
-    WINDOW_SIZE_UPDATE = "WINDOW_SIZE_UPDATE",
-    DOCUMENT_SIZE_UPDATE = "DOCUMENT_SIZE_UPDATE",
-    USER_PREFERENCE_UPDATE = "USER_PREFERENCE_UPDATE",
-    SITE_PREFERENCE_UPDATE = "SITE_PREFERENCE_UPDATE",
-    ELEMENT_FOCUS = "FOCUS",
-    FOCUS = "FOCUS",
-    DOCUMENT_MEMBERS_LOADED = "DOCUMENT_MEMBERS_LOADED",
-    WHITELISTED_USERS_LOADED = "WHITELISTED_USERS_LOADED",
-    DOCUMENT_EDITABLE_CHANGED = "DOCUMENT_EDITABLE_CHANGED",
-    ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
-    WIDTH_UPDATE = "WIDTH_UPDATE",
-}
-
 interface ResizingOptions {
     minWidth?: number;
     minHeight?: number;
@@ -132,6 +114,7 @@ export enum EventType {
     DOCUMENT_EDITABLE_CHANGED = "DOCUMENT_EDITABLE_CHANGED",
     ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
     WIDTH_UPDATE = "WIDTH_UPDATE",
+    THREAD_MEMBERSHIP_CHANGED = "THREAD_MEMBERSHIP_CHANGED",
 }
 
 export enum MenuIcons {
@@ -182,6 +165,7 @@ export default class Client {
     public isApiVersionAtLeastValue: boolean = true;
     public isAppFocusedValue: boolean = true;
     public isDocumentEditableValue: boolean = true;
+    public isThreadMemberValue: boolean = true;
     public isElementFocusedValue: boolean = true;
     public isExplorerTemplateValue: boolean = false;
     public isIOsValue: boolean = false;
@@ -240,10 +224,7 @@ export default class Client {
 
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
-    addEventListener(
-        type: ElementsEventType | EventType,
-        listener: () => void
-    ) {}
+    addEventListener(type: EventType, listener: () => void) {}
     addWhitelistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];
@@ -357,6 +338,9 @@ export default class Client {
     isDocumentEditable() {
         return this.isDocumentEditableValue;
     }
+    isThreadMember() {
+        return this.isThreadMemberValue;
+    }
     isElementFocused() {
         return this.isElementFocusedValue;
     }
@@ -416,10 +400,7 @@ export default class Client {
     registerEmbeddedIframe(node: Node) {}
     removeDetachedNode(node: Node) {}
     removeDraggableNode(node: Node) {}
-    removeEventListener(
-        type: ElementsEventType | EventType,
-        listener: () => void
-    ) {}
+    removeEventListener(type: EventType, listener: () => void) {}
     searchPeople(searchString: string, callback: (users: User[]) => void) {
         callback(this.peopleToSearchForValue);
     }

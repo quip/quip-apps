@@ -14,7 +14,6 @@ import Client_, {
     BlobWithThumbnails as BlobWithThumbnails_,
     CreationSource as CreationSource_,
     DocumentMenuCommands as DocumentMenuCommands_,
-    ElementsEventType as ElementsEventType_,
     EventType as EventType_,
     MenuCommand as MenuCommand_,
     MenuIcons as MenuIcons_,
@@ -91,7 +90,6 @@ declare namespace quip {
     export type HttpResponse<T = Object> = HttpResponse_<T>;
     export type HttpHeaders = HttpHeaders_;
     export type CanvasRecordCommentAnchorRecord = CanvasRecordCommentAnchorRecord_;
-    export type ElementsEventType = ElementsEventType_;
     export type BlobWithThumbnails = BlobWithThumbnails_;
     export type MenuCommand = MenuCommand_;
     export type ToolbarState = ToolbarState_;

@@ -1,6 +1,6 @@
 // Copyright 2019 Quip
 
-import Client, {ElementsEventType} from "./client";
+import Client, {EventType} from "./client";
 
 enum PreferenceType {
     USER = 0,
@@ -11,7 +11,7 @@ export default class Preferences {
     constructor(
         client?: Client,
         preferenceType?: PreferenceType,
-        eventType?: ElementsEventType,
+        eventType?: EventType,
         rateLimiter?: any, // RateLimiter,
         sizeLimit?: {entries: number; size: number}
     ) {}
