@@ -8,8 +8,8 @@ import copy
 import fnmatch
 import json
 import logging
-import re
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -144,6 +144,7 @@ def read_manifest():
 def warn_missing_paths(manifest, written_paths, app_dir):
     js_filenames = set(manifest.get("js_files", []))
     css_filenames = set(manifest.get("css_files", []))
+    migrations = migration_paths(manifest)
     missing = False
     for js_filename in js_filenames:
         if not js_filename in written_paths:
@@ -155,8 +156,17 @@ def warn_missing_paths(manifest, written_paths, app_dir):
             logging.error(
                 "Could not find css_file: '%s' in %s" % (css_filename, app_dir))
             missing = True
+    for migration in migrations:
+        if not migration in written_paths:
+            logging.error(
+                "Could not find migration: '%s' in %s" % (migration, app_dir))
+            missing = True
     return missing
 
+def migration_paths(manifest):
+    return set([
+        os.path.normpath(m["js_file"]) for m in manifest.get("migrations", [])
+    ])
 
 def is_enumerated_path(manifest, path):
     old_resources = manifest.get("resources", [])
@@ -171,6 +181,7 @@ def is_enumerated_path(manifest, path):
         resource_patterns.append(thumbnail)
     js_filenames = set(manifest.get("js_files", []))
     css_filenames = set(manifest.get("css_files", []))
+    migrations = migration_paths(manifest)
 
     def matches_resource_pattern(resource_patterns, path):
         for pattern in resource_patterns:
@@ -180,6 +191,7 @@ def is_enumerated_path(manifest, path):
     return path == "manifest.json" or \
         path in js_filenames or \
         path in css_filenames or \
+        path in migrations or \
         matches_resource_pattern(resource_patterns, path)
 
 
