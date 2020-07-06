@@ -123,7 +123,7 @@ Inside that directory, you can run several commands:
     Starts the development server (for Use Local Resources mode).
 
   {2} run build
-    Builds and packages your {0}/app/app.ele for upload to production.
+    Builds and packages your app.ele for upload to production.
 
 Quip Live Apps Getting Started Guide:
 https://quip.com/dev/liveapps
@@ -213,6 +213,13 @@ def create_package(app_dir, package_path=None):
         return
     if not package_path:
         package_path = os.path.basename(os.path.abspath(app_dir)) + ".ele"
+    # make sure the package_path exists even if its in a non-existent subdir
+    package_dir = os.path.dirname(package_path)
+    try:
+        os.makedirs(package_dir)
+    except OSError:
+        if not os.path.isdir(package_dir):
+            raise
     os.chdir(app_dir)
     manifest = read_manifest()
     written_paths = set()
