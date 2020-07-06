@@ -36,8 +36,9 @@ def check_environment(yarn_or_npm):
     def check_min_major_version(command, min_version):
         version_re = re.compile("^v?(\d+)\.\d+\.\d+")
         try:
-            installed_version = subprocess.check_output(
-                "%s --version" % command, shell=True)
+            installed_version = subprocess.check_output("%s --version" %
+                                                        command,
+                                                        shell=True)
         except:
             return False
         if installed_version:
@@ -47,6 +48,7 @@ def check_environment(yarn_or_npm):
                 if major_version >= min_version:
                     return True
         return False
+
     min_npm = 3
     min_node = 6
     if yarn_or_npm == "npm":
@@ -63,8 +65,10 @@ def init_app(app_dir_name):
     yarn_or_npm = "npm"
     try:
         FNULL = open(os.devnull, 'w')
-        subprocess.check_call("%s --version" % yarn_or_npm, shell=True,
-                              stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.check_call("%s --version" % yarn_or_npm,
+                              shell=True,
+                              stdout=FNULL,
+                              stderr=subprocess.STDOUT)
     except:
         yarn_or_npm = "yarn"
 
@@ -80,7 +84,8 @@ def init_app(app_dir_name):
 
     logging.info("Creating a new Quip App in %s\n", app_dir)
     lib_path = os.path.dirname(os.path.realpath(__file__))
-    shutil.copytree(os.path.join(lib_path, "template"), app_dir,
+    shutil.copytree(os.path.join(lib_path, "template"),
+                    app_dir,
                     ignore=shutil.ignore_patterns("*node_modules*", "*dist*"))
 
     def replace_placeholders(file_path):
@@ -89,11 +94,11 @@ def init_app(app_dir_name):
             f.seek(0)
             f.write(content.replace("$APP_DIR_NAME", app_dir_name))
             f.truncate()
+
     for file_path in ["app/manifest.json", "package.json"]:
         replace_placeholders(file_path)
 
     installed_packages = False
-
 
     try:
         logging.info(
@@ -148,25 +153,27 @@ def warn_missing_paths(manifest, written_paths, app_dir):
     missing = False
     for js_filename in js_filenames:
         if not js_filename in written_paths:
-            logging.error(
-                "Could not find js_file: '%s' in %s" % (js_filename, app_dir))
+            logging.error("Could not find js_file: '%s' in %s" %
+                          (js_filename, app_dir))
             missing = True
     for css_filename in css_filenames:
         if not css_filename in written_paths:
-            logging.error(
-                "Could not find css_file: '%s' in %s" % (css_filename, app_dir))
+            logging.error("Could not find css_file: '%s' in %s" %
+                          (css_filename, app_dir))
             missing = True
     for migration in migrations:
         if not migration in written_paths:
-            logging.error(
-                "Could not find migration: '%s' in %s" % (migration, app_dir))
+            logging.error("Could not find migration: '%s' in %s" %
+                          (migration, app_dir))
             missing = True
     return missing
+
 
 def migration_paths(manifest):
     return set([
         os.path.normpath(m["js_file"]) for m in manifest.get("migrations", [])
     ])
+
 
 def is_enumerated_path(manifest, path):
     old_resources = manifest.get("resources", [])
@@ -199,7 +206,8 @@ def is_enumerated_path(manifest, path):
 # manifest.json.
 def is_map_path(manifest, path):
     def is_map(manifest, path, suffix):
-        return path.endswith(suffix) and is_enumerated_path(manifest, path[:-4])
+        return path.endswith(suffix) and is_enumerated_path(
+            manifest, path[:-4])
     return is_map(manifest, path, ".js.map") or \
         is_map(manifest, path, ".css.map")
 
