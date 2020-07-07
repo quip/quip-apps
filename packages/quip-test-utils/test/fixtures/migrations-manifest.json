@@ -1,0 +1,14 @@
+{
+    "id": "example-id",
+    "manifest_version": 1,
+    "name": "Test",
+    "description": "test",
+    "version_name": "1.0.0",
+    "version_number": 50,
+    "migrations": [
+        {
+            "version_number": 42,
+            "js_file": "test/fixtures/example-migration.js"
+        }
+    ]
+}
