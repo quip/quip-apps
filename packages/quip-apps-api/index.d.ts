@@ -33,6 +33,9 @@ import Record_, {
 } from "./dist/record";
 import RecordIndex_ from "./dist/record-index";
 import RecordList_ from "./dist/record-list";
+import registerMigration, {
+    MigrationFn as MigrationFn_,
+} from "./dist/register-migration";
 import RichTextRecord_ from "./dist/rich-text-record";
 import RootRecord_ from "./dist/root-record";
 import * as ui from "./dist/ui";
@@ -58,6 +61,7 @@ declare type QuipAPI = Client_ &
         UrlAuth: typeof UrlAuth_;
         User: typeof User_;
         ui: typeof ui;
+        registerMigration: typeof registerMigration;
     };
 
 declare const quip: {
@@ -102,4 +106,5 @@ declare namespace quip {
     export type RecordParams = RecordParams_;
     export type RecordPropertyDefinition = RecordPropertyDefinition_;
     export type RecordType = RecordType_;
+    export type MigrationFn = MigrationFn_;
 }

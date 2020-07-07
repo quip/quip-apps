@@ -4,22 +4,21 @@ import Auth_ from "./auth";
 import BaseOAuth_ from "./base-oauth";
 import Blob_ from "./blob";
 import CanvasRecord_ from "./canvas-record";
-import Record_ from "./record";
+import Client_, * as clientExports from "./client";
 import ClientError_ from "./client-error";
 import ImageRecord_ from "./image-record";
 import OAuth1_ from "./oauth-1";
 import OAuth2_ from "./oauth-2";
 import Preferences_ from "./preferences";
+import Record_ from "./record";
 import RecordIndex_ from "./record-index";
-import RootRecord_ from "./root-record";
 import RecordList_ from "./record-list";
-import Client_ from "./client";
-import * as clientExports from "./client";
+import registerMigration from "./register-migration";
 import RichTextRecord_ from "./rich-text-record";
+import RootRecord_ from "./root-record";
+import * as ui from "./ui";
 import UrlAuth_ from "./url-auth";
 import User_ from "./user";
-import * as ui from "./ui";
-import applySnapshot from "./test-utils/apply-snapshot";
 
 const client = new Client_("", "", "");
 const api = Object.assign(client, clientExports, {
@@ -45,13 +44,11 @@ const api = Object.assign(client, clientExports, {
     UrlAuth: UrlAuth_,
     User: User_,
     ui,
+    registerMigration,
 });
 
 const quip = {
     apps: api,
     elements: api,
-    testUtils: {
-        applySnapshot,
-    },
 };
 export = quip;
