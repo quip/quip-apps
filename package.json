@@ -11,7 +11,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npx lerna bootstrap && npx lerna exec -- npm run build --if-present && npx lerna run test"
+      "pre-push": "npm run test"
     }
   },
   "devDependencies": {
@@ -25,6 +25,7 @@
   "scripts": {
     "build": "lerna run build",
     "release": "lerna run build && lerna publish",
-    "release:next": "lerna run build && lerna publish prerelease --dist-tag next"
+    "release:next": "lerna run build && lerna publish prerelease --dist-tag next",
+    "test": "lerna bootstrap && lerna exec -- npm run build --if-present && lerna run test"
   }
 }
