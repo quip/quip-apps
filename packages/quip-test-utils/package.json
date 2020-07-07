@@ -1,0 +1,29 @@
+{
+    "name": "quip-test-utils",
+    "version": "1.0.0-alpha.21",
+    "description": "Quip Live Apps Test Utilities",
+    "main": "dist/test-utils.js",
+    "scripts": {
+        "build": "tsc",
+        "test": "npm run build && tape test/**/*.test.js",
+        "prepublishOnly": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/quip/quip-apps.git"
+    },
+    "author": "Quip",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/quip/quip-apps/issues"
+    },
+    "homepage": "https://github.com/quip/quip-apps#readme",
+    "devDependencies": {
+        "react": "^16.13.1",
+        "tape": "^4.11.0",
+        "typescript": "^3.6.3"
+    },
+    "dependencies": {
+        "quip-apps-api": "^1.0.0-alpha.20"
+    }
+}
