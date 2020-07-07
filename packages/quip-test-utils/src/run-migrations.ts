@@ -33,7 +33,6 @@ export default async function runMigrations(
             }
             return mA.version_number < mB.version_number ? -1 : 1;
         });
-    console.log("needed:", neededMigrations, manifest.migrations);
     const migrationJs = await Promise.all(
         neededMigrations.map(m =>
             fs.promises.readFile(path.join(process.cwd(), m.js_file), "utf-8")
@@ -47,7 +46,6 @@ export default async function runMigrations(
         remainingMigrations.push(migrate());
     };
     migrationJs.forEach(js => {
-        console.log(js);
         const migration = new Function("quip", js);
         migration(quip);
     });
