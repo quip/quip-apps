@@ -1,0 +1,10 @@
+.root {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.root .highlight {
+    background-color: aquamarine;
+}
