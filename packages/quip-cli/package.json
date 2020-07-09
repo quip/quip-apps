@@ -1,64 +1,67 @@
 {
-  "name": "quip-cli",
-  "description": "A Command Line Interface for the Quip Live Apps platform",
-  "version": "1.0.0-alpha.16",
-  "author": "Quip",
-  "bin": {
-    "quip-cli": "./bin/run",
-    "qla": "./bin/run"
-  },
-  "bugs": "https://github.com/quip/quip-apps/issues",
-  "dependencies": {
-    "@oclif/command": "^1.6.1",
-    "@oclif/config": "^1.15.1",
-    "@oclif/plugin-help": "^3.1.0",
-    "inquirer": "^7.2.0",
-    "ncp": "^2.0.0",
-    "tslib": "^1.13.0"
-  },
-  "devDependencies": {
-    "@oclif/dev-cli": "^1.22.2",
-    "@types/inquirer": "^6.5.0",
-    "@types/node": "^10.17.26",
-    "@types/ncp": "^2.0.4",
-    "globby": "^10.0.2",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.5"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/quip/quip-apps#readme",
-  "keywords": [
-    "oclif",
-    "quip",
-    "live",
-    "apps"
-  ],
-  "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "qla",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/quip/quip-apps.git"
-  },
-  "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "echo NO TESTS",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "types": "lib/index.d.ts"
+    "name": "quip-cli",
+    "description": "A Command Line Interface for the Quip Live Apps platform",
+    "version": "1.0.0-alpha.16",
+    "author": "Quip",
+    "bin": {
+        "quip-cli": "./bin/run",
+        "qla": "./bin/run"
+    },
+    "bugs": "https://github.com/quip/quip-apps/issues",
+    "dependencies": {
+        "@oclif/command": "^1.6.1",
+        "@oclif/config": "^1.15.1",
+        "@oclif/plugin-help": "^3.1.0",
+        "inquirer": "^7.2.0",
+        "mkdirp": "^1.0.4",
+        "ncp": "^2.0.0",
+        "prettier": "^2.0.5",
+        "tslib": "^1.13.0"
+    },
+    "devDependencies": {
+        "@oclif/dev-cli": "^1.22.2",
+        "@types/inquirer": "^6.5.0",
+        "@types/mkdirp": "^1.0.1",
+        "@types/ncp": "^2.0.4",
+        "@types/node": "^10.17.26",
+        "@types/prettier": "^2.0.2",
+        "globby": "^10.0.2",
+        "ts-node": "^8.10.2",
+        "typescript": "^3.9.5"
+    },
+    "engines": {
+        "node": ">=8.0.0"
+    },
+    "files": [
+        "/bin",
+        "/lib",
+        "/npm-shrinkwrap.json",
+        "/oclif.manifest.json"
+    ],
+    "homepage": "https://github.com/quip/quip-apps#readme",
+    "keywords": [
+        "oclif",
+        "quip",
+        "live",
+        "apps"
+    ],
+    "license": "Apache-2.0",
+    "main": "lib/index.js",
+    "oclif": {
+        "commands": "./lib/commands",
+        "bin": "qla",
+        "plugins": [
+            "@oclif/plugin-help"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/quip/quip-apps.git"
+    },
+    "scripts": {
+        "postpack": "rm -f oclif.manifest.json",
+        "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+        "test": "echo NO TESTS",
+        "version": "oclif-dev readme && git add README.md"
+    }
 }
