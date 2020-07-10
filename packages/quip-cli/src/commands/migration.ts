@@ -25,11 +25,6 @@ export default class Migration extends Command {
             description:
                 "The version to generate this migration for. By default, it will use the current version_number in the manifest",
         }),
-        typescript: flags.boolean({
-            char: "t",
-            hidden: true,
-            description: "Generate a .ts file instead of a .js file",
-        }),
         ["dry-run"]: flags.boolean({
             char: "d",
             hidden: true,
@@ -47,7 +42,9 @@ export default class Migration extends Command {
     ];
 
     private getMigrationName_(name?: string): string {
-        const desc = name ? `_${name.replace(/[^\w\d_-]/g, "_")}` : "_01";
+        const desc = name
+            ? `_${name.replace(/[^\w\d_-]/g, "_").toLowerCase()}`
+            : "_01";
         const migrationDate = new Date()
             .toISOString()
             .substring(0, 10)
@@ -89,7 +86,7 @@ export default class Migration extends Command {
         } else {
             ops.push(() => mkdirp(migrationsFolder));
         }
-        const extension = flags.typescript ? ".ts" : ".js";
+        const extension = ".js";
         let name = this.getMigrationName_(args.name);
         let migrationPath = path.join(migrationsFolder, name + extension);
         while (await pathExists(migrationPath)) {

@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`qla migration running with a file name verify manifest 1`] = `
+Object {
+  "description": "test",
+  "id": "no-id",
+  "manifest_version": 1,
+  "name": "Test",
+  "toolbar_color": "blue",
+  "toolbar_icon": "poll",
+  "version_name": "1.0",
+  "version_number": 1,
+}
+`;
+
 exports[`qla migration running with no arguments creates a migration with today's date 2`] = `
 "quip.apps.registerMigration(rootRecord => {
     // Write your migration code here
@@ -11,17 +24,30 @@ exports[`qla migration running with no arguments creates a migration with today'
 exports[`qla migration running with no arguments increments the migration number when adding another 1`] = `
 Array [
   Object {
-    "js_file": "migrations/20200710_01.js",
+    "js_file": "migrations/20150614_01.js",
     "version_number": 1,
   },
   Object {
-    "js_file": "migrations/20200710_02.js",
+    "js_file": "migrations/20150614_02.js",
     "version_number": 1,
   },
 ]
 `;
 
 exports[`qla migration running with no arguments verify manifest 1`] = `
+Object {
+  "description": "test",
+  "id": "no-id",
+  "manifest_version": 1,
+  "name": "Test",
+  "toolbar_color": "blue",
+  "toolbar_icon": "poll",
+  "version_name": "1.0",
+  "version_number": 1,
+}
+`;
+
+exports[`qla migration targeting a version (-v) verify manifest 1`] = `
 Object {
   "description": "test",
   "id": "no-id",
