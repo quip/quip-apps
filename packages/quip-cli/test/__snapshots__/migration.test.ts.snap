@@ -1,5 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`qla migration running with no arguments creates a migration with today's date 2`] = `
+"quip.apps.registerMigration(rootRecord => {
+    // Write your migration code here
+    return rootRecord;
+});
+"
+`;
+
+exports[`qla migration running with no arguments increments the migration number when adding another 1`] = `
+Array [
+  Object {
+    "js_file": "migrations/20200710_01.js",
+    "version_number": 1,
+  },
+  Object {
+    "js_file": "migrations/20200710_02.js",
+    "version_number": 1,
+  },
+]
+`;
+
 exports[`qla migration running with no arguments verify manifest 1`] = `
 Object {
   "description": "test",

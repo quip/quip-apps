@@ -7,17 +7,27 @@ import util from "util";
 const exec = util.promisify(exec_node);
 
 describe("qla migration", () => {
-    const useFixtureDir = async (dir: string) => {
-        process.chdir(path.join(__dirname, "fixtures", dir));
+    beforeAll(async () => {
+        process.chdir(path.join(__dirname));
         try {
-            await exec("git diff --exit-code .");
+            await exec("git diff --exit-code fixtures");
+            const {stdout} = await exec("git clean -n fixtures");
+            if (stdout) {
+                throw new Error(`found unstaged files: ${stdout}`);
+            }
         } catch (e) {
-            throw new Error(
-                "Cannot run with dirty fixtures. git add your fixtures changes first."
+            process.stderr.write(
+                "Cannot run with dirty fixtures.\ngit add your fixtures changes first, and make sure that your tests are properly calling cleanup.\n"
             );
+            process.exit(1);
         }
-        await exec("git clean -fd; git checkout .");
-        return () => useFixtureDir(dir);
+    });
+    const useFixtureDir = (dir: string) => {
+        process.chdir(path.join(__dirname, "fixtures", dir));
+        return async () => {
+            process.chdir(path.join(__dirname, "fixtures", dir));
+            await exec("git clean -fd; git checkout .");
+        };
     };
     const readManifestContent = async (): Promise<string> => {
         return String(await fs.promises.readFile("manifest.json", "utf-8"));
@@ -29,12 +39,13 @@ describe("qla migration", () => {
 
     describe("running with no arguments", () => {
         let cleanup: Function;
-        beforeAll(async () => {
-            cleanup = await useFixtureDir("no-args");
+        beforeEach(() => {
+            cleanup = useFixtureDir("no-args");
         });
         afterAll(() => cleanup());
 
         test("verify manifest", async () => {
+            console.log(process.cwd());
             const manifest = await readManifest();
             // We run this first to force snapshots to be updated when fixtures change.
             expect(manifest).toMatchSnapshot();
