@@ -22,16 +22,15 @@
         "@oclif/dev-cli": "^1.22.2",
         "@oclif/test": "^1.2.6",
         "@types/inquirer": "^6.5.0",
+        "@types/jest": "^26.0.4",
         "@types/mkdirp": "^1.0.1",
-        "@types/mocha": "^7.0.2",
         "@types/ncp": "^2.0.4",
         "@types/node": "^10.17.26",
         "@types/prettier": "^2.0.2",
         "chai": "^4.2.0",
         "globby": "^10.0.2",
-        "mocha": "^8.0.1",
-        "nyc": "^15.1.0",
-        "ts-node": "^8.10.2",
+        "jest": "^26.1.0",
+        "ts-jest": "^26.1.1",
         "typescript": "^3.9.5"
     },
     "engines": {
@@ -66,7 +65,7 @@
     "scripts": {
         "postpack": "rm -f oclif.manifest.json",
         "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-        "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+        "test": "jest --coverage",
         "version": "oclif-dev readme && git add README.md"
     },
     "types": "lib/index.d.ts"

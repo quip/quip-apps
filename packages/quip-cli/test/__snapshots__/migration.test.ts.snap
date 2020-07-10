@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`qla migration running with no arguments 1`] = `
+Object {
+  "description": "test",
+  "id": "no-id",
+  "manifest_version": 1,
+  "name": "Test",
+  "toolbar_color": "blue",
+  "toolbar_icon": "poll",
+  "version_name": "1.0",
+  "version_number": 1,
+}
+`;
+
+exports[`qla migration running with no arguments verify manifest 1`] = `
+Object {
+  "description": "test",
+  "id": "no-id",
+  "manifest_version": 1,
+  "name": "Test",
+  "toolbar_color": "blue",
+  "toolbar_icon": "poll",
+  "version_name": "1.0",
+  "version_number": 1,
+}
+`;
