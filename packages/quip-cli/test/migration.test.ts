@@ -232,16 +232,15 @@ describe("qla migration", () => {
             .stdout()
             .command(["migration", "-v=50", "dry", "--dry-run"])
             .it("outputs dry run info", async (ctx) => {
-                expect(ctx.stdout).toMatchInlineSnapshot(`
-                    "Would create: /Users/jditson/code/quip-apps/packages/quip-cli/test/fixtures/folders/migrations
-                    Would create: /Users/jditson/code/quip-apps/packages/quip-cli/test/fixtures/folders/migrations/20150614_dry.js
-                    Would add migration:
-                    {
-                        \\"version_number\\": 50,
-                        \\"js_file\\": \\"migrations/20150614_dry.js\\"
-                    }
-                    "
-                `);
+                expect(ctx.stdout).toMatch(/Would create: \/.+\/migrations$/m);
+                expect(ctx.stdout).toMatch(
+                    /Would create: \/.+\/migrations\/20150614_dry.js$/m
+                );
+                expect(ctx.stdout).toMatch(/Would add migration:/);
+                expect(ctx.stdout).toMatch(`"version_number": 50,`);
+                expect(ctx.stdout).toMatch(
+                    `"js_file": "migrations/20150614_dry.js"`
+                );
             });
     });
 });
