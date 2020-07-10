@@ -10,6 +10,7 @@ describe("qla migration", () => {
     const useFixtureDir = async (dir: string) => {
         process.chdir(path.join(__dirname, "fixtures", dir));
         await exec("git clean -fd; git checkout .");
+        return () => useFixtureDir(dir);
     };
     const readManifestContent = async (): Promise<string> => {
         return String(await fs.promises.readFile("manifest.json", "utf-8"));
@@ -18,12 +19,13 @@ describe("qla migration", () => {
         const content = await readManifestContent();
         return JSON.parse(content);
     };
-    afterEach(async () => {
-        await exec("git clean -fd; git checkout .");
-    });
 
     describe("running with no arguments", () => {
-        useFixtureDir("migration");
+        let cleanup: Function;
+        beforeAll(async () => {
+            cleanup = await useFixtureDir("migration");
+        });
+        afterAll(() => cleanup());
         test("verify manifest", async () => {
             const manifest = await readManifest();
             // We run this first to force snapshots to be updated when fixtures change.
