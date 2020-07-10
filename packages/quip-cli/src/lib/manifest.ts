@@ -17,8 +17,14 @@ export const findManifest = async (
     const files = await fs.promises.readdir(dir);
     const dirs: string[] = [];
     for (const file of files) {
+        const filePath = path.join(dir, file);
         if (file === "manifest.json") {
-            return path.join(dir, file);
+            return filePath;
+        } else {
+            const stat = await fs.promises.stat(filePath);
+            if (stat.isDirectory()) {
+                dirs.push(filePath);
+            }
         }
     }
     for (const dir of dirs) {
