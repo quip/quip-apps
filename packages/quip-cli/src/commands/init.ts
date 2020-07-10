@@ -1,9 +1,8 @@
 import {Command, flags} from "@oclif/command";
-
+import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
-import fs from "fs";
-import {ncp} from "ncp";
+import {copy} from "../lib/util";
 
 interface PackageOptions {
     name: string;
@@ -145,16 +144,7 @@ const copyTemplateToCWD = (packageOptions: PackageOptions) => {
             fileName.indexOf("node_modules") === -1 &&
             fileName.indexOf(".git/") === -1,
     };
-
-    return new Promise((resolve, reject) =>
-        ncp(templatePath, path.join(process.cwd(), name), options, error => {
-            if (error) {
-                console.log(error);
-                reject(error);
-            }
-            resolve();
-        })
-    );
+    return copy(templatePath, path.join(process.cwd(), name), options);
 };
 
 const mangleBoilerplate = (
