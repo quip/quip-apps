@@ -15,6 +15,6 @@ jobs:
               with:
                   node-version: 12.x
             - run: npm install
-            - run: npm run release:next
+            - run: npm run release:next -- --yes
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
