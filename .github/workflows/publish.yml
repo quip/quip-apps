@@ -1,0 +1,19 @@
+name: Publish to @next tag on npm
+on:
+    push:
+        branches:
+            - master
+jobs:
+    npm-publish:
+        name: npm-publish
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Set up Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12.x
+            - run: npm run release:next
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

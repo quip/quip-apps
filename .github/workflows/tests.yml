@@ -1,9 +1,9 @@
-name: Node.js CI
+name: Test All Packages
 
 on: [push]
 
 jobs:
-    build:
+    run-tests:
         runs-on: ubuntu-latest
 
         strategy:
