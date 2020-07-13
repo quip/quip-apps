@@ -14,6 +14,9 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: 12.x
+            - run: |
+                  git config --local user.email "jesse.ditson@gmail.com"
+                  git config --local user.name "Jesse Ditson [CI]"
             - run: npm install
             - run: npm run release:next -- --yes
               env:
