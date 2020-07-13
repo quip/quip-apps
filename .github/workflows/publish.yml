@@ -19,5 +19,5 @@ jobs:
                   git config --local user.name "Jesse Ditson [CI]"
             - run: npm install
             - run: npm run release:next -- --yes
-              env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        env:
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
