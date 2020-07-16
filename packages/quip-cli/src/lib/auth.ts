@@ -1,6 +1,6 @@
 import {readConfig} from "./config";
 
-exports.isLoggedIn = async (quiprcPath: string) => {
-    const {accessToken} = await readConfig(quiprcPath);
-    return !!accessToken;
+export const isLoggedIn = async (configPath: string, site: string) => {
+    const {sites} = await readConfig(configPath);
+    return !!sites[site]?.accessToken;
 };
