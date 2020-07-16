@@ -65,7 +65,18 @@ describe("qla migration", () => {
                 "increments the migration number when adding another",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations).toMatchSnapshot();
+                    expect(manifest.migrations).toMatchInlineSnapshot(`
+                        Array [
+                          Object {
+                            "js_file": "migrations/20150614_01.js",
+                            "version_number": 1,
+                          },
+                          Object {
+                            "js_file": "migrations/20150614_02.js",
+                            "version_number": 1,
+                          },
+                        ]
+                    `);
                 }
             );
     });
