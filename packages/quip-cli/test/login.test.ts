@@ -81,7 +81,11 @@ describe("qla login", () => {
                 }).not.toThrowError();
                 expect(parsed).toMatchInlineSnapshot(`
                     Object {
-                      "accessToken": "some-token",
+                      "sites": Object {
+                        "quip.com": Object {
+                          "accessToken": "some-token",
+                        },
+                      },
                     }
                 `);
             });

@@ -1,11 +1,16 @@
 import {Command, flags} from "@oclif/command";
+import fs from "fs";
 import http from "http";
 import open from "open";
+import path from "path";
 import qs from "querystring";
 import url from "url";
-import {defaultConfigPath, writeConfig} from "../lib/config";
+import {isLoggedIn} from "../lib/auth";
+import {defaultConfigPath, writeSiteConfig} from "../lib/config";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
+
+const DEFAULT_SITE = "quip.com";
 
 export default class Login extends Command {
     static description =
@@ -21,7 +26,7 @@ export default class Login extends Command {
             char: "s",
             description:
                 "use a specific quip site rather than the standard quip.com login",
-            default: "quip.com",
+            default: DEFAULT_SITE,
         }),
         port: flags.integer({
             hidden: true,
@@ -50,12 +55,16 @@ export default class Login extends Command {
         port: number,
         ready: () => void
     ): Promise<ResponseParams> => {
+        const pagePromise = fs.promises.readFile(
+            path.join(__dirname, "../..", "templates", "logged-in.html"),
+            "utf-8"
+        );
         return new Promise((resolve) => {
-            this.server_ = http.createServer((req, res) => {
+            this.server_ = http.createServer(async (req, res) => {
                 const urlInfo = url.parse(req.url || "");
                 res.statusCode = 200;
-                res.setHeader("Content-Type", "text/plain");
-                res.end("ok");
+                res.setHeader("Content-Type", "text/html");
+                res.end(await pagePromise);
                 resolve(qs.parse(urlInfo.query || ""));
                 this.server_?.close();
             });
@@ -71,16 +80,29 @@ export default class Login extends Command {
     async run() {
         const {flags} = this.parse(Login);
 
-        const {site, hostname, port, config} = flags;
+        const {site, force, hostname, port, config} = flags;
+
+        if (!force && (await isLoggedIn(config, site))) {
+            let alt = "";
+            if (site !== DEFAULT_SITE) {
+                alt = " or --site to log in to a different site";
+            }
+            this.log(
+                `You're already logged in to ${site}. Pass --force to log in again${alt}.`
+            );
+            return;
+        }
 
         const redirectURL = `http://${hostname}:${port}`;
         const oAuthURL = `https://${site}/api/cli/token?r=${encodeURIComponent(
             redirectURL
         )}`;
+        this.log(
+            `opening login URL in your browser. Log in to Quip there.\n${oAuthURL}`
+        );
         const responseParams = await this.waitForLogin(hostname, port, () =>
             open(oAuthURL)
         );
-        this.log(JSON.stringify(responseParams, null, 4));
         const accessToken = responseParams["token"] as string | undefined;
         if (!accessToken) {
             this.log(
@@ -88,7 +110,7 @@ export default class Login extends Command {
             );
             throw new Error("No token received");
         }
-        await writeConfig({accessToken}, config);
+        await writeSiteConfig(config, site, {accessToken});
         this.log("Successfully logged in.");
     }
 }
