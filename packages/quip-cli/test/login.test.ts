@@ -54,10 +54,8 @@ describe("qla login", () => {
             .spyOn(config, "defaultConfigPath")
             .mockImplementation(() => path.join(homedir, ".quiprc"));
     });
-    afterAll(() => {
+    afterAll(async () => {
         configSpy.mockRestore();
-    });
-    afterEach(async () => {
         await cleanFixtures();
     });
     describe("basic login", () => {
@@ -88,6 +86,17 @@ describe("qla login", () => {
                       },
                     }
                 `);
+            });
+        oclifTest
+            .stdout()
+            .do(() => mockedOpen.mockReset())
+            .command(["login"])
+            .it("Doesn't log in if you're already logged in", async (ctx) => {
+                expect(ctx.stdout).toMatchInlineSnapshot(`
+                    "You're already logged in to quip.com. Pass --force to log in again.
+                    "
+                `);
+                expect(mockedOpen).not.toHaveBeenCalled();
             });
     });
 });

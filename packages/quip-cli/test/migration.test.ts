@@ -4,6 +4,7 @@ import fs from "fs";
 import MockDate from "mockdate";
 import path from "path";
 import util from "util";
+import {readManifest, useFixtureDir} from "./test-util";
 
 const exec = util.promisify(exec_node);
 
@@ -28,21 +29,6 @@ describe("qla migration", () => {
     afterAll(() => {
         MockDate.reset();
     });
-    const useFixtureDir = (dir: string) => {
-        process.chdir(path.join(__dirname, "fixtures", dir));
-        return async () => {
-            process.chdir(path.join(__dirname, "fixtures", dir));
-            await exec("git clean -fd; git checkout .");
-        };
-    };
-    const readManifestContent = async (dir?: string): Promise<string> => {
-        const mPath = dir ? path.join(dir, "manifest.json") : "manifest.json";
-        return String(await fs.promises.readFile(mPath, "utf-8"));
-    };
-    const readManifest = async (dir?: string) => {
-        const content = await readManifestContent(dir);
-        return JSON.parse(content);
-    };
 
     describe("running with no arguments", () => {
         let cleanup: Function;
