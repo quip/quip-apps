@@ -5,6 +5,7 @@ import open from "open";
 import path from "path";
 import * as config from "../src/lib/config";
 import {pathExists} from "../src/lib/util";
+import {cleanFixtures} from "./test-util";
 
 const homedir = path.join(__dirname, "fixtures", "homedir");
 const doOAuthLogin = async (
@@ -55,6 +56,9 @@ describe("qla login", () => {
     });
     afterAll(() => {
         configSpy.mockRestore();
+    });
+    afterEach(async () => {
+        await cleanFixtures();
     });
     describe("basic login", () => {
         oclifTest

@@ -1,5 +1,8 @@
+process.env.TS_NODE_IGNORE = "test/**/*.ts";
+
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
-    roots: ["src", "test"],
+    roots: ["test"],
+    globalSetup: "./test/global-setup.js",
 };
