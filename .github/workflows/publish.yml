@@ -17,6 +17,7 @@ jobs:
             - run: |
                   git config --local user.email "jesse.ditson@gmail.com"
                   git config --local user.name "Jesse Ditson [CI]"
+            - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
             - run: npm install
             - run: npm run release:next -- --yes
         env:
