@@ -8,8 +8,8 @@ import {pathExists} from "../src/lib/util";
 import {cleanFixtures} from "./test-util";
 
 const homedir = path.join(__dirname, "fixtures", "homedir");
-const doOAuthLogin = async (
-    token: string,
+const makeLoginRequest = async (
+    path: string,
     host: string = "127.0.0.1",
     port: number = 9898
 ) => {
@@ -19,7 +19,7 @@ const doOAuthLogin = async (
                 {
                     host,
                     port,
-                    path: `/?token=${token}`,
+                    path,
                 },
                 (response) => {
                     let data = "";
@@ -57,12 +57,24 @@ describe("qla login", () => {
     describe("basic login", () => {
         oclifTest
             .stdout()
+            .stderr()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    makeLoginRequest("/i/did/not/return/a/token");
+                    return open;
+                });
+            })
+            .command(["login"])
+            .exit(2)
+            .it("A bad request exits non-zero");
+        oclifTest
+            .stdout()
             .do(() => {
                 mockedOpen.mockImplementation(() => {
                     // this command normally opens a browser and lets the user login,
                     // so we have to load the place it would redirect to in order to
                     // allow the script to continue
-                    doOAuthLogin("some-token");
+                    makeLoginRequest("/?token=some-token");
                     return open;
                 });
             })
@@ -97,7 +109,7 @@ describe("qla login", () => {
             .command(["login"])
             .it("Doesn't log in if you're already logged in", async (ctx) => {
                 expect(ctx.stdout).toMatchInlineSnapshot(`
-                    "You're already logged in to quip.com. Pass --force to log in again.
+                    "You're already logged in to quip.com. Pass --force to log in again or --site to log in to a different site.
                     "
                 `);
                 expect(mockedOpen).not.toHaveBeenCalled();
@@ -109,7 +121,7 @@ describe("qla login", () => {
                     // this command normally opens a browser and lets the user login,
                     // so we have to load the place it would redirect to in order to
                     // allow the script to continue
-                    doOAuthLogin("another-token");
+                    makeLoginRequest("/?token=another-token");
                     return open;
                 });
             })
@@ -133,5 +145,72 @@ describe("qla login", () => {
                     `);
                 }
             );
+    });
+    describe("customization", () => {
+        oclifTest
+            .stdout()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    makeLoginRequest("/?token=hello");
+                    return open;
+                });
+            })
+            .command(["login", "--site", "staging.quip.com"])
+            .it("passing --site results in a new login", async (ctx) => {
+                // Verify that we called open with the right URL
+                expect(mockedOpen).toHaveBeenCalledWith(
+                    "https://staging.quip.com/api/cli/token?r=http%3A%2F%2F127.0.0.1%3A9898"
+                );
+                const config = (await fs.promises.readFile(
+                    path.join(homedir, ".quiprc"),
+                    "utf-8"
+                )) as string;
+                expect(config).toMatchInlineSnapshot(`
+                    "{
+                      \\"sites\\": {
+                        \\"quip.com\\": {
+                          \\"accessToken\\": \\"another-token\\"
+                        },
+                        \\"staging.quip.com\\": {
+                          \\"accessToken\\": \\"hello\\"
+                        }
+                      }
+                    }"
+                `);
+            });
+        oclifTest
+            .stdout()
+            .command(["login", "--site", "staging.quip.com"])
+            .it(
+                "prints a different message when re-logging in to a custom site",
+                async (ctx) => {
+                    expect(ctx.stdout).toMatchInlineSnapshot(`
+                        "You're already logged in to staging.quip.com. Pass --force to log in again.
+                        "
+                    `);
+                    expect(mockedOpen).not.toHaveBeenCalled();
+                }
+            );
+        oclifTest
+            .stdout()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    makeLoginRequest("/?token=hello", "localhost", 6969);
+                    return open;
+                });
+            })
+            .command([
+                "login",
+                "--force",
+                "--hostname",
+                "localhost",
+                "--port=6969",
+            ])
+            .it("hostname and port can be customized", async (ctx) => {
+                // Verify that we called open with the right URL
+                expect(mockedOpen).toHaveBeenCalledWith(
+                    "https://quip.com/api/cli/token?r=http%3A%2F%2Flocalhost%3A6969"
+                );
+            });
     });
 });

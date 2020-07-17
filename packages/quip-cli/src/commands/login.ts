@@ -84,7 +84,7 @@ export default class Login extends Command {
 
         if (!force && (await isLoggedIn(config, site))) {
             let alt = "";
-            if (site !== DEFAULT_SITE) {
+            if (site === DEFAULT_SITE) {
                 alt = " or --site to log in to a different site";
             }
             this.log(
@@ -105,10 +105,15 @@ export default class Login extends Command {
         );
         const accessToken = responseParams["token"] as string | undefined;
         if (!accessToken) {
-            this.log(
-                `Invalid response:\n${JSON.stringify(responseParams, null, 2)}`
+            this.error(
+                new Error(
+                    `Invalid response:\n${JSON.stringify(
+                        responseParams,
+                        null,
+                        2
+                    )}`
+                )
             );
-            throw new Error("No token received");
         }
         await writeSiteConfig(config, site, {accessToken});
         this.log("Successfully logged in.");
