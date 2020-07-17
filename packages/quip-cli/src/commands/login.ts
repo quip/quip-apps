@@ -17,7 +17,7 @@ export default class Login extends Command {
         "Logs in to Quip and stores credentials in the .quiprc file";
     static flags = {
         help: flags.help({char: "h"}),
-        force: flags.string({
+        force: flags.boolean({
             char: "f",
             description:
                 "forces a re-login even if a user is currently logged in",

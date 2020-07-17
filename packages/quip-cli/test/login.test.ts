@@ -39,13 +39,6 @@ const doOAuthLogin = async (
 
 jest.mock("open");
 const mockedOpen = (open as unknown) as jest.Mock<typeof open>;
-mockedOpen.mockImplementation(() => {
-    // this command normally opens a browser and lets the user login,
-    // so we have to load the place it would redirect to in order to
-    // allow the script to continue
-    doOAuthLogin("some-token");
-    return open;
-});
 
 describe("qla login", () => {
     let configSpy: jest.SpyInstance;
@@ -58,9 +51,21 @@ describe("qla login", () => {
         configSpy.mockRestore();
         await cleanFixtures();
     });
+    afterEach(() => {
+        mockedOpen.mockClear();
+    });
     describe("basic login", () => {
         oclifTest
             .stdout()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    // this command normally opens a browser and lets the user login,
+                    // so we have to load the place it would redirect to in order to
+                    // allow the script to continue
+                    doOAuthLogin("some-token");
+                    return open;
+                });
+            })
             .command(["login"])
             .it("creates a .quiprc file in $HOME", async (ctx) => {
                 // Verify that we called open with the right URL
@@ -89,7 +94,6 @@ describe("qla login", () => {
             });
         oclifTest
             .stdout()
-            .do(() => mockedOpen.mockReset())
             .command(["login"])
             .it("Doesn't log in if you're already logged in", async (ctx) => {
                 expect(ctx.stdout).toMatchInlineSnapshot(`
@@ -98,5 +102,36 @@ describe("qla login", () => {
                 `);
                 expect(mockedOpen).not.toHaveBeenCalled();
             });
+        oclifTest
+            .stdout()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    // this command normally opens a browser and lets the user login,
+                    // so we have to load the place it would redirect to in order to
+                    // allow the script to continue
+                    doOAuthLogin("another-token");
+                    return open;
+                });
+            })
+            .command(["login", "--force"])
+            .it(
+                "logs in again regardless when passing --force",
+                async (ctx) => {
+                    expect(mockedOpen).toHaveBeenCalled();
+                    const config = (await fs.promises.readFile(
+                        path.join(homedir, ".quiprc"),
+                        "utf-8"
+                    )) as string;
+                    expect(config).toMatchInlineSnapshot(`
+                        "{
+                          \\"sites\\": {
+                            \\"quip.com\\": {
+                              \\"accessToken\\": \\"another-token\\"
+                            }
+                          }
+                        }"
+                    `);
+                }
+            );
     });
 });

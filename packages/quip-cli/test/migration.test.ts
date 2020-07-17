@@ -32,7 +32,7 @@ describe("qla migration", () => {
 
     describe("running with no arguments", () => {
         let cleanup: Function;
-        beforeEach(() => {
+        beforeAll(() => {
             cleanup = useFixtureDir("no-args");
         });
         afterAll(() => cleanup());
@@ -59,6 +59,11 @@ describe("qla migration", () => {
                 );
                 expect(migration).toMatchSnapshot();
             });
+        test("migration exists before running second test", () => {
+            expect(() =>
+                fs.statSync("migrations/20150614_01.js")
+            ).not.toThrowError();
+        });
         oclifTest
             .command(["migration"])
             .it(

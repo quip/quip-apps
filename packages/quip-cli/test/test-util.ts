@@ -5,7 +5,7 @@ import util from "util";
 
 export const exec = util.promisify(exec_node);
 
-export const cleanFixtures = (alreadyInSubdir: boolean = false) => {
+export const cleanFixtures = async (alreadyInSubdir: boolean = false) => {
     if (!alreadyInSubdir) {
         process.chdir(path.join(__dirname, "fixtures"));
     }
