@@ -16,7 +16,7 @@ $ npm install -g quip-cli
 $ qla COMMAND
 running command...
 $ qla (-v|--version|version)
-quip-cli/1.0.0-alpha.22 darwin-x64 node-v10.15.0
+quip-cli/1.0.0-alpha.24 linux-x64 node-v12.18.2
 $ qla --help [COMMAND]
 USAGE
   $ qla COMMAND
@@ -61,7 +61,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.22/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/init.ts)_
 
 ## `qla login`
 
@@ -72,12 +72,12 @@ USAGE
   $ qla login
 
 OPTIONS
-  -f, --force=force  forces a re-login even if a user is currently logged in
-  -h, --help         show CLI help
-  -s, --site=site    [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -f, --force      forces a re-login even if a user is currently logged in
+  -h, --help       show CLI help
+  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.22/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/login.ts)_
 
 ## `qla migration [NAME]`
 
@@ -99,7 +99,7 @@ OPTIONS
                            version_number in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.22/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/migration.ts)_
 <!-- commandsstop -->
 
 ## Running locally
