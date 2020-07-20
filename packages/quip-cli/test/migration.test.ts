@@ -2,8 +2,8 @@ import {test as oclifTest} from "@oclif/test";
 import {exec as exec_node} from "child_process";
 import fs from "fs";
 import MockDate from "mockdate";
-import path from "path";
 import util from "util";
+import {readManifest, useFixtureDir} from "./test-util";
 
 const exec = util.promisify(exec_node);
 
@@ -11,42 +11,14 @@ describe("qla migration", () => {
     beforeAll(async () => {
         // we use dates to generate names. Make this static so we can snapshot generated dates
         MockDate.set(1434319925275);
-        process.chdir(path.join(__dirname));
-        try {
-            await exec("git diff --exit-code fixtures");
-            const {stdout} = await exec("git clean -n fixtures");
-            if (stdout) {
-                throw new Error(`found unstaged files: ${stdout}`);
-            }
-        } catch (e) {
-            process.stderr.write(
-                "Cannot run with dirty fixtures.\ngit add your fixtures changes first, and make sure that your tests are properly calling cleanup.\n"
-            );
-            process.exit(1);
-        }
     });
     afterAll(() => {
         MockDate.reset();
     });
-    const useFixtureDir = (dir: string) => {
-        process.chdir(path.join(__dirname, "fixtures", dir));
-        return async () => {
-            process.chdir(path.join(__dirname, "fixtures", dir));
-            await exec("git clean -fd; git checkout .");
-        };
-    };
-    const readManifestContent = async (dir?: string): Promise<string> => {
-        const mPath = dir ? path.join(dir, "manifest.json") : "manifest.json";
-        return String(await fs.promises.readFile(mPath, "utf-8"));
-    };
-    const readManifest = async (dir?: string) => {
-        const content = await readManifestContent(dir);
-        return JSON.parse(content);
-    };
 
     describe("running with no arguments", () => {
         let cleanup: Function;
-        beforeEach(() => {
+        beforeAll(() => {
             cleanup = useFixtureDir("no-args");
         });
         afterAll(() => cleanup());
@@ -73,13 +45,29 @@ describe("qla migration", () => {
                 );
                 expect(migration).toMatchSnapshot();
             });
+        test("migration exists before running second test", () => {
+            expect(() =>
+                fs.statSync("migrations/20150614_01.js")
+            ).not.toThrowError();
+        });
         oclifTest
             .command(["migration"])
             .it(
                 "increments the migration number when adding another",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations).toMatchSnapshot();
+                    expect(manifest.migrations).toMatchInlineSnapshot(`
+                        Array [
+                          Object {
+                            "js_file": "migrations/20150614_01.js",
+                            "version_number": 1,
+                          },
+                          Object {
+                            "js_file": "migrations/20150614_02.js",
+                            "version_number": 1,
+                          },
+                        ]
+                    `);
                 }
             );
     });
