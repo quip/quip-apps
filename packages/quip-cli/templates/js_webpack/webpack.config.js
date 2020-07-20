@@ -33,8 +33,4 @@ module.exports = {
         port: 8888,
         inline: false,
     },
-    externals: {
-        quip: "quip",
-        quiptext: "quiptext",
-    },
 };
