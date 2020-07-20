@@ -1,0 +1,12 @@
+# jest coverage output
+coverage
+
+# typescript
+dist
+
+# OS
+.DS_Store
+
+# npm
+node_modules
+
