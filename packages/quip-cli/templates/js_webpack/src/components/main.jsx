@@ -25,7 +25,7 @@ export default class Main extends Component {
             rootRecord.getActions().onToggleHighlight();
     }
     componentDidMount() {
-        // Set up the listner on the rootRecord (RootEntity). The listener
+        // Set up the listener on the rootRecord (RootEntity). The listener
         // will propogate changes to the render() method in this component
         // using setState
         const {rootRecord} = this.props;

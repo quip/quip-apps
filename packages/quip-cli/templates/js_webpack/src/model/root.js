@@ -2,7 +2,6 @@ import quip from "quip-apps-api";
 
 export class RootEntity extends quip.apps.RootRecord {
     static ID = "example";
-    static DATA_VERSION = 1;
 
     initialize() {
         this.isHighlighted_ = false;

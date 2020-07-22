@@ -6,7 +6,6 @@ export interface AppData {
 
 export class RootEntity extends quip.apps.RootRecord {
     static ID = "example";
-    static DATA_VERSION = 1;
 
     static getProperties() {
         return {};
