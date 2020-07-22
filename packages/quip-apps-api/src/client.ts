@@ -124,6 +124,7 @@ export enum MenuIcons {
     SALESFORCE_LOGO = "SALESFORCE_LOGO",
     SYNCING = "SYNCING",
     JIRA = "JIRA",
+    COMMENT_MENU_ITEM = "COMMENT_MENU_ITEM",
 }
 
 export const RootEntityConstructor = class {};
