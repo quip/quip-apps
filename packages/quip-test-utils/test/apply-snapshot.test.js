@@ -3,10 +3,14 @@ const quip = require("quip-apps-api");
 const {applySnapshot} = require("../dist/test-utils");
 
 test("Test Utils: applySnapshot", t => {
-    t.plan(9);
+    t.plan(13);
 
     const record = new Root();
-    applySnapshot(record, snapshot);
+    applySnapshot(record, snapshot, {
+        sibling: ACustomClass,
+        "child.oldProp": ACustomClass,
+        "child.aList.oldProp": ACustomClass,
+    });
 
     t.equal(
         record.get("rootName"),
@@ -18,6 +22,10 @@ test("Test Utils: applySnapshot", t => {
     t.ok(child, "child is created");
     t.ok(child instanceof ChildRecord, "child is right type");
 
+    const sibling = record.get("sibling");
+    t.ok(sibling, "legacy child is created");
+    t.ok(sibling instanceof ACustomClass, "legacy child is right type");
+
     t.equal(
         child.get("aString"),
         snapshot.data.child.v.aString.v,
@@ -27,6 +35,10 @@ test("Test Utils: applySnapshot", t => {
         child.get("anObject"),
         snapshot.data.child.v.anObject.v,
         "child object is copied over"
+    );
+    t.ok(
+        child.get("oldProp") instanceof ACustomClass,
+        "child legacy prop is right type"
     );
 
     const list = child.get("aList");
@@ -43,7 +55,13 @@ test("Test Utils: applySnapshot", t => {
         snapshot.data.child.v.aList.children[1].name.v,
         "second child has correct name"
     );
+    t.ok(
+        children[0].get("oldProp") instanceof ACustomClass,
+        "list child legacy prop is right type"
+    );
 });
+
+class ACustomClass extends quip.apps.Record {}
 
 class ListChild extends quip.apps.Record {
     static getProperties() {
@@ -86,9 +104,17 @@ const snapshot = {
             "t": 0,
             "v": "My Root Name",
         },
+        "sibling": {
+            "t": 1,
+            "v": {},
+        },
         "child": {
             "t": 1,
             "v": {
+                "oldProp": {
+                    "t": 1,
+                    "v": {},
+                },
                 "aString": {
                     "t": 0,
                     "v": "foo",
@@ -114,6 +140,10 @@ const snapshot = {
                             "name": {
                                 "t": 0,
                                 "v": "thing one",
+                            },
+                            "oldProp": {
+                                "t": 1,
+                                "v": {},
                             },
                         },
                         {
