@@ -59,12 +59,6 @@ const promptInitialAppConfig = async () => {
             message: "Use Typescript?",
             default: true,
         },
-        {
-            type: "list",
-            name: "bundler",
-            message: "Which bundler do you want to use?",
-            choices: ["parcel", "webpack"],
-        },
     ]);
 
     const {addManifestConfig} = await inquirer.prompt([
@@ -133,8 +127,8 @@ const promptInitialAppConfig = async () => {
     return {packageOptions, manifestOptions};
 };
 
-const copyTemplateToCWD = (packageOptions: PackageOptions) => {
-    const {typescript, bundler, name} = packageOptions;
+const copyTemplateToCWD = (packageOptions: PackageOptions, dryRun: boolean) => {
+    const {typescript, bundler = "webpack", name} = packageOptions;
     // get lib path
     const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
     const templatePath = path.join(__dirname, "../../templates", templateName);
@@ -144,7 +138,13 @@ const copyTemplateToCWD = (packageOptions: PackageOptions) => {
             fileName.indexOf("node_modules") === -1 &&
             fileName.indexOf(".git/") === -1,
     };
-    return copy(templatePath, path.join(process.cwd(), name), options);
+    const dest = path.join(process.cwd(), name);
+    if (dryRun) {
+        console.log(`Would intialize ${templateName} on ${dest}`);
+        return;
+    } else {
+        return copy(templatePath, dest, options);
+    }
 };
 
 const mangleBoilerplate = (
@@ -167,12 +167,16 @@ const mangleJsonConfig = (
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 };
 
-const init = async () => {
-    // // initial app options from user
+const init = async (dryRun: boolean) => {
+    // initial app options from user
     const {packageOptions, manifestOptions} = await promptInitialAppConfig();
-    await copyTemplateToCWD(packageOptions);
-    mangleBoilerplate(packageOptions, manifestOptions);
-
+    await copyTemplateToCWD(packageOptions, dryRun);
+    if (dryRun) {
+        console.log("Would update package.json with", packageOptions);
+        console.log("Would update manifest.json with", manifestOptions);
+    } else {
+        mangleBoilerplate(packageOptions, manifestOptions);
+    }
     console.log(
         `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
     );
@@ -183,10 +187,17 @@ export default class Init extends Command {
 
     static flags = {
         help: flags.help({char: "h"}),
+        ["dry-run"]: flags.boolean({
+            char: "d",
+            hidden: true,
+            description:
+                "Print what this would do, but don't create any files.",
+        }),
     };
 
     async run() {
-        this.parse(Init);
-        init();
+        const {flags} = this.parse(Init);
+        const dryRun = flags["dry-run"];
+        init(dryRun);
     }
 }
