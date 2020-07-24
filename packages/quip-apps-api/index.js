@@ -23,5 +23,6 @@ let quip = global_["quip"];
 if (quip === undefined) {
     quip = require("./dist/quip");
     quip.apps.setVersion(require("./package.json").version);
+    quip.apps.__IS_MOCK = true;
 }
 module.exports = quip;
