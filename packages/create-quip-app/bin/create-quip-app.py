@@ -95,7 +95,7 @@ def init_app(app_dir_name):
             f.write(content.replace("$APP_DIR_NAME", app_dir_name))
             f.truncate()
 
-    for file_path in ["app/manifest.json", "package.json"]:
+    for file_path in ["manifest.json", "package.json"]:
         replace_placeholders(file_path)
 
     installed_packages = False
