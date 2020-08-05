@@ -26,7 +26,7 @@ export default async function runMigrations(
         );
     }
     const neededMigrations = manifest.migrations
-        .filter(m => m.version_number && appVersion <= m.version_number)
+        .filter(m => m.version_number && appVersion < m.version_number)
         .sort((mA, mB) => {
             if (mA.version_number === mB.version_number) {
                 return mA.js_file < mB.js_file ? -1 : 1;

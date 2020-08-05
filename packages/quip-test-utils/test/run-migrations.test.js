@@ -7,8 +7,16 @@ test("v42 deprecates the name 'jacob'", async t => {
     t.plan(2);
     const root = new Root();
     t.equal(root.get("name"), "jacob", "pre-migration name is jacob");
-    await runMigrations(manifest, 42, root);
+    await runMigrations(manifest, 41, root);
     t.equal(root.get("name"), "bromst", "post-migration name is bromst");
+});
+
+test("v42 is not run against 42+", async t => {
+    t.plan(2);
+    const root = new Root();
+    t.equal(root.get("name"), "jacob", "pre-migration name is jacob");
+    await runMigrations(manifest, 42, root);
+    t.equal(root.get("name"), "jacob", "post-migration name is jacob");
 });
 
 class Root extends quip.apps.RootRecord {}
