@@ -1,6 +1,6 @@
 {
     "name": "quip-test-utils",
-    "version": "1.0.0-alpha.33",
+    "version": "1.0.0-alpha.34",
     "description": "Quip Live Apps Test Utilities",
     "main": "dist/test-utils.js",
     "scripts": {
@@ -24,6 +24,6 @@
         "typescript": "^3.6.3"
     },
     "dependencies": {
-        "quip-apps-api": "^1.0.0-alpha.33"
+        "quip-apps-api": "^1.0.0-alpha.34"
     }
 }
