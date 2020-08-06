@@ -68,7 +68,7 @@ export interface ToolbarState {
     highlightedCommandIds?: string[];
 }
 
-interface InitOptions {
+export interface InitOptions {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[] | undefined;
     initializationCallback?: (
