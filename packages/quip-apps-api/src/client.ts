@@ -16,7 +16,7 @@ interface ResizingOptions {
     listener?: (width: number, height: number) => void;
 }
 
-interface InitializationParameters {
+export interface InitializationParameters {
     isCreation: boolean;
     creationUrl?: string;
     initOptions?: string;
