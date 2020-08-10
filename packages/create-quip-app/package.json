@@ -16,5 +16,8 @@
   "bin": {
     "create-quip-app": "./bin/create-quip-app.py"
   },
-  "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1"
+  "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
+  "dependencies": {
+    "quip-cli": "latest"
+  }
 }

@@ -5,5 +5,6 @@
     "**/dist": true,
     "**/node_modules": true,
     "**/app.ele": true
-  }
+  },
+  "python.formatting.provider": "yapf"
 }
