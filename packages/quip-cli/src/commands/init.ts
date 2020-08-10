@@ -162,9 +162,9 @@ export default class Init extends Command {
         );
         const options = {
             dereference: true,
+            // For use during local developement. Do not copy ,git and boilerplate node_modules
             filter: (fileName: string) =>
-                fileName.indexOf("node_modules") === -1 &&
-                fileName.indexOf(".git/") === -1,
+                !fileName.match(/(?:\.git\/|templates\/[\w_]+\/node_modules)/),
         };
         const dest = path.join(process.cwd(), name);
         if (dryRun) {
