@@ -132,7 +132,8 @@ def create_package(app_dir, package_path=None):
     # make sure the package_path exists even if its in a non-existent subdir
     package_dir = os.path.dirname(package_path)
     try:
-        os.makedirs(package_dir)
+        if package_dir:
+            os.makedirs(package_dir)
     except OSError:
         if not os.path.isdir(package_dir):
             raise
