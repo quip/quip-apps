@@ -18,9 +18,8 @@ def check_environment(yarn_or_npm):
     def check_min_major_version(command, min_version):
         version_re = re.compile("^v?(\d+)\.\d+\.\d+")
         try:
-            installed_version = subprocess.check_output("%s --version" %
-                                                        command,
-                                                        shell=True)
+            installed_version = subprocess.check_output(
+                "%s --version" % command, shell=True)
         except:
             return False
         if installed_version:
@@ -47,8 +46,8 @@ def init_app():
     # TODO: continue supporting yarn
     check_environment("npm")
     script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-    quip_cli_path = os.path.join(script_path, "..", "node_modules", "quip-cli",
-                                 "bin", "run")
+    quip_cli_path = os.path.join(
+        script_path, "..", "node_modules", "quip-cli", "bin", "run")
     subprocess.check_call(
         "%s init" % quip_cli_path,
         shell=True,
@@ -71,26 +70,26 @@ def warn_missing_paths(manifest, written_paths, app_dir):
     missing = False
     for js_filename in js_filenames:
         if not js_filename in written_paths:
-            logging.error("Could not find js_file: '%s' in %s" %
-                          (js_filename, app_dir))
+            logging.error(
+                "Could not find js_file: '%s' in %s" % (js_filename, app_dir))
             missing = True
     for css_filename in css_filenames:
         if not css_filename in written_paths:
-            logging.error("Could not find css_file: '%s' in %s" %
-                          (css_filename, app_dir))
+            logging.error(
+                "Could not find css_file: '%s' in %s" % (css_filename, app_dir))
             missing = True
     for migration in migrations:
         if not migration in written_paths:
-            logging.error("Could not find migration: '%s' in %s" %
-                          (migration, app_dir))
+            logging.error(
+                "Could not find migration: '%s' in %s" % (migration, app_dir))
             missing = True
     return missing
 
 
 def migration_paths(manifest):
-    return set([
-        os.path.normpath(m["js_file"]) for m in manifest.get("migrations", [])
-    ])
+    return set(
+        [os.path.normpath(m["js_file"]) for m in manifest.get("migrations", [])
+         ])
 
 
 def is_enumerated_path(manifest, path):
@@ -156,7 +155,6 @@ def create_package(app_dir, package_path=None):
                 info = zipfile.ZipInfo(path, date_time=time.gmtime(315576000))
                 with open(path, "rb") as f:
                     zfile.writestr(info, f.read())
-
         logging.info("Built package at '%s/%s'" % (app_dir, package_path))
     else:
         sys.exit(1)
@@ -169,10 +167,8 @@ def main():
     parser.add_argument("args", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     if len(args.args) and args.args[0] == "pack":
-        if len(args.args) != 2:
-            logging.error("Please specify the app directory location")
-            sys.exit(1)
-        create_package(args.args[1], args.output)
+        app_location = args.args[1] if len(args.args) > 1 else "."
+        create_package(app_location, args.output)
     else:
         init_app()
 
