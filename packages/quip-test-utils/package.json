@@ -19,6 +19,7 @@
     },
     "homepage": "https://github.com/quip/quip-apps#readme",
     "devDependencies": {
+        "@types/react": "^16.9.49",
         "react": "^16.13.1",
         "tape": "^4.11.0",
         "typescript": "^3.6.3"
