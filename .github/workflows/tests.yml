@@ -5,7 +5,9 @@ on: [push]
 jobs:
     quip-apps-api:
         runs-on: ubuntu-latest
-        working-directory: packages/quip-apps-api
+        defaults:
+            run:
+                working-directory: packages/quip-apps-api
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
@@ -23,7 +25,9 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quip-cli:
         runs-on: ubuntu-latest
-        working-directory: packages/quip-cli
+        defaults:
+            run:
+                working-directory: packages/quip-cli
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
@@ -41,7 +45,9 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quip-test-utils:
         runs-on: ubuntu-latest
-        working-directory: packages/quip-test-utils
+        defaults:
+            run:
+                working-directory: packages/quip-test-utils
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
@@ -59,7 +65,9 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quiptext:
         runs-on: ubuntu-latest
-        working-directory: packages/quiptext
+        defaults:
+            run:
+                working-directory: packages/quiptext
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
