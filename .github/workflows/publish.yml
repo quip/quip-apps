@@ -19,6 +19,9 @@ jobs:
                   git config --local user.name "Jesse Ditson [CI]"
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
             - run: npm install
+            - run: npm test
+              env:
+                  CI: true
             - run: npm run release:next -- --yes
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
