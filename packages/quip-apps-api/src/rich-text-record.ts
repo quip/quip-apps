@@ -47,6 +47,8 @@ export default class RichTextRecord extends Record {
     insertText(text: string) {}
     listenToContent(listener: (record: Record) => void) {}
     unlistenToContent(listener: (record: Record) => void) {}
+    listenToSave(listener: (record: Record) => void) {}
+    unlistenToSave(listener: (record: Record) => void) {}
     replaceContent(text: string) {}
     selectAll() {}
     setDeleted() {
