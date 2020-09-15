@@ -110,7 +110,7 @@ export enum EventType {
     ELEMENT_FOCUS = "ELEMENT_FOCUS",
     FOCUS = "FOCUS",
     DOCUMENT_MEMBERS_LOADED = "DOCUMENT_MEMBERS_LOADED",
-    WHITELISTED_USERS_LOADED = "WHITELISTED_USERS_LOADED",
+    ALLOWLISTED_USERS_LOADED = "ALLOWLISTED_USERS_LOADED",
     DOCUMENT_EDITABLE_CHANGED = "DOCUMENT_EDITABLE_CHANGED",
     ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
     WIDTH_UPDATE = "WIDTH_UPDATE",
@@ -226,7 +226,7 @@ export default class Client {
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
     addEventListener(type: EventType, listener: () => void) {}
-    addWhitelistedUser(userId: string) {}
+    addAllowlistedlistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];
     }
