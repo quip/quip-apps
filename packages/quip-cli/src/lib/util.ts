@@ -1,9 +1,26 @@
+import chalk from "chalk";
+import {spawn as cp_spawn} from "child_process";
 import fs from "fs";
 import ncp from "ncp";
+import util from "util";
+import {println} from "./print";
+
+const spawnP = util.promisify(cp_spawn);
+
+export const runCmd = (cwd: string, command: string, ...args: string[]) => {
+    try {
+        return spawnP(command, [...args], {cwd, stdio: "inherit"});
+    } catch (error) {
+        println(chalk`{red Command failed: ${command} ${args.join(" ")}}`);
+        println(chalk`{red CWD: ${cwd}}`);
+        println(chalk`{red ${error.stack}}`);
+        process.exit(1);
+    }
+};
 
 export const pathExists = (filePath: string): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-        fs.stat(filePath, err => {
+        fs.stat(filePath, (err) => {
             if (err && err.code === "ENOENT") {
                 return resolve(false);
             } else if (err) {
@@ -20,7 +37,7 @@ export const copy = (
     options: ncp.Options = {}
 ): Promise<void> => {
     return new Promise((resolve, reject) =>
-        ncp(source, dest, options, err => {
+        ncp(source, dest, options, (err) => {
             if (err) {
                 return reject(err);
             }

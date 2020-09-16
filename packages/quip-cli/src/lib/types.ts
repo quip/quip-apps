@@ -4,6 +4,7 @@ interface Migration {
 }
 
 export interface Manifest {
+    id: string;
     name: string;
     manifest_version: number;
     version_name: string;

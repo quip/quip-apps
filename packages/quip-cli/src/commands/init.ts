@@ -1,20 +1,28 @@
 import {Command, flags} from "@oclif/command";
+import chalk from "chalk";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
+import cliAPI, {successOnly} from "../lib/cli-api";
+import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
 import {println} from "../lib/print";
-import {copy} from "../lib/util";
+import {Manifest} from "../lib/types";
+import {copy, runCmd} from "../lib/util";
+import {doPublish} from "./publish";
 
 interface PackageOptions {
     name: string;
+    version: string;
     description: string;
     typescript: boolean;
     bundler: string;
 }
 
 interface ManifestOptions {
+    id: string;
     name: string;
     description?: string;
+    version_number?: number;
     version_name?: string;
     toolbar_color?: string;
     diable_app_level_comments?: boolean;
@@ -39,9 +47,29 @@ export default class Init extends Command {
             description:
                 "only create a local app (don't create an app in the dev console or assign an ID)",
         }),
+        dir: flags.string({
+            char: "d",
+            description:
+                "specify directory to create app in (defaults to the name provided)",
+        }),
+        site: flags.string({
+            char: "s",
+            description:
+                "use a specific quip site rather than the standard quip.com login",
+            default: DEFAULT_SITE,
+        }),
+        json: flags.boolean({
+            char: "j",
+            description: "output responses in JSON",
+        }),
+        config: flags.string({
+            hidden: true,
+            description: "Use a custom config file (default ~/.quiprc)",
+            default: () => defaultConfigPath(),
+        }),
     };
 
-    private promptInitialAppConfig_ = async () => {
+    private promptInitialAppConfig_ = async (specifiedDir?: string) => {
         println("Creating a new Quip Live App");
         const defaultName = path
             .basename(process.cwd())
@@ -56,6 +84,12 @@ export default class Init extends Command {
                 message:
                     "What is the name of this app?\n(This is what users will see when inserting your app)\n",
                 default: defaultName,
+            },
+            {
+                type: "list",
+                name: "toolbar_color",
+                message: "Choose a toolbar color",
+                choices: ["red", "orange", "yellow", "green", "blue", "violet"],
             },
         ]);
 
@@ -91,28 +125,8 @@ export default class Init extends Command {
                 default: true,
             },
         ]);
-
         if (addManifestConfig) {
             const extraManifestOptions = await inquirer.prompt([
-                {
-                    type: "input",
-                    name: "version_name",
-                    message: "Choose an initial version string",
-                    default: "1.0.0-alpha.0",
-                },
-                {
-                    type: "list",
-                    name: "toolbar_color",
-                    message: "Choose a toolbar color",
-                    choices: [
-                        "red",
-                        "orange",
-                        "yellow",
-                        "green",
-                        "blue",
-                        "violet",
-                    ],
-                },
                 {
                     type: "confirm",
                     name: "disable_app_level_comments",
@@ -151,14 +165,31 @@ export default class Init extends Command {
 
         packageOptions.bundler = "webpack";
         manifestOptions.description = packageOptions.description;
-        return {packageOptions, manifestOptions};
+
+        println(packageOptions);
+        println(manifestOptions);
+
+        let appDir: string;
+        if (specifiedDir && specifiedDir.length) {
+            appDir = path.join(process.cwd(), specifiedDir);
+        } else {
+            appDir = path.join(process.cwd(), packageOptions.name);
+        }
+
+        manifestOptions.description = packageOptions.description;
+        return {
+            appDir,
+            packageOptions,
+            manifestOptions,
+        };
     };
 
-    private copyTemplateToCWD_ = (
+    private copyTemplate_ = (
         packageOptions: PackageOptions,
+        dest: string,
         dryRun: boolean
     ) => {
-        const {typescript, bundler, name} = packageOptions;
+        const {typescript, bundler} = packageOptions;
         // get lib path
         const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
         const templatePath = path.join(
@@ -172,7 +203,6 @@ export default class Init extends Command {
             filter: (fileName: string) =>
                 !fileName.match(/(?:\.git\/|templates\/[\w_]+\/node_modules)/),
         };
-        const dest = path.join(process.cwd(), name);
         if (dryRun) {
             println(`Would intialize ${templateName} on ${dest}`);
             return;
@@ -181,45 +211,99 @@ export default class Init extends Command {
         }
     };
 
-    private mangleBoilerplate_ = (
-        packageOptions: PackageOptions,
-        manifestOptions: ManifestOptions
+    private mutatePackage_ = (
+        packageOptions: Pick<
+            Partial<PackageOptions>,
+            "name" | "description" | "version"
+        >,
+        dir: string
     ) => {
-        const {name, description} = packageOptions;
-        const packagePath = path.join(process.cwd(), name, "package.json");
-        this.mangleJsonConfig_(packagePath, {name, description});
-        const manifestPath = path.join(process.cwd(), name, "manifest.json");
-        this.mangleJsonConfig_(manifestPath, manifestOptions);
+        const {name, description, version} = packageOptions;
+        const packagePath = path.join(dir, "package.json");
+        return this.mutateJsonConfig_(packagePath, {
+            name,
+            description,
+            version,
+        });
     };
 
-    private mangleJsonConfig_ = (
-        configPath: string,
-        updates: PackageOptions | ManifestOptions
+    private mutateManifest_ = (
+        manifestOptions: Partial<ManifestOptions>,
+        dir: string
     ) => {
+        const manifestPath = path.join(dir, "manifest.json");
+        return this.mutateJsonConfig_(manifestPath, manifestOptions);
+    };
+
+    private mutateJsonConfig_ = <T extends PackageOptions | ManifestOptions>(
+        configPath: string,
+        updates: Partial<T>
+    ): T => {
         const config = JSON.parse(fs.readFileSync(configPath).toString());
         Object.assign(config, updates);
         fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
+        return config;
     };
 
     async run() {
         const {flags} = this.parse(Init);
         const dryRun = flags["dry-run"];
-        const noCreate = flags["no-create"];
 
         // initial app options from user
         const {
+            appDir,
             packageOptions,
             manifestOptions,
-        } = await this.promptInitialAppConfig_();
-        await this.copyTemplateToCWD_(packageOptions, dryRun);
+        } = await this.promptInitialAppConfig_(flags.dir);
+        await this.copyTemplate_(packageOptions, appDir, dryRun);
         if (dryRun) {
             println("Would update package.json with", packageOptions);
             println("Would update manifest.json with", manifestOptions);
         } else {
-            this.mangleBoilerplate_(packageOptions, manifestOptions);
+            this.mutatePackage_(packageOptions, appDir);
+            this.mutateManifest_(manifestOptions, appDir);
         }
+
+        if (!flags["no-create"]) {
+            const fetch = await cliAPI(flags.config, flags.site);
+            // create app
+            println(chalk`{green Creating app in dev console...}`);
+            const createdApp = await successOnly(
+                fetch<Manifest>("apps", "post"),
+                flags.json
+            );
+            if (!createdApp) {
+                return;
+            }
+            // update manifest
+            manifest = this.mutateManifest_(
+                {
+                    id: createdApp.id,
+                    version_number: createdApp.version_number,
+                    version_name: createdApp.version_name,
+                },
+                appDir
+            );
+            println(
+                chalk`{magenta App created: ${createdApp.id}, v${createdApp.version_name} (${createdApp.version_number})}`
+            );
+            // npm install
+            println(chalk`{green installing dependencies...}`);
+            await runCmd(appDir, "npm", "install");
+            // npm run build
+            println(chalk`{green building app...}`);
+            await runCmd(appDir, "npm", "run", "build");
+            // upload initial version
+            println(chalk`{green uploading bundle...}`);
+            await doPublish(
+                path.join(appDir, "dist"),
+                flags.config,
+                flags.site
+            );
+        }
+
         println(
-            `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
+            chalk`{magenta Live App Project initialized: ${manifest.name} (${pkg.name})}`
         );
     }
 }
