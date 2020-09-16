@@ -1,16 +1,14 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import fs from "fs";
 import http from "http";
 import open from "open";
 import path from "path";
 import qs from "querystring";
 import url from "url";
-import {isLoggedIn} from "../lib/auth";
-import {defaultConfigPath, writeSiteConfig} from "../lib/config";
+import { isLoggedIn } from "../lib/auth";
+import { defaultConfigPath, DEFAULT_SITE, writeSiteConfig } from "../lib/config";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
-
-const DEFAULT_SITE = "quip.com";
 
 export default class Login extends Command {
     static description =
@@ -94,7 +92,7 @@ export default class Login extends Command {
         }
 
         const redirectURL = `http://${hostname}:${port}`;
-        const oAuthURL = `https://${site}/api/cli/token?r=${encodeURIComponent(
+        const oAuthURL = `https://platform.${site}/cli/login?r=${encodeURIComponent(
             redirectURL
         )}`;
         this.log(

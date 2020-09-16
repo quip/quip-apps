@@ -3,14 +3,16 @@
 This package contains the Quip command line interface, which is used for interacting with the Quip Live Apps platform.
 
 <!-- toc -->
-* [Quip CLI](#quip-cli)
-* [Usage](#usage)
-* [Commands](#commands)
+
+-   [Quip CLI](#quip-cli)
+-   [Usage](#usage)
+-   [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g quip-cli
 $ qla COMMAND
@@ -22,15 +24,56 @@ USAGE
   $ qla COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`qla help [COMMAND]`](#qla-help-command)
-* [`qla init`](#qla-init)
-* [`qla login`](#qla-login)
-* [`qla migration [NAME]`](#qla-migration-name)
+
+-   [`qla apps`](#qla-apps)
+-   [`qla bump [INCREMENT]`](#qla-bump-increment)
+-   [`qla help [COMMAND]`](#qla-help-command)
+-   [`qla init`](#qla-init)
+-   [`qla login`](#qla-login)
+-   [`qla migration [NAME]`](#qla-migration-name)
+-   [`qla publish`](#qla-publish)
+
+## `qla apps`
+
+Browse, inspect, create, and manipulate your Apps
+
+```
+USAGE
+  $ qla apps
+
+OPTIONS
+  -c, --create           create a new live app
+  -h, --help             show CLI help
+  -i, --id=id            show the details of an app ID
+  -j, --json             output responses in JSON
+  -s, --site=site        [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -v, --version=version  which version to show the details for. Only useful with --id
+```
+
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/apps.ts)_
+
+## `qla bump [INCREMENT]`
+
+Bump the application version
+
+```
+USAGE
+  $ qla bump [INCREMENT]
+
+ARGUMENTS
+  INCREMENT  which number to bump - can be one of 'major', 'minor', or 'patch' - defaults to 'patch'
+
+OPTIONS
+  -h, --help  show CLI help
+```
+
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/bump.ts)_
 
 ## `qla help [COMMAND]`
 
@@ -99,7 +142,24 @@ OPTIONS
                            version_number in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.40/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/migration.ts)_
+
+## `qla publish`
+
+Uploads this bundle to the developer console, and sets it as the latest development version.
+
+```
+USAGE
+  $ qla publish
+
+OPTIONS
+  -d, --dist=dist  [default: ./dist] dist folder to upload
+  -h, --help       show CLI help
+  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+```
+
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/publish.ts)_
+
 <!-- commandsstop -->
 
 ## Running locally

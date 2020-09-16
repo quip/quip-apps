@@ -3,6 +3,9 @@ import os from "os";
 import path from "path";
 import {pathExists} from "./util";
 
+export const DEFAULT_SITE = "quip.com";
+export const SKIP_SSL_FOR_SITES = new Set(["quip.codes"]);
+
 interface QLAConfigSite {
     accessToken: string;
 }
