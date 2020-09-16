@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import FormData from "form-data";
 import https from "https";
 import fetch from "node-fetch";
 import {readConfig, SKIP_SSL_FOR_SITES} from "../lib/config";
@@ -67,20 +68,27 @@ const cliAPI = async (configPath: string, site: string) => {
     return async <T>(
         path: string,
         method?: "get" | "post",
-        body?: {[key: string]: any}
+        data?: {[key: string]: any} | FormData
     ): Promise<T | ErrorResponse> => {
         const {accessToken} = config.sites[site];
-
+        let headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+        };
+        let body: string | FormData | undefined;
+        if (data?.getHeaders) {
+            headers = {...headers, ...data.getHeaders()};
+            body = data as FormData;
+        } else if (data) {
+            body = JSON.stringify(data);
+        }
         const request = await fetch(`https://platform.${site}/cli/${path}`, {
             agent: new https.Agent({
                 rejectUnauthorized: SKIP_SSL_FOR_SITES.has(site) ? false : true,
             }),
             method: method || "get",
-            body: JSON.stringify(body),
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`,
-            },
+            body,
+            headers,
         });
         const raw = await request.text();
         try {
