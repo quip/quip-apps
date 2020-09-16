@@ -2,6 +2,7 @@ import chalk from "chalk";
 import {spawn as cp_spawn} from "child_process";
 import fs from "fs";
 import ncp from "ncp";
+import path from "path";
 import util from "util";
 import {println} from "./print";
 
@@ -16,6 +17,45 @@ export const runCmd = (cwd: string, command: string, ...args: string[]) => {
         println(chalk`{red ${error.stack}}`);
         process.exit(1);
     }
+};
+
+export const readRecursive = async (
+    dir: string,
+    files: string[] = []
+): Promise<string[]> => {
+    return new Promise((resolve, reject) => {
+        fs.readdir(dir, (err, children) => {
+            if (err) {
+                return reject(err);
+            }
+            Promise.all(
+                children.map((child) => {
+                    return new Promise<string[]>((res, rej) => {
+                        fs.stat(path.join(dir, child), (err, info) => {
+                            if (err) {
+                                return rej(err);
+                            }
+                            if (info.isDirectory()) {
+                                res(
+                                    readRecursive(
+                                        path.join(dir, child)
+                                    ).then((children) =>
+                                        children.map((file) =>
+                                            path.join(child, file)
+                                        )
+                                    )
+                                );
+                            } else {
+                                res([child]);
+                            }
+                        });
+                    });
+                })
+            ).then((childLists) => {
+                resolve(files.concat(...childLists));
+            });
+        });
+    });
 };
 
 export const pathExists = (filePath: string): Promise<boolean> => {
