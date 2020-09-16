@@ -2,6 +2,7 @@ import {Command, flags} from "@oclif/command";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
+import {println} from "../lib/print";
 import {copy} from "../lib/util";
 
 interface PackageOptions {
@@ -33,15 +34,20 @@ export default class Init extends Command {
             description:
                 "Print what this would do, but don't create any files.",
         }),
+        "no-create": flags.boolean({
+            char: "n",
+            description:
+                "only create a local app (don't create an app in the dev console or assign an ID)",
+        }),
     };
 
     private promptInitialAppConfig_ = async () => {
-        this.log("Creating a new Quip Live App");
+        println("Creating a new Quip Live App");
         const defaultName = path
             .basename(process.cwd())
             .replace(/[^\w\d\s]/g, " ")
-            .replace(/(:?^|\s)(\w)/g, c => c.toUpperCase());
-        const validateNumber: (input: any) => true | string = val =>
+            .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
+        const validateNumber: (input: any) => true | string = (val) =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
         const manifestOptions: ManifestOptions = await inquirer.prompt([
             {
@@ -61,7 +67,7 @@ export default class Init extends Command {
                 default: manifestOptions.name
                     .toLowerCase()
                     .replace(/\s+/g, "-"),
-                filter: val => val.toLowerCase(),
+                filter: (val) => val.toLowerCase(),
             },
             {
                 type: "input",
@@ -135,9 +141,9 @@ export default class Init extends Command {
                     message:
                         "Specify an initial width for your app (optional)\nThis will be the width of the app while it is loading.\n",
                     default: "none",
-                    validate: input =>
+                    validate: (input) =>
                         input === "none" || validateNumber(input),
-                    filter: val => (val === "none" ? -1 : val),
+                    filter: (val) => (val === "none" ? -1 : val),
                 },
             ]);
             Object.assign(manifestOptions, extraManifestOptions);
@@ -168,7 +174,7 @@ export default class Init extends Command {
         };
         const dest = path.join(process.cwd(), name);
         if (dryRun) {
-            this.log(`Would intialize ${templateName} on ${dest}`);
+            println(`Would intialize ${templateName} on ${dest}`);
             return;
         } else {
             return copy(templatePath, dest, options);
@@ -198,6 +204,7 @@ export default class Init extends Command {
     async run() {
         const {flags} = this.parse(Init);
         const dryRun = flags["dry-run"];
+        const noCreate = flags["no-create"];
 
         // initial app options from user
         const {
@@ -206,12 +213,12 @@ export default class Init extends Command {
         } = await this.promptInitialAppConfig_();
         await this.copyTemplateToCWD_(packageOptions, dryRun);
         if (dryRun) {
-            this.log("Would update package.json with", packageOptions);
-            this.log("Would update manifest.json with", manifestOptions);
+            println("Would update package.json with", packageOptions);
+            println("Would update manifest.json with", manifestOptions);
         } else {
             this.mangleBoilerplate_(packageOptions, manifestOptions);
         }
-        this.log(
+        println(
             `Live App Project initialized: ${manifestOptions.name} (${packageOptions.name})`
         );
     }

@@ -1,6 +1,8 @@
+import chalk from "chalk";
 import https from "https";
 import fetch from "node-fetch";
 import {readConfig, SKIP_SSL_FOR_SITES} from "../lib/config";
+import {println} from "../lib/print";
 
 interface ErrorResponse {
     error: string;
@@ -32,8 +34,30 @@ export interface AppsListResponse {
     disabled: AppListInfo[];
 }
 
-export const isError = (response: any): response is ErrorResponse =>
+const isError = (response: any): response is ErrorResponse =>
     response && response.error;
+
+export const successOnly = async <T extends Object>(
+    promise: Promise<T | ErrorResponse>,
+    json: boolean
+): Promise<T | false> => {
+    let response: T | ErrorResponse;
+    try {
+        response = await promise;
+    } catch (e) {
+        response = {error: "Failed:", response: e.message};
+    }
+    if (json) {
+        println(JSON.stringify(response));
+    } else if (isError(response)) {
+        println(chalk`
+{red Error: ${response.error}}
+{red ${response.response}}`);
+    } else {
+        return response;
+    }
+    return false;
+};
 
 const cliAPI = async (configPath: string, site: string) => {
     const config = await readConfig(configPath);

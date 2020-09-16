@@ -4,45 +4,14 @@ import inquirer from "inquirer";
 import cliAPI, {
     AppsListResponse,
     AppVersionsResponse,
-    isError,
+    successOnly,
 } from "../lib/cli-api";
 import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
+import {prettyPrintObject, print} from "../lib/print";
 import {Manifest} from "../lib/types";
 
-const log = process.stdout.write.bind(process.stdout);
-
-const ptabs = (count: number) => {
-    let tabs = "";
-    for (var i = 0; i < count; i++) {
-        tabs += " ";
-    }
-    return tabs;
-};
-
-const prettyPrintObject = (obj: any, tabs: number = 0, prefix: string = "") => {
-    if (!obj) {
-        return;
-    } else if (Array.isArray(obj)) {
-        log("\n");
-        for (let i = 0; i < obj.length; i++) {
-            const item = obj[i];
-            log(chalk`${prefix}${ptabs(tabs)}{grey [${i}]: }`);
-            prettyPrintObject(item, tabs + 1);
-        }
-    } else if (typeof obj === "object") {
-        log("\n");
-        for (const key in obj) {
-            log(chalk`${prefix}${ptabs(tabs)}{grey - ${key}:} `);
-            prettyPrintObject(obj[key], tabs + 1);
-        }
-    } else {
-        log(chalk`${prefix}{green ${obj}}
-`);
-    }
-};
-
 export default class Apps extends Command {
-    static description = "Browse, inspect, create, and manipulate your Apps";
+    static description = "Browse, inspect, and manipulate your Apps";
 
     static flags = {
         help: flags.help({char: "h"}),
@@ -61,10 +30,6 @@ export default class Apps extends Command {
             description:
                 "which version to show the details for. Only useful with --id",
         }),
-        create: flags.boolean({
-            char: "c",
-            description: "create a new live app",
-        }),
         json: flags.boolean({
             char: "j",
             description: "output responses in JSON",
@@ -81,35 +46,20 @@ export default class Apps extends Command {
     async run() {
         const {args, flags} = this.parse(Apps);
         const fetch = await cliAPI(flags.config, flags.site);
-        const callApi = async <T>(
-            path: string,
-            method?: "get" | "post",
-            body?: {[key: string]: any}
-        ) => {
-            const response = await fetch<T>(path, method, body);
-            if (flags.json) {
-                log(JSON.stringify(response) + "\n");
-            } else if (isError(response)) {
-                log(chalk`
-{red Error: ${response.error}}
-{red ${response.response}}
-`);
-            } else {
-                return response;
-            }
-            return false;
-        };
 
         const handleAppId = async (id: string) => {
             const printAppInfo = async (
                 id: string,
                 version: number | null = null
             ) => {
-                const appInfo = await callApi<Manifest>(
-                    `app/${id}` + (version !== null ? "" : `/${version}`)
+                const appInfo = await successOnly(
+                    fetch<Manifest>(
+                        `app/${id}` + (version !== null ? "" : `/${version}`)
+                    ),
+                    flags.json
                 );
                 if (appInfo) {
-                    log(chalk`
+                    print(chalk`
 {magenta ${appInfo.name} v${appInfo.version_name} (${appInfo.version_number})}
 `);
                     prettyPrintObject(appInfo);
@@ -118,13 +68,14 @@ export default class Apps extends Command {
             if (flags.version) {
                 return await printAppInfo(flags.version);
             }
-            const versions = await callApi<AppVersionsResponse>(
-                `app/${id}/versions`
+            const versions = await successOnly(
+                fetch<AppVersionsResponse>(`app/${id}/versions`),
+                flags.json
             );
             if (!versions) {
                 return;
             }
-            log(chalk`
+            print(chalk`
 {magenta ${versions.name}}
 `);
             const {release, development} = versions;
@@ -157,22 +108,13 @@ export default class Apps extends Command {
             }
         };
 
-        if (flags.create) {
-            const createdApp = await callApi<Manifest>(
-                "apps",
-                "post"
-                /* TODO: manifest */
-            );
-            if (createdApp) {
-                log(chalk`
-{magenta Created New Application:}
-${prettyPrintObject(createdApp)}
-`);
-            }
-        } else if (flags.id) {
+        if (flags.id) {
             handleAppId(flags.id);
         } else {
-            const apps = await callApi<AppsListResponse>("apps");
+            const apps = await successOnly(
+                fetch<AppsListResponse>("apps"),
+                flags.json
+            );
             if (apps) {
                 const choices = [
                     new inquirer.Separator(chalk`{green === Released ===}`),
