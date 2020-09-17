@@ -18,19 +18,6 @@ interface PackageOptions {
     bundler?: string;
 }
 
-interface ManifestOptions {
-    id: string;
-    name: string;
-    description?: string;
-    version_number?: number;
-    version_name?: string;
-    toolbar_color?: string;
-    diable_app_level_comments?: boolean;
-    sizing_mode?: string;
-    initial_width?: number;
-    initial_height?: number;
-}
-
 export default class Init extends Command {
     static description = "Initialize a new Live App Project";
 
@@ -77,7 +64,8 @@ export default class Init extends Command {
             .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
         const validateNumber: (input: any) => true | string = (val) =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
-        const manifestOptions: ManifestOptions = await inquirer.prompt([
+        const manifestOptions: Pick<Manifest, "name" | "toolbar_color"> &
+            Partial<Manifest> = await inquirer.prompt([
             {
                 type: "input",
                 name: "name",
@@ -228,14 +216,14 @@ export default class Init extends Command {
     };
 
     private mutateManifest_ = (
-        manifestOptions: Partial<ManifestOptions>,
+        manifestOptions: Partial<Manifest>,
         dir: string
     ) => {
         const manifestPath = path.join(dir, "manifest.json");
         return this.mutateJsonConfig_(manifestPath, manifestOptions);
     };
 
-    private mutateJsonConfig_ = <T extends PackageOptions | ManifestOptions>(
+    private mutateJsonConfig_ = <T extends PackageOptions | Manifest>(
         configPath: string,
         updates: Partial<T>
     ): T => {
@@ -296,9 +284,12 @@ export default class Init extends Command {
             // upload initial version
             println(chalk`{green uploading bundle...}`);
             await doPublish(
-                path.join(appDir, "dist"),
+                manifest,
+                path.join(appDir, "manifest.json"),
+                "node_modules",
                 flags.config,
-                flags.site
+                flags.site,
+                flags.json
             );
         }
 
