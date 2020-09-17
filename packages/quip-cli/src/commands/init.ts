@@ -15,7 +15,7 @@ interface PackageOptions {
     version: string;
     description: string;
     typescript: boolean;
-    bundler: string;
+    bundler?: string;
 }
 
 interface ManifestOptions {
@@ -72,7 +72,7 @@ export default class Init extends Command {
     private promptInitialAppConfig_ = async (specifiedDir?: string) => {
         println("Creating a new Quip Live App");
         const defaultName = path
-            .basename(process.cwd())
+            .basename(path.resolve(process.cwd(), specifiedDir || ""))
             .replace(/[^\w\d\s]/g, " ")
             .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
         const validateNumber: (input: any) => true | string = (val) =>
@@ -259,10 +259,10 @@ export default class Init extends Command {
         if (dryRun) {
             println("Would update package.json with", packageOptions);
             println("Would update manifest.json with", manifestOptions);
-        } else {
-            this.mutatePackage_(packageOptions, appDir);
-            this.mutateManifest_(manifestOptions, appDir);
+            return;
         }
+        let pkg = this.mutatePackage_(packageOptions, appDir);
+        let manifest = this.mutateManifest_(manifestOptions, appDir);
 
         if (!flags["no-create"]) {
             const fetch = await cliAPI(flags.config, flags.site);
