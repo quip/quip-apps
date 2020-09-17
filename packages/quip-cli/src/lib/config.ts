@@ -35,7 +35,7 @@ const writeConfig = (configPath: string, config: QLAConfig) => {
     delete newConfig._exists;
     return fs.promises.writeFile(
         configPath,
-        JSON.stringify(config, null, 2),
+        JSON.stringify(newConfig, null, 2),
         "utf-8"
     );
 };

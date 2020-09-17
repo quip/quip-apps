@@ -1,12 +1,12 @@
-import { Command, flags } from "@oclif/command";
+import {Command, flags} from "@oclif/command";
 import fs from "fs";
 import http from "http";
 import open from "open";
 import path from "path";
 import qs from "querystring";
 import url from "url";
-import { isLoggedIn } from "../lib/auth";
-import { defaultConfigPath, DEFAULT_SITE, writeSiteConfig } from "../lib/config";
+import {isLoggedIn} from "../lib/auth";
+import {defaultConfigPath, DEFAULT_SITE, writeSiteConfig} from "../lib/config";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
 
@@ -91,8 +91,12 @@ export default class Login extends Command {
             return;
         }
 
+        const subdomainCount = site.split(".").length - 2;
+        const platformHost =
+            subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
+
         const redirectURL = `http://${hostname}:${port}`;
-        const oAuthURL = `https://platform.${site}/cli/login?r=${encodeURIComponent(
+        const oAuthURL = `https://${platformHost}/cli/login?r=${encodeURIComponent(
             redirectURL
         )}`;
         this.log(

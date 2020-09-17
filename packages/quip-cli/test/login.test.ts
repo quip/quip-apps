@@ -21,9 +21,9 @@ const makeLoginRequest = async (
                     port,
                     path,
                 },
-                response => {
+                (response) => {
                     let data = "";
-                    response.on("data", d => {
+                    response.on("data", (d) => {
                         data += String(d);
                     });
                     response.on("end", () => {
@@ -79,10 +79,10 @@ describe("qla login", () => {
                 });
             })
             .command(["login"])
-            .it("creates a .quiprc file in $HOME", async ctx => {
+            .it("creates a .quiprc file in $HOME", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://quip.com/api/cli/token?r=http%3A%2F%2F127.0.0.1%3A9898"
+                    "https://platform.quip.com/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
                 );
                 const rcPath = path.join(homedir, ".quiprc");
                 expect(await pathExists(rcPath)).toBe(true);
@@ -107,7 +107,7 @@ describe("qla login", () => {
         oclifTest
             .stdout()
             .command(["login"])
-            .it("Doesn't log in if you're already logged in", async ctx => {
+            .it("Doesn't log in if you're already logged in", async (ctx) => {
                 expect(ctx.stdout).toMatchInlineSnapshot(`
                     "You're already logged in to quip.com. Pass --force to log in again or --site to log in to a different site.
                     "
@@ -126,13 +126,15 @@ describe("qla login", () => {
                 });
             })
             .command(["login", "--force"])
-            .it("logs in again regardless when passing --force", async ctx => {
-                expect(mockedOpen).toHaveBeenCalled();
-                const config = (await fs.promises.readFile(
-                    path.join(homedir, ".quiprc"),
-                    "utf-8"
-                )) as string;
-                expect(config).toMatchInlineSnapshot(`
+            .it(
+                "logs in again regardless when passing --force",
+                async (ctx) => {
+                    expect(mockedOpen).toHaveBeenCalled();
+                    const config = (await fs.promises.readFile(
+                        path.join(homedir, ".quiprc"),
+                        "utf-8"
+                    )) as string;
+                    expect(config).toMatchInlineSnapshot(`
                         "{
                           \\"sites\\": {
                             \\"quip.com\\": {
@@ -141,7 +143,8 @@ describe("qla login", () => {
                           }
                         }"
                     `);
-            });
+                }
+            );
     });
     describe("customization", () => {
         oclifTest
@@ -152,11 +155,11 @@ describe("qla login", () => {
                     return open;
                 });
             })
-            .command(["login", "--site", "staging.quip.com"])
-            .it("passing --site results in a new login", async ctx => {
+            .command(["login", "--site", "quip.codes"])
+            .it("passing --site results in a new login", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://staging.quip.com/api/cli/token?r=http%3A%2F%2F127.0.0.1%3A9898"
+                    "https://platform.quip.codes/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
                 );
                 const config = (await fs.promises.readFile(
                     path.join(homedir, ".quiprc"),
@@ -167,6 +170,40 @@ describe("qla login", () => {
                       \\"sites\\": {
                         \\"quip.com\\": {
                           \\"accessToken\\": \\"another-token\\"
+                        },
+                        \\"quip.codes\\": {
+                          \\"accessToken\\": \\"hello\\"
+                        }
+                      }
+                    }"
+                `);
+            });
+        oclifTest
+            .stdout()
+            .do(() => {
+                mockedOpen.mockImplementation(() => {
+                    makeLoginRequest("/?token=hello");
+                    return open;
+                });
+            })
+            .command(["login", "--site", "staging.quip.com"])
+            .it("passing --site results in a new login", async (ctx) => {
+                // Verify that we called open with the right URL (note the dash on subdomains)
+                expect(mockedOpen).toHaveBeenCalledWith(
+                    "https://platform-staging.quip.com/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
+                );
+                const config = (await fs.promises.readFile(
+                    path.join(homedir, ".quiprc"),
+                    "utf-8"
+                )) as string;
+                expect(config).toMatchInlineSnapshot(`
+                    "{
+                      \\"sites\\": {
+                        \\"quip.com\\": {
+                          \\"accessToken\\": \\"another-token\\"
+                        },
+                        \\"quip.codes\\": {
+                          \\"accessToken\\": \\"hello\\"
                         },
                         \\"staging.quip.com\\": {
                           \\"accessToken\\": \\"hello\\"
@@ -180,7 +217,7 @@ describe("qla login", () => {
             .command(["login", "--site", "staging.quip.com"])
             .it(
                 "prints a different message when re-logging in to a custom site",
-                async ctx => {
+                async (ctx) => {
                     expect(ctx.stdout).toMatchInlineSnapshot(`
                         "You're already logged in to staging.quip.com. Pass --force to log in again.
                         "
@@ -203,10 +240,10 @@ describe("qla login", () => {
                 "localhost",
                 "--port=6969",
             ])
-            .it("hostname and port can be customized", async ctx => {
+            .it("hostname and port can be customized", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://quip.com/api/cli/token?r=http%3A%2F%2Flocalhost%3A6969"
+                    "https://platform.quip.com/cli/login?r=http%3A%2F%2Flocalhost%3A6969"
                 );
             });
     });
