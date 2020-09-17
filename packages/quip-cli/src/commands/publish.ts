@@ -91,7 +91,7 @@ export const doPublish = async (
     );
     fileBinaries.forEach(([name, data]) =>
         form.append("bundle", data, {
-            filename: name,
+            filepath: name,
         })
     );
     const fetch = await cliAPI(config, site);

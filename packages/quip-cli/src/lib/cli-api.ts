@@ -7,7 +7,7 @@ import {println} from "../lib/print";
 
 interface ErrorResponse {
     error: string;
-    response: string;
+    response?: string;
 }
 
 interface AppVersionResponse {
@@ -53,7 +53,7 @@ export const successOnly = async <T extends Object>(
     } else if (isError(response)) {
         println(chalk`
 {red Error: ${response.error}}
-{red ${response.response}}`);
+{red ${response.response || ""}}`);
     } else {
         return response;
     }
@@ -62,14 +62,14 @@ export const successOnly = async <T extends Object>(
 
 const cliAPI = async (configPath: string, site: string) => {
     const config = await readConfig(configPath);
-    if (!config.sites[site]) {
-        throw new Error(`Not logged in to ${site}`);
-    }
     return async <T>(
         path: string,
         method?: "get" | "post",
         data?: {[key: string]: any} | FormData
     ): Promise<T | ErrorResponse> => {
+        if (!config.sites[site]) {
+            return {error: `Not logged in to ${site}`};
+        }
         const {accessToken} = config.sites[site];
         let headers = {
             "Content-Type": "application/json",
