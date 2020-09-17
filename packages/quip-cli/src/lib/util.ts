@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import {spawn as cp_spawn} from "child_process";
 import fs from "fs";
+import minimatch from "minimatch";
 import ncp from "ncp";
 import path from "path";
 import util from "util";
@@ -21,15 +22,20 @@ export const runCmd = (cwd: string, command: string, ...args: string[]) => {
 
 export const readRecursive = async (
     dir: string,
-    files: string[] = []
+    skip: string
 ): Promise<string[]> => {
     return new Promise((resolve, reject) => {
         fs.readdir(dir, (err, children) => {
             if (err) {
                 return reject(err);
             }
-            Promise.all(
+            Promise.all<string[]>(
                 children.map((child) => {
+                    if (child) {
+                        if (minimatch(child, skip)) {
+                            return Promise.resolve([]);
+                        }
+                    }
                     return new Promise<string[]>((res, rej) => {
                         fs.stat(path.join(dir, child), (err, info) => {
                             if (err) {
@@ -38,7 +44,8 @@ export const readRecursive = async (
                             if (info.isDirectory()) {
                                 res(
                                     readRecursive(
-                                        path.join(dir, child)
+                                        path.join(dir, child),
+                                        skip
                                     ).then((children) =>
                                         children.map((file) =>
                                             path.join(child, file)
@@ -52,7 +59,9 @@ export const readRecursive = async (
                     });
                 })
             ).then((childLists) => {
-                resolve(files.concat(...childLists));
+                let arr: string[] = [];
+                // ts doesn't like [].concat, I think it believes it's immutable.
+                resolve(arr.concat(...childLists));
             });
         });
     });

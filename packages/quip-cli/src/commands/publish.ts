@@ -1,35 +1,94 @@
-import { Command, flags } from "@oclif/command";
+import {Command, flags} from "@oclif/command";
 import chalk from "chalk";
 import FormData from "form-data";
 import fs from "fs";
+import minimatch from "minimatch";
 import path from "path";
-import cliAPI, { successOnly } from "../lib/cli-api";
-import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
-import { findManifest, getManifest } from "../lib/manifest";
-import { println } from "../lib/print";
-import { Manifest } from "../lib/types";
-import { readRecursive } from "../lib/util";
+import cliAPI, {successOnly} from "../lib/cli-api";
+import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
+import {findManifest, getManifest} from "../lib/manifest";
+import {println} from "../lib/print";
+import {isMigration, Manifest, Migration} from "../lib/types";
+import {readRecursive} from "../lib/util";
+
+export const createBundle = async (
+    manifest: Manifest,
+    manifestPath: string,
+    ignore: string
+): Promise<{bundle: string[]; missing: Map<string, Set<string>>}> => {
+    const root = path.dirname(manifestPath);
+    const allFiles = new Set(await readRecursive(root, ignore));
+    const missing: Map<string, Set<string>> = new Map();
+    const bundle: string[] = [];
+    const addToFiles = (matcher: string | undefined, source: string) => {
+        if (!matcher) {
+            return;
+        }
+        let found = false;
+        for (let file of allFiles) {
+            if (minimatch(file, matcher)) {
+                bundle.push(path.relative(root, file));
+                found = true;
+            }
+        }
+        if (!found) {
+            missing.set(source, missing.get(source) || new Set());
+            missing.get(source)!.add(matcher);
+        }
+    };
+    const addAll = (
+        files: (string | Migration)[] | undefined,
+        source: string
+    ) => {
+        if (!files) {
+            return;
+        }
+        files.forEach((matcher) => {
+            if (isMigration(matcher)) {
+                addToFiles(matcher.js_file, source);
+            } else {
+                addToFiles(matcher, source);
+            }
+        });
+    };
+    addToFiles("manifest.json", "manifest");
+    addToFiles(manifest.thumbnail, "thumbnail");
+    addToFiles(manifest.toolbar_icon, "toolbar_icon");
+    addAll(manifest.js_files, "js_files");
+    addAll(manifest.css_files, "css_file");
+    addAll(manifest.other_resources, "other_resources");
+    addAll(manifest.migrations, "migrations");
+    return {bundle, missing};
+};
 
 export const doPublish = async (
-    id: string,
+    manifest: Manifest,
     manifestPath: string,
-    dist: string,
+    ignore: string,
     config: string,
     site: string,
     json: boolean
 ): Promise<Manifest | null> => {
     const form = new FormData();
-    const distFiles = await readRecursive(dist);
-    const fileBinaries = await Promise.all<[string, Buffer]>([
-        ["manifest.json", await fs.promises.readFile(manifestPath)],
-        ...distFiles.map(
+    const {bundle, missing} = await createBundle(
+        manifest,
+        manifestPath,
+        ignore
+    );
+    if (missing.size > 0) {
+        println(chalk`{red WARNING: the following files were defined in your manifest, but were not found.}
+{red This bundle may be incomplete, you should include these files ore remove them from your manifest.}`);
+        for (let [source, files] of missing) {
+            println(chalk`{red === ${source} ===}`);
+            files.forEach((f) => println(chalk`{red ${f}}`));
+        }
+    }
+    const fileBinaries = await Promise.all<[string, Buffer]>(
+        bundle.map(
             async (name) =>
-                [name, await fs.promises.readFile(path.join(dist, name))] as [
-                    string,
-                    Buffer
-                ]
-        ),
-    ]);
+                [name, await fs.promises.readFile(name)] as [string, Buffer]
+        )
+    );
     fileBinaries.forEach(([name, data]) =>
         form.append("bundle", data, {
             filename: name,
@@ -37,7 +96,7 @@ export const doPublish = async (
     );
     const fetch = await cliAPI(config, site);
     const response = await successOnly(
-        fetch<Manifest>(`app/${id}`, "post", form),
+        fetch<Manifest>(`app/${manifest.id}`, "post", form),
         json
     );
     if (!response) {
@@ -52,14 +111,14 @@ export default class Publish extends Command {
 
     static flags = {
         help: flags.help({char: "h"}),
-        dist: flags.string({
-            char: "d",
-            description: "dist folder to upload",
-            default: "./dist",
-        }),
         json: flags.boolean({
             char: "j",
             description: "output responses in JSON",
+        }),
+        ignore: flags.string({
+            char: "i",
+            description: "blob to ignore. Defaults to 'node_modules'",
+            default: "node_modules",
         }),
         site: flags.string({
             char: "s",
@@ -84,9 +143,9 @@ export default class Publish extends Command {
         }
         const manifest = await getManifest(manifestPath);
         const success = await doPublish(
-            manifest.id,
+            manifest,
             manifestPath,
-            flags.dist,
+            flags.ignore,
             flags.config,
             flags.site,
             flags.json
