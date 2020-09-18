@@ -40,7 +40,7 @@ const isError = (response: any): response is ErrorResponse =>
 
 export const successOnly = async <T extends Object>(
     promise: Promise<T | ErrorResponse>,
-    json: boolean
+    printJson: boolean
 ): Promise<T | false> => {
     let response: T | ErrorResponse;
     try {
@@ -48,7 +48,7 @@ export const successOnly = async <T extends Object>(
     } catch (e) {
         response = {error: "Failed:", response: e.message};
     }
-    if (json) {
+    if (printJson) {
         println(JSON.stringify(response));
     } else if (isError(response)) {
         println(chalk`

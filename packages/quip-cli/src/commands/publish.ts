@@ -15,7 +15,11 @@ export const createBundle = async (
     manifest: Manifest,
     manifestPath: string,
     ignore: string
-): Promise<{bundle: string[]; missing: Map<string, Set<string>>}> => {
+): Promise<{
+    root: string;
+    bundle: string[];
+    missing: Map<string, Set<string>>;
+}> => {
     const root = path.dirname(manifestPath);
     const allFiles = new Set(await readRecursive(root, ignore));
     const missing: Map<string, Set<string>> = new Map();
@@ -27,7 +31,7 @@ export const createBundle = async (
         let found = false;
         for (let file of allFiles) {
             if (minimatch(file, matcher)) {
-                bundle.push(path.relative(root, file));
+                bundle.push(file);
                 found = true;
             }
         }
@@ -51,14 +55,14 @@ export const createBundle = async (
             }
         });
     };
-    addToFiles("manifest.json", "manifest");
+    addToFiles("manifest.json", "manifest file");
     addToFiles(manifest.thumbnail, "thumbnail");
     addToFiles(manifest.toolbar_icon, "toolbar_icon");
     addAll(manifest.js_files, "js_files");
     addAll(manifest.css_files, "css_file");
     addAll(manifest.other_resources, "other_resources");
     addAll(manifest.migrations, "migrations");
-    return {bundle, missing};
+    return {root, bundle, missing};
 };
 
 export const doPublish = async (
@@ -67,10 +71,10 @@ export const doPublish = async (
     ignore: string,
     config: string,
     site: string,
-    json: boolean
+    printJson: boolean
 ): Promise<Manifest | null> => {
     const form = new FormData();
-    const {bundle, missing} = await createBundle(
+    const {root, bundle, missing} = await createBundle(
         manifest,
         manifestPath,
         ignore
@@ -86,7 +90,10 @@ export const doPublish = async (
     const fileBinaries = await Promise.all<[string, Buffer]>(
         bundle.map(
             async (name) =>
-                [name, await fs.promises.readFile(name)] as [string, Buffer]
+                [name, await fs.promises.readFile(path.join(root, name))] as [
+                    string,
+                    Buffer
+                ]
         )
     );
     fileBinaries.forEach(([name, data]) =>
@@ -97,7 +104,7 @@ export const doPublish = async (
     const fetch = await cliAPI(config, site);
     const response = await successOnly(
         fetch<Manifest>(`app/${manifest.id}`, "post", form),
-        json
+        printJson
     );
     if (!response) {
         return null;

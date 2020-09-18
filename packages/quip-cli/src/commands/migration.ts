@@ -1,12 +1,7 @@
 import {Command, flags} from "@oclif/command";
 import mkdirp from "mkdirp";
 import path from "path";
-import {
-    findManifest,
-    getManifest,
-    manifestFlag,
-    writeManifest,
-} from "../lib/manifest";
+import {findManifest, getManifest, writeManifest} from "../lib/manifest";
 import {copy, pathExists} from "../lib/util";
 
 export default class Migration extends Command {
@@ -19,7 +14,6 @@ export default class Migration extends Command {
             description: "The folder where your migrations are stored",
             default: "migrations",
         }),
-        manifest: manifestFlag,
         version: flags.integer({
             char: "v",
             description:
@@ -27,9 +21,14 @@ export default class Migration extends Command {
         }),
         ["dry-run"]: flags.boolean({
             char: "d",
-            hidden: true,
             description:
                 "Print what this would do, but don't create any files.",
+        }),
+        manifest: flags.string({
+            char: "m",
+            description:
+                "A manifest.json file to add the migration to. By default, we'll use the first one we find.",
+            hidden: true,
         }),
     };
 

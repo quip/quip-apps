@@ -5,18 +5,50 @@ import inquirer from "inquirer";
 import path from "path";
 import cliAPI, {successOnly} from "../lib/cli-api";
 import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
-import {println} from "../lib/print";
+import {print, println} from "../lib/print";
 import {Manifest} from "../lib/types";
 import {copy, runCmd} from "../lib/util";
+import {bump} from "./bump";
 import {doPublish} from "./publish";
 
 interface PackageOptions {
     name: string;
-    version: string;
     description: string;
     typescript: boolean;
     bundler?: string;
 }
+
+interface PackageJson {
+    name: string;
+    version: string;
+    description: string;
+}
+
+const defaultName = (dir?: string) => {
+    return path
+        .basename(path.resolve(process.cwd(), dir || ""))
+        .replace(/[^\w\d\s]/g, " ")
+        .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
+};
+
+const getAppDir = (name: string, dir?: string) => {
+    if (dir && dir.length) {
+        if (dir.startsWith("/")) {
+            return dir;
+        }
+        return path.join(process.cwd(), dir);
+    }
+    return path.join(process.cwd(), name);
+};
+
+const defaultPackageOptions = (name: string) => ({
+    name: name.toLowerCase().replace(/\s+/g, "-"),
+    description: "A Quip Live App",
+    typescript: true,
+});
+const defaultManifestOptions = (dir?: string) => ({
+    name: defaultName(dir),
+});
 
 export default class Init extends Command {
     static description = "Initialize a new Live App Project";
@@ -30,7 +62,6 @@ export default class Init extends Command {
                 "Print what this would do, but don't create any files.",
         }),
         "no-create": flags.boolean({
-            char: "n",
             description:
                 "only create a local app (don't create an app in the dev console or assign an ID)",
         }),
@@ -47,7 +78,11 @@ export default class Init extends Command {
         }),
         json: flags.boolean({
             char: "j",
-            description: "output responses in JSON",
+            description: "output responses in JSON (must provide --name)",
+        }),
+        name: flags.string({
+            char: "n",
+            description: "set the name of the application",
         }),
         config: flags.string({
             hidden: true,
@@ -58,20 +93,16 @@ export default class Init extends Command {
 
     private promptInitialAppConfig_ = async (specifiedDir?: string) => {
         println("Creating a new Quip Live App");
-        const defaultName = path
-            .basename(path.resolve(process.cwd(), specifiedDir || ""))
-            .replace(/[^\w\d\s]/g, " ")
-            .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
         const validateNumber: (input: any) => true | string = (val) =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
-        const manifestOptions: Pick<Manifest, "name" | "toolbar_color"> &
-            Partial<Manifest> = await inquirer.prompt([
+        const defaultManifest = defaultManifestOptions(specifiedDir);
+        const manifestOptions: Manifest = await inquirer.prompt([
             {
                 type: "input",
                 name: "name",
                 message:
                     "What is the name of this app?\n(This is what users will see when inserting your app)\n",
-                default: defaultName,
+                default: defaultManifest.name,
             },
             {
                 type: "list",
@@ -81,26 +112,27 @@ export default class Init extends Command {
             },
         ]);
 
+        const defaultPackage = defaultPackageOptions(manifestOptions.name);
+
         const packageOptions: PackageOptions = await inquirer.prompt([
             {
                 type: "input",
                 name: "name",
                 message: "Choose a package name",
-                default: manifestOptions.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "-"),
+                default: defaultPackage.name,
                 filter: (val) => val.toLowerCase(),
             },
             {
                 type: "input",
                 name: "description",
                 message: "What does this app do?\n",
+                default: defaultPackage.description,
             },
             {
                 type: "confirm",
                 name: "typescript",
                 message: "Use Typescript?",
-                default: true,
+                default: defaultPackage.typescript,
             },
         ]);
 
@@ -154,17 +186,7 @@ export default class Init extends Command {
         packageOptions.bundler = "webpack";
         manifestOptions.description = packageOptions.description;
 
-        println(packageOptions);
-        println(manifestOptions);
-
-        let appDir: string;
-        if (specifiedDir && specifiedDir.length) {
-            appDir = path.join(process.cwd(), specifiedDir);
-        } else {
-            appDir = path.join(process.cwd(), packageOptions.name);
-        }
-
-        manifestOptions.description = packageOptions.description;
+        const appDir = getAppDir(packageOptions.name, specifiedDir);
         return {
             appDir,
             packageOptions,
@@ -201,18 +223,14 @@ export default class Init extends Command {
 
     private mutatePackage_ = (
         packageOptions: Pick<
-            Partial<PackageOptions>,
+            Partial<PackageJson>,
             "name" | "description" | "version"
         >,
         dir: string
-    ) => {
+    ): PackageJson => {
         const {name, description, version} = packageOptions;
         const packagePath = path.join(dir, "package.json");
-        return this.mutateJsonConfig_(packagePath, {
-            name,
-            description,
-            version,
-        });
+        return this.mutateJsonConfig_<PackageJson>(packagePath, packageOptions);
     };
 
     private mutateManifest_ = (
@@ -223,7 +241,7 @@ export default class Init extends Command {
         return this.mutateJsonConfig_(manifestPath, manifestOptions);
     };
 
-    private mutateJsonConfig_ = <T extends PackageOptions | Manifest>(
+    private mutateJsonConfig_ = <T extends PackageJson | Manifest>(
         configPath: string,
         updates: Partial<T>
     ): T => {
@@ -236,13 +254,42 @@ export default class Init extends Command {
     async run() {
         const {flags} = this.parse(Init);
         const dryRun = flags["dry-run"];
-
-        // initial app options from user
-        const {
-            appDir,
-            packageOptions,
-            manifestOptions,
-        } = await this.promptInitialAppConfig_(flags.dir);
+        const fetch = await cliAPI(flags.config, flags.site);
+        const shouldCreate = !flags["no-create"];
+        if (flags.json && !flags.name) {
+            println(
+                chalk`{red You must provide --name when initializing with --json}`
+            );
+            process.exit(1);
+        }
+        if (shouldCreate) {
+            const ok = await successOnly(fetch("ok"), false);
+            if (!ok) {
+                println(
+                    chalk`{red Refusing to create an app since we can't contact Quip servers.}`
+                );
+                process.exit(1);
+            }
+        }
+        let config:
+            | {
+                  appDir: string;
+                  packageOptions: PackageOptions;
+                  manifestOptions: Partial<Manifest>;
+              }
+            | undefined;
+        if (flags.name && flags.json) {
+            const manifestOptions = defaultManifestOptions(flags.dir);
+            config = {
+                appDir: getAppDir(flags.name, flags.dir),
+                manifestOptions,
+                packageOptions: defaultPackageOptions(manifestOptions.name),
+            };
+        } else {
+            // initial app options from user
+            config = await this.promptInitialAppConfig_(flags.dir);
+        }
+        const {packageOptions, manifestOptions, appDir} = config;
         await this.copyTemplate_(packageOptions, appDir, dryRun);
         if (dryRun) {
             println("Would update package.json with", packageOptions);
@@ -251,14 +298,13 @@ export default class Init extends Command {
         }
         let pkg = this.mutatePackage_(packageOptions, appDir);
         let manifest = this.mutateManifest_(manifestOptions, appDir);
-
+        let success = true;
         if (!flags["no-create"]) {
-            const fetch = await cliAPI(flags.config, flags.site);
             // create app
             println(chalk`{green Creating app in dev console...}`);
             const createdApp = await successOnly(
                 fetch<Manifest>("apps", "post"),
-                flags.json
+                false
             );
             if (!createdApp) {
                 return;
@@ -278,12 +324,15 @@ export default class Init extends Command {
             // npm install
             println(chalk`{green installing dependencies...}`);
             await runCmd(appDir, "npm", "install");
+            // bump the version since we already have a verison 1 in the console
+            println(chalk`{green bumping version...}`);
+            await bump(appDir, "patch", flags.json);
             // npm run build
             println(chalk`{green building app...}`);
             await runCmd(appDir, "npm", "run", "build");
-            // upload initial version
+            // then publish the new version
             println(chalk`{green uploading bundle...}`);
-            await doPublish(
+            const newManifest = await doPublish(
                 manifest,
                 path.join(appDir, "manifest.json"),
                 "node_modules",
@@ -291,10 +340,19 @@ export default class Init extends Command {
                 flags.site,
                 flags.json
             );
+            success = !!newManifest;
+            if (flags.json) {
+                if (success) {
+                    print(JSON.stringify(newManifest));
+                } else {
+                    process.exit(1);
+                }
+            }
         }
-
-        println(
-            chalk`{magenta Live App Project initialized: ${manifest.name} (${pkg.name})}`
-        );
+        if (!flags.json && success) {
+            println(
+                chalk`{magenta Live App Project initialized: ${manifest.name} (${pkg.name})}`
+            );
+        }
     }
 }

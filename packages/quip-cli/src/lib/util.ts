@@ -1,23 +1,25 @@
 import chalk from "chalk";
-import {spawn as cp_spawn} from "child_process";
+import {spawn} from "child_process";
 import fs from "fs";
 import minimatch from "minimatch";
 import ncp from "ncp";
 import path from "path";
-import util from "util";
 import {println} from "./print";
 
-const spawnP = util.promisify(cp_spawn);
-
 export const runCmd = (cwd: string, command: string, ...args: string[]) => {
-    try {
-        return spawnP(command, [...args], {cwd, stdio: "inherit"});
-    } catch (error) {
-        println(chalk`{red Command failed: ${command} ${args.join(" ")}}`);
-        println(chalk`{red CWD: ${cwd}}`);
-        println(chalk`{red ${error.stack}}`);
-        process.exit(1);
-    }
+    return new Promise((resolve, reject) => {
+        const cmd = spawn(command, [...args], {
+            cwd,
+            stdio: ["inherit", "inherit", "inherit"],
+        });
+        cmd.on("error", (error) => {
+            println(chalk`{red Command failed: ${command} ${args.join(" ")}}`);
+            println(chalk`{red CWD: ${cwd}}`);
+            println(chalk`{red ${error.stack}}`);
+            process.exit(1);
+        });
+        cmd.on("close", resolve);
+    });
 };
 
 export const readRecursive = async (
