@@ -46,6 +46,7 @@ const defaultPackageOptions = (name: string) => ({
     description: "A Quip Live App",
     typescript: true,
 });
+
 const defaultManifestOptions = (dir?: string) => ({
     name: defaultName(dir),
 });
@@ -227,8 +228,7 @@ export default class Init extends Command {
             "name" | "description" | "version"
         >,
         dir: string
-    ): PackageJson => {
-        const {name, description, version} = packageOptions;
+    ): Promise<PackageJson> => {
         const packagePath = path.join(dir, "package.json");
         return this.mutateJsonConfig_<PackageJson>(packagePath, packageOptions);
     };
@@ -241,13 +241,16 @@ export default class Init extends Command {
         return this.mutateJsonConfig_(manifestPath, manifestOptions);
     };
 
-    private mutateJsonConfig_ = <T extends PackageJson | Manifest>(
+    private mutateJsonConfig_ = async <T extends PackageJson | Manifest>(
         configPath: string,
         updates: Partial<T>
-    ): T => {
+    ): Promise<T> => {
         const config = JSON.parse(fs.readFileSync(configPath).toString());
         Object.assign(config, updates);
-        fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
+        await fs.promises.writeFile(
+            configPath,
+            JSON.stringify(config, null, 4)
+        );
         return config;
     };
 
@@ -296,8 +299,8 @@ export default class Init extends Command {
             println("Would update manifest.json with", manifestOptions);
             return;
         }
-        let pkg = this.mutatePackage_(packageOptions, appDir);
-        let manifest = this.mutateManifest_(manifestOptions, appDir);
+        let pkg = await this.mutatePackage_(packageOptions, appDir);
+        let manifest = await this.mutateManifest_(manifestOptions, appDir);
         let success = true;
         if (!flags["no-create"]) {
             // create app
@@ -310,7 +313,7 @@ export default class Init extends Command {
                 return;
             }
             // update manifest
-            manifest = this.mutateManifest_(
+            manifest = await this.mutateManifest_(
                 {
                     id: createdApp.id,
                     version_number: createdApp.version_number,
