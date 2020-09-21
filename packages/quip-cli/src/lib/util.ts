@@ -61,9 +61,9 @@ export const readRecursive = async (
                     });
                 })
             ).then((childLists) => {
-                let arr: string[] = [];
-                // ts doesn't like [].concat, I think it believes it's immutable.
-                resolve(arr.concat(...childLists));
+                resolve(
+                    childLists.reduce((all, child) => [...all, ...child], [])
+                );
             });
         });
     });
