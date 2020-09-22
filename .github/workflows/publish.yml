@@ -10,7 +10,6 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v2
-            - run: git status
             - name: Set up Node.js
               uses: actions/setup-node@v1
               with:
@@ -19,11 +18,8 @@ jobs:
                   git config --local user.email "ospreyquip@gmail.com"
                   git config --local user.name "Osp Rey [CI]"
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-            - run: git status
             - run: npm install
-            - run: git status
             - run: npm test
-            - run: git status
             - run: npm run release:ci
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -5,7 +5,7 @@
     "main": "dist/test-utils.js",
     "scripts": {
         "build": "tsc",
-        "pretest": "npm i react @types/react @types/node",
+        "pretest": "npm i --no-save react @types/react @types/node",
         "test": "npm run build && tape test/**/*.test.js",
         "prepublishOnly": "npm run build"
     },
