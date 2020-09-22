@@ -15,8 +15,8 @@ jobs:
               with:
                   node-version: 12.x
             - run: |
-                  git config --local user.email "jesse.ditson@gmail.com"
-                  git config --local user.name "Jesse Ditson [CI]"
+                  git config --local user.email "ospreyquip@gmail.com"
+                  git config --local user.name "Osp Rey [CI]"
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
             - run: npm install
             - run: npm test
