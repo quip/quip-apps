@@ -21,7 +21,7 @@
     "version": "lerna version",
     "release:next": "lerna publish prerelease --dist-tag next",
     "release": "lerna publish from-git",
-    "release:ci": "lerna run build && npm run release:next --yes && npm run release --yes",
+    "release:ci": "lerna run build && npm run release:next -- --yes && npm run release --yes",
     "postinstall": "lerna bootstrap",
     "test": "lerna bootstrap && lerna exec -- npm run build --if-present && lerna run test"
   }
