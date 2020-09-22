@@ -85,7 +85,7 @@ export default class RecordList<T extends Record> {
         return true;
     }
 
-    remove(item: T) {
+    remove(item: T, skipDelete?: boolean) {
         const idx = this.indexOf(item);
         if (idx > -1) {
             this.recordsValue.splice(idx, 1);
