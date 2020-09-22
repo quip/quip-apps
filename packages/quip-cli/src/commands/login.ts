@@ -6,11 +6,9 @@ import path from "path";
 import qs from "querystring";
 import url from "url";
 import {isLoggedIn} from "../lib/auth";
-import {defaultConfigPath, writeSiteConfig} from "../lib/config";
+import {defaultConfigPath, DEFAULT_SITE, writeSiteConfig} from "../lib/config";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
-
-const DEFAULT_SITE = "quip.com";
 
 export default class Login extends Command {
     static description =
@@ -93,8 +91,12 @@ export default class Login extends Command {
             return;
         }
 
+        const subdomainCount = site.split(".").length - 2;
+        const platformHost =
+            subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
+
         const redirectURL = `http://${hostname}:${port}`;
-        const oAuthURL = `https://${site}/api/cli/token?r=${encodeURIComponent(
+        const oAuthURL = `https://${platformHost}/cli/login?r=${encodeURIComponent(
             redirectURL
         )}`;
         this.log(

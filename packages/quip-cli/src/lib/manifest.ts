@@ -1,15 +1,8 @@
-import {flags} from "@oclif/command";
 import fs from "fs";
 import path from "path";
 import prettier from "prettier";
 import {Manifest} from "./types";
 import {pathExists} from "./util";
-
-export const manifestFlag = flags.string({
-    char: "m",
-    description:
-        "A manifest.json file to add the migration to. By default, we'll use the first one we find.",
-});
 
 export const findManifest = async (
     dir: string

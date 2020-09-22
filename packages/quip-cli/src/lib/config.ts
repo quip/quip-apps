@@ -3,10 +3,13 @@ import os from "os";
 import path from "path";
 import {pathExists} from "./util";
 
+export const DEFAULT_SITE = "quip.com";
+export const SKIP_SSL_FOR_SITES = new Set(["quip.codes"]);
+
 interface QLAConfigSite {
     accessToken: string;
 }
-interface QLAConfig {
+export interface QLAConfig {
     _exists: boolean;
     sites: {
         [hostname: string]: QLAConfigSite;
@@ -26,10 +29,13 @@ export const writeSiteConfig = async (
 };
 
 const writeConfig = (configPath: string, config: QLAConfig) => {
-    delete config._exists;
+    let newConfig: Omit<QLAConfig, "_exists"> & {_exists?: boolean} = {
+        ...config,
+    };
+    delete newConfig._exists;
     return fs.promises.writeFile(
         configPath,
-        JSON.stringify(config, null, 2),
+        JSON.stringify(newConfig, null, 2),
         "utf-8"
     );
 };
