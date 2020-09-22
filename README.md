@@ -8,40 +8,36 @@ The Quip Apps platform enables developers to extend the Quip document canvas wit
     <li><a href="https://quip.com/dev/liveapps/samples">Example Apps</a> - Browse open-source code.</li>
 </ul>
 
-The platform is currently in beta.
-
 ## Quick Overview
 
-```
-npm install -g create-quip-app
-
-create-quip-app my-app
-```
-
-`create-quip-app my-app` will create a directory called `my-app` inside the current folder.
-Inside that directory, it will generate the initial project structure and install the transitive dependencies:
+You can interact with the Live Apps developer platform via our command line too, `quip-cli`. To get started, make sure you have a modern (e.g. v10+) version of node.js, then run:
 
 ```
-my-app
-├── package.json
-├── node_modules
-├── webpack.config.js
-├── app
-│   └── manifest.json
-└── src
-    └── App.less
-    └── App.jsx
-    └── root.jsx
+npm install -g quip-cli
 ```
 
-## Getting Started
+You will also want to log in to quip before interacting with the platform:
 
-Follow the <a href="https://quip.com/dev/liveapps/">Getting Started Guide</a> to start creating your own live app.
+```
+quip-cli login
+```
 
-## Publishing
+Once you're logged in, you can create your first app using:
 
-During the beta period, only developers of your app will be able to insert the app. To add a developer, go to the Quip Dev Portal. To insert the live app in a Quip document, type @ followed by the app name.
+```
+quip-cli init
+```
 
-Others can view and interact with the app, but they won't be able to create new instances of it yet.
+This will launch an interactive prompt which will ask you some questions about your application, then it will do the following:
+
+-   Create a new application in the [dev console](https://quip.com/dev/console)
+-   Create an app directory in the current working directory based on the name provided.
+-   Upload an initial bundle to Quip
+
+After `init` completes, you should be able to at-mention the app in a document, and point it at your development environment:
+
+[![CLI Demo](https://img.youtube.com/vi/IejJfRX-bKM/0.jpg)](https://www.youtube.com/watch?v=IejJfRX-bKM)
+
+For more details on how to use the Live Apps, consult the official [Getting Started Guide](https://quip.com/dev/liveapps/) and [API Reference](https://quip.com/dev/liveapps/documentation).
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
