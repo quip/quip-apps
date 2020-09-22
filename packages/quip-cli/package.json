@@ -79,7 +79,6 @@
         "test": "jest",
         "test:cover": "jest --coverage",
         "test:watch": "jest --watch",
-        "version": "npm run readme && git add README.md && git commit -m \"update README.md [CI]\"",
         "readme": "oclif-dev readme"
     },
     "types": "lib/index.d.ts"

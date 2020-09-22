@@ -17,11 +17,9 @@
   },
   "dependencies": {},
   "scripts": {
-    "build": "lerna run build",
-    "version": "lerna version",
-    "release:next": "lerna publish prerelease --dist-tag next",
-    "release": "lerna publish from-git",
-    "release:ci": "lerna run build && npm run release:next -- --yes && npm run release --yes",
+    "publish-all:next": "lerna publish prerelease --dist-tag next",
+    "publish-all": "lerna publish from-git",
+    "publish-all:ci": "lerna run build && npm run publish-all:next -- --yes && npm run publish-all -- --yes",
     "postinstall": "lerna bootstrap",
     "test": "lerna bootstrap && lerna exec -- npm run build --if-present && lerna run test"
   }

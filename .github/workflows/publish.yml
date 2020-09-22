@@ -20,7 +20,7 @@ jobs:
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
             - run: npm install
             - run: npm test
-            - run: npm run release:ci
+            - run: npm run publish-all:ci
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             CI: true
