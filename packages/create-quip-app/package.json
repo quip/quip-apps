@@ -1,6 +1,6 @@
 {
   "name": "create-quip-app",
-  "version": "1.0.0-alpha.41",
+  "version": "1.0.0-alpha.43",
   "keywords": [
     "quip"
   ],
@@ -18,6 +18,6 @@
   },
   "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
   "dependencies": {
-    "quip-cli": "^1.0.0-alpha.40"
+    "quip-cli": "^1.0.0-alpha.43"
   }
 }
