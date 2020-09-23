@@ -24,6 +24,6 @@
         "typescript": "^3.6.3"
     },
     "dependencies": {
-        "quip-apps-api": "^1.0.0-alpha.41"
+        "quip-apps-api": "^1.0.0-alpha.40"
     }
 }
