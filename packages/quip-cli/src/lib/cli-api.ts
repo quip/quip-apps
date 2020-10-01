@@ -71,31 +71,49 @@ const cliAPI = async (configPath: string, site: string) => {
             return {error: `Not logged in to ${site}`};
         }
         const {accessToken} = config.sites[site];
-        let headers = {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
-        };
-        let body: string | FormData | undefined;
-        if (data?.getHeaders) {
-            headers = {...headers, ...data.getHeaders()};
-            body = data as FormData;
-        } else if (data) {
-            body = JSON.stringify(data);
-        }
-        const request = await fetch(`https://platform.${site}/cli/${path}`, {
-            agent: new https.Agent({
-                rejectUnauthorized: SKIP_SSL_FOR_SITES.has(site) ? false : true,
-            }),
-            method: method || "get",
-            body,
-            headers,
-        });
-        const raw = await request.text();
-        try {
-            return JSON.parse(raw);
-        } catch (e) {
-            return {error: "Invalid response", response: raw};
-        }
+        return callAPI(site, path, method, data, accessToken);
     };
 };
+
+export const platformHost = (site: string) => {
+    const subdomainCount = site.split(".").length - 2;
+    return subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
+};
+
+export const callAPI = async (
+    site: string,
+    path: string,
+    method?: "get" | "post",
+    data?: {[key: string]: any} | FormData,
+    accessToken?: string
+) => {
+    let headers: {[name: string]: string} = {
+        "Content-Type": "application/json",
+    };
+    if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    let body: string | FormData | undefined;
+    if (data?.getHeaders) {
+        headers = {...headers, ...data.getHeaders()};
+        body = data as FormData;
+    } else if (data) {
+        body = JSON.stringify(data);
+    }
+    const request = await fetch(`https://${platformHost(site)}/cli/${path}`, {
+        agent: new https.Agent({
+            rejectUnauthorized: SKIP_SSL_FOR_SITES.has(site) ? false : true,
+        }),
+        method: method || "get",
+        body,
+        headers,
+    });
+    const raw = await request.text();
+    try {
+        return JSON.parse(raw);
+    } catch (e) {
+        return {error: "Invalid response", response: raw};
+    }
+};
+
 export default cliAPI;
