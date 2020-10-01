@@ -6,6 +6,8 @@ import path from "path";
 import * as config from "../src/lib/config";
 import {pathExists} from "../src/lib/util";
 import {cleanFixtures} from "./test-util";
+import {callAPI, getStateString} from "../src/lib/cli-api";
+import createChallenge from "pkce-challenge";
 
 const homedir = path.join(__dirname, "fixtures", "homedir");
 const makeLoginRequest = async (
@@ -38,7 +40,25 @@ const makeLoginRequest = async (
 };
 
 jest.mock("open");
-const mockedOpen = (open as unknown) as jest.Mock<typeof open>;
+const mockedOpen = (open as unknown) as jest.Mock<Promise<any>>;
+// this command normally opens a browser and lets the user login, so in test we
+// just skip the user interaction and redirect back to a given URL.
+const redirectToUrl = (url: string, host?: string, port?: number) => {
+    mockedOpen.mockImplementationOnce(() => makeLoginRequest(url, host, port));
+};
+jest.mock("pkce-challenge");
+const mockedPKCE = (createChallenge as unknown) as jest.Mock<{
+    code_challenge: string;
+    code_verifier: string;
+}>;
+mockedPKCE.mockReturnValue({
+    code_challenge: "ch",
+    code_verifier: "ve",
+});
+jest.mock("../src/lib/cli-api");
+const mockedCallAPI = (callAPI as unknown) as jest.Mock<Promise<any>>;
+const mockGetStateString = (getStateString as unknown) as jest.Mock<string>;
+mockGetStateString.mockImplementation(() => "state1234");
 
 describe("qla login", () => {
     let configSpy: jest.SpyInstance;
@@ -53,16 +73,14 @@ describe("qla login", () => {
     });
     afterEach(() => {
         mockedOpen.mockClear();
+        mockedCallAPI.mockClear();
     });
     describe("basic login", () => {
         oclifTest
             .stdout()
             .stderr()
             .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    makeLoginRequest("/i/did/not/return/a/token");
-                    return open;
-                });
+                redirectToUrl("/?error=true");
             })
             .command(["login"])
             .exit(2)
@@ -70,19 +88,29 @@ describe("qla login", () => {
         oclifTest
             .stdout()
             .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    // this command normally opens a browser and lets the user login,
-                    // so we have to load the place it would redirect to in order to
-                    // allow the script to continue
-                    makeLoginRequest("/?token=some-token%3D");
-                    return open;
+                redirectToUrl("/?code=some-code&state=state1234");
+                mockedCallAPI.mockResolvedValueOnce({
+                    access_token: "an-access-token",
+                    token_type: "Bearer",
                 });
             })
             .command(["login"])
             .it("creates a .quiprc file in $HOME", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://platform.quip.com/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
+                    "https://quip.com/cli/login?client_id=quip-cli&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A9898&state=state1234&code_challenge=ch&code_challenge_method=S256"
+                );
+                expect(mockedCallAPI).toHaveBeenCalledWith(
+                    "quip.com",
+                    "token",
+                    "post",
+                    {
+                        "client_id": "quip-cli",
+                        "code": "some-code",
+                        "code_verifier": "ve",
+                        "grant_type": "authorization_code",
+                        "redirect_uri": "http%3A%2F%2F127.0.0.1%3A9898",
+                    }
                 );
                 const rcPath = path.join(homedir, ".quiprc");
                 expect(await pathExists(rcPath)).toBe(true);
@@ -98,7 +126,7 @@ describe("qla login", () => {
                     Object {
                       "sites": Object {
                         "quip.com": Object {
-                          "accessToken": "some-token=",
+                          "accessToken": "an-access-token",
                         },
                       },
                     }
@@ -117,12 +145,10 @@ describe("qla login", () => {
         oclifTest
             .stdout()
             .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    // this command normally opens a browser and lets the user login,
-                    // so we have to load the place it would redirect to in order to
-                    // allow the script to continue
-                    makeLoginRequest("/?token=another-token");
-                    return open;
+                redirectToUrl("/?code=some-code&state=state1234");
+                mockedCallAPI.mockResolvedValueOnce({
+                    access_token: "another-token",
+                    token_type: "Bearer",
                 });
             })
             .command(["login", "--force"])
@@ -130,6 +156,7 @@ describe("qla login", () => {
                 "logs in again regardless when passing --force",
                 async (ctx) => {
                     expect(mockedOpen).toHaveBeenCalled();
+                    expect(mockedCallAPI).toHaveBeenCalled();
                     const config = (await fs.promises.readFile(
                         path.join(homedir, ".quiprc"),
                         "utf-8"
@@ -150,16 +177,29 @@ describe("qla login", () => {
         oclifTest
             .stdout()
             .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    makeLoginRequest("/?token=hello");
-                    return open;
+                redirectToUrl("/?code=some-code&state=state1234");
+                mockedCallAPI.mockResolvedValueOnce({
+                    access_token: "hello",
+                    token_type: "Bearer",
                 });
             })
             .command(["login", "--site", "quip.codes"])
             .it("passing --site results in a new login", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://platform.quip.codes/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
+                    "https://quip.codes/cli/login?client_id=quip-cli&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A9898&state=state1234&code_challenge=ch&code_challenge_method=S256"
+                );
+                expect(mockedCallAPI).toHaveBeenCalledWith(
+                    "quip.codes",
+                    "token",
+                    "post",
+                    {
+                        "client_id": "quip-cli",
+                        "code": "some-code",
+                        "code_verifier": "ve",
+                        "grant_type": "authorization_code",
+                        "redirect_uri": "http%3A%2F%2F127.0.0.1%3A9898",
+                    }
                 );
                 const config = (await fs.promises.readFile(
                     path.join(homedir, ".quiprc"),
@@ -180,46 +220,12 @@ describe("qla login", () => {
             });
         oclifTest
             .stdout()
-            .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    makeLoginRequest("/?token=hello");
-                    return open;
-                });
-            })
-            .command(["login", "--site", "staging.quip.com"])
-            .it("passing --site results in a new login", async (ctx) => {
-                // Verify that we called open with the right URL (note the dash on subdomains)
-                expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://platform-staging.quip.com/cli/login?r=http%3A%2F%2F127.0.0.1%3A9898"
-                );
-                const config = (await fs.promises.readFile(
-                    path.join(homedir, ".quiprc"),
-                    "utf-8"
-                )) as string;
-                expect(config).toMatchInlineSnapshot(`
-                    "{
-                      \\"sites\\": {
-                        \\"quip.com\\": {
-                          \\"accessToken\\": \\"another-token\\"
-                        },
-                        \\"quip.codes\\": {
-                          \\"accessToken\\": \\"hello\\"
-                        },
-                        \\"staging.quip.com\\": {
-                          \\"accessToken\\": \\"hello\\"
-                        }
-                      }
-                    }"
-                `);
-            });
-        oclifTest
-            .stdout()
-            .command(["login", "--site", "staging.quip.com"])
+            .command(["login", "--site", "quip.codes"])
             .it(
                 "prints a different message when re-logging in to a custom site",
                 async (ctx) => {
                     expect(ctx.stdout).toMatchInlineSnapshot(`
-                        "You're already logged in to staging.quip.com. Pass --force to log in again.
+                        "You're already logged in to quip.codes. Pass --force to log in again.
                         "
                     `);
                     expect(mockedOpen).not.toHaveBeenCalled();
@@ -228,9 +234,14 @@ describe("qla login", () => {
         oclifTest
             .stdout()
             .do(() => {
-                mockedOpen.mockImplementation(() => {
-                    makeLoginRequest("/?token=hello", "localhost", 6969);
-                    return open;
+                redirectToUrl(
+                    "/?code=some-code&state=state1234",
+                    "localhost",
+                    6969
+                );
+                mockedCallAPI.mockResolvedValueOnce({
+                    access_token: "hello",
+                    token_type: "Bearer",
                 });
             })
             .command([
@@ -243,7 +254,7 @@ describe("qla login", () => {
             .it("hostname and port can be customized", async (ctx) => {
                 // Verify that we called open with the right URL
                 expect(mockedOpen).toHaveBeenCalledWith(
-                    "https://platform.quip.com/cli/login?r=http%3A%2F%2Flocalhost%3A6969"
+                    "https://quip.com/cli/login?client_id=quip-cli&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A6969&state=state1234&code_challenge=ch&code_challenge_method=S256"
                 );
             });
     });

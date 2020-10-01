@@ -7,6 +7,8 @@ import qs from "querystring";
 import url from "url";
 import {isLoggedIn} from "../lib/auth";
 import {defaultConfigPath, DEFAULT_SITE, writeSiteConfig} from "../lib/config";
+import pkceChallenge from "pkce-challenge";
+import {callAPI, getStateString} from "../lib/cli-api";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
 
@@ -91,29 +93,56 @@ export default class Login extends Command {
             return;
         }
 
-        const subdomainCount = site.split(".").length - 2;
-        const platformHost =
-            subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
+        const {code_challenge, code_verifier} = pkceChallenge(42);
+        const state = getStateString();
 
         const redirectURL = `http://${hostname}:${port}`;
-        const oAuthURL = `https://${platformHost}/cli/login?r=${encodeURIComponent(
+        const loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
             redirectURL
-        )}`;
+        )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
         this.log(
-            `opening login URL in your browser. Log in to Quip there.\n${oAuthURL}`
+            `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
         );
         const responseParams = await this.waitForLogin(hostname, port, () =>
-            open(oAuthURL)
+            open(loginURL)
         );
-        const accessToken = responseParams["token"] as string | undefined;
-        if (!accessToken) {
+        if (responseParams.state !== state) {
+            this.error(new Error("API returned invalid state."));
+        } else if (!responseParams.code || responseParams.error) {
             this.error(
                 new Error(
-                    `Invalid response:\n${JSON.stringify(
-                        responseParams,
-                        null,
-                        2
-                    )}`
+                    `Login Failed: ${
+                        responseParams.error ||
+                        `no code returned, got ${JSON.stringify(
+                            responseParams,
+                            null,
+                            2
+                        )}`
+                    }`
+                )
+            );
+        }
+
+        const tokenResponse = await callAPI(site, "token", "post", {
+            client_id: "quip-cli",
+            grant_type: "authorization_code",
+            redirect_uri: encodeURIComponent(redirectURL),
+            code_verifier: code_verifier,
+            code: responseParams.code,
+        });
+        const accessToken =
+            tokenResponse.accessToken || tokenResponse.access_token;
+        if (!accessToken || tokenResponse.error) {
+            this.error(
+                new Error(
+                    `Failed to acquire access token: ${
+                        tokenResponse.error ||
+                        `no code returned, got ${JSON.stringify(
+                            tokenResponse,
+                            null,
+                            2
+                        )}`
+                    }`
                 )
             );
         }
