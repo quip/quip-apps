@@ -29,7 +29,7 @@
         "@oclif/dev-cli": "^1.22.2",
         "@oclif/test": "^1.2.6",
         "@types/inquirer": "^6.5.0",
-        "@types/jest": "^26.0.4",
+        "@types/jest": "^26.0.14",
         "@types/mkdirp": "^1.0.1",
         "@types/ncp": "^2.0.4",
         "@types/nock": "^11.1.0",

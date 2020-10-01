@@ -8,7 +8,7 @@ import url from "url";
 import {isLoggedIn} from "../lib/auth";
 import {defaultConfigPath, DEFAULT_SITE, writeSiteConfig} from "../lib/config";
 import pkceChallenge from "pkce-challenge";
-import {callAPI} from "../lib/cli-api";
+import {callAPI, getStateString} from "../lib/cli-api";
 
 type ResponseParams = {[key: string]: string | string[] | undefined};
 
@@ -93,8 +93,8 @@ export default class Login extends Command {
             return;
         }
 
-        const {code_challenge, code_verifier} = pkceChallenge();
-        const state = `${new Date().getTime()}${process.env.USER}`;
+        const {code_challenge, code_verifier} = pkceChallenge(42);
+        const state = getStateString();
 
         const redirectURL = `http://${hostname}:${port}`;
         const loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
@@ -130,7 +130,9 @@ export default class Login extends Command {
             code_verifier: code_verifier,
             code: responseParams.code,
         });
-        if (!tokenResponse.accessToken || tokenResponse.error) {
+        const accessToken =
+            tokenResponse.accessToken || tokenResponse.access_token;
+        if (!accessToken || tokenResponse.error) {
             this.error(
                 new Error(
                     `Failed to acquire access token: ${
@@ -144,9 +146,7 @@ export default class Login extends Command {
                 )
             );
         }
-        await writeSiteConfig(config, site, {
-            accessToken: tokenResponse.accessToken,
-        });
+        await writeSiteConfig(config, site, {accessToken});
         this.log("Successfully logged in.");
     }
 }

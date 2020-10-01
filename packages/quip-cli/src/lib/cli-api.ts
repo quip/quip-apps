@@ -38,6 +38,9 @@ export interface AppsListResponse {
 const isError = (response: any): response is ErrorResponse =>
     response && response.error;
 
+export const getStateString = () =>
+    `${new Date().getTime()}${process.env.USER}`;
+
 export const successOnly = async <T extends Object>(
     promise: Promise<T | ErrorResponse>,
     printJson: boolean
@@ -71,22 +74,22 @@ const cliAPI = async (configPath: string, site: string) => {
             return {error: `Not logged in to ${site}`};
         }
         const {accessToken} = config.sites[site];
-        return callAPI(site, path, method, data, accessToken);
+        return callAPI<T>(site, path, method, data, accessToken);
     };
 };
 
-export const platformHost = (site: string) => {
+const platformHost = (site: string) => {
     const subdomainCount = site.split(".").length - 2;
     return subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
 };
 
-export const callAPI = async (
+export const callAPI = async <T = any>(
     site: string,
     path: string,
     method?: "get" | "post",
     data?: {[key: string]: any} | FormData,
     accessToken?: string
-) => {
+): Promise<T | ErrorResponse> => {
     let headers: {[name: string]: string} = {
         "Content-Type": "application/json",
     };
