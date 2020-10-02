@@ -12,10 +12,13 @@ export const cleanFixtures = async (alreadyInSubdir: boolean = false) => {
     return exec("git clean -fd; git checkout .");
 };
 
+export const getFixtureDir = (dir: string) =>
+    path.join(__dirname, "fixtures", dir);
+
 export const useFixtureDir = (dir: string) => {
-    process.chdir(path.join(__dirname, "fixtures", dir));
+    process.chdir(getFixtureDir(dir));
     return () => {
-        process.chdir(path.join(__dirname, "fixtures", dir));
+        process.chdir(getFixtureDir(dir));
         return cleanFixtures(true);
     };
 };

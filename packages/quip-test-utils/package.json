@@ -21,9 +21,10 @@
     "homepage": "https://github.com/quip/quip-apps#readme",
     "devDependencies": {
         "tape": "^4.11.0",
-        "typescript": "^3.6.3"
+        "typescript": "^3.6.3",
+        "quip-apps-api": "next"
     },
     "dependencies": {
-        "quip-apps-api": "^1.0.0-alpha.43"
+        "quip-apps-api": "next"
     }
 }

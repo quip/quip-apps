@@ -1,11 +1,8 @@
 import {test as oclifTest} from "@oclif/test";
-import {exec as exec_node} from "child_process";
 import fs from "fs";
+import path from "path";
 import MockDate from "mockdate";
-import util from "util";
-import {readManifest, useFixtureDir} from "./test-util";
-
-const exec = util.promisify(exec_node);
+import {readManifest, useFixtureDir, getFixtureDir} from "./test-util";
 
 describe("qla migration", () => {
     beforeAll(async () => {
@@ -47,7 +44,12 @@ describe("qla migration", () => {
             });
         test("migration exists before running second test", () => {
             expect(() =>
-                fs.statSync("migrations/20150614_01.js")
+                fs.statSync(
+                    path.join(
+                        getFixtureDir("no-args"),
+                        "migrations/20150614_01.js"
+                    )
+                )
             ).not.toThrowError();
         });
         oclifTest
@@ -159,7 +161,12 @@ describe("qla migration", () => {
                     }
                 `);
                 expect(() =>
-                    fs.statSync("migrations/20150614_01.js")
+                    fs.statSync(
+                        path.join(
+                            getFixtureDir("custom-manifest-path"),
+                            "migrations/20150614_01.js"
+                        )
+                    )
                 ).not.toThrowError();
             });
     });
@@ -184,7 +191,12 @@ describe("qla migration", () => {
                     }
                 `);
                 expect(() =>
-                    fs.statSync("migrations/20150614_subdir.js")
+                    fs.statSync(
+                        path.join(
+                            getFixtureDir("subdir"),
+                            "migrations/20150614_subdir.js"
+                        )
+                    )
                 ).not.toThrowError();
             });
     });
@@ -209,7 +221,12 @@ describe("qla migration", () => {
                         }
                     `);
                     expect(() =>
-                        fs.statSync("created-folder/20150614_some-name.js")
+                        fs.statSync(
+                            path.join(
+                                getFixtureDir("folders"),
+                                "created-folder/20150614_some-name.js"
+                            )
+                        )
                     ).not.toThrowError();
                 }
             );
