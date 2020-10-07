@@ -73,6 +73,7 @@ export default class Login extends Command {
     };
 
     async catch(error: Error) {
+        console.error(error);
         this.server_?.close();
         throw error;
     }
@@ -93,7 +94,7 @@ export default class Login extends Command {
             return;
         }
 
-        const {code_challenge, code_verifier} = pkceChallenge(42);
+        const {code_challenge, code_verifier} = pkceChallenge(43);
         const state = getStateString();
 
         const redirectURL = `http://${hostname}:${port}`;
