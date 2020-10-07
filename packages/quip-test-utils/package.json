@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "pretest": "npm i --no-save react @types/react @types/node",
-        "test": "npm run build && tape test/**/*.test.js",
+        "test": "tape test/**/*.test.js",
         "prepublishOnly": "npm run build"
     },
     "repository": {
@@ -21,8 +21,7 @@
     "homepage": "https://github.com/quip/quip-apps#readme",
     "devDependencies": {
         "tape": "^4.11.0",
-        "typescript": "^3.6.3",
-        "quip-apps-api": "next"
+        "typescript": "^3.6.3"
     },
     "dependencies": {
         "quip-apps-api": "next"
