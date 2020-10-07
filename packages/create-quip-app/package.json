@@ -1,23 +1,23 @@
 {
-  "name": "create-quip-app",
-  "version": "1.0.0-alpha.43",
-  "keywords": [
-    "quip"
-  ],
-  "description": "Create Quip apps with no build configuration",
-  "repository": "quip/quip-apps",
-  "license": "Apache-2.0",
-  "engines": {
-    "node": ">=6"
-  },
-  "bugs": {
-    "url": "https://github.com/quip/quip-apps/issues"
-  },
-  "bin": {
-    "create-quip-app": "./bin/create-quip-app.py"
-  },
-  "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
-  "dependencies": {
-    "quip-cli": "^1.0.0-alpha.43"
-  }
+    "name": "create-quip-app",
+    "version": "1.0.0-alpha.43",
+    "keywords": [
+        "quip"
+    ],
+    "description": "Create Quip apps with no build configuration",
+    "repository": "quip/quip-apps",
+    "license": "Apache-2.0",
+    "engines": {
+        "node": ">=6"
+    },
+    "bugs": {
+        "url": "https://github.com/quip/quip-apps/issues"
+    },
+    "bin": {
+        "create-quip-app": "./create-quip-app.sh"
+    },
+    "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
+    "dependencies": {
+        "quip-cli": "^1.0.0-alpha.43"
+    }
 }
