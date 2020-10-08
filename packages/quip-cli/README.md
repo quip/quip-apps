@@ -3,52 +3,47 @@
 This package contains the Quip command line interface, which is used for interacting with the Quip Live Apps platform.
 
 <!-- toc -->
-
--   [Quip CLI](#quip-cli)
--   [Usage](#usage)
--   [Commands](#commands)
+* [Quip CLI](#quip-cli)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g quip-cli
 $ qla COMMAND
 running command...
 $ qla (-v|--version|version)
-quip-cli/1.0.0-alpha.40 linux-x64 node-v12.18.3
+quip-cli/1.0.0-alpha.44 darwin-x64 node-v10.15.0
 $ qla --help [COMMAND]
 USAGE
   $ qla COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
--   [`qla apps`](#qla-apps)
--   [`qla bump [INCREMENT]`](#qla-bump-increment)
--   [`qla help [COMMAND]`](#qla-help-command)
--   [`qla init`](#qla-init)
--   [`qla login`](#qla-login)
--   [`qla migration [NAME]`](#qla-migration-name)
--   [`qla publish`](#qla-publish)
+* [`qla apps`](#qla-apps)
+* [`qla bump [INCREMENT]`](#qla-bump-increment)
+* [`qla help [COMMAND]`](#qla-help-command)
+* [`qla init`](#qla-init)
+* [`qla login`](#qla-login)
+* [`qla migration [NAME]`](#qla-migration-name)
+* [`qla publish`](#qla-publish)
 
 ## `qla apps`
 
-Browse, inspect, create, and manipulate your Apps
+Browse, inspect, and manipulate your Apps
 
 ```
 USAGE
   $ qla apps
 
 OPTIONS
-  -c, --create           create a new live app
   -h, --help             show CLI help
   -i, --id=id            show the details of an app ID
   -j, --json             output responses in JSON
@@ -56,7 +51,7 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/apps.ts)_
 
 ## `qla bump [INCREMENT]`
 
@@ -73,7 +68,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/bump.ts)_
 
 ## `qla help [COMMAND]`
 
@@ -101,10 +96,16 @@ USAGE
   $ qla init
 
 OPTIONS
-  -h, --help  show CLI help
+  -d, --dir=dir    specify directory to create app in (defaults to the name provided)
+  -h, --help       show CLI help
+  -i, --id=id      set the ID of the application
+  -j, --json       output responses in JSON (must provide --name and --id)
+  -n, --name=name  set the name of the application
+  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+  --no-create      only create a local app (don't create an app in the dev console or assign an ID)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.40/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/init.ts)_
 
 ## `qla login`
 
@@ -120,7 +121,7 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.40/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/login.ts)_
 
 ## `qla migration [NAME]`
 
@@ -134,15 +135,15 @@ ARGUMENTS
   NAME  A short description to generate the filename with
 
 OPTIONS
-  -f, --folder=folder      [default: migrations] The folder where your migrations are stored
-  -h, --help               show CLI help
-  -m, --manifest=manifest  A manifest.json file to add the migration to. By default, we'll use the first one we find.
+  -d, --dry-run          Print what this would do, but don't create any files.
+  -f, --folder=folder    [default: migrations] The folder where your migrations are stored
+  -h, --help             show CLI help
 
-  -v, --version=version    The version to generate this migration for. By default, it will use the current
-                           version_number in the manifest
+  -v, --version=version  The version to generate this migration for. By default, it will use the current version_number
+                         in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/migration.ts)_
 
 ## `qla publish`
 
@@ -153,13 +154,13 @@ USAGE
   $ qla publish
 
 OPTIONS
-  -d, --dist=dist  [default: ./dist] dist folder to upload
-  -h, --help       show CLI help
-  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -h, --help           show CLI help
+  -i, --ignore=ignore  [default: node_modules] blob to ignore. Defaults to 'node_modules'
+  -j, --json           output responses in JSON
+  -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.24/src/commands/publish.ts)_
-
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v1.0.0-alpha.44/src/commands/publish.ts)_
 <!-- commandsstop -->
 
 ## Running locally
