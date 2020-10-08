@@ -5,7 +5,7 @@
     "main": "dist/test-utils.js",
     "scripts": {
         "build": "tsc",
-        "prebuild": "npm i --no-save react @types/react @types/node",
+        "prebuild": "npm i --no-save react @types/react @types/node quip-apps-api",
         "test": "tape test/**/*.test.js",
         "prepublishOnly": "npm run build"
     },
