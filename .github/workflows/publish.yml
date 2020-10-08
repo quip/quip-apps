@@ -31,17 +31,14 @@ jobs:
         name: Publish latest tag
         runs-on: ubuntu-latest
         steps:
-            - name: find latest release
-              uses: oprypin/find-latest-tag@v1
-              with:
-                  repository: quip/quip-apps
-                  releases-only: true
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - run: echo "::set-output name=TAG::$(git tag --sort version:refname | grep -v "-" | tail -n 1)"
               id: latest
-            - run: echo "Latest release is ${{ steps.latest.outputs.tag }}."
             - name: Checkout repository
               uses: actions/checkout@v2
               with:
-                  ref: ${{ steps.latest.outputs.tag }}
+                  ref: ${{ steps.latest.outputs.TAG }}
             - name: Set up Node.js
               uses: actions/setup-node@v1
               with:
@@ -50,7 +47,6 @@ jobs:
                   git config --local user.email "ospreyquip@gmail.com"
                   git config --local user.name "Osp Rey [CI]"
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-            - run: git checkout $(git tag --sort version:refname | grep -v "-" | tail -n 1)
             - run: npm install
             - run: npm test
             - run: npm run build
