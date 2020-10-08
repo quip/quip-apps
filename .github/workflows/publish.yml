@@ -40,7 +40,8 @@ jobs:
             - run: echo "Latest release is ${{ steps.latest.outputs.tag }}."
             - name: Checkout repository
               uses: actions/checkout@v2
-              ref: ${{ steps.latest.outputs.tag }}
+              with:
+                  ref: ${{ steps.latest.outputs.tag }}
             - name: Set up Node.js
               uses: actions/setup-node@v1
               with:
