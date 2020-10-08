@@ -36,7 +36,7 @@ jobs:
               with:
                   repository: quip/quip-apps
                   releases-only: true
-                  id: latest
+              id: latest
             - run: echo "Latest release is ${{ steps.latest.outputs.tag }}."
             - name: Checkout repository
               uses: actions/checkout@v2
