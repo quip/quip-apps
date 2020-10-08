@@ -33,12 +33,8 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v2
-            - run: echo "::set-output name=TAG::$(git tag --sort version:refname | grep -v "-" | tail -n 1)"
-              id: latest
-            - name: Checkout repository
-              uses: actions/checkout@v2
               with:
-                  ref: ${{ steps.latest.outputs.TAG }}
+                  fetch-depth: 0
             - name: Set up Node.js
               uses: actions/setup-node@v1
               with:
@@ -47,6 +43,7 @@ jobs:
                   git config --local user.email "ospreyquip@gmail.com"
                   git config --local user.name "Osp Rey [CI]"
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+            - run: git checkout $(git tag --sort version:refname | grep -v "-" | tail -n 1)
             - run: npm install
             - run: npm test
             - run: npm run build
