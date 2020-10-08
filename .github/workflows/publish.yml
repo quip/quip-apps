@@ -27,12 +27,20 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             CI: true
     npm-publish-current:
-        # Gets the latest tag that isn't alpha, and attempts to publish it.
+        # Gets the latest tag that has a release, and attempts to publish it.
         name: Publish latest tag
         runs-on: ubuntu-latest
         steps:
+            - name: find latest release
+              uses: oprypin/find-latest-tag@v1
+                with:
+                repository: quip/quip-apps
+                releases-only: true
+                id: latest
+            - run: echo "Latest release is ${{ steps.latest.outputs.tag }}."
             - name: Checkout repository
               uses: actions/checkout@v2
+              ref: ${{ steps.latest.outputs.tag }}
             - name: Set up Node.js
               uses: actions/setup-node@v1
               with:
