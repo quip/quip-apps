@@ -33,10 +33,10 @@ jobs:
         steps:
             - name: find latest release
               uses: oprypin/find-latest-tag@v1
-                with:
-                repository: quip/quip-apps
-                releases-only: true
-                id: latest
+              with:
+                  repository: quip/quip-apps
+                  releases-only: true
+                  id: latest
             - run: echo "Latest release is ${{ steps.latest.outputs.tag }}."
             - name: Checkout repository
               uses: actions/checkout@v2
