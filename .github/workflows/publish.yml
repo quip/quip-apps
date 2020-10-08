@@ -1,11 +1,12 @@
-name: Publish to @next tag on npm
+name: Publish npm packages
 on:
     push:
         branches:
             - master
 jobs:
-    npm-publish:
-        name: npm-publish
+    npm-publish-next:
+        name: npm-publish-next
+        description: Publishes HEAD as a new -alpha.x version under the @next tag
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -20,7 +21,32 @@ jobs:
             - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
             - run: npm install
             - run: npm test
-            - run: npm run publish-all:ci
+            - run: npm run build
+            - run: ./node_modules/.bin/lerna publish prerelease --pre-dist-tag next --yes
+        env:
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            CI: true
+    npm-publish-current:
+        name: npm-publish-current
+        description: Gets the latest tag that isn't alpha, and attempts to publish it.
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Set up Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12.x
+            - run: |
+                  git config --local user.email "ospreyquip@gmail.com"
+                  git config --local user.name "Osp Rey [CI]"
+            - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+            - run: git checkout $(git tag --sort version:refname | grep -v "-" | tail -n 1)
+            - run: npm install
+            - run: npm test
+            - run: npm run build
+            # This may error, which is ok - it just means the latest version is already published.
+            - run: ./node_modules/.bin/lerna publish from-git --yes || true
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             CI: true
