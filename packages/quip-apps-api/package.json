@@ -1,6 +1,6 @@
 {
   "name": "quip-apps-api",
-  "version": "1.0.0-alpha.44",
+  "version": "1.0.0-alpha.45",
   "description": "Quip Live Apps API",
   "main": "index.js",
   "types": "index.d.ts",
