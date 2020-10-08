@@ -5,8 +5,8 @@ on:
             - master
 jobs:
     npm-publish-next:
-        name: npm-publish-next
-        description: Publishes HEAD as a new -alpha.x version under the @next tag
+        # Publishes HEAD as a new -alpha.x version under the @next tag
+        name: Publish next tag
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -27,8 +27,8 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             CI: true
     npm-publish-current:
-        name: npm-publish-current
-        description: Gets the latest tag that isn't alpha, and attempts to publish it.
+        # Gets the latest tag that isn't alpha, and attempts to publish it.
+        name: Publish latest tag
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
