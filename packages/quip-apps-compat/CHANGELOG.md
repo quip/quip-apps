@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quip-apps-compat
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -207,6 +220,3 @@
 * Add quip-apps-compat package. ([0546b87](https://github.com/quip/quip-apps/commit/0546b87))
 * quip-apps-compat README ([d2fd52c](https://github.com/quip/quip-apps/commit/d2fd52c))
 * v0.0.16 ([a7172a9](https://github.com/quip/quip-apps/commit/a7172a9))
-
-
-

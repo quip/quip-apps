@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quip-test-utils
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -157,6 +170,3 @@
 * Quip test utils (#87) ([e8898e8](https://github.com/quip/quip-apps/commit/e8898e8)), closes [#87](https://github.com/quip/quip-apps/issues/87)
 * v1.0.0-alpha.22 ([dee871c](https://github.com/quip/quip-apps/commit/dee871c))
 * v1.0.0-alpha.23 ([2a98636](https://github.com/quip/quip-apps/commit/2a98636))
-
-
-

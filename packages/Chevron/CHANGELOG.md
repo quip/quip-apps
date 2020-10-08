@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quip-apps-chevron
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -239,6 +252,3 @@
 
 * Initial import with basic directory layout, lerna config, and shared packages. ([7e910cb](https://github.com/quip/quip-apps/commit/7e910cb))
 * v0.0.7 ([3b2f265](https://github.com/quip/quip-apps/commit/3b2f265))
-
-
-

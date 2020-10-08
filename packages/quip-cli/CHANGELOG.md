@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quip-cli
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -202,6 +215,3 @@
 * Quip CLI (#83) ([c7d82e2](https://github.com/quip/quip-apps/commit/c7d82e2)), closes [#83](https://github.com/quip/quip-apps/issues/83)
 * v1.0.0-alpha.22 ([dee871c](https://github.com/quip/quip-apps/commit/dee871c))
 * v1.0.0-alpha.23 ([2a98636](https://github.com/quip/quip-apps/commit/2a98636))
-
-
-

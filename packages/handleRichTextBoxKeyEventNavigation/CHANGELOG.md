@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quip-apps-handle-richtextbox-key-event-navigation
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -234,6 +247,3 @@
 ## <small>0.0.11 (2017-10-31)</small>
 
 * v0.0.11 ([479be44](https://github.com/quip/quip-apps/commit/479be44))
-
-
-

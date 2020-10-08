@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+
+
+**Note:** Version bump only for package quiptext
+
+
+
+
+
 ## 0.1.0 (2020-10-08)
 
 * v0.1.0 ([e4953f3](https://github.com/quip/quip-apps/commit/e4953f3))
@@ -186,6 +199,3 @@
 * Add quiptext package ([501aff8](https://github.com/quip/quip-apps/commit/501aff8))
 * Modernization (#44) ([efde115](https://github.com/quip/quip-apps/commit/efde115)), closes [#44](https://github.com/quip/quip-apps/issues/44)
 * v1.0.0-alpha.0 ([e0fabee](https://github.com/quip/quip-apps/commit/e0fabee))
-
-
-
