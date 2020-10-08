@@ -31,7 +31,8 @@ const defaultName = (dir?: string) => {
         .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
 };
 
-const packageName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
+const packageName = (name: string) =>
+    name.toLowerCase().trim().replace(/\s+/g, "-");
 
 const getAppDir = (name: string, dir?: string) => {
     if (dir && dir.length) {
@@ -87,6 +88,7 @@ export default class Init extends Command {
             char: "j",
             description:
                 "output responses in JSON (must provide --name and --id)",
+            dependsOn: ["name", "id"],
         }),
         name: flags.string({
             char: "n",
@@ -275,12 +277,6 @@ export default class Init extends Command {
         const dryRun = flags["dry-run"];
         const fetch = await cliAPI(flags.config, flags.site);
         const shouldCreate = !flags["no-create"];
-        if (flags.json && (!flags.name || !flags.id)) {
-            println(
-                chalk`{red You must provide --name and --id when initializing with --json}`
-            );
-            process.exit(1);
-        }
         if (shouldCreate) {
             const ok = await successOnly(fetch("ok"), false);
             if (!ok) {
