@@ -31,6 +31,9 @@ const defaultName = (dir?: string) => {
         .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
 };
 
+const packageName = (name: string) =>
+    name.toLowerCase().trim().replace(/\s+/g, "-");
+
 const getAppDir = (name: string, dir?: string) => {
     if (dir && dir.length) {
         if (dir.startsWith("/")) {
@@ -42,13 +45,17 @@ const getAppDir = (name: string, dir?: string) => {
 };
 
 const defaultPackageOptions = (name: string) => ({
-    name: name.toLowerCase().replace(/\s+/g, "-"),
+    name: packageName(name),
     description: "A Quip Live App",
     typescript: true,
 });
 
-const defaultManifestOptions = (dir?: string) => ({
+const defaultManifestOptions = (
+    dir?: string,
+    opts?: {name?: string; id?: string}
+) => ({
     name: defaultName(dir),
+    ...(opts || {}),
 });
 
 export default class Init extends Command {
@@ -79,11 +86,17 @@ export default class Init extends Command {
         }),
         json: flags.boolean({
             char: "j",
-            description: "output responses in JSON (must provide --name)",
+            description:
+                "output responses in JSON (must provide --name and --id)",
+            dependsOn: ["name", "id"],
         }),
         name: flags.string({
             char: "n",
             description: "set the name of the application",
+        }),
+        id: flags.string({
+            char: "i",
+            description: "set the ID of the application",
         }),
         config: flags.string({
             hidden: true,
@@ -92,11 +105,14 @@ export default class Init extends Command {
         }),
     };
 
-    private promptInitialAppConfig_ = async (specifiedDir?: string) => {
+    private promptInitialAppConfig_ = async (
+        specifiedDir?: string,
+        defaults?: {name?: string; id?: string}
+    ) => {
         println("Creating a new Quip Live App");
         const validateNumber: (input: any) => true | string = (val) =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
-        const defaultManifest = defaultManifestOptions(specifiedDir);
+        const defaultManifest = defaultManifestOptions(specifiedDir, defaults);
         const manifestOptions: Manifest = await inquirer.prompt([
             {
                 type: "input",
@@ -202,7 +218,9 @@ export default class Init extends Command {
     ) => {
         const {typescript, bundler} = packageOptions;
         // get lib path
-        const templateName = `${typescript ? "ts" : "js"}_${bundler}`;
+        const templateName = `${typescript ? "ts" : "js"}_${
+            bundler || "webpack"
+        }`;
         const templatePath = path.join(
             __dirname,
             "../../templates",
@@ -259,12 +277,6 @@ export default class Init extends Command {
         const dryRun = flags["dry-run"];
         const fetch = await cliAPI(flags.config, flags.site);
         const shouldCreate = !flags["no-create"];
-        if (flags.json && !flags.name) {
-            println(
-                chalk`{red You must provide --name when initializing with --json}`
-            );
-            process.exit(1);
-        }
         if (shouldCreate) {
             const ok = await successOnly(fetch("ok"), false);
             if (!ok) {
@@ -281,16 +293,23 @@ export default class Init extends Command {
                   manifestOptions: Partial<Manifest>;
               }
             | undefined;
-        if (flags.name && flags.json) {
-            const manifestOptions = defaultManifestOptions(flags.dir);
+        if (flags.name && flags.json && flags.id) {
+            const manifestOptions = defaultManifestOptions(flags.dir, {
+                name: flags.name,
+                id: flags.id,
+            });
+            const packageOptions = defaultPackageOptions(manifestOptions.name);
             config = {
-                appDir: getAppDir(flags.name, flags.dir),
+                appDir: getAppDir(packageOptions.name, flags.dir),
                 manifestOptions,
-                packageOptions: defaultPackageOptions(manifestOptions.name),
+                packageOptions,
             };
         } else {
             // initial app options from user
-            config = await this.promptInitialAppConfig_(flags.dir);
+            config = await this.promptInitialAppConfig_(flags.dir, {
+                name: flags.name,
+                id: flags.id,
+            });
         }
         const {packageOptions, manifestOptions, appDir} = config;
         await this.copyTemplate_(packageOptions, appDir, dryRun);
@@ -351,6 +370,8 @@ export default class Init extends Command {
                     process.exit(1);
                 }
             }
+        } else if (flags.json && success) {
+            print(JSON.stringify(manifest));
         }
         if (!flags.json && success) {
             println(
