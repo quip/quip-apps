@@ -49,7 +49,7 @@ def init_app():
     quip_cli_path = os.path.join(
         script_path, "..", "node_modules", "quip-cli", "bin", "run")
     subprocess.check_call(
-        "%s init" % quip_cli_path,
+        "%s init --no-create --json --name \"Live App\" --id \"LIVE_APP_ID\"" % quip_cli_path,
         shell=True,
     )
 
