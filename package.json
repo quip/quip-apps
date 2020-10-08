@@ -19,6 +19,7 @@
   "scripts": {
     "build": "lerna run build",
     "postinstall": "lerna bootstrap",
+    "release": "lerna version --conventional-commits --create-release github",
     "test": "lerna exec -- npm run build --if-present && lerna run test"
   }
 }
