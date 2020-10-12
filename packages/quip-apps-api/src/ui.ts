@@ -23,11 +23,8 @@ export class Button extends Component<{
 }
 
 export class CalendarPicker extends Component<{
-    dateMs: number;
-    setDateMsFn: (dateMs: number) => void;
-    useDisabledColor?: boolean;
-    useWarningColors?: boolean;
-    focusOnMount?: boolean;
+    initialSelectedDateMs: number;
+    onChangeSelectedDateMs: (dateMs: number) => void;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.CalendarPicker");
