@@ -9,7 +9,7 @@ import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
 import {findManifest, getManifest} from "../lib/manifest";
 import {println} from "../lib/print";
 import {isMigration, Manifest, Migration} from "../lib/types";
-import {readRecursive} from "../lib/util";
+import {readRecursive, runCmdPromise} from "../lib/util";
 
 export const createBundle = async (
     manifest: Manifest,
@@ -73,6 +73,17 @@ export const doPublish = async (
     site: string,
     printJson: boolean
 ): Promise<Manifest | null> => {
+    let gitsha: string | null = null;
+    try {
+        gitsha = await runCmdPromise(
+            path.dirname(manifestPath),
+            "git",
+            "rev-parse",
+            "HEAD"
+        );
+    } catch (e) {
+        /* swallow this error, this is just a best effort. */
+    }
     const form = new FormData();
     const {root, bundle, missing} = await createBundle(
         manifest,
@@ -101,6 +112,10 @@ export const doPublish = async (
             filepath: name,
         })
     );
+    if (gitsha) {
+        form.append("gitsha", gitsha);
+        console.log(gitsha);
+    }
     const fetch = await cliAPI(config, site);
     const response = await successOnly(
         fetch<Manifest>(`app/${manifest.id}`, "post", form),

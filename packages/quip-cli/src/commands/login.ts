@@ -137,13 +137,8 @@ export default class Login extends Command {
             this.error(
                 new Error(
                     `Failed to acquire access token: ${
-                        tokenResponse.error ||
-                        `no code returned, got ${JSON.stringify(
-                            tokenResponse,
-                            null,
-                            2
-                        )}`
-                    }`
+                        tokenResponse.error
+                    } - response: ${JSON.stringify(tokenResponse, null, 2)}`
                 )
             );
         }

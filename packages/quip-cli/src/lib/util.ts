@@ -7,18 +7,36 @@ import path from "path";
 import {println} from "./print";
 
 export const runCmd = (cwd: string, command: string, ...args: string[]) => {
-    return new Promise((resolve, reject) => {
-        const cmd = spawn(command, [...args], {
-            cwd,
-            stdio: ["inherit", "inherit", "inherit"],
-        });
-        cmd.on("error", (error) => {
+    return runCmdPromise(cwd, command, ...args)
+        .then((stdout) => console.log(stdout))
+        .catch((error) => {
             println(chalk`{red Command failed: ${command} ${args.join(" ")}}`);
             println(chalk`{red CWD: ${cwd}}`);
             println(chalk`{red ${error.stack}}`);
             process.exit(1);
         });
-        cmd.on("close", resolve);
+};
+
+export const runCmdPromise = (
+    cwd: string,
+    command: string,
+    ...args: string[]
+): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const cmd = spawn(command, [...args], {
+            cwd,
+            stdio: ["inherit", "pipe", "inherit"],
+        });
+        let stdout = "";
+        cmd.stdout.on("data", (d) => {
+            stdout += d;
+        });
+        cmd.on("error", (error) => {
+            reject(error);
+        });
+        cmd.on("close", () => {
+            resolve(stdout);
+        });
     });
 };
 
