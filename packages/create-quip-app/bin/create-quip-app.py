@@ -42,16 +42,33 @@ def check_environment(yarn_or_npm):
     return True
 
 
-def init_app():
+def init_app(app_name = "Live App"):
     # TODO: continue supporting yarn
     check_environment("npm")
     script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
     quip_cli_path = os.path.join(
         script_path, "..", "node_modules", "quip-cli", "bin", "run")
-    subprocess.check_call(
-        "%s init --no-create --json --name \"Live App\" --id \"LIVE_APP_ID\"" % quip_cli_path,
-        shell=True,
+    manifest = subprocess.check_output([
+        quip_cli_path,
+        "init",
+        "--no-create",
+        "--json",
+        "--name", app_name,
+        "--id", "\"LIVE_APP_ID\""],
     )
+    if manifest is not None:
+        app_dir = app_name.lower().strip().replace(" ", "-")
+        # if we've initted via create-quip-app, we should also build with it by default
+        package_path = "%s/package.json" % app_dir
+        with open(package_path, 'r') as package_f:
+            package_json = json.loads(package_f.read())
+            package_json["scripts"]["build"] += " && create-quip-app pack ."
+        with open(package_path, 'w') as package_f:
+            package_f.write(json.dumps(package_json).encode("utf-8"))
+        logging.info("Created live app at %s" % app_dir)
+        logging.info("running npm install. This can take a few minutes...")
+        subprocess.check_call(["npm", "install", "--prefix", app_dir])
+        subprocess.check_call(["npm", "install", "--save-dev", "create-quip-app@latest", "--prefix", app_dir])
 
 
 def read_manifest():
@@ -170,7 +187,7 @@ def main():
         app_location = args.args[1] if len(args.args) > 1 else "."
         create_package(app_location, args.output)
     else:
-        init_app()
+        init_app(args.args[0])
 
 
 if __name__ == "__main__":
