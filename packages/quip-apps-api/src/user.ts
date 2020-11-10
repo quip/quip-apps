@@ -5,6 +5,7 @@ export default class User {
     idValue: string = "mock-user";
     nameValue: string = "Mock User";
     languageValue: string = "en";
+    companyIdValue: string = "HWWAcAP8yS4";
 
     id() {
         return this.getId();
@@ -20,5 +21,8 @@ export default class User {
     }
     getName() {
         return this.nameValue;
+    }
+    getCompanyId() {
+        return this.companyIdValue;
     }
 }
