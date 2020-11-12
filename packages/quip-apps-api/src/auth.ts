@@ -7,7 +7,7 @@ export default class Auth {
     constructor(client: Client, authConfig: Object) {
         this.values = {};
     }
-    login(params: Object): Promise<boolean> {
+    login(params?: {[name: string]: string}): Promise<boolean> {
         return Promise.reject("Unconfigured Auth");
     }
 }
