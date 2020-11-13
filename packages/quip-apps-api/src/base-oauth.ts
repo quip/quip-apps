@@ -17,7 +17,7 @@ export default class BaseOAuth extends Auth {
     isLoggedIn() {
         return !!this.getTokenResponseParam("access_token");
     }
-    login(params: Object): Promise<boolean> {
+    login(params?: {[name: string]: string}): Promise<boolean> {
         return Promise.resolve(true);
     }
     logout(): Promise<HttpResponse> {
