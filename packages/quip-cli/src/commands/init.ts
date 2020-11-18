@@ -28,14 +28,11 @@ const defaultName = (dir?: string) => {
     return path
         .basename(path.resolve(process.cwd(), dir || ""))
         .replace(/[^\w\d\s]/g, " ")
-        .replace(/(:?^|\s)(\w)/g, c => c.toUpperCase());
+        .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
 };
 
 const packageName = (name: string) =>
-    name
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, "-");
+    name.toLowerCase().trim().replace(/\s+/g, "-");
 
 const getAppDir = (name: string, dir?: string) => {
     if (dir && dir.length) {
@@ -113,7 +110,7 @@ export default class Init extends Command {
         defaults?: { name?: string; id?: string }
     ) => {
         println("Creating a new Quip Live App");
-        const validateNumber: (input: any) => true | string = val =>
+        const validateNumber: (input: any) => true | string = (val) =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
         const defaultManifest = defaultManifestOptions(specifiedDir, defaults);
         const manifestOptions: Manifest = await inquirer.prompt([
@@ -140,7 +137,7 @@ export default class Init extends Command {
                 name: "name",
                 message: "Choose a package name",
                 default: defaultPackage.name,
-                filter: val => val.toLowerCase(),
+                filter: (val) => val.toLowerCase(),
             },
             {
                 type: "input",
@@ -195,9 +192,9 @@ export default class Init extends Command {
                     message:
                         "Specify an initial width for your app (optional)\nThis will be the width of the app while it is loading.\n",
                     default: "none",
-                    validate: input =>
+                    validate: (input) =>
                         input === "none" || validateNumber(input),
-                    filter: val => (val === "none" ? -1 : val),
+                    filter: (val) => (val === "none" ? -1 : val),
                 },
             ]);
             Object.assign(manifestOptions, extraManifestOptions);
@@ -221,8 +218,9 @@ export default class Init extends Command {
     ) => {
         const { typescript, bundler } = packageOptions;
         // get lib path
-        const templateName = `${typescript ? "ts" : "js"}_${bundler ||
-            "webpack"}`;
+        const templateName = `${typescript ? "ts" : "js"}_${
+            bundler || "webpack"
+        }`;
         const templatePath = path.join(
             __dirname,
             "../../templates",

@@ -2,8 +2,8 @@ import chalk from "chalk";
 import FormData from "form-data";
 import https from "https";
 import fetch from "node-fetch";
-import {readConfig, SKIP_SSL_FOR_SITES} from "../lib/config";
-import {println} from "../lib/print";
+import { readConfig, SKIP_SSL_FOR_SITES } from "../lib/config";
+import { println } from "../lib/print";
 
 interface ErrorResponse {
     error: string;
@@ -49,7 +49,7 @@ export const successOnly = async <T extends Object>(
     try {
         response = await promise;
     } catch (e) {
-        response = {error: "Failed:", response: e.message};
+        response = { error: "Failed:", response: e.message };
     }
     if (printJson) {
         println(JSON.stringify(response));
@@ -68,12 +68,12 @@ const cliAPI = async (configPath: string, site: string) => {
     return async <T>(
         path: string,
         method?: "get" | "post",
-        data?: {[key: string]: any} | FormData
+        data?: { [key: string]: any } | FormData
     ): Promise<T | ErrorResponse> => {
         if (!config.sites[site]) {
-            return {error: `Not logged in to ${site}`};
+            return { error: `Not logged in to ${site}` };
         }
-        const {accessToken} = config.sites[site];
+        const { accessToken } = config.sites[site];
         return callAPI<T>(site, path, method, data, accessToken);
     };
 };
@@ -87,10 +87,10 @@ export const callAPI = async <T = any>(
     site: string,
     path: string,
     method?: "get" | "post",
-    data?: {[key: string]: any} | FormData,
+    data?: { [key: string]: any } | FormData,
     accessToken?: string
 ): Promise<T | ErrorResponse> => {
-    let headers: {[name: string]: string} = {
+    let headers: { [name: string]: string } = {
         "Content-Type": "application/json",
     };
     if (accessToken) {
@@ -98,7 +98,7 @@ export const callAPI = async <T = any>(
     }
     let body: string | FormData | undefined;
     if (data?.getHeaders) {
-        headers = {...headers, ...data.getHeaders()};
+        headers = { ...headers, ...data.getHeaders() };
         body = data as FormData;
     } else if (data) {
         body = JSON.stringify(data);
@@ -115,7 +115,7 @@ export const callAPI = async <T = any>(
     try {
         return JSON.parse(raw);
     } catch (e) {
-        return {error: "Invalid response", response: raw};
+        return { error: "Invalid response", response: raw };
     }
 };
 

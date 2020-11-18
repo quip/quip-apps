@@ -8,8 +8,8 @@ import { println } from "./print";
 
 export const runCmd = (cwd: string, command: string, ...args: string[]) => {
     return runCmdPromise(cwd, command, ...args)
-        .then(stdout => console.log(stdout))
-        .catch(error => {
+        .then((stdout) => console.log(stdout))
+        .catch((error) => {
             println(chalk`{red Command failed: ${command} ${args.join(" ")}}`);
             println(chalk`{red CWD: ${cwd}}`);
             println(chalk`{red ${error.stack}}`);
@@ -28,10 +28,10 @@ export const runCmdPromise = (
             stdio: ["inherit", "pipe", "inherit"],
         });
         let stdout = "";
-        cmd.stdout.on("data", d => {
+        cmd.stdout.on("data", (d) => {
             stdout += d;
         });
-        cmd.on("error", error => {
+        cmd.on("error", (error) => {
             reject(error);
         });
         cmd.on("close", () => {
@@ -50,7 +50,7 @@ export const readRecursive = async (
                 return reject(err);
             }
             Promise.all<string[]>(
-                children.map(child => {
+                children.map((child) => {
                     if (child) {
                         if (minimatch(child, skip)) {
                             return Promise.resolve([]);
@@ -66,8 +66,8 @@ export const readRecursive = async (
                                     readRecursive(
                                         path.join(dir, child),
                                         skip
-                                    ).then(children =>
-                                        children.map(file =>
+                                    ).then((children) =>
+                                        children.map((file) =>
                                             path.join(child, file)
                                         )
                                     )
@@ -78,7 +78,7 @@ export const readRecursive = async (
                         });
                     });
                 })
-            ).then(childLists => {
+            ).then((childLists) => {
                 resolve(
                     childLists.reduce((all, child) => [...all, ...child], [])
                 );
@@ -89,7 +89,7 @@ export const readRecursive = async (
 
 export const pathExists = (filePath: string): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-        fs.stat(filePath, err => {
+        fs.stat(filePath, (err) => {
             if (err && err.code === "ENOENT") {
                 return resolve(false);
             } else if (err) {
@@ -106,7 +106,7 @@ export const copy = (
     options: ncp.Options = {}
 ): Promise<void> => {
     return new Promise((resolve, reject) =>
-        ncp(source, dest, options, err => {
+        ncp(source, dest, options, (err) => {
             if (err) {
                 return reject(err);
             }

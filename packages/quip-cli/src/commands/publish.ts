@@ -47,7 +47,7 @@ export const createBundle = async (
         if (!files) {
             return;
         }
-        files.forEach(matcher => {
+        files.forEach((matcher) => {
             if (isMigration(matcher)) {
                 addToFiles(matcher.js_file, source);
             } else {
@@ -95,12 +95,12 @@ export const doPublish = async (
 {red This bundle may be incomplete, you should include these files or remove them from your manifest.}`);
         for (let [source, files] of missing) {
             println(chalk`{red === ${source} ===}`);
-            files.forEach(f => println(chalk`{red ${f}}`));
+            files.forEach((f) => println(chalk`{red ${f}}`));
         }
     }
     const fileBinaries = await Promise.all<[string, Buffer]>(
         bundle.map(
-            async name =>
+            async (name) =>
                 [name, await fs.promises.readFile(path.join(root, name))] as [
                     string,
                     Buffer

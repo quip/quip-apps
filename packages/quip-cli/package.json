@@ -78,6 +78,7 @@
         "postpack": "rm -f oclif.manifest.json",
         "prepack": "rm -rf lib && tsc -b && oclif-dev manifest",
         "test": "jest",
+        "prettier": "prettier --write test/**/*.js test/**/*.ts src/**/*.ts",
         "test:cover": "jest --coverage",
         "test:watch": "jest --watch",
         "readme": "oclif-dev readme"

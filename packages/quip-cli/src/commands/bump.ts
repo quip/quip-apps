@@ -1,10 +1,10 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
-import {findManifest, getManifest, writeManifest} from "../lib/manifest";
-import {println} from "../lib/print";
-import {runCmd} from "../lib/util";
+import { findManifest, getManifest, writeManifest } from "../lib/manifest";
+import { println } from "../lib/print";
+import { runCmd } from "../lib/util";
 
 export const bump = async (
     dir: string,
@@ -53,7 +53,7 @@ export default class Bump extends Command {
     static description = "Bump the application version";
 
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
     };
 
     static args = [
@@ -65,7 +65,7 @@ export default class Bump extends Command {
     ];
 
     async run() {
-        const {args, flags} = this.parse(Bump);
+        const { args, flags } = this.parse(Bump);
         const increment = (args.increment ?? "patch").toLowerCase();
         if (!["major", "minor", "patch"].includes(increment)) {
             this._help();
