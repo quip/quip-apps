@@ -348,7 +348,7 @@ export default class Init extends Command {
             await runCmd(appDir, "npm", "install");
             // bump the version since we already have a verison 1 in the console
             println(chalk`{green bumping version...}`);
-            await bump(appDir, "patch", flags.json);
+            await bump(appDir, "patch", {silent: flags.json});
             // npm run build
             println(chalk`{green building app...}`);
             await runCmd(appDir, "npm", "run", "build");
