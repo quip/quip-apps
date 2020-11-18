@@ -1,4 +1,4 @@
-import {exec as exec_node} from "child_process";
+import { exec as exec_node } from "child_process";
 import fs from "fs";
 import path from "path";
 import util from "util";

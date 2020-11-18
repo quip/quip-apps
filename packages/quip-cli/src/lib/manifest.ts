@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import prettier from "prettier";
-import {Manifest} from "./types";
-import {pathExists} from "./util";
+import { Manifest } from "./types";
+import { pathExists } from "./util";
 
 export const findManifest = async (
     dir: string
@@ -43,7 +43,7 @@ const getManifestContent = async (
         manifestPath,
         "utf-8"
     )) as string;
-    const formattingInfo = {indent: 2};
+    const formattingInfo = { indent: 2 };
     const indentMatch = content.match(FIND_INDENT);
     if (indentMatch) {
         formattingInfo.indent = indentMatch[1].length;
@@ -67,12 +67,12 @@ export const writeManifest = async (
     if (!(await pathExists(manifestPath))) {
         throw new Error(`Manifest ${manifestPath} does not exist.`);
     }
-    const [manifest, {indent}] = await getManifestContent(manifestPath);
+    const [manifest, { indent }] = await getManifestContent(manifestPath);
     // Note: should be obvious, but this won't do anything special for arrays.
     Object.assign(manifest, data);
     let prettierConfig = await prettier.resolveConfig(manifestPath);
     if (!prettierConfig) {
-        prettierConfig = {tabWidth: indent};
+        prettierConfig = { tabWidth: indent };
     }
     await fs.promises.writeFile(
         manifestPath,

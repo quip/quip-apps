@@ -1,15 +1,15 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import FormData from "form-data";
 import fs from "fs";
 import minimatch from "minimatch";
 import path from "path";
-import cliAPI, {successOnly} from "../lib/cli-api";
-import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
-import {findManifest, getManifest} from "../lib/manifest";
-import {println} from "../lib/print";
-import {isMigration, Manifest, Migration} from "../lib/types";
-import {readRecursive, runCmdPromise} from "../lib/util";
+import cliAPI, { successOnly } from "../lib/cli-api";
+import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import { findManifest, getManifest } from "../lib/manifest";
+import { println } from "../lib/print";
+import { isMigration, Manifest, Migration } from "../lib/types";
+import { readRecursive, runCmdPromise } from "../lib/util";
 
 export const createBundle = async (
     manifest: Manifest,
@@ -47,7 +47,7 @@ export const createBundle = async (
         if (!files) {
             return;
         }
-        files.forEach((matcher) => {
+        files.forEach(matcher => {
             if (isMigration(matcher)) {
                 addToFiles(matcher.js_file, source);
             } else {
@@ -62,7 +62,7 @@ export const createBundle = async (
     addAll(manifest.css_files, "css_file");
     addAll(manifest.other_resources, "other_resources");
     addAll(manifest.migrations, "migrations");
-    return {root, bundle, missing};
+    return { root, bundle, missing };
 };
 
 export const doPublish = async (
@@ -85,7 +85,7 @@ export const doPublish = async (
         /* swallow this error, this is just a best effort. */
     }
     const form = new FormData();
-    const {root, bundle, missing} = await createBundle(
+    const { root, bundle, missing } = await createBundle(
         manifest,
         manifestPath,
         ignore
@@ -95,12 +95,12 @@ export const doPublish = async (
 {red This bundle may be incomplete, you should include these files or remove them from your manifest.}`);
         for (let [source, files] of missing) {
             println(chalk`{red === ${source} ===}`);
-            files.forEach((f) => println(chalk`{red ${f}}`));
+            files.forEach(f => println(chalk`{red ${f}}`));
         }
     }
     const fileBinaries = await Promise.all<[string, Buffer]>(
         bundle.map(
-            async (name) =>
+            async name =>
                 [name, await fs.promises.readFile(path.join(root, name))] as [
                     string,
                     Buffer
@@ -132,7 +132,7 @@ export default class Publish extends Command {
         "Uploads this bundle to the developer console, and sets it as the latest development version.";
 
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
         json: flags.boolean({
             char: "j",
             description: "output responses in JSON",
@@ -158,7 +158,7 @@ export default class Publish extends Command {
     static args = [];
 
     async run() {
-        const {args, flags} = this.parse(Publish);
+        const { args, flags } = this.parse(Publish);
         const manifestPath = await findManifest(process.cwd());
         if (!manifestPath) {
             throw new Error(`Could not find a manifest.json file.`);

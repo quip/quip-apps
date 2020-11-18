@@ -1,8 +1,8 @@
-import {test as oclifTest} from "@oclif/test";
+import { test as oclifTest } from "@oclif/test";
 import fs from "fs";
 import path from "path";
 import MockDate from "mockdate";
-import {readManifest, useFixtureDir, getFixtureDir} from "./test-util";
+import { readManifest, useFixtureDir, getFixtureDir } from "./test-util";
 
 describe("qla migration", () => {
     beforeAll(async () => {

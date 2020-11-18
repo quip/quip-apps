@@ -1,22 +1,26 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import fs from "fs";
 import http from "http";
 import open from "open";
 import path from "path";
 import qs from "querystring";
 import url from "url";
-import {isLoggedIn} from "../lib/auth";
-import {defaultConfigPath, DEFAULT_SITE, writeSiteConfig} from "../lib/config";
+import { isLoggedIn } from "../lib/auth";
+import {
+    defaultConfigPath,
+    DEFAULT_SITE,
+    writeSiteConfig,
+} from "../lib/config";
 import pkceChallenge from "pkce-challenge";
-import {callAPI, getStateString} from "../lib/cli-api";
+import { callAPI, getStateString } from "../lib/cli-api";
 
-type ResponseParams = {[key: string]: string | string[] | undefined};
+type ResponseParams = { [key: string]: string | string[] | undefined };
 
 export default class Login extends Command {
     static description =
         "Logs in to Quip and stores credentials in the .quiprc file";
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
         force: flags.boolean({
             char: "f",
             description:
@@ -79,9 +83,9 @@ export default class Login extends Command {
     }
 
     async run() {
-        const {flags} = this.parse(Login);
+        const { flags } = this.parse(Login);
 
-        const {site, force, hostname, port, config} = flags;
+        const { site, force, hostname, port, config } = flags;
 
         if (!force && (await isLoggedIn(config, site))) {
             let alt = "";
@@ -94,7 +98,7 @@ export default class Login extends Command {
             return;
         }
 
-        const {code_challenge, code_verifier} = pkceChallenge(43);
+        const { code_challenge, code_verifier } = pkceChallenge(43);
         const state = getStateString();
 
         const redirectURL = `http://${hostname}:${port}`;
@@ -142,7 +146,7 @@ export default class Login extends Command {
                 )
             );
         }
-        await writeSiteConfig(config, site, {accessToken});
+        await writeSiteConfig(config, site, { accessToken });
         this.log("Successfully logged in.");
     }
 }

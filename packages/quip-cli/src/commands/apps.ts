@@ -1,4 +1,4 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import cliAPI, {
@@ -6,15 +6,15 @@ import cliAPI, {
     AppVersionsResponse,
     successOnly,
 } from "../lib/cli-api";
-import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
-import {prettyPrintObject, print} from "../lib/print";
-import {Manifest} from "../lib/types";
+import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import { prettyPrintObject, print } from "../lib/print";
+import { Manifest } from "../lib/types";
 
 export default class Apps extends Command {
     static description = "Browse, inspect, and manipulate your Apps";
 
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
         site: flags.string({
             char: "s",
             description:
@@ -44,7 +44,7 @@ export default class Apps extends Command {
     static args = [];
 
     async run() {
-        const {args, flags} = this.parse(Apps);
+        const { args, flags } = this.parse(Apps);
         const fetch = await cliAPI(flags.config, flags.site);
 
         const handleAppId = async (id: string) => {
@@ -78,14 +78,14 @@ export default class Apps extends Command {
             print(chalk`
 {magenta ${versions.name}}
 `);
-            const {release, development} = versions;
+            const { release, development } = versions;
             const otherVersions = versions.versions
                 .filter(
                     (v) =>
                         v.version_number !== release.version_number &&
                         v.version_number !== release.version_number
                 )
-                .map((v) => ({...v, icon: v.released ? "⚓️" : ""}));
+                .map((v) => ({ ...v, icon: v.released ? "⚓️" : "" }));
             const response = await inquirer.prompt([
                 {
                     type: "list",
@@ -93,8 +93,8 @@ export default class Apps extends Command {
                     message:
                         "Select a version (🚢: prod, 🛠: dev, ⚓️: previously released)",
                     choices: [
-                        {...release, icon: "🚢"},
-                        {...development, icon: "🛠"},
+                        { ...release, icon: "🚢" },
+                        { ...development, icon: "🛠" },
                     ]
                         .concat(otherVersions)
                         .map((v) => ({

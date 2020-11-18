@@ -6,7 +6,7 @@ module.exports = async () => {
     process.chdir(__dirname);
     try {
         await exec("git diff --exit-code fixtures");
-        const {stdout} = await exec("git clean -n fixtures");
+        const { stdout } = await exec("git clean -n fixtures");
         if (stdout) {
             throw new Error(`found unstaged files: ${stdout}`);
         }

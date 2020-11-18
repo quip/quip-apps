@@ -1,14 +1,14 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import mkdirp from "mkdirp";
 import path from "path";
-import {findManifest, getManifest, writeManifest} from "../lib/manifest";
-import {copy, pathExists} from "../lib/util";
+import { findManifest, getManifest, writeManifest } from "../lib/manifest";
+import { copy, pathExists } from "../lib/util";
 
 export default class Migration extends Command {
     static description = "Creates a new migration";
 
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
         folder: flags.string({
             char: "f",
             description: "The folder where your migrations are stored",
@@ -62,7 +62,7 @@ export default class Migration extends Command {
     }
 
     async run() {
-        const {args, flags} = this.parse(Migration);
+        const { args, flags } = this.parse(Migration);
         const dryRun = flags["dry-run"];
         let manifestPath = flags.manifest;
         if (flags.manifest && !(await pathExists(flags.manifest))) {
@@ -117,7 +117,7 @@ export default class Migration extends Command {
                 JSON.stringify(migrations[migrations.length - 1], null, 4)
             );
         } else {
-            ops.push(() => writeManifest(manifestPath!, {migrations}));
+            ops.push(() => writeManifest(manifestPath!, { migrations }));
         }
         for (const op of ops) {
             await op();

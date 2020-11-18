@@ -1,12 +1,12 @@
-import {test as oclifTest} from "@oclif/test";
+import { test as oclifTest } from "@oclif/test";
 import fs from "fs";
 import * as http from "http";
 import open from "open";
 import path from "path";
 import * as config from "../src/lib/config";
-import {pathExists} from "../src/lib/util";
-import {cleanFixtures} from "./test-util";
-import {callAPI, getStateString} from "../src/lib/cli-api";
+import { pathExists } from "../src/lib/util";
+import { cleanFixtures } from "./test-util";
+import { callAPI, getStateString } from "../src/lib/cli-api";
 import createChallenge from "pkce-challenge";
 
 const homedir = path.join(__dirname, "fixtures", "homedir");
@@ -105,11 +105,11 @@ describe("qla login", () => {
                     "token",
                     "post",
                     {
-                        "client_id": "quip-cli",
-                        "code": "some-code",
-                        "code_verifier": "ve",
-                        "grant_type": "authorization_code",
-                        "redirect_uri": "http%3A%2F%2F127.0.0.1%3A9898",
+                        client_id: "quip-cli",
+                        code: "some-code",
+                        code_verifier: "ve",
+                        grant_type: "authorization_code",
+                        redirect_uri: "http%3A%2F%2F127.0.0.1%3A9898",
                     }
                 );
                 const rcPath = path.join(homedir, ".quiprc");
@@ -194,11 +194,11 @@ describe("qla login", () => {
                     "token",
                     "post",
                     {
-                        "client_id": "quip-cli",
-                        "code": "some-code",
-                        "code_verifier": "ve",
-                        "grant_type": "authorization_code",
-                        "redirect_uri": "http%3A%2F%2F127.0.0.1%3A9898",
+                        client_id: "quip-cli",
+                        code: "some-code",
+                        code_verifier: "ve",
+                        grant_type: "authorization_code",
+                        redirect_uri: "http%3A%2F%2F127.0.0.1%3A9898",
                     }
                 );
                 const config = (await fs.promises.readFile(

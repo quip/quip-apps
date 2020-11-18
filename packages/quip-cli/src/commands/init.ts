@@ -1,15 +1,15 @@
-import {Command, flags} from "@oclif/command";
+import { Command, flags } from "@oclif/command";
 import chalk from "chalk";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
-import cliAPI, {successOnly} from "../lib/cli-api";
-import {defaultConfigPath, DEFAULT_SITE} from "../lib/config";
-import {print, println} from "../lib/print";
-import {Manifest} from "../lib/types";
-import {copy, runCmd} from "../lib/util";
-import {bump} from "./bump";
-import {doPublish} from "./publish";
+import cliAPI, { successOnly } from "../lib/cli-api";
+import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import { print, println } from "../lib/print";
+import { Manifest } from "../lib/types";
+import { copy, runCmd } from "../lib/util";
+import { bump } from "./bump";
+import { doPublish } from "./publish";
 
 interface PackageOptions {
     name: string;
@@ -28,11 +28,14 @@ const defaultName = (dir?: string) => {
     return path
         .basename(path.resolve(process.cwd(), dir || ""))
         .replace(/[^\w\d\s]/g, " ")
-        .replace(/(:?^|\s)(\w)/g, (c) => c.toUpperCase());
+        .replace(/(:?^|\s)(\w)/g, c => c.toUpperCase());
 };
 
 const packageName = (name: string) =>
-    name.toLowerCase().trim().replace(/\s+/g, "-");
+    name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-");
 
 const getAppDir = (name: string, dir?: string) => {
     if (dir && dir.length) {
@@ -52,7 +55,7 @@ const defaultPackageOptions = (name: string) => ({
 
 const defaultManifestOptions = (
     dir?: string,
-    opts?: {name?: string; id?: string}
+    opts?: { name?: string; id?: string }
 ) => ({
     name: defaultName(dir),
     ...(opts || {}),
@@ -62,7 +65,7 @@ export default class Init extends Command {
     static description = "Initialize a new Live App Project";
 
     static flags = {
-        help: flags.help({char: "h"}),
+        help: flags.help({ char: "h" }),
         ["dry-run"]: flags.boolean({
             char: "d",
             hidden: true,
@@ -107,10 +110,10 @@ export default class Init extends Command {
 
     private promptInitialAppConfig_ = async (
         specifiedDir?: string,
-        defaults?: {name?: string; id?: string}
+        defaults?: { name?: string; id?: string }
     ) => {
         println("Creating a new Quip Live App");
-        const validateNumber: (input: any) => true | string = (val) =>
+        const validateNumber: (input: any) => true | string = val =>
             !isNaN(parseInt(val, 10)) || "Please enter a number";
         const defaultManifest = defaultManifestOptions(specifiedDir, defaults);
         const manifestOptions: Manifest = await inquirer.prompt([
@@ -137,7 +140,7 @@ export default class Init extends Command {
                 name: "name",
                 message: "Choose a package name",
                 default: defaultPackage.name,
-                filter: (val) => val.toLowerCase(),
+                filter: val => val.toLowerCase(),
             },
             {
                 type: "input",
@@ -153,7 +156,7 @@ export default class Init extends Command {
             },
         ]);
 
-        const {addManifestConfig} = await inquirer.prompt([
+        const { addManifestConfig } = await inquirer.prompt([
             {
                 type: "confirm",
                 name: "addManifestConfig",
@@ -192,9 +195,9 @@ export default class Init extends Command {
                     message:
                         "Specify an initial width for your app (optional)\nThis will be the width of the app while it is loading.\n",
                     default: "none",
-                    validate: (input) =>
+                    validate: input =>
                         input === "none" || validateNumber(input),
-                    filter: (val) => (val === "none" ? -1 : val),
+                    filter: val => (val === "none" ? -1 : val),
                 },
             ]);
             Object.assign(manifestOptions, extraManifestOptions);
@@ -216,11 +219,10 @@ export default class Init extends Command {
         dest: string,
         dryRun: boolean
     ) => {
-        const {typescript, bundler} = packageOptions;
+        const { typescript, bundler } = packageOptions;
         // get lib path
-        const templateName = `${typescript ? "ts" : "js"}_${
-            bundler || "webpack"
-        }`;
+        const templateName = `${typescript ? "ts" : "js"}_${bundler ||
+            "webpack"}`;
         const templatePath = path.join(
             __dirname,
             "../../templates",
@@ -273,7 +275,7 @@ export default class Init extends Command {
     };
 
     async run() {
-        const {flags} = this.parse(Init);
+        const { flags } = this.parse(Init);
         const dryRun = flags["dry-run"];
         const fetch = await cliAPI(flags.config, flags.site);
         const shouldCreate = !flags["no-create"];
@@ -311,7 +313,7 @@ export default class Init extends Command {
                 id: flags.id,
             });
         }
-        const {packageOptions, manifestOptions, appDir} = config;
+        const { packageOptions, manifestOptions, appDir } = config;
         await this.copyTemplate_(packageOptions, appDir, dryRun);
         if (dryRun) {
             println("Would update package.json with", packageOptions);

@@ -1,5 +1,5 @@
 import path from "path";
-import {readRecursive} from "../../src/lib/util";
+import { readRecursive } from "../../src/lib/util";
 describe("readRecursive", () => {
     test("basics", async () => {
         const files = await readRecursive(
