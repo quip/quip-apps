@@ -114,7 +114,6 @@ export const doPublish = async (
     );
     if (gitsha) {
         form.append("gitsha", gitsha);
-        console.log(gitsha);
     }
     const fetch = await cliAPI(config, site);
     const response = await successOnly(

@@ -54,9 +54,10 @@ export const successOnly = async <T extends Object>(
     if (printJson) {
         println(JSON.stringify(response));
     } else if (isError(response)) {
-        println(chalk`
-{red Error: ${response.error}}
-{red ${response.response || ""}}`);
+        println(chalk`{red Error: ${response.error}}`);
+        if (response.response) {
+            println(chalk`{red ${response.response || ""}}`);
+        }
     } else {
         return response;
     }
