@@ -139,7 +139,7 @@ module.exports = {
         quiptext: "quiptext",
     },
     devServer: {
-        contentBase: path.resolve(cwd, "app/dist"),
+        contentBase: path.resolve(cwd, "app"),
         // host: "docker.qa",
         port: 8888,
         inline: false,
