@@ -4,6 +4,7 @@ import FormData from "form-data";
 import fs from "fs";
 import minimatch from "minimatch";
 import path from "path";
+import crypto from "crypto";
 import cliAPI, { successOnly } from "../lib/cli-api";
 import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
 import { findManifest, getManifest } from "../lib/manifest";
@@ -98,20 +99,29 @@ export const doPublish = async (
             files.forEach((f) => println(chalk`{red ${f}}`));
         }
     }
-    const fileBinaries = await Promise.all<[string, Buffer]>(
-        bundle.map(
-            async (name) =>
-                [name, await fs.promises.readFile(path.join(root, name))] as [
-                    string,
-                    Buffer
-                ]
-        )
-    );
-    fileBinaries.forEach(([name, data]) =>
-        form.append("bundle", data, {
-            filepath: name,
+    const files = await Promise.all<[string, Buffer, string]>(
+        bundle.map(async (name) => {
+            const fileBuffer = await fs.promises.readFile(
+                path.join(root, name)
+            );
+            return [
+                name,
+                fileBuffer,
+                crypto.createHash("md5").update(fileBuffer).digest("hex"),
+            ];
         })
     );
+    const bundlemd5 = crypto.createHash("md5");
+    // Sort by md5 alphabetically so the md5 of these md5s is stable
+    files
+        .sort(([_na, _fa, a], [_nb, _fb, b]) => (a === b ? 0 : a < b ? -1 : 1))
+        .forEach(([name, data, md5]) => {
+            form.append("bundle", data, {
+                filepath: name,
+            });
+            bundlemd5.update(md5);
+        });
+    form.append("md5", bundlemd5.digest("hex"));
     if (gitsha) {
         form.append("gitsha", gitsha);
     }
