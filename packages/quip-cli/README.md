@@ -16,7 +16,7 @@ $ npm install -g quip-cli
 $ qla COMMAND
 running command...
 $ qla (-v|--version|version)
-quip-cli/0.1.2-alpha.9 darwin-x64 node-v10.15.0
+quip-cli/0.1.2-alpha.13 darwin-x64 node-v10.15.0
 $ qla --help [COMMAND]
 USAGE
   $ qla COMMAND
@@ -51,7 +51,7 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/apps.ts)_
 
 ## `qla bump [INCREMENT]`
 
@@ -67,12 +67,13 @@ ARGUMENTS
 OPTIONS
   -h, --help                             show CLI help
   -m, --message=message                  Specify a commit message to use as the version commit message
+  -n, --no-git                           Don't perform git operations even when available (just makes changes inline)
 
   -p, --prerelease-name=prerelease-name  When specifying prerelease, use this as the prefix, e.g. -p alpha will produce
                                          v0.x.x-alpha.x
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/bump.ts)_
 
 ## `qla help [COMMAND]`
 
@@ -109,7 +110,7 @@ OPTIONS
   --no-create      only create a local app (don't create an app in the dev console or assign an ID)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/init.ts)_
 
 ## `qla login`
 
@@ -125,7 +126,7 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/login.ts)_
 
 ## `qla migration [NAME]`
 
@@ -147,7 +148,7 @@ OPTIONS
                          in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/migration.ts)_
 
 ## `qla publish`
 
@@ -164,7 +165,7 @@ OPTIONS
   -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.9/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/publish.ts)_
 <!-- commandsstop -->
 
 ## Running locally
