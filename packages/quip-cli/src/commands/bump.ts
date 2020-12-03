@@ -14,9 +14,10 @@ export const bump = async (
         prereleaseName?: string;
         message?: string;
         silent?: boolean;
+        noGit?: boolean;
     }
 ) => {
-    const { message, silent, prereleaseName } = options || {};
+    const { message, silent, prereleaseName, noGit } = options || {};
     const packagePath = path.join(dir, "package.json");
     const manifestPath = await findManifest(dir);
     if (!manifestPath) {
@@ -56,17 +57,22 @@ export const bump = async (
     manifest.version_name = version;
     await writeManifest(manifestPath, manifest);
 
-    // stage manifest.json since we want the increment to be part of our version tag
-    try {
-        await runCmd(dir, "git", "add", manifestPath);
-    } catch (e) {
-        // silent failure ok here, since it just means we're not using git
+    if (!noGit) {
+        // stage manifest.json since we want the increment to be part of our version tag
+        try {
+            await runCmd(dir, "git", "add", manifestPath);
+        } catch (e) {
+            // silent failure ok here, since it just means we're not using git
+        }
     }
 
     // run npm version to create the version tag and commit
     const extraArgs = [];
     if (message) {
         extraArgs.push("--message", message);
+    }
+    if (noGit) {
+        extraArgs.push("--git-tag-version", "false");
     }
     // run with --force since we will have a dirty tree (cause we added manifest.json above)
     await runCmd(dir, "npm", "version", "--force", version, ...extraArgs);
@@ -94,6 +100,11 @@ export default class Bump extends Command {
             description:
                 "When specifying prerelease, use this as the prefix, e.g. -p alpha will produce v0.x.x-alpha.x",
         }),
+        "no-git": flags.boolean({
+            char: "n",
+            description:
+                "Don't perform git operations even when available (just makes changes inline)",
+        }),
     };
 
     static args = [
@@ -108,26 +119,28 @@ export default class Bump extends Command {
         const { args, flags } = this.parse(Bump);
         const increment = (args.increment || "patch").toLowerCase();
         const manifestPath = await findManifest(process.cwd());
+        const noGit = flags["no-git"];
         if (!manifestPath) {
             throw new Error("Couldn't find a quip app.");
         }
-
-        let gitDirty = false;
-        try {
-            const r = await runCmdPromise(
-                path.dirname(manifestPath),
-                "git",
-                "status",
-                "--porcelain"
-            );
-            gitDirty = r != "";
-        } catch (e) {
-            /* This just means that we're not in a git repo, safe to ignore. */
-        }
-        if (gitDirty) {
-            throw new Error(
-                "Cannot bump version in a dirty repo. Commit your changes before running bump."
-            );
+        if (!noGit) {
+            let gitDirty = false;
+            try {
+                const r = await runCmdPromise(
+                    path.dirname(manifestPath),
+                    "git",
+                    "status",
+                    "--porcelain"
+                );
+                gitDirty = r != "";
+            } catch (e) {
+                /* This just means that we're not in a git repo, safe to ignore. */
+            }
+            if (gitDirty) {
+                throw new Error(
+                    "Cannot bump version in a dirty repo. Commit your changes before running bump."
+                );
+            }
         }
 
         if (!["major", "minor", "patch", "prerelease"].includes(increment)) {
@@ -138,6 +151,7 @@ export default class Bump extends Command {
         bump(process.cwd(), increment, {
             message: flags.message,
             prereleaseName: flags["prerelease-name"],
+            noGit,
         });
     }
 }
