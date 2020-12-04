@@ -2,6 +2,7 @@ import chalk from "chalk";
 import FormData from "form-data";
 import https from "https";
 import fetch from "node-fetch";
+import { login } from "../commands/login";
 import { readConfig, SKIP_SSL_FOR_SITES } from "../lib/config";
 import { println } from "../lib/print";
 
@@ -64,9 +65,11 @@ export const successOnly = async <T extends Object>(
     return false;
 };
 
+const UNAUTHORIZED = "unauthorized";
+
 const cliAPI = async (configPath: string, site: string) => {
-    const config = await readConfig(configPath);
-    return async <T>(
+    let config = await readConfig(configPath);
+    const doAPICall = async <T>(
         path: string,
         method?: "get" | "post",
         data?: { [key: string]: any } | FormData
@@ -75,8 +78,24 @@ const cliAPI = async (configPath: string, site: string) => {
             return { error: `Not logged in to ${site}` };
         }
         const { accessToken } = config.sites[site];
-        return callAPI<T>(site, path, method, data, accessToken);
+        try {
+            return callAPI<T>(site, path, method, data, accessToken);
+        } catch (e) {
+            if (e.message === UNAUTHORIZED) {
+                try {
+                    await login({ transparent: true, site });
+                    config = await readConfig(configPath);
+                    return doAPICall(path, method, data);
+                } catch (_ignored) {
+                    // if our attempt to transparently login fails, just throw the original error.
+                    throw e;
+                }
+            } else {
+                throw e;
+            }
+        }
     };
+    return doAPICall;
 };
 
 const platformHost = (site: string) => {
@@ -112,6 +131,9 @@ export const callAPI = async <T = any>(
         body,
         headers,
     });
+    if (request.status === 401 || request.status === 400) {
+        throw new Error(UNAUTHORIZED);
+    }
     const raw = await request.text();
     try {
         return JSON.parse(raw);
