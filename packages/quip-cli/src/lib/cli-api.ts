@@ -50,12 +50,12 @@ export const successOnly = async <T extends Object>(
     try {
         response = await promise;
     } catch (e) {
-        response = { error: "Failed:", response: e.message };
+        response = { error: "Request Failed:", response: e.message };
     }
     if (printJson) {
         println(JSON.stringify(response));
     } else if (isError(response)) {
-        println(chalk`{red Error: ${response.error}}`);
+        println(chalk`{red ${response.error}}`);
         if (response.response) {
             println(chalk`{red ${response.response || ""}}`);
         }
@@ -78,22 +78,27 @@ const cliAPI = async (configPath: string, site: string) => {
             return { error: `Not logged in to ${site}` };
         }
         const { accessToken } = config.sites[site];
-        try {
-            return callAPI<T>(site, path, method, data, accessToken);
-        } catch (e) {
-            if (e.message === UNAUTHORIZED) {
-                try {
-                    await login({ transparent: true, site });
-                    config = await readConfig(configPath);
-                    return doAPICall(path, method, data);
-                } catch (_ignored) {
-                    // if our attempt to transparently login fails, just throw the original error.
+        return callAPI<T>(site, path, method, data, accessToken).catch(
+            async (e) => {
+                if (e.message === UNAUTHORIZED) {
+                    return (
+                        login({ transparent: true, site })
+                            .catch(() => {
+                                // if our attempt to transparently login fails, just throw the original error.
+                                throw e;
+                            })
+                            .then(async () => {
+                                // successfully logged in. Need to re-read the config.
+                                config = await readConfig(configPath);
+                            })
+                            // TODO: this hangs... not sure why
+                            .then(() => doAPICall(path, method, data))
+                    );
+                } else {
                     throw e;
                 }
-            } else {
-                throw e;
             }
-        }
+        );
     };
     return doAPICall;
 };
