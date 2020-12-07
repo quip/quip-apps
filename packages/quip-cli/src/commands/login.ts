@@ -14,6 +14,7 @@ import {
 import pkceChallenge from "pkce-challenge";
 import { callAPI, getStateString } from "../lib/cli-api";
 import { println } from "../lib/print";
+import { ChildProcess } from "child_process";
 
 type ResponseParams = { [key: string]: string | string[] | undefined };
 
@@ -30,10 +31,19 @@ const waitForLogin = (
     return new Promise((resolve) => {
         server_ = http.createServer(async (req, res) => {
             const urlInfo = url.parse(req.url || "");
-            res.statusCode = 200;
-            res.setHeader("Content-Type", "text/html");
-            res.end(await pagePromise);
-            resolve(qs.parse(urlInfo.query || ""));
+            const query = qs.parse(urlInfo.query || "")
+            resolve(query);
+            
+            if (query.next) {
+                res.statusCode=302;
+                res.setHeader('Location', query.next);
+                res.end();
+            } else {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "text/html");
+                res.end(await pagePromise);
+            }
+
             server_?.close();
         });
         server_.listen(port, hostname, ready);
@@ -70,9 +80,11 @@ export const login = async ({
             `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
         );
     }
-    const responseParams = await waitForLogin(hostname, port, () =>
-        open(loginURL)
-    );
+    let currentWindow: ChildProcess | undefined;
+    const responseParams = await waitForLogin(hostname, port, async () => {
+        currentWindow = await open(loginURL);
+    });
+    currentWindow?.emit("close");
     if (responseParams.cancelled) {
         throw new Error("Login cancelled.");
     } else if (responseParams.state !== state) {
