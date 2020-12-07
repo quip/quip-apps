@@ -108,7 +108,7 @@ export const doPublish = async (
                 name,
                 fileBuffer,
                 crypto.createHash("md5").update(fileBuffer).digest("hex"),
-            ];
+            ] as [string, Buffer, string];
         })
     );
     const bundlemd5 = crypto.createHash("md5");
