@@ -82,23 +82,27 @@ export default class Apps extends Command {
             const otherVersions = versions.versions
                 .filter(
                     (v) =>
-                        v.version_number !== release.version_number &&
-                        v.version_number !== release.version_number
+                        v.version_number !== release?.version_number &&
+                        v.version_number !== development?.version_number
                 )
                 .map((v) => ({ ...v, icon: v.released ? "⚓️" : "" }));
+            const releasedVersions = []
+            if (release) {
+                releasedVersions.push({ ...release, icon: "🚢" })
+            }
+            if (development) {
+                releasedVersions.push({ ...development, icon: "🧪" })
+            }
             const response = await inquirer.prompt([
                 {
                     type: "list",
                     name: "version",
                     message:
-                        "Select a version (🚢: prod, 🛠: dev, ⚓️: previously released)",
-                    choices: [
-                        { ...release, icon: "🚢" },
-                        { ...development, icon: "🛠" },
-                    ]
+                        "Select a version (🚢: prod, 🧪: beta, ⚓️: previously released)",
+                    choices: releasedVersions
                         .concat(otherVersions)
                         .map((v) => ({
-                            name: chalk`{green ${v.version_name} ${v.icon}}`,
+                            name: chalk`{green ${v.version_name} (${v.version_number}) ${v.icon}}`,
                             value: v.version_number,
                         })),
                 },
