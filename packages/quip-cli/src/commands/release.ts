@@ -11,7 +11,7 @@ import { Manifest } from "../lib/types";
 import { println } from "../lib/print";
 import inquirer from "inquirer";
 
-enum ReleaseDestination {
+export enum ReleaseDestination {
     BETA = "beta",
     PROD = "prod",
 }
