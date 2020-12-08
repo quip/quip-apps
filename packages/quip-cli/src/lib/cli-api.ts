@@ -19,8 +19,8 @@ interface AppVersionResponse {
 
 export interface AppVersionsResponse {
     name: string;
-    release: AppVersionResponse;
-    development: AppVersionResponse;
+    release?: AppVersionResponse;
+    development?: AppVersionResponse;
     versions: AppVersionResponse[];
 }
 
