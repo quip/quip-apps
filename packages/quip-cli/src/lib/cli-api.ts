@@ -2,6 +2,7 @@ import chalk from "chalk";
 import FormData from "form-data";
 import https from "https";
 import fetch from "node-fetch";
+import { login } from "../commands/login";
 import { readConfig, SKIP_SSL_FOR_SITES } from "../lib/config";
 import { println } from "../lib/print";
 
@@ -49,12 +50,12 @@ export const successOnly = async <T extends Object>(
     try {
         response = await promise;
     } catch (e) {
-        response = { error: "Failed:", response: e.message };
+        response = { error: "Request Failed:", response: e.message };
     }
     if (printJson) {
         println(JSON.stringify(response));
     } else if (isError(response)) {
-        println(chalk`{red Error: ${response.error}}`);
+        println(chalk`{red ${response.error}}`);
         if (response.response) {
             println(chalk`{red ${response.response || ""}}`);
         }
@@ -64,9 +65,11 @@ export const successOnly = async <T extends Object>(
     return false;
 };
 
+const UNAUTHORIZED = "unauthorized";
+
 const cliAPI = async (configPath: string, site: string) => {
-    const config = await readConfig(configPath);
-    return async <T>(
+    let config = await readConfig(configPath);
+    const doAPICall = async <T>(
         path: string,
         method?: "get" | "post",
         data?: { [key: string]: any } | FormData
@@ -75,8 +78,29 @@ const cliAPI = async (configPath: string, site: string) => {
             return { error: `Not logged in to ${site}` };
         }
         const { accessToken } = config.sites[site];
-        return callAPI<T>(site, path, method, data, accessToken);
+        return callAPI<T>(site, path, method, data, accessToken).catch(
+            async (e) => {
+                if (e.message === UNAUTHORIZED) {
+                    return (
+                        login({ transparent: true, site })
+                            .catch(() => {
+                                // if our attempt to transparently login fails, just throw the original error.
+                                throw e;
+                            })
+                            .then(async () => {
+                                // successfully logged in. Need to re-read the config.
+                                config = await readConfig(configPath);
+                            })
+                            // TODO: this hangs... not sure why
+                            .then(() => doAPICall(path, method, data))
+                    );
+                } else {
+                    throw e;
+                }
+            }
+        );
     };
+    return doAPICall;
 };
 
 const platformHost = (site: string) => {
@@ -112,6 +136,9 @@ export const callAPI = async <T = any>(
         body,
         headers,
     });
+    if (request.status === 401 || request.status === 400) {
+        throw new Error(UNAUTHORIZED);
+    }
     const raw = await request.text();
     try {
         return JSON.parse(raw);

@@ -13,8 +13,112 @@ import {
 } from "../lib/config";
 import pkceChallenge from "pkce-challenge";
 import { callAPI, getStateString } from "../lib/cli-api";
+import { println } from "../lib/print";
+import { ChildProcess } from "child_process";
 
 type ResponseParams = { [key: string]: string | string[] | undefined };
+
+let server_: http.Server | undefined;
+const waitForLogin = (
+    hostname: string,
+    port: number,
+    ready: () => void
+): Promise<ResponseParams> => {
+    const pagePromise = fs.promises.readFile(
+        path.join(__dirname, "../..", "templates", "logged-in.html"),
+        "utf-8"
+    );
+    return new Promise((resolve) => {
+        server_ = http.createServer(async (req, res) => {
+            const urlInfo = url.parse(req.url || "");
+            const query = qs.parse(urlInfo.query || "")
+            resolve(query);
+            
+            if (query.next) {
+                res.statusCode=302;
+                res.setHeader('Location', query.next);
+                res.end();
+            } else {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "text/html");
+                res.end(await pagePromise);
+            }
+
+            server_?.close();
+        });
+        server_.listen(port, hostname, ready);
+    });
+};
+
+const DEFAULT_HOSTNAME = "127.0.0.1";
+const DEFAULT_PORT = 9898;
+
+export const login = async ({
+    site,
+    transparent = false,
+    hostname = DEFAULT_HOSTNAME,
+    port = DEFAULT_PORT,
+    config = defaultConfigPath(),
+}: {
+    site: string;
+    transparent?: boolean;
+    hostname?: string;
+    port?: number;
+    config?: string;
+}): Promise<void> => {
+    const { code_challenge, code_verifier } = pkceChallenge(43);
+    const state = getStateString();
+
+    const redirectURL = `http://${hostname}:${port}`;
+    let loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
+        redirectURL
+    )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
+    if (transparent) {
+        loginURL += "&transparent=true";
+    } else {
+        println(
+            `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
+        );
+    }
+    let currentWindow: ChildProcess | undefined;
+    const responseParams = await waitForLogin(hostname, port, async () => {
+        currentWindow = await open(loginURL);
+    });
+    currentWindow?.emit("close");
+    if (responseParams.cancelled) {
+        throw new Error("Login cancelled.");
+    } else if (responseParams.state !== state) {
+        throw new Error("API returned invalid state.");
+    } else if (!responseParams.code || responseParams.error) {
+        throw new Error(
+            `Login Failed: ${
+                responseParams.error ||
+                `no code returned, got ${JSON.stringify(
+                    responseParams,
+                    null,
+                    2
+                )}`
+            }`
+        );
+    }
+
+    const tokenResponse = await callAPI(site, "token", "post", {
+        client_id: "quip-cli",
+        grant_type: "authorization_code",
+        redirect_uri: encodeURIComponent(redirectURL),
+        code_verifier: code_verifier,
+        code: responseParams.code,
+    });
+    const accessToken = tokenResponse.accessToken || tokenResponse.access_token;
+    if (!accessToken || tokenResponse.error) {
+        throw new Error(
+            `Failed to acquire access token: ${
+                tokenResponse.error
+            } - response: ${JSON.stringify(tokenResponse, null, 2)}`
+        );
+    }
+    await writeSiteConfig(config, site, { accessToken });
+};
 
 export default class Login extends Command {
     static description =
@@ -36,13 +140,13 @@ export default class Login extends Command {
             hidden: true,
             description:
                 "Use a custom port for the OAuth redirect server (defaults to 9898)",
-            default: 9898,
+            default: DEFAULT_PORT,
         }),
         hostname: flags.string({
             hidden: true,
             description:
                 "Use a custom hostname for the OAuth redirect server (defaults to 127.0.0.1)",
-            default: "127.0.0.1",
+            default: DEFAULT_HOSTNAME,
         }),
         config: flags.string({
             hidden: true,
@@ -53,32 +157,8 @@ export default class Login extends Command {
 
     static args = [];
 
-    private server_: http.Server | undefined;
-    private waitForLogin = (
-        hostname: string,
-        port: number,
-        ready: () => void
-    ): Promise<ResponseParams> => {
-        const pagePromise = fs.promises.readFile(
-            path.join(__dirname, "../..", "templates", "logged-in.html"),
-            "utf-8"
-        );
-        return new Promise((resolve) => {
-            this.server_ = http.createServer(async (req, res) => {
-                const urlInfo = url.parse(req.url || "");
-                res.statusCode = 200;
-                res.setHeader("Content-Type", "text/html");
-                res.end(await pagePromise);
-                resolve(qs.parse(urlInfo.query || ""));
-                this.server_?.close();
-            });
-            this.server_.listen(port, hostname, ready);
-        });
-    };
-
     async catch(error: Error) {
-        console.error(error);
-        this.server_?.close();
+        server_?.close();
         throw error;
     }
 
@@ -98,55 +178,11 @@ export default class Login extends Command {
             return;
         }
 
-        const { code_challenge, code_verifier } = pkceChallenge(43);
-        const state = getStateString();
-
-        const redirectURL = `http://${hostname}:${port}`;
-        const loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
-            redirectURL
-        )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
-        this.log(
-            `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
-        );
-        const responseParams = await this.waitForLogin(hostname, port, () =>
-            open(loginURL)
-        );
-        if (responseParams.state !== state) {
-            this.error(new Error("API returned invalid state."));
-        } else if (!responseParams.code || responseParams.error) {
-            this.error(
-                new Error(
-                    `Login Failed: ${
-                        responseParams.error ||
-                        `no code returned, got ${JSON.stringify(
-                            responseParams,
-                            null,
-                            2
-                        )}`
-                    }`
-                )
-            );
+        try {
+            await login({ site, hostname, port, config });
+            this.log("Successfully logged in.");
+        } catch (e) {
+            this.error(e);
         }
-
-        const tokenResponse = await callAPI(site, "token", "post", {
-            client_id: "quip-cli",
-            grant_type: "authorization_code",
-            redirect_uri: encodeURIComponent(redirectURL),
-            code_verifier: code_verifier,
-            code: responseParams.code,
-        });
-        const accessToken =
-            tokenResponse.accessToken || tokenResponse.access_token;
-        if (!accessToken || tokenResponse.error) {
-            this.error(
-                new Error(
-                    `Failed to acquire access token: ${
-                        tokenResponse.error
-                    } - response: ${JSON.stringify(tokenResponse, null, 2)}`
-                )
-            );
-        }
-        await writeSiteConfig(config, site, { accessToken });
-        this.log("Successfully logged in.");
     }
 }
