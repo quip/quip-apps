@@ -29,6 +29,24 @@ export interface AppListInfo {
     id: string;
 }
 
+interface ReleasableVersionReponse {
+    created_sequence: number;
+    version_number: number;
+    version_name: string;
+}
+
+export interface ReleasableVersionsReponse {
+    name: string;
+    versions: ReleasableVersionReponse[];
+}
+
+export interface ReleaseAppResponse {
+    destination: string;
+    version_number: number;
+    version_name: string;
+    build_sequence: number;
+}
+
 export interface AppsListResponse {
     released: AppListInfo[];
     development: AppListInfo[];

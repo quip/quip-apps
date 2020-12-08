@@ -34,6 +34,7 @@ USAGE
 * [`qla login`](#qla-login)
 * [`qla migration [NAME]`](#qla-migration-name)
 * [`qla publish`](#qla-publish)
+* [`qla release [BUILD NUMBER]`](#qla-release-build-number)
 
 ## `qla apps`
 
@@ -166,6 +167,27 @@ OPTIONS
 ```
 
 _See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/publish.ts)_
+
+## `qla release [BUILD NUMBER]`
+
+Release an app to Beta or Production
+
+```
+USAGE
+  $ qla release [BUILD NUMBER]
+
+ARGUMENTS
+  BUILD NUMBER  the build number to release
+
+OPTIONS
+  -b, --beta       release beta version
+  -h, --help       show CLI help
+  -j, --json       output responses in JSON
+  -p, --prod       release production version
+  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+```
+
+_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/release.ts)_
 <!-- commandsstop -->
 
 ## Running locally
