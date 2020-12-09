@@ -370,7 +370,11 @@ export default class Init extends Command {
             success = !!newManifest;
 
             if (success && !flags["no-release"]) {
-                println(chalk`{green releasing initial beta version...}`);
+                println(
+                    chalk`{green releasing build ${
+                        newManifest!.version_number
+                    } as initial beta...}`
+                );
                 await release({
                     manifest: newManifest!,
                     destination: ReleaseDestination.BETA,
