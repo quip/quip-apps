@@ -26,6 +26,8 @@ export default function(e, record) {
         if (next.getRichTextRecord) {
             next = next.getRichTextRecord();
         }
+        // Clear the focus just in case it was focused before.
+        next.clearFocus();
         next.focus();
         return true;
     }
