@@ -10,6 +10,7 @@ import { Manifest } from "../lib/types";
 import { copy, runCmd } from "../lib/util";
 import { bump } from "./bump";
 import { doPublish } from "./publish";
+import { release, ReleaseDestination } from "./release";
 
 interface PackageOptions {
     name: string;
@@ -72,6 +73,10 @@ export default class Init extends Command {
         "no-create": flags.boolean({
             description:
                 "only create a local app (don't create an app in the dev console or assign an ID)",
+        }),
+        "no-release": flags.boolean({
+            description:
+                'don\'t release the initial version (leave app uninstallable and in the "unreleased" state)',
         }),
         dir: flags.string({
             char: "d",
@@ -348,7 +353,7 @@ export default class Init extends Command {
             await runCmd(appDir, "npm", "install");
             // bump the version since we already have a verison 1 in the console
             println(chalk`{green bumping version...}`);
-            await bump(appDir, "patch", {silent: flags.json});
+            await bump(appDir, "patch", { silent: flags.json });
             // npm run build
             println(chalk`{green building app...}`);
             await runCmd(appDir, "npm", "run", "build");
@@ -363,6 +368,23 @@ export default class Init extends Command {
                 flags.json
             );
             success = !!newManifest;
+
+            if (success && !flags["no-release"]) {
+                println(
+                    chalk`{green releasing build ${
+                        newManifest!.version_number
+                    } as initial beta...}`
+                );
+                await release({
+                    manifest: newManifest!,
+                    destination: ReleaseDestination.BETA,
+                    build: newManifest!.version_number,
+                    site: flags.site,
+                    config: flags.config,
+                    json: flags.json,
+                });
+            }
+
             if (flags.json) {
                 if (success) {
                     print(JSON.stringify(newManifest));

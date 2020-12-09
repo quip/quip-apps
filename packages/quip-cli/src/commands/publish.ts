@@ -181,12 +181,17 @@ export default class Publish extends Command {
             flags.site,
             flags.json
         );
-        if (!success) {
-            println(chalk`{red Publishing failed.}`);
+        if (success) {
+            if (!flags.json) {
+                println(
+                    chalk`{magenta Successfully published ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
+                );
+            }
+        } else {
+            if (!flags.json) {
+                println(chalk`{red Publishing failed.}`);
+            }
             process.exit(1);
         }
-        println(
-            chalk`{magenta Successfully published ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
-        );
     }
 }

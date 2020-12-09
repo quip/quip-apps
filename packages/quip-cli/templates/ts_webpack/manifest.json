@@ -4,7 +4,7 @@
     "name": "quip-app-boilerplate",
     "description": "Quip Live App Boilerplate",
     "version_name": "0.1.0",
-    "version_number": 1,
+    "version_number": 0,
     "sizing_mode": "fit_content",
     "initial_height": 500,
     "initial_width": 500,
