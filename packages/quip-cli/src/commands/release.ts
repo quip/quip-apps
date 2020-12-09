@@ -106,7 +106,7 @@ export default class Release extends Command {
             }
             if (versions.versions.length === 0) {
                 println(
-                    chalk`{red No releasable versions. Release a build first.}`
+                    chalk`{red No releasable versions. Publish a build first.}`
                 );
                 return;
             }
