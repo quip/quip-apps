@@ -330,7 +330,7 @@ export default class Client {
     isAndroid() {
         return this.isAndroidValue;
     }
-    isApiVersionAtLeast() {
+    isApiVersionAtLeast(minVersion: string) {
         return this.isApiVersionAtLeastValue;
     }
     isAppFocused() {
