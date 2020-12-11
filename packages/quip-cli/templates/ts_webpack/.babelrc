@@ -1,8 +1,0 @@
-{
-    "presets": [
-        ["@babel/env", {"shippedProposals": true}],
-        "@babel/react",
-        "@babel/preset-typescript"
-    ],
-    "plugins": ["@babel/plugin-transform-runtime"]
-}

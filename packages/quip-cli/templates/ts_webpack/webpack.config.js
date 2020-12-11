@@ -7,7 +7,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "./dist"),
         filename: "app.js",
-        publicPath: "dist",
+        publicPath: "/dist/",
     },
     resolve: {
         modules: [
@@ -22,14 +22,9 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
-                loader: "babel-loader",
-            },
-            {
-                test: /\.tsx?$/,
-                use: "ts-loader",
-                exclude: /node_modules/,
+                test: /\.[jt]sx?$/,
+                include: [/src/],
+                use: "babel-loader",
             },
         ],
     },
