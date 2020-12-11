@@ -18,12 +18,14 @@ const TABBABLE_ELEMENT_SELECTOR = [
     .concat(["[tabindex='0']:not([class*='a11y-hidden'])"])
     .join(", ");
 
-export default function (e, record, tabToSiblingFocusableItem = false) {
+// tabToAdjacentFocusableElement is a boolean. It allows to tab to the adjacent
+// focusable item if it is enable.
+export default function (e, record, tabToAdjacentFocusableElement = false) {
     let next;
 
     if (e.keyCode === TAB) {
         if (e.shiftKey) {
-            if (tabToSiblingFocusableItem) {
+            if (tabToAdjacentFocusableElement) {
                 next = findPrevFocusableElem_(record);
             }
             if (!next) {
@@ -34,7 +36,7 @@ export default function (e, record, tabToSiblingFocusableItem = false) {
                 next = records[records.length - 1];
             }
         } else {
-            if (tabToSiblingFocusableItem) {
+            if (tabToAdjacentFocusableElement) {
                 next = findNextFocusableElem_(record);
             }
             if (!next) {
@@ -72,10 +74,10 @@ export default function (e, record, tabToSiblingFocusableItem = false) {
     return false;
 }
 
-// Depends on implementation, sometimes there are nested div elements
-// for a record's rich textbox DOMNode. However, record.focus()
-// will only focus on one of them. When finding the previous focusable element,
-// we need to skip all the elements for the rich textbox DOMNode.
+// Depends on the implementation, there might be nested div elements
+// for a record's rich text box DOMNode. However, record.focus()
+// will only focus on one of them. When tabbing to the previous focusable
+// element, we need to skip all the elements for record's DOMNode.
 function findPrevFocusableElem_(record) {
     const tabbableElems = [
         ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
@@ -123,7 +125,7 @@ function findNextFocusableElem_(record) {
                 return tabbableElems[i + 1];
             }
         }
-        if (recordElems.some(elem => elem === tabbableElems[i])) {
+        if (recordElems.includes(tabbableElems[i])) {
             const index = tabbableElems.findIndex(
                 item => item === recordElems[recordElems.length - 1]
             );
