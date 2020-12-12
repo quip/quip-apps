@@ -15,10 +15,10 @@ export class Root extends React.Component {
         this.props.auth
             .request({ url: "https://platform.quip.com/1/threads/recent" })
             .then(
-                response => {
+                (response) => {
                     console.log({ response: response.json() });
                 },
-                err => {
+                (err) => {
                     console.error({ error });
                 },
             );
@@ -52,7 +52,7 @@ export class Root extends React.Component {
                     error: null,
                 });
             },
-            error => {
+            (error) => {
                 this.setState({ error });
             },
         );
@@ -66,7 +66,7 @@ export class Root extends React.Component {
                     error: null,
                 });
             },
-            error => {
+            (error) => {
                 this.setState({ error });
             },
         );
@@ -78,7 +78,7 @@ export class Root extends React.Component {
 }
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, params) {
+    initializationCallback: function (rootNode, params) {
         ReactDOM.render(
             <Root auth={quip.apps.auth("quip-automation-api")}/>,
             rootNode,

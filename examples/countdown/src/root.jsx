@@ -59,7 +59,7 @@ function allMenuCommands(deadlineDate) {
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["color", "date"],
-    initializationCallback: function(rootNode, params) {
+    initializationCallback: function (rootNode, params) {
         const rootRecord = quip.apps.getRootRecord();
 
         if (params.isCreation) {

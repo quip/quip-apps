@@ -10,12 +10,14 @@ import classNames from "classnames";
 import chunk from "lodash.chunk";
 import throttle from "lodash.throttle";
 
-import startOfWeek from "date-fns/start_of_week";
-
+import startOfWeek from "date-fns/startOfWeek";
+import endOfWeek from "date-fns/endOfWeek";
+import eachDayOfInterval from "date-fns/eachDayOfInterval";
 import Styles from "./Calendar.less";
 import StylesCalendarEvent from "./CalendarEvent.less";
 
 import {EventRecord, RootRecord} from "../model";
+import {formatDate} from "../util";
 import {
     refreshEvents,
     setDebugProp,
@@ -55,16 +57,6 @@ import type {
 
 const {CONTAINER_SIZE_UPDATE, ELEMENT_BLUR} = quip.apps.EventType;
 
-const LONG_WEEK_DAYS = [
-    quiptext("Sun [Sunday abbreviated]"),
-    quiptext("Mon [Monday abbreviated]"),
-    quiptext("Tue [Tuesday abbreviated]"),
-    quiptext("Wed [Wednesday abbreviated]"),
-    quiptext("Thu [Thursday abbreviated]"),
-    quiptext("Fri [Friday abbreviated]"),
-    quiptext("Sat [Saturday abbreviated]"),
-];
-const SHORT_WEEK_DAYS = LONG_WEEK_DAYS.map(d => d[0]);
 const BUTTON_RIGHT_CLICK = 2;
 const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
@@ -247,7 +239,8 @@ class Calendar extends React.Component<Props, null> {
     getMovingEventOrder(
         movingEvent,
         movingEventRect,
-        draggingEventDateRange): MovingEventOrder {
+        draggingEventDateRange
+    ): MovingEventOrder {
         const {rootRecord} = this.props;
         const movingEventId = movingEvent.id();
         const events = rootRecord
@@ -432,7 +425,11 @@ class Calendar extends React.Component<Props, null> {
             resizingEvent,
         } = this.props;
 
-        const weekDays = isSmallScreen ? SHORT_WEEK_DAYS : LONG_WEEK_DAYS;
+        const weekDays = eachDayOfInterval({
+            start: startOfWeek(new Date()),
+            end: endOfWeek(new Date()),
+        }).map(date => formatDate(date, isSmallScreen ? "EEEEE" : "EEE"));
+
         const weeks = chunk(getCalendarMonth(displayMonth), 7);
         return <div
             onMouseUp={this.onMouseUp}
@@ -484,17 +481,15 @@ const mapStateToProps = state => ({
     rootRecord: state.rootRecord,
     selectedEvent: state.selectedEvent,
 });
-export default connect(
-    mapStateToProps,
-    {
-        refreshEvents,
-        setDebugProp,
-        setFocusedEvent,
-        setIsSmallScreen,
-        setMouseCoordinates,
-        setMovingEvent,
-        setMovingEventOrder,
-        setMovingEventRectMap,
-        setResizingEvent,
-        setSelectedEvent,
-    })(Calendar);
+export default connect(mapStateToProps, {
+    refreshEvents,
+    setDebugProp,
+    setFocusedEvent,
+    setIsSmallScreen,
+    setMouseCoordinates,
+    setMovingEvent,
+    setMovingEventOrder,
+    setMovingEventRectMap,
+    setResizingEvent,
+    setSelectedEvent,
+})(Calendar);

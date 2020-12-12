@@ -29,7 +29,7 @@ function setPlaylist(userId, playlistId) {
 }
 
 quip.apps.initialize({
-    initializationCallback: function(root, params) {
+    initializationCallback: function (root, params) {
         var rootRecord = quip.apps.getRootRecord();
         if (params.isCreation) {
             if (params.creationUrl &&

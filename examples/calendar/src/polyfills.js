@@ -2,7 +2,7 @@
 // Copyright 2017 Quip
 
 const polyfills = {
-    elementsFromPoint: function(x: number, y: number) {
+    elementsFromPoint: function (x: number, y: number) {
         if (window.document.elementsFromPoint) {
             return window.document.elementsFromPoint(x, y);
         }
@@ -19,7 +19,7 @@ const polyfills = {
                 parent = false;
             }
         } while (parent);
-        parents.forEach(function(parent) {
+        parents.forEach(function (parent) {
             return (parent.style.pointerEvents = "all");
         });
         return parents;

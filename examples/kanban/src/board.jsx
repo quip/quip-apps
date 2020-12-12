@@ -4,9 +4,10 @@ import PropTypes from "prop-types";
 import AddCard, {kAddCardHeight} from "./add-card.jsx";
 import Card from "./card.jsx";
 import {showCardContextMenu} from "./menus.js";
-import {BoardRecord, entityListener} from "./model.jsx";
+import {BoardRecord, entityListener} from "./model.tsx";
 import getClosest from "./getClosest";
 import styles from "./board.less";
+import manifest from "../manifest.json";
 
 export const kDefaultColumnWidth = 269; // 800 / 3 columns
 const kCardDropTargetMargin = 3;
@@ -39,6 +40,21 @@ class Board extends React.Component {
         };
         this.width_ = 0;
         this.height_ = 0;
+    }
+
+    componentDidCatch(error, info) {
+        const params = {
+            "message": error.message,
+            "version_number": manifest.version_number + "",
+            "version_name": manifest.version_name + "",
+        };
+        if (error.stack) {
+            params["stack"] = error.stack;
+        }
+        if (info && info.componentStack) {
+            params["component_stack"] = info.componentStack;
+        }
+        quip.apps.recordQuipMetric("kankan_error", params);
     }
 
     componentDidMount() {

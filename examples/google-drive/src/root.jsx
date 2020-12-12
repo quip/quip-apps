@@ -34,7 +34,7 @@ export class Root extends React.Component {
                         error: null,
                     });
                 },
-                error => {
+                (error) => {
                     this.setState({ error });
                 },
             );
@@ -45,7 +45,7 @@ export class Root extends React.Component {
 }
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, params) {
+    initializationCallback: function (rootNode, params) {
         ReactDOM.render(<Root auth={quip.apps.auth("gdrive")}/>, rootNode);
     },
 });

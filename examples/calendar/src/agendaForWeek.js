@@ -1,8 +1,8 @@
 // Copyright 2017 Quip
 // @flow
 
-import isWithinRange from "date-fns/is_within_range";
-import areRangesOverlapping from "date-fns/are_ranges_overlapping";
+import isWithinInterval from "date-fns/isWithinInterval";
+import areIntervalsOverlapping from "date-fns/areIntervalsOverlapping";
 import max from "date-fns/max";
 import min from "date-fns/min";
 
@@ -12,9 +12,8 @@ import type {EventRecord} from "./model";
 
 const agendaForWeek = (
     week: Array<Date>,
-    events: Array<EventRecord>): Array<
-    Array<{event: ?EventRecord, start: Date, end: Date}>
-> => {
+    events: Array<EventRecord>
+): Array<Array<{event: ?EventRecord, start: Date, end: Date}>> => {
     //console.log("EVENTS", events);
     return events
         .filter(event => isEventForWeek(event, week))
@@ -56,9 +55,9 @@ const firstRowForEvent = (eventWithDays, eventRows) =>
 const getItemForLayout = (event, week) => {
     const {start, end} = event.getDateRange();
     return {
-        end: min(end, week[6]),
+        end: min([end, week[6]]),
         event,
-        start: max(start, week[0]),
+        start: max([start, week[0]]),
     };
 };
 
@@ -79,7 +78,10 @@ const eventOrDayPadForDay = agendaRow => dayOfWeek =>
                 start: dayOfWeek,
                 end: endOfDay(dayOfWeek),
             },
-            {start, end})
+            {
+                start: start,
+                end: end,
+            })
     ) || {
         event: undefined,
         start: dayOfWeek,
@@ -105,15 +107,17 @@ const rangesOverlap = (a, b) => {
     }
 
     if (aIsSameDay) {
-        return isWithinRange(a.start, b.start, b.end);
+        return isWithinInterval(a.start, {start: b.start, end: b.end});
     }
 
     if (bIsSameDay) {
-        return isWithinRange(b.start, a.start, a.end);
+        return isWithinInterval(b.start, {start: a.start, end: a.end});
     }
 
     return (
-        areRangesOverlapping(a.start, a.end, b.start, b.end) ||
+        areIntervalsOverlapping(
+            {start: a.start, end: a.end},
+            {start: b.start, end: b.end}) ||
         isSameDay(a.start, b.end) ||
         isSameDay(a.end, b.start)
     );

@@ -11,7 +11,7 @@ class StickyNoteRoot extends quip.apps.RootRecord {
 quip.apps.registerClass(StickyNoteRoot, "root");
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, params) {
+    initializationCallback: function (rootNode, params) {
         let rootRecord = quip.apps.getRootRecord();
         if (params.isCreation) {
             rootRecord.set("stickyNote", {});

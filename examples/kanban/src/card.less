@@ -10,6 +10,7 @@
     left: 0;
     padding: 2px;
     border-radius: 3px;
+    @backgroundInverse: var(--quipBackgroundInverse, 0, 0, 0);
     cursor: default;
 
     .titleRow {
@@ -30,7 +31,7 @@
 
     &.header .chevron {
         height: 100%;
-        stroke: rgba(0, 0, 0, 0.2);
+        stroke: ~"rgba(@{backgroundInverse}, 0.2)";
     }
 
     &.header .remoteEditor article .content {
@@ -50,6 +51,7 @@
     .draggableHeader {
         font-size: 15px;
         padding-right: 3px;
+        stroke: ~"rgba(@{backgroundInverse}, 0.2)";
     }
 
     .commentWrapper {
@@ -88,14 +90,13 @@
             border-radius: 3px;
             padding: 3px;
             padding-left: 5px;
-            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0) inset;
+            box-shadow: 0 0 0 1px ~"rgba(@{backgroundInverse}, 0)" inset;
         }
 
         &:hover,
         &.isFocused {
             :global article .section[data-section-type="0"] > .content {
-                box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
-                background-color: #fff;
+                box-shadow: 0 0 0 1px ~"rgba(@{backgroundInverse}, 0.1)" inset;
             }
         }
     }

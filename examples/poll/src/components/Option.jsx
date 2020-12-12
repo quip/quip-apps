@@ -50,6 +50,11 @@ export default class Option extends React.Component {
             return true;
         }
 
+        // Both keydown and keyup event will be triggered. Ignore keydown event
+        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
+        if (e.type === "keydown") {
+            return false;
+        }
         return handleRichTextBoxKeyEventNavigation(e, this.props.record);
     };
 

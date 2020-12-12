@@ -2,7 +2,7 @@
 
 import {localizedColorLabel} from "quip-apps-compat";
 
-import {kDefaultColumnColors} from "./model.jsx";
+import {kDefaultColumnColors} from "./model.tsx";
 
 const colors = kDefaultColumnColors;
 

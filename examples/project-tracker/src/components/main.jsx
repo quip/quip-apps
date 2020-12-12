@@ -1,27 +1,24 @@
 // Copyright 2017 Quip
 
+import React from "react";
+import ReactDOM from "react-dom";
+import quip from "quip-apps-api";
 import PropTypes from "prop-types";
-import debounce from "lodash.debounce";
 import shallowEqual from "shallowequal";
-import connectEntity from "./lib/connectEntity";
-import registerModels from "./model";
-import timePerf from "./lib/timePerf";
-import {DefaultCardRenderer} from "../../shared/table-view/DefaultCardRenderer.js";
-import {
-    toJSON,
-    COLUMN_TYPE as TABLE_VIEW_COLUMN_TYPE,
-    COLUMN_TYPE_LABELS,
-} from "../../shared/table-view/model.js";
+import {DefaultCardRenderer} from "../../../shared/table-view/DefaultCardRenderer.js";
+import {toJSON} from "../../../shared/table-view/model.js";
 import {
     getHeights,
     getWidths,
     ROW_START_HEIGHT,
     ROW_PADDING,
-} from "../../shared/table-view/utils";
-import {COLUMN_TYPE, RootRecord} from "./model.js";
-import {TableView} from "../../shared/table-view/table-view.jsx";
+    additionalDateColumnWidth,
+} from "../../../shared/table-view/utils";
+import {COLUMN_TYPE, RootRecord} from "../model/root.ts";
+import {TableView} from "../../../shared/table-view/table-view.jsx";
+import manifest from "../../manifest.json";
 
-class Root extends React.Component {
+export class Main extends React.Component {
     static propTypes = {
         record: PropTypes.instanceOf(RootRecord).isRequired,
         columns: PropTypes.instanceOf(quip.apps.RecordList).isRequired,
@@ -45,6 +42,21 @@ class Root extends React.Component {
                 this.getMinWidth),
             heights: getHeights(props),
         };
+    }
+
+    componentDidCatch(error, info) {
+        const params = {
+            "message": error.message,
+            "version_number": manifest.version_number + "",
+            "version_name": manifest.version_name + "",
+        };
+        if (error.stack) {
+            params["stack"] = error.stack;
+        }
+        if (info && info.componentStack) {
+            params["component_stack"] = info.componentStack;
+        }
+        quip.apps.recordQuipMetric("project_tracker_error", params);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -107,7 +119,7 @@ class Root extends React.Component {
         const users = record.getCells();
         const max = Math.max.apply(
             null,
-            users.map(u => u.getUsers().length));
+            users.filter(u => u !== undefined).map(u => u.getUsers().length));
         if (max > 4) return 150;
         /* From here we start at 128 (removed the `+N`) and
           subtract (Picture width (30 at time of writing) - negative
@@ -142,7 +154,7 @@ class Root extends React.Component {
             case COLUMN_TYPE.TEXT:
                 return 214;
             case COLUMN_TYPE.DATE:
-                return 158;
+                return 158 + additionalDateColumnWidth();
             case COLUMN_TYPE.FILE:
                 return 158;
             case COLUMN_TYPE.STATUS:
@@ -268,106 +280,9 @@ class Root extends React.Component {
             onResizeEnd={this.onResizeEnd_}
             onCardClicked={(id, column) => {
                 if (column.type === COLUMN_TYPE.TEXT) {
-                    quip.apps
-                        .getRecordById(id)
-                        .get("contents")
-                        .focus();
+                    quip.apps.getRecordById(id).get("contents").focus();
                 }
             }}
             metricType={"project_tracker"}/>;
     }
 }
-
-registerModels();
-
-quip.apps.initialize({
-    initializationCallback: (root, {isCreation}) => {
-        const rootRecord = quip.apps.getRootRecord();
-
-        // Render performance timer
-        timePerf("Init To Render", () => rootRecord.getDom());
-
-        if (isCreation) {
-            rootRecord.seed();
-        } else {
-            if (rootRecord.getDataVersion() < RootRecord.DATA_VERSION) {
-                // Migrate data to new format
-                const columns = rootRecord.getColumns();
-                const statusTypes = rootRecord.get("statusTypes").getRecords();
-                /** @private {Map<string, string>} */
-                const migrationMap = new Map();
-                columns.forEach(function(col) {
-                    if (col.getType() == "status") {
-                        let record;
-                        statusTypes.forEach(function(status) {
-                            record = col.addStatusType(
-                                status.getText(),
-                                status.getColor());
-                            migrationMap.set(status.getId(), record.getId());
-                        });
-                        const cells = col.getCells();
-                        cells.forEach(function(cell) {
-                            const status = cell.getStatus();
-                            const newStatus = migrationMap.get(status);
-                            if (status && newStatus) {
-                                cell.setStatus(newStatus);
-                            }
-                        });
-                    }
-                });
-                rootRecord.setDataVersion(RootRecord.DATA_VERSION);
-            }
-            rootRecord.checkAndRepairNullCells();
-        }
-
-        const Connected = connectEntity(rootRecord, Root, {
-            isV2: true,
-            mapStateToProps: state => ({
-                rowCount: state.rows.count(),
-                columnCount: state.columns.count(),
-            }),
-        });
-
-        ReactDOM.render(<Connected/>, root);
-    },
-    toolbarCommandIds: ["addRow"],
-    menuCommands: [
-        {
-            id: "sortAscending",
-            label: quiptext("Sort Ascending"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "sortDescending",
-            label: quiptext("Sort Descending"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "addColumn",
-            label: quiptext("Add Column"),
-            subCommands: Object.keys(COLUMN_TYPE).map(
-                type => type + "AddColumn"),
-        },
-        {
-            id: "addRow",
-            label: quiptext("Add Row"),
-            handler: () => quip.apps.getRootRecord().addRow(),
-        },
-        {
-            id: "deleteColumn",
-            label: quiptext("Delete Column"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "deleteRow",
-            label: quiptext("Delete Row"),
-            handler: (name, context) => context[name](),
-        },
-        ...Object.keys(COLUMN_TYPE).map(type => ({
-            id: type + "AddColumn",
-            label: COLUMN_TYPE_LABELS[TABLE_VIEW_COLUMN_TYPE[type]],
-            isHeader: false,
-            handler: (name, context) => context["addColumn"](type),
-        })),
-    ],
-});

@@ -3,8 +3,8 @@
 
 import React from "react";
 import {connect} from "react-redux";
-import addMonths from "date-fns/add_months";
-import subMonths from "date-fns/sub_months";
+import addMonths from "date-fns/addMonths";
+import subMonths from "date-fns/subMonths";
 
 import LeftChevron from "./LeftChevron.jsx";
 import RightChevron from "./RightChevron.jsx";
@@ -38,7 +38,7 @@ class CalendarNavHeader extends React.Component<Props, null> {
                 </span>
 
                 <span className={Styles.displayYear}>
-                    {formatDate(displayMonth, "YYYY")}
+                    {formatDate(displayMonth, "yyyy")}
                 </span>
             </div>
             <div className={Styles.navButtonGroup}>
@@ -61,8 +61,6 @@ class CalendarNavHeader extends React.Component<Props, null> {
 const mapHeaderStateToProps = state => ({
     displayMonth: state.displayMonth,
 });
-export default connect(
-    mapHeaderStateToProps,
-    {
-        setDisplayMonth,
-    })(CalendarNavHeader);
+export default connect(mapHeaderStateToProps, {
+    setDisplayMonth,
+})(CalendarNavHeader);

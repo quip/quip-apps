@@ -5,6 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import quip from "quip";
 import Option from "./Option.jsx";
+import manifest from "../../app/manifest.json";
 
 export default class App extends React.Component {
     static propTypes = {
@@ -13,6 +14,21 @@ export default class App extends React.Component {
         options: PropTypes.any.isRequired,
         rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
     };
+
+    componentDidCatch(error, info) {
+        const params = {
+            "message": error.message,
+            "version_number": manifest.version_number + "",
+            "version_name": manifest.version_name + "",
+        };
+        if (error.stack) {
+            params["stack"] = error.stack;
+        }
+        if (info && info.componentStack) {
+            params["component_stack"] = info.componentStack;
+        }
+        quip.apps.recordQuipMetric("poll_error", params);
+    }
 
     componentDidMount() {
         const itemId = this.props.rootRecord.get("allowMultiple")

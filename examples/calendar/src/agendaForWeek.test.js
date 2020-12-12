@@ -1,6 +1,6 @@
 // Copyright 2017 Quip
 
-import eachDay from "date-fns/each_day";
+import eachDayOfInterval from "date-fns/eachDayOfInterval";
 
 import agendaForWeek from "./agendaForWeek";
 
@@ -25,7 +25,7 @@ test("creates an agenda of events spanning the week", () => {
         end: mondayDate,
     });
 
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
     const events = [mondayEvent, sundayEvent];
 
     expect(agendaForWeek(week, events)).toEqual([
@@ -81,7 +81,7 @@ test("creates a new row when events are on the same day", () => {
     });
 
     const events = [mondayEvent, otherMondayEvent];
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
 
     expect(agendaForWeek(week, events)).toEqual([
         [
@@ -178,7 +178,7 @@ test("creates a new row when event boundaries are shared", () => {
     });
 
     const events = [mondayEvent, sundayEvent, sundayMondayEvent];
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
 
     expect(agendaForWeek(week, events)).toEqual([
         [
@@ -270,7 +270,7 @@ test("creates a new row when event ranges overlap", () => {
     });
 
     const events = [sundayEvent, mondayTuesdayEvent, sundayMondayEvent];
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
 
     expect(agendaForWeek(week, events)).toEqual([
         [
@@ -346,7 +346,7 @@ test("supports events starting previous week", () => {
         end: sundayDate,
     });
     const events = [lastFridayTillSundayEvent];
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
 
     expect(agendaForWeek(week, events)).toEqual([
         [
@@ -395,7 +395,7 @@ test("supports events ending the following week", () => {
         end: nextSundayDate,
     });
     const events = [saturdayTilNextSundayEvent];
-    const week = eachDay(sundayDate, saturdayDate);
+    const week = eachDayOfInterval({start: sundayDate, end: saturdayDate});
 
     expect(agendaForWeek(week, events)).toEqual([
         [

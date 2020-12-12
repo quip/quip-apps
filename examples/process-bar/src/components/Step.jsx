@@ -79,6 +79,11 @@ export default class Step extends React.Component {
     cursorOnLeft = selection => selection.anchorOffset === 0;
 
     handleKeyEvent = e => {
+        // Both keydown and keyup event will be triggered. Ignore keydown event
+        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
+        if (e.type === "keydown") {
+            return false;
+        }
         return handleRichTextBoxKeyEventNavigation(e, this.props.record);
     };
 

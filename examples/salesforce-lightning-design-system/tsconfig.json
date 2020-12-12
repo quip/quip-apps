@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "module": "es6",
+        "target": "es2017",
+        "jsx": "react",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "downlevelIteration": true
+    },
+    "include": ["./src/**/*", "./custom.d.ts"]
+}

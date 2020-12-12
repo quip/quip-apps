@@ -14,7 +14,7 @@ import registerModels from "./model";
 registerModels();
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, {isCreation}) {
+    initializationCallback: function (rootNode, {isCreation}) {
         const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
@@ -24,11 +24,7 @@ quip.apps.initialize({
         quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);
         const ConnectedApp = connectRecord(rootRecord, App);
         ReactDOM.render(<ConnectedApp/>, rootNode, () => {
-            isCreation &&
-                rootRecord
-                    .get("steps")
-                    .getRecords()[0]
-                    .focus();
+            isCreation && rootRecord.get("steps").getRecords()[0].focus();
         });
     },
     menuCommands: allMenuCommands(),

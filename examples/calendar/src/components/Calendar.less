@@ -31,7 +31,8 @@
     margin-bottom: 4px;
     user-select: none;
     pointer-events: none;
-    color: #333;
+    color: @cell-color;
+    text-align: center;
     .cell {
         width: calc(100% / 7);
     }
@@ -64,7 +65,6 @@
     }
 
     .day {
-        background-color: #fff;
         border-bottom: 1px solid @cell-border-gray;
         border-right: 1px solid @cell-border-gray;
         flex: 1;
@@ -86,7 +86,7 @@
             padding: 3px 6px;
             text-align: right;
             user-select: none;
-            color: #333;
+            color: @cell-color;
             cursor: pointer;
 
             &.isInOtherMonth {

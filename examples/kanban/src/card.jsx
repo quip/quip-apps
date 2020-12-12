@@ -6,13 +6,13 @@ import PropTypes from "prop-types";
 import {Motion} from "react-motion";
 import cx from "classnames";
 import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
-import {CardRecord, entityListener} from "./model.jsx";
+import {CardRecord, entityListener} from "./model.tsx";
 import {
     animateTo,
     getCardToFocus,
     listenForCardFocus,
     unlistenForCardFocus,
-} from "./root.jsx";
+} from "./root.tsx";
 
 import Chevron from "quip-apps-chevron";
 
@@ -273,6 +273,11 @@ class Card extends React.Component {
     };
 
     handleKeyEvent_ = e => {
+        // Both keydown and keyup event will be triggered. Ignore keydown event
+        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
+        if (e.type === "keydown") {
+            return false;
+        }
         return handleRichTextBoxKeyEventNavigation(e, this.props.entity);
     };
 

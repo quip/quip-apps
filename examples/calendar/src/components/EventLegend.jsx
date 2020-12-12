@@ -5,11 +5,11 @@
 import quip from "quip";
 import React from "react";
 import {connect} from "react-redux";
-import isAfter from "date-fns/is_after";
-import isBefore from "date-fns/is_before";
-import isSameMonth from "date-fns/is_same_month";
-import isSameYear from "date-fns/is_same_year";
-import isWithinRange from "date-fns/is_within_range";
+import isAfter from "date-fns/isAfter";
+import isBefore from "date-fns/isBefore";
+import isSameMonth from "date-fns/isSameMonth";
+import isSameYear from "date-fns/isSameYear";
+import isWithinInterval from "date-fns/isWithinInterval";
 import classNames from "classnames";
 
 import Styles from "./EventLegend.less";
@@ -19,7 +19,7 @@ import {EventRecord} from "../model";
 import {isSameDay, formatDate} from "../util";
 
 const formatDateRange = (start, end) => {
-    const startText = formatDate(start, "MMMM D");
+    const startText = formatDate(start, "MMMM do");
 
     const sameYear = isSameYear(start, end);
     const sameMonth = isSameMonth(start, end);
@@ -29,14 +29,14 @@ const formatDateRange = (start, end) => {
     }
 
     if (sameYear && sameMonth) {
-        return `${startText}-${formatDate(end, "D")}`;
+        return `${startText}-${formatDate(end, "do")}`;
     }
 
     if (isSameYear(start, end)) {
-        return `${startText}-${formatDate(end, "MMMM D")}`;
+        return `${startText}-${formatDate(end, "MMMM do")}`;
     }
 
-    return `${startText}-${formatDate(end, "MMMM D YY")}`;
+    return `${startText}-${formatDate(end, "MMMM do YY")}`;
 };
 
 const eventsForMonth = (events, date) => {
@@ -51,13 +51,13 @@ const eventsForMonth = (events, date) => {
             end,
             sameMonth(start),
             sameMonth(end),
-            isWithinRange(date, start, end),
+            isWithinInterval(date, {start: start, end: end}),
         );
         */
         return (
             sameMonth(start) ||
             sameMonth(end) ||
-            isWithinRange(date, start, end)
+            isWithinInterval(date, {start: start, end: end})
         );
     });
     return matchingEvents.sort((a, b) => {

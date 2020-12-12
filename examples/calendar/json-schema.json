@@ -1,0 +1,159 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "Calendar Schema",
+    "description": "Calendar input events.",
+    "default": {},
+    "examples": [
+        {
+            "events": [
+                {
+                    "color": "ORANGE",
+                    "dateRange": {
+                        "start": "2020-8-3",
+                        "end": "2020-8-3"
+                    },
+                    "content": "Client Meeting"
+                },
+                {
+                    "color": "RED",
+                    "dateRange": {
+                        "start": "2020-8-11",
+                        "end": "2020-8-11"
+                    },
+                    "content": "Rest Time"
+                },
+                {
+                    "color": "ORANGE",
+                    "dateRange": {
+                        "start": "2020-8-12",
+                        "end": "2020-8-12"
+                    },
+                    "content": "My Day Off"
+                }
+            ],
+            "displayMonth": "2020-8"
+        }
+    ],
+    "required": ["events", "displayMonth"],
+    "properties": {
+        "events": {
+            "$id": "#/properties/events",
+            "type": "array",
+            "title": "The events schema",
+            "description": "A single event on the calendar.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "color": "ORANGE",
+                        "dateRange": {
+                            "start": "2020-8-3",
+                            "end": "2020-8-3"
+                        },
+                        "content": "Client Meeting"
+                    },
+                    {
+                        "color": "RED",
+                        "dateRange": {
+                            "start": "2020-8-11",
+                            "end": "2020-8-11"
+                        },
+                        "content": "Rest Time"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/events/items",
+                "type": "object",
+                "title": "Event schema",
+                "description": "The event schema.",
+                "default": {},
+                "examples": [
+                    {
+                        "color": "ORANGE",
+                        "dateRange": {
+                            "start": "2020-8-3",
+                            "end": "2020-8-3"
+                        },
+                        "content": "Client Meeting"
+                    }
+                ],
+                "required": ["color", "dateRange", "content"],
+                "properties": {
+                    "color": {
+                        "$id": "#/properties/events/items/anyOf/1/properties/color",
+                        "type": "string",
+                        "title": "The color schema",
+                        "description": "The event's background color.",
+                        "default": "",
+                        "enum": [
+                            "RED",
+                            "ORANGE",
+                            "YELLOW",
+                            "GREEN",
+                            "BLUE",
+                            "VIOLET"
+                        ],
+                        "examples": ["RED"]
+                    },
+                    "dateRange": {
+                        "$id": "#/properties/events/items/anyOf/0/properties/dateRange",
+                        "type": "object",
+                        "title": "The dateRange schema",
+                        "description": "The event's date range.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "start": "2020-8-3",
+                                "end": "2020-8-3"
+                            }
+                        ],
+                        "required": ["start", "end"],
+                        "properties": {
+                            "start": {
+                                "$id": "#/properties/events/items/anyOf/0/properties/dateRange/properties/start",
+                                "type": "string",
+                                "format": "date",
+                                "title": "The start date",
+                                "description": "Start date for the event.",
+                                "default": "",
+                                "examples": ["2020-8-3"]
+                            },
+                            "end": {
+                                "$id": "#/properties/events/items/anyOf/0/properties/dateRange/properties/end",
+                                "type": "string",
+                                "format": "date",
+                                "title": "The end date",
+                                "description": "End date for the event.",
+                                "default": "",
+                                "examples": ["2020-8-3"]
+                            }
+                        },
+                        "additionalProperties": true
+                    },
+                    "content": {
+                        "$id": "#/properties/events/items/anyOf/0/properties/content",
+                        "type": "string",
+                        "title": "The content schema",
+                        "description": "The content for the event.",
+                        "default": "",
+                        "examples": ["Client Meeting"]
+                    }
+                },
+                "additionalProperties": true
+            }
+        },
+        "displayMonth": {
+            "$id": "#/properties/displayMonth",
+            "type": "string",
+            "title": "The displayMonth schema",
+            "description": "What month to display.",
+            "default": "",
+            "examples": ["2020-8"]
+        }
+    },
+    "additionalProperties": true
+}

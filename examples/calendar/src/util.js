@@ -5,18 +5,18 @@
 // $FlowIssueQuipModule
 // import quip from "quip";
 
-import addDays from "date-fns/add_days";
-import differenceInDays from "date-fns/difference_in_days";
+import addDays from "date-fns/addDays";
+import differenceInDays from "date-fns/differenceInDays";
 import format from "date-fns/format";
-import getDay from "date-fns/get_day";
-import getDaysInMonth from "date-fns/get_days_in_month";
-import isAfter from "date-fns/is_after";
-import isEqual from "date-fns/is_equal";
-import isWithinRange from "date-fns/is_within_range";
-import lastDayOfMonth from "date-fns/last_day_of_month";
-import startOfMonth from "date-fns/start_of_month";
-import subDays from "date-fns/sub_days";
-import subMonths from "date-fns/sub_months";
+import getDay from "date-fns/getDay";
+import getDaysInMonth from "date-fns/getDaysInMonth";
+import isAfter from "date-fns/isAfter";
+import isEqual from "date-fns/isEqual";
+import isWithinInterval from "date-fns/isWithinInterval";
+import lastDayOfMonth from "date-fns/lastDayOfMonth";
+import startOfMonth from "date-fns/startOfMonth";
+import subDays from "date-fns/subDays";
+import subMonths from "date-fns/subMonths";
 
 import de from "date-fns/locale/de";
 import es from "date-fns/locale/es";
@@ -28,7 +28,7 @@ import nl from "date-fns/locale/nl";
 import pt from "date-fns/locale/pt";
 import ru from "date-fns/locale/ru";
 import tr from "date-fns/locale/tr";
-import zh_cn from "date-fns/locale/zh_cn";
+import zh_cn from "date-fns/locale/zh-CN";
 
 import range from "lodash.range";
 
@@ -134,7 +134,10 @@ export const endOfDay = (date: Date): Date => {
 };
 
 export const dayInMonth = (date: Date, month: Date) =>
-    isWithinRange(date, startOfMonth(month), lastDayOfMonth(month));
+    isWithinInterval(date, {
+        start: startOfMonth(month),
+        end: lastDayOfMonth(month),
+    });
 
 export const getIsSmallScreen = (): boolean =>
     // $FlowIssueQuipModule
@@ -142,7 +145,8 @@ export const getIsSmallScreen = (): boolean =>
 
 export const isElAtPoint = (
     xy: MouseCoordinates,
-    className: string): boolean => {
+    className: string
+): boolean => {
     const {x, y} = xy;
     return !!polyfills
         .elementsFromPoint(x, y)
@@ -151,7 +155,8 @@ export const isElAtPoint = (
 
 export const elAtPoint = (
     xy: MouseCoordinates,
-    className: string): ?HTMLElement => {
+    className: string
+): ?HTMLElement => {
     const {x, y} = xy;
     return polyfills
         .elementsFromPoint(x, y)
@@ -178,7 +183,8 @@ export const dateAtPoint = (xy: MouseCoordinates) => {
 export const getMovingEventDateRange = (
     movingEvent: EventRecord,
     mouseCoordinates: MouseCoordinates,
-    mouseStartCoordinates: MouseStartCoordinates) => {
+    mouseStartCoordinates: MouseStartCoordinates
+) => {
     const {start, end} = movingEvent.getDateRange();
     const endDragDate = dateAtPoint(mouseCoordinates);
     if (endDragDate) {
@@ -196,7 +202,8 @@ export const getMovingEventDateRange = (
 
 export const getResizingEventDateRange = (
     resizingEvent: EventRecord,
-    mouseCoordinates: MouseCoordinates) => {
+    mouseCoordinates: MouseCoordinates
+) => {
     const {start, end} = resizingEvent.getDateRange();
     const newEndDate = dateAtPoint(mouseCoordinates);
     if (newEndDate &&
@@ -209,9 +216,10 @@ export const getResizingEventDateRange = (
     return {start, end};
 };
 
-export const areDateRangesEqual = function(
+export const areDateRangesEqual = function (
     a: DateRange,
-    b: DateRange): boolean {
+    b: DateRange
+): boolean {
     if (a.start.getTime() !== b.start.getTime()) {
         return false;
     }
@@ -224,7 +232,8 @@ export const areDateRangesEqual = function(
 export function getMovingEventRectMap(
     movingEvent: EventRecord,
     mouseStartCoordinates: MouseStartCoordinates,
-    mouseCoordinates?: MouseCoordinates): MovingEventRectMap {
+    mouseCoordinates?: MouseCoordinates
+): MovingEventRectMap {
     const movingEventElMap = movingEvent.getDomNodesForEvent();
     //console.log("getMovingEventRectMap movingEventElMap", movingEventElMap);
     let rectMap = {};
@@ -244,7 +253,8 @@ export function getMovingEventRectMap(
 function getMovingEventRect(
     el: HTMLDivElement,
     mouseStartCoordinates: MouseStartCoordinates,
-    mouseCoordinates: ?MouseCoordinates): MovingEventRect {
+    mouseCoordinates: ?MouseCoordinates
+): MovingEventRect {
     mouseCoordinates = mouseCoordinates || mouseStartCoordinates;
     const rect = el.getBoundingClientRect();
     const offsetX = mouseStartCoordinates.x - rect.left;

@@ -5,8 +5,8 @@ import {Motion} from "react-motion";
 import cx from "classnames";
 import AddCardIcon from "./icons/add-card.jsx";
 import {kHorizontalMargin} from "./card.jsx";
-import {ColumnRecord} from "./model.jsx";
-import {animateTo, focusCard} from "./root.jsx";
+import {ColumnRecord} from "./model.tsx";
+import {animateTo, focusCard} from "./root.tsx";
 
 import styles from "./add-card.less";
 

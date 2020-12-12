@@ -54,8 +54,6 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(
-    mapStateToProps,
-    {
-        setMenuOpenRecord,
-    })(EventDropdown);
+export default connect(mapStateToProps, {
+    setMenuOpenRecord,
+})(EventDropdown);

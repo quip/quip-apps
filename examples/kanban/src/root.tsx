@@ -1,14 +1,18 @@
 // Copyright 2017 Quip
 
+import React from "react";
+import ReactDOM from "react-dom";
+import quip from "quip-apps-api";
+import quiptext from "quiptext";
 import {spring} from "react-motion";
-
 import Board from "./board.jsx";
 import {
     allMenuCommands,
     onSelectedCardChanged,
     refreshToolbar,
 } from "./menus.js";
-import {BoardRecord, CardRecord, ColumnRecord} from "./model.jsx";
+import {BoardRecord, CardRecord, ColumnRecord} from "./model";
+import "./root.less";
 
 const kInitialColumns = [
     {
@@ -24,8 +28,6 @@ const kInitialColumns = [
         numCards: 1,
     },
 ];
-
-import "./root.less";
 
 export function animateTo(value) {
     return spring(value, {
@@ -63,14 +65,17 @@ function ensureBoardPopulated(boardRecord) {
 }
 
 quip.apps.registerClass(BoardRecord, "Root");
+// @ts-ignore TODO(GASPAR) remove after adding types ColumnRecord
 quip.apps.registerClass(ColumnRecord, ColumnRecord.CONSTRUCTOR_KEY);
+// @ts-ignore TODO(GASPAR) remove after adding types CardRecord
 quip.apps.registerClass(CardRecord, CardRecord.CONSTRUCTOR_KEY);
 
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
     toolbarCommandIds: ["insert-column"],
-    initializationCallback: (root, {isCreation, creationSource}) => {
-        const boardRecord = quip.apps.getRootRecord();
+    // @ts-ignore for payload, remove after moving to quip-apps-private
+    initializationCallback: (root, {isCreation, creationSource, payload}) => {
+        const boardRecord = quip.apps.getRootRecord() as BoardRecord;
         let justCreated = false;
         if (isCreation) {
             ensureBoardPopulated(boardRecord);
@@ -82,6 +87,30 @@ quip.apps.initialize({
             ensureBoardPopulated(boardRecord);
             justCreated = true;
         }
+
+        // Populating kanban board from init options.
+        // We assume that if rootRecord doesn't have any columns, we should read
+        // from the payload (if present). This is to support creation from API.
+        if ((justCreated || !boardRecord.getColumns().length) && payload) {
+            let initOptions: {[key: string]: any} | null = null;
+            try {
+                initOptions = JSON.parse(payload);
+            } catch (e) {
+                // Ignore parse errors here. Presumably the metrics and local
+                // logs are enough to debug.
+                console.error(`Invalid JSON in payload: ${payload}`);
+            }
+
+            if (initOptions) {
+                if (!initOptions["columns"]) {
+                    console.error(
+                        "Invalid payload: 'columns' property not set");
+                } else {
+                    boardRecord.populateColumns(initOptions["columns"]);
+                }
+            }
+        }
+
         ReactDOM.render(
             <Board
                 entity={boardRecord}

@@ -4,14 +4,8 @@ import Styles from "./App.less";
 function renderBadge(rootNode) {
     var header = $("<div/>")
         .addClass(Styles.header)
-        .append(
-            $("<div/>")
-                .text("Hello")
-                .addClass(Styles.hello))
-        .append(
-            $("<div/>")
-                .text("your name is")
-                .addClass(Styles.nameLabel));
+        .append($("<div/>").text("Hello").addClass(Styles.hello))
+        .append($("<div/>").text("your name is").addClass(Styles.nameLabel));
     var firstName = $("<div/>")
         .addClass(Styles.firstName)
         .text(quip.apps.getViewingUser().getFirstName());
@@ -25,6 +19,6 @@ function renderBadge(rootNode) {
     $(rootNode).html(badge);
 }
 
-export const start = function(rootNode) {
+export const start = function (rootNode) {
     renderBadge(rootNode);
 };

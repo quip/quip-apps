@@ -3,8 +3,8 @@
     "manifest_version": 1,
     "name": "Poll",
     "description": "Ask a question, add choices, and let the people decide.",
-    "version_name": "1.0",
-    "version_number": 1,
+    "version_name": "1.2.0",
+    "version_number": 3,
     "min_api_version": "0.1.022",
     "disable_app_level_comments": true,
     "sizing_mode": "fill_container",
@@ -13,5 +13,6 @@
     "toolbar_icon": "poll",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"]
+    "css_files": ["dist/app.css"],
+    "use_color_theme": true
 }

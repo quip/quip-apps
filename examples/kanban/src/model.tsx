@@ -1,7 +1,11 @@
 // Copyright 2017 Quip
-//import quip from "quip";
+// @ts-nocheck TODO(GASPAR) remove
 
+import React from "react";
+import quip from "quip-apps-api";
+import quiptext from "quiptext";
 import PropTypes from "prop-types";
+import debounce from "lodash.debounce";
 
 export const kDefaultColumnColors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -31,6 +35,9 @@ const ACTIVITY_LOG_MESSAGES = {
     },
 };
 
+const newTitleText = quiptext("New Title");
+const newCardText = quiptext("New Card");
+
 export class BoardRecord extends quip.apps.RootRecord {
     static getProperties() {
         return {
@@ -48,7 +55,14 @@ export class BoardRecord extends quip.apps.RootRecord {
 
     initialize() {
         this.get("columns").listen(() => this.notifyListeners());
+        this.listener = this.listen(this.setStatePayload_);
     }
+
+    setStatePayload_ = debounce(() => {
+        if (typeof quip.apps.setPayload === "function") {
+            quip.apps.setPayload(this.getExportState());
+        }
+    }, 2000);
 
     getColumns() {
         return this.get("columns").getRecords();
@@ -87,6 +101,42 @@ export class BoardRecord extends quip.apps.RootRecord {
                 : kDefaultColumnColors[index + 1];
         this.set("nextColumnColor", nextColor);
         return color;
+    }
+
+    getExportState(): String {
+        let columns = this.getColumns().map(column => {
+            return {
+                color: column.getColor(),
+                headerContent: column.getHeader().getTextContent(),
+                cards: column
+                    .getCards()
+                    .filter(card => !card.isHeader())
+                    .map(card => {
+                        return {
+                            "color": card.getColor(),
+                            "content": card.getTextContent(),
+                        };
+                    }),
+            };
+        });
+        return JSON.stringify({
+            columns,
+        });
+    }
+
+    populateColumns(columns: []): Array<ColumnRecord> {
+        columns.forEach(column => {
+            let newColumn = this.get("columns").add(
+                {color: column.color},
+                this.get("columns").count());
+            newColumn.addCard(true, column.headerContent, 0);
+            column.cards.forEach((card, index) => {
+                newColumn.addCard(false, card.content, index + 1, card.color);
+            });
+        });
+
+        quip.apps.recordQuipMetric("kanban_columns_populated");
+        return this.get("columns");
     }
 }
 
@@ -138,16 +188,14 @@ export class ColumnRecord extends quip.apps.Record {
         return cards.length ? cards[cards.length - 1] : null;
     }
 
-    addCard(isHeader, defaultText, index) {
-        let defaultPlaceholderText = isHeader
-            ? quiptext("New Title")
-            : quiptext("New Card");
+    addCard(isHeader, defaultText, index, color) {
+        let defaultPlaceholderText = isHeader ? newTitleText : newCardText;
         quip.apps.recordQuipMetric("add_card");
         return this.get("cards").add(
             {
                 isHeader,
-                RichText_defaultText:
-                    isHeader && defaultText ? defaultText : null,
+                color,
+                RichText_defaultText: defaultText ? defaultText : null,
                 RichText_placeholderText: !defaultText
                     ? defaultPlaceholderText
                     : null,
@@ -218,8 +266,13 @@ export class CardRecord extends quip.apps.RichTextRecord {
     initialize() {
         this.height = 0;
         this.domNode = undefined;
-        this.listenToComments(() => this.notifyListeners());
+        this.commentsListener = this.listenToComments(this.notifyParent);
+        this.contentListener = this.listenToContent(this.notifyParent);
     }
+
+    notifyParent = () => {
+        this.getParentRecord().notifyListeners();
+    };
 
     getDom() {
         return this.domNode;
@@ -280,6 +333,12 @@ export class CardRecord extends quip.apps.RichTextRecord {
         /*quip.apps.sendMessage(
             ACTIVITY_LOG_MESSAGES.REMOVE_CARD(this.getTextContent().trim()),
         );*/
+        if (this.commentsListener) {
+            this.unlistenToComments(this.notifyParent);
+        }
+        if (this.contentListener) {
+            this.unlistenToContent(this.notifyParent);
+        }
         super.delete();
         quip.apps.recordQuipMetric("delete_card");
     }
@@ -292,9 +351,7 @@ export class CardRecord extends quip.apps.RichTextRecord {
                 prev = previousColumn.getLastCard();
             }
             if (!prev) {
-                const cols = this.getColumn()
-                    .getContainingList()
-                    .getRecords();
+                const cols = this.getColumn().getContainingList().getRecords();
                 prev = cols[cols.length - 1].getLastCard();
             }
         }

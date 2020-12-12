@@ -1,0 +1,253 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "Project Tracker State",
+    "description": "Schema describing state of project tracker live app.",
+    "default": {},
+    "examples": [
+        {
+            "columns": [
+                {
+                    "id": "0",
+                    "content": "Project",
+                    "type": "TEXT"
+                },
+                {
+                    "id": "1",
+                    "content": "Owner",
+                    "type": "PERSON"
+                },
+                {
+                    "id": "2",
+                    "content": "Status",
+                    "type": "STATUS",
+                    "options": [
+                        {
+                            "label": "Done",
+                            "devName": "done",
+                            "color": "BLUE"
+                        }
+                    ]
+                },
+                {
+                    "id": "3",
+                    "content": "Deadline",
+                    "type": "DATE"
+                },
+                {
+                    "id": "4",
+                    "content": "Attachment",
+                    "type": "FILE"
+                }
+            ],
+            "rows": [
+                {
+                    "0": "RichTextBox content",
+                    "1": ["aXNAEAPwtkY"],
+                    "2": "done",
+                    "3": "1599116400000",
+                    "4": "AOra6tfvNoD4t0Vl4H77rQ"
+                }
+            ]
+        }
+    ],
+    "required": ["columns", "rows"],
+    "properties": {
+        "columns": {
+            "$id": "#/properties/columns",
+            "type": "array",
+            "title": "The columns schema",
+            "description": "Describes the columns of project tracker.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "id": "0",
+                        "content": "Project",
+                        "type": "TEXT"
+                    },
+                    {
+                        "id": "1",
+                        "content": "Owner",
+                        "type": "PERSON"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/columns/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/columns/items/anyOf/0",
+                        "type": "object",
+                        "title": "Column",
+                        "description": "Describes a single column.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "id": "0",
+                                "content": "Project",
+                                "type": "TEXT"
+                            }
+                        ],
+                        "required": ["id", "content", "type"],
+                        "properties": {
+                            "id": {
+                                "$id": "#/properties/columns/items/anyOf/0/properties/id",
+                                "type": "string",
+                                "title": "Column Id",
+                                "description": "An unique value that represents this column. Will be used in the rows.",
+                                "default": "",
+                                "examples": ["0"]
+                            },
+                            "content": {
+                                "$id": "#/properties/columns/items/anyOf/0/properties/content",
+                                "type": "string",
+                                "title": "Column header",
+                                "description": "The column's header text",
+                                "default": "",
+                                "examples": ["Project"]
+                            },
+                            "type": {
+                                "$id": "#/properties/columns/items/anyOf/0/properties/type",
+                                "type": "string",
+                                "title": "Column Type",
+                                "description": "The column type.",
+                                "default": "",
+                                "enum": [
+                                    "TEXT",
+                                    "PERSON",
+                                    "DATE",
+                                    "FILE",
+                                    "STATUS"
+                                ],
+                                "examples": ["TEXT"]
+                            },
+                            "options": {
+                                "$id": "#/properties/columns/items/anyOf/1/properties/options",
+                                "type": "array",
+                                "title": "Status options",
+                                "description": "Optional property that describes a Status type column's options",
+                                "default": [],
+                                "examples": [
+                                    [
+                                        {
+                                            "label": "Done",
+                                            "devName": "done",
+                                            "color": "BLUE"
+                                        }
+                                    ]
+                                ],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/columns/items/anyOf/1/properties/options/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/columns/items/anyOf/1/properties/options/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "Status object",
+                                            "description": "Describes a status.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "label": "Done",
+                                                    "devName": "done",
+                                                    "color": "BLUE"
+                                                }
+                                            ],
+                                            "required": [
+                                                "label",
+                                                "devName",
+                                                "color"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "$id": "#/properties/columns/items/anyOf/1/properties/options/items/anyOf/0/properties/label",
+                                                    "type": "string",
+                                                    "title": "Status Label",
+                                                    "description": "Non-unique status label.",
+                                                    "default": "",
+                                                    "examples": ["Done"]
+                                                },
+                                                "devName": {
+                                                    "$id": "#/properties/columns/items/anyOf/1/properties/options/items/anyOf/0/properties/devName",
+                                                    "type": "string",
+                                                    "title": "Status DevName",
+                                                    "description": "Unique name that matches with a row's status.",
+                                                    "default": "",
+                                                    "examples": ["done_1"]
+                                                },
+                                                "color": {
+                                                    "$id": "#/properties/columns/items/anyOf/1/properties/options/items/anyOf/0/properties/color",
+                                                    "type": "string",
+                                                    "title": "The color schema",
+                                                    "description": "color",
+                                                    "default": "",
+                                                    "enum": [
+                                                        "RED",
+                                                        "ORANGE",
+                                                        "YELLOW",
+                                                        "GREEN",
+                                                        "BLUE",
+                                                        "VIOLET"
+                                                    ],
+                                                    "examples": ["BLUE"]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        },
+        "rows": {
+            "$id": "#/properties/rows",
+            "type": "array",
+            "title": "The rows schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "0": "RichTextBox content",
+                        "1": ["aXNAEAPwtkY"],
+                        "2": "done",
+                        "3": "1599116400000",
+                        "4": null
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/rows/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/rows/items/anyOf/0",
+                        "type": "object",
+                        "title": "Row",
+                        "description": "Represents a single row. Id's should match the id's of the columns defined.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "0": "RichTextBox content",
+                                "1": ["aXNAEAPwtkY"],
+                                "2": "done",
+                                "3": "1599116400000",
+                                "4": null
+                            }
+                        ],
+                        "properties": {},
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

@@ -185,9 +185,7 @@ export default class App extends React.Component {
                     {quiptext("Counting down to %(date)s", {
                         "date": deadlineDate.toLocaleDateString(),
                     })}{" "}
-                    {moment(deadline)
-                        .tz(moment.tz.guess())
-                        .format("ha z")}
+                    {moment(deadline).tz(moment.tz.guess()).format("ha z")}
                 </p>
             </div>}
         </div>;

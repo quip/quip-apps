@@ -46,9 +46,9 @@ export default class App extends React.Component {
             },
             params,
         );
-        return this.props.auth.request(requestParams).then(response => {
+        return this.props.auth.request(requestParams).then((response) => {
             if (response.status == 401 && tryRefresh) {
-                return this.refreshToken().then(response =>
+                return this.refreshToken().then((response) =>
                     this.fetchPath(path, params, false),
                 );
             } else if (response.ok) {
@@ -60,7 +60,7 @@ export default class App extends React.Component {
     }
 
     refreshToken() {
-        return this.props.auth.refreshToken().then(response => {
+        return this.props.auth.refreshToken().then((response) => {
             if (response && response.ok) {
                 return response;
             } else {

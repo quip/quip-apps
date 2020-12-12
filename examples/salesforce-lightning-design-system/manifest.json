@@ -1,0 +1,18 @@
+{
+    "id": "BAMAjAn2kpw",
+    "manifest_version": 1,
+    "name": "Salesforce Lightning Design System",
+    "description": "An Example of an app using slds-react",
+    "version_name": "0.1.5",
+    "version_number": 6,
+    "sizing_mode": "fill_container",
+    "initial_height": 300,
+    "initial_width": -1,
+    "toolbar_color": "blue",
+    "toolbar_icon": "assets/icons/toolbar.svg",
+    "thumbnail": "assets/icons/thumbnail.svg",
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/main.css"],
+    "other_resources": ["dist/*.png", "dist/*.woff", "dist/*.woff2"],
+    "disable_app_level_comments": true
+}

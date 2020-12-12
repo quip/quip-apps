@@ -22,7 +22,7 @@ const colors = [
 ];
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, {isCreation}) {
+    initializationCallback: function (rootNode, {isCreation}) {
         const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
@@ -38,11 +38,7 @@ quip.apps.initialize({
         const ConnectedApp = Connect(rootRecord, App);
         ReactDOM.render(<ConnectedApp/>, rootNode, () => {
             isCreation &&
-                rootRecord
-                    .get("options")
-                    .getRecords()[0]
-                    .get("text")
-                    .focus();
+                rootRecord.get("options").getRecords()[0].get("text").focus();
         });
     },
     menuCommands: [

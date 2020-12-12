@@ -46,10 +46,7 @@ class Root extends quip.apps.RootRecord {
         const isMatch =
             last &&
             matchDefaultOptionText(
-                last
-                    .getRichTextRecord()
-                    .getTextContent()
-                    .trim());
+                last.getRichTextRecord().getTextContent().trim());
         const lastIndex = isMatch ? parseInt(isMatch) : options.length;
 
         this.get("options").add(Option.getDefaultProperties(lastIndex));

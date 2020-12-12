@@ -7,6 +7,7 @@ import React from "react";
 import cx from "classnames";
 import Styles from "./App.less";
 import Step from "./Step.jsx";
+import manifest from "../../app/manifest.json";
 
 export default class App extends React.Component {
     static propTypes = {
@@ -33,6 +34,21 @@ export default class App extends React.Component {
 
         quip.apps.recordQuipMetric("delete_step");
     };
+
+    componentDidCatch(error, info) {
+        const params = {
+            "message": error.message,
+            "version_number": manifest.version_number + "",
+            "version_name": manifest.version_name + "",
+        };
+        if (error.stack) {
+            params["stack"] = error.stack;
+        }
+        if (info && info.componentStack) {
+            params["component_stack"] = info.componentStack;
+        }
+        quip.apps.recordQuipMetric("process_bar_error", params);
+    }
 
     componentDidMount() {
         quip.apps.addEventListener(

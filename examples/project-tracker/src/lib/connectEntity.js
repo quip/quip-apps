@@ -2,7 +2,8 @@
 export default (
     record,
     WrappedComponent,
-    {isV2 = false, mapStateToProps = () => {}} = {}) => {
+    {isV2 = false, mapStateToProps = () => {}} = {}
+) => {
     class RecordComponent extends React.Component {
         constructor(props) {
             super(props);

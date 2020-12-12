@@ -3,8 +3,8 @@
     "manifest_version": 1,
     "name": "Kanban Board",
     "description": "Use cards and columns to organize your work. Drag cards to track progress.",
-    "version_name": "0.1.0",
-    "version_number": 1,
+    "version_name": "0.4.0",
+    "version_number": 6,
     "min_api_version": "0.1.022",
     "disable_app_level_comments": true,
     "sizing_mode": "fit_content",
@@ -14,5 +14,6 @@
     "toolbar_icon": "kanban",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"]
+    "css_files": ["dist/app.css"],
+    "use_color_theme": true
 }

@@ -16,7 +16,7 @@ export default function getClosest(elem, selector) {
             Element.prototype.msMatchesSelector ||
             Element.prototype.oMatchesSelector ||
             Element.prototype.webkitMatchesSelector ||
-            function(s) {
+            function (s) {
                 var matches = (
                         this.document || this.ownerDocument
                     ).querySelectorAll(s),

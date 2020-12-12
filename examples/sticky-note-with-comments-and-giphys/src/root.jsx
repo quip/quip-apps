@@ -30,7 +30,7 @@ class StickyNoteRichTextRecord extends quip.apps.RichTextRecord {
 quip.apps.registerClass(StickyNoteRichTextRecord, "stickyNote");
 
 quip.apps.initialize({
-    initializationCallback: function(rootNode, params) {
+    initializationCallback: function (rootNode, params) {
         let rootRecord = quip.apps.getRootRecord();
         if (params.isCreation) {
             rootRecord.set("stickyNote", {});

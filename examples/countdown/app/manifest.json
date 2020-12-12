@@ -3,8 +3,8 @@
     "manifest_version": 1,
     "name": "Countdown",
     "description": "The big day is coming. Get people excited about it.",
-    "version_name": "1.0",
-    "version_number": 1,
+    "version_name": "1.1.0",
+    "version_number": 2,
     "disable_app_level_comments": false,
     "sizing_mode": "fit_content",
     "initial_height": 116,
@@ -13,5 +13,6 @@
     "toolbar_icon": "countdown",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"]
+    "css_files": ["dist/app.css"],
+    "use_color_theme": true
 }

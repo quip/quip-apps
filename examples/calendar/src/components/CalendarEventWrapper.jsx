@@ -7,8 +7,8 @@ import React from "react";
 import {connect} from "react-redux";
 import classNames from "classnames";
 
-import differenceInDays from "date-fns/difference_in_days";
-import startOfWeek from "date-fns/start_of_week";
+import differenceInDays from "date-fns/differenceInDays";
+import startOfWeek from "date-fns/startOfWeek";
 
 import {EventRecord} from "../model";
 import {startOfDay} from "../util";
@@ -77,14 +77,13 @@ class CalendarEventWrapper extends React.Component<Props, null> {
                 showMovingEventGuideBefore={showMovingEventGuideBefore}
                 showMovingEventGuideColor={showMovingEventGuideColor}
                 week={week}/>
-            {movingEvent &&
-                movingEventRect && <MovingEventWrapper
-                    movingEventRect={movingEventRect}>
-                    <CalendarEvent
-                        eventRecord={eventRecord}
-                        isInMovingEventWrapper
-                        week={week}/>
-                </MovingEventWrapper>}
+            {movingEvent && movingEventRect && <MovingEventWrapper
+                movingEventRect={movingEventRect}>
+                <CalendarEvent
+                    eventRecord={eventRecord}
+                    isInMovingEventWrapper
+                    week={week}/>
+            </MovingEventWrapper>}
         </div>;
     }
 }

@@ -6,7 +6,7 @@ import quip from "quip";
 import React from "react";
 import {connect} from "react-redux";
 import classNames from "classnames";
-import isWithinRange from "date-fns/is_within_range";
+import isWithinInterval from "date-fns/isWithinInterval";
 
 import {setMovingEvent, setSelectedEvent} from "../actions";
 import {dateAtPoint} from "../util";
@@ -143,12 +143,12 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                             record={eventRecord}
                             showEmpty/>}
                 </div>
-                {isEndDateWithinThisWeek &&
-                    !isMobileApp && <div className={Styles.handleContainer}>
-                        <EventEndHandle
-                            eventRecord={eventRecord}
-                            fill={eventHandleFillColor}/>
-                    </div>}
+                {isEndDateWithinThisWeek && !isMobileApp && <div
+                    className={Styles.handleContainer}>
+                    <EventEndHandle
+                        eventRecord={eventRecord}
+                        fill={eventHandleFillColor}/>
+                </div>}
             </div>
 
             {!isStartDateWithinThisWeek && <div
@@ -171,8 +171,14 @@ const mapStateToProps = (state, ownProps) => {
     const {start, end} = eventRecord.getDateRange();
     return {
         commentCount: eventRecord.getCommentCount(),
-        isStartDateWithinThisWeek: isWithinRange(start, week[0], week[6]),
-        isEndDateWithinThisWeek: isWithinRange(end, week[0], week[6]),
+        isStartDateWithinThisWeek: isWithinInterval(start, {
+            start: week[0],
+            end: week[6],
+        }),
+        isEndDateWithinThisWeek: isWithinInterval(end, {
+            start: week[0],
+            end: week[6],
+        }),
         isMobileApp: state.isMobileApp,
         isSelected:
             state.selectedEvent &&
@@ -180,11 +186,9 @@ const mapStateToProps = (state, ownProps) => {
         isSmallScreen: state.isSmallScreen,
     };
 };
-CalendarEvent = connect(
-    mapStateToProps,
-    {
-        setMovingEvent,
-        setSelectedEvent,
-    })(CalendarEvent);
+CalendarEvent = connect(mapStateToProps, {
+    setMovingEvent,
+    setSelectedEvent,
+})(CalendarEvent);
 
 export default CalendarEvent;

@@ -3,7 +3,7 @@
 
 // $FlowIssueQuipModule
 import quip from "quip";
-import isEqual from "date-fns/is_equal";
+import isEqual from "date-fns/isEqual";
 import {localizedColorLabel} from "quip-apps-compat";
 
 import {EventRecord, colors} from "./model";
@@ -63,7 +63,8 @@ export function refreshToolbar() {
 export function showEventContextMenu(
     e: Event,
     eventRecord: EventRecord,
-    onDismiss: Function) {
+    onDismiss: Function
+) {
     selectedEvent = eventRecord;
 
     const commands = [...colors, quip.apps.DocumentMenuCommands.SEPARATOR];
@@ -95,7 +96,9 @@ function getDisabledCommands() {
 
 function getToolbarComandIds() {
     let toolbarCommandIds = [];
-    if (!isEqual(displayMonth, quip.apps.getRootRecord().getDisplayMonth())) {
+    const rootRecordDate = quip.apps.getRootRecord().getDisplayMonth();
+    if (displayMonth.getFullYear() !== rootRecordDate.getFullYear() ||
+        displayMonth.getMonth() !== rootRecordDate.getMonth()) {
         toolbarCommandIds.push("set-display-month");
     }
     return toolbarCommandIds;

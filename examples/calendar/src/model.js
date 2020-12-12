@@ -3,13 +3,21 @@
 
 // $FlowIssueQuipModule
 import quip from "quip";
+import moment from "moment";
 
-import isDate from "date-fns/is_date";
-import startOfWeek from "date-fns/start_of_week";
-
-import type {DateRange} from "./types";
+import isDate from "date-fns/isDate";
+import startOfWeek from "date-fns/startOfWeek";
 
 import {isSameDay} from "./util";
+
+import debounce from "lodash.debounce";
+import type {DateRange} from "./types";
+
+export type Event = {
+    color: "RED" | "ORANGE" | "YELLOW" | "GREEN" | "BLUE" | "VIOLET",
+    dateRange: string,
+    titleText: string,
+};
 
 export const colors = [
     quip.apps.ui.ColorMap.RED.KEY,
@@ -20,22 +28,63 @@ export const colors = [
     quip.apps.ui.ColorMap.VIOLET.KEY,
 ];
 
-const formatDateForAllDayEvent = (d: Date): string => {
+const formatDisplayMonthForStorage = (d: Date): string => {
+    return String(d);
+};
+
+const formatDefaultMonthForApi = (d: Date): string => {
+    return moment(d).format("YYYY-MM");
+};
+
+const parseDefaultMonthFromStorage = (displayMonth: string): Date => {
+    // Fixes a previous display month data type by converting
+    // New date format ranges from 2020-01 to 2020-12 (zero-padded, eg 05).
+    // Date(string) parses it after adding one to the month.
+    const regex = /^\d{4}-[01][0-9]$/g;
+    if (regex.test(displayMonth)) {
+        const tempDate = new Date(displayMonth);
+        return new Date(tempDate.setMonth(tempDate.getMonth() + 1));
+    }
+    return new Date(displayMonth);
+};
+
+const parseDisplayMonthFromApi = (s: string): Date => {
+    const date = moment(s, "YYYY-MM").toDate();
+    // Adding 5 days to potentially avoid any time-zone differences
+    // since parsing date from API sets it to the beginning of the month.
+    date.setDate(date.getDate() + 5);
+    return date;
+};
+
+const formatAllDayDateForStorage = (d: Date): string => {
+    // Stores it as zero-based months - eg. 2020,0,1 (Jan 1st, 2020)
     return `${d.getFullYear()},${d.getMonth()},${d.getDate()}`;
 };
 
-const parseAllDayStringToDate = (s: string): Date => {
+const formatAllDayDateForApi = (d: Date): string => {
+    return moment(d).format("YYYY-MM-DD");
+};
+
+const parseAllDayStringFromStorage = (s: string): Date => {
     if (typeof s === "number") {
         // We formerly used timestamps in storage but that has tz issues.
         return new Date(s);
-    } else {
+    } else if (s.includes(",")) {
         const [year, monthIndex, day] = s.split(",");
         return new Date(
             window.parseInt(year, 10),
             window.parseInt(monthIndex, 10),
             window.parseInt(day, 10));
+    } else {
+        throw new Error(s + " is not a valid date from storage.");
     }
 };
+
+const parseAllDayStringFromApi = (s: string): Date => {
+    return moment(s, "YYYY-MM-DD").toDate();
+};
+
+const eventPlaceholderText = quiptext("New Event");
 
 export class RootRecord extends quip.apps.RootRecord {
     static getProperties() {
@@ -51,6 +100,16 @@ export class RootRecord extends quip.apps.RootRecord {
             events: [],
         };
     }
+
+    initialize() {
+        this.listener = this.listen(this.setStatePayload_);
+    }
+
+    setStatePayload_ = debounce(() => {
+        if (typeof quip.apps.setPayload === "function") {
+            quip.apps.setPayload(this.getExportState());
+        }
+    }, 2000);
 
     getEvents(): Array<EventRecord> {
         return this.get("events").getRecords();
@@ -72,6 +131,36 @@ export class RootRecord extends quip.apps.RootRecord {
         });
     }
 
+    populateDisplayMonth(displayMonth: string): void {
+        const displayMonthDate = parseDisplayMonthFromApi(displayMonth);
+        this.set(
+            "displayMonth",
+            formatDisplayMonthForStorage(displayMonthDate));
+    }
+
+    populateEvents(events: Event[]): Array<EventRecord> {
+        events.forEach(event => {
+            const start = parseAllDayStringFromApi(event.dateRange.start);
+            const end = parseAllDayStringFromApi(event.dateRange.end);
+            this.get("events").add(
+                {
+                    dateRange: JSON.stringify({
+                        start: formatAllDayDateForStorage(start),
+                        end: formatAllDayDateForStorage(end),
+                    }),
+                    color: event.color,
+                    title: {
+                        "RichText_placeholderText": eventPlaceholderText,
+                        "RichText_defaultText": event.content,
+                    },
+                },
+                this.getNextIndexForStartDate(start));
+        });
+
+        quip.apps.recordQuipMetric("events_populated");
+        return this.get("events");
+    }
+
     addEvent(start: Date, end: Date): EventRecord {
         let color = quip.apps.ui.ColorMap.RED.KEY;
         const lastEvent = this.getLastEvent();
@@ -87,8 +176,8 @@ export class RootRecord extends quip.apps.RootRecord {
         const newEvent = this.get("events").add(
             {
                 dateRange: JSON.stringify({
-                    start: formatDateForAllDayEvent(start),
-                    end: formatDateForAllDayEvent(end),
+                    start: formatAllDayDateForStorage(start),
+                    end: formatAllDayDateForStorage(end),
                 }),
                 color,
             },
@@ -97,7 +186,26 @@ export class RootRecord extends quip.apps.RootRecord {
         quip.apps.recordQuipMetric("add_event", {
             event_id: newEvent.id(),
         });
+
         return newEvent;
+    }
+
+    getExportState(): String {
+        let events = this.getEvents().map(event => {
+            const dateRange = event.getDateRange();
+            dateRange.start = formatAllDayDateForApi(dateRange.start);
+            dateRange.end = formatAllDayDateForApi(dateRange.end);
+
+            return {
+                color: event.getColor(),
+                dateRange,
+                content: event.getTitleText(),
+            };
+        });
+        return JSON.stringify({
+            events,
+            displayMonth: formatDefaultMonthForApi(this.getDisplayMonth()),
+        });
     }
 
     getNextIndexForStartDate(
@@ -126,11 +234,12 @@ export class RootRecord extends quip.apps.RootRecord {
     }
 
     getDisplayMonth() {
-        return new Date(this.get("displayMonth"));
+        const displayMonth = this.get("displayMonth");
+        return parseDefaultMonthFromStorage(displayMonth);
     }
 
     setDisplayMonth(date: Date) {
-        this.set("displayMonth", String(date));
+        this.set("displayMonth", formatDisplayMonthForStorage(date));
         quip.apps.recordQuipMetric("set_display_month");
     }
 }
@@ -154,7 +263,7 @@ export class EventRecord extends quip.apps.Record {
             color: quip.apps.ui.ColorMap.RED.KEY,
             created: Date.now(),
             title: {
-                RichText_placeholderText: quiptext("New Event"),
+                RichText_placeholderText: eventPlaceholderText,
             },
         };
     }
@@ -164,15 +273,23 @@ export class EventRecord extends quip.apps.Record {
         this.domNodesEvent = {};
         this.listener = this.listen(this.notifyParent);
         this.commentsListener = this.listenToComments(this.notifyParent);
+        if (this.get("title")) {
+            this.titleContentListener = this.get("title").listenToContent(
+                this.notifyParent);
+        }
     }
 
     delete() {
-        //quip.apps.sendMessage("deleted an event");
         if (this.listener) {
             this.unlisten(this.notifyParent);
         }
         if (this.commentsListener) {
             this.unlistenToComments(this.notifyParent);
+        }
+        if (this.titleContentListener) {
+            if (this.get("title")) {
+                this.get("title").unlistenToContent(this.notifyParent);
+            }
         }
         quip.apps.recordQuipMetric("delete_event", {
             event_id: this.id(),
@@ -189,7 +306,9 @@ export class EventRecord extends quip.apps.Record {
     }
 
     getTitleText() {
-        return this.get("title").getTextContent();
+        if (this.get("title")) {
+            return this.get("title").getTextContent();
+        }
     }
 
     getDom() {
@@ -240,8 +359,8 @@ export class EventRecord extends quip.apps.Record {
         const {start, end} = JSON.parse(this.get("dateRange"));
         // TODO(elsigh): update when we support time
         return {
-            start: parseAllDayStringToDate(start),
-            end: parseAllDayStringToDate(end),
+            start: parseAllDayStringFromStorage(start),
+            end: parseAllDayStringFromStorage(end),
         };
     }
 
@@ -254,8 +373,8 @@ export class EventRecord extends quip.apps.Record {
         this.set(
             "dateRange",
             JSON.stringify({
-                start: formatDateForAllDayEvent(start),
-                end: formatDateForAllDayEvent(end),
+                start: formatAllDayDateForStorage(start),
+                end: formatAllDayDateForStorage(end),
             }));
         //quip.apps.sendMessage("moved an event");
         quip.apps.recordQuipMetric("move_event", {

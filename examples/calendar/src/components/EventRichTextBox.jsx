@@ -132,9 +132,7 @@ const mapStateToProps = (state, ownProps) => {
         titleRecord: eventRecord.get("title"),
     };
 };
-export default connect(
-    mapStateToProps,
-    {
-        setFocusedEvent,
-        setSelectedEvent,
-    })(EventRichTextBox);
+export default connect(mapStateToProps, {
+    setFocusedEvent,
+    setSelectedEvent,
+})(EventRichTextBox);

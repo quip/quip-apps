@@ -7,10 +7,10 @@ import React from "react";
 import {connect} from "react-redux";
 import classNames from "classnames";
 
-import isEqual from "date-fns/is_equal";
-import isWithinRange from "date-fns/is_within_range";
-import isToday from "date-fns/is_today";
-import isWeekend from "date-fns/is_weekend";
+import isEqual from "date-fns/isEqual";
+import isWithinInterval from "date-fns/isWithinInterval";
+import isToday from "date-fns/isToday";
+import isWeekend from "date-fns/isWeekend";
 
 import {EventRecord} from "../model";
 import {dayInMonth, formatDate} from "../util";
@@ -57,22 +57,22 @@ class CalendarWeek extends React.Component<Props, null> {
                 {agenda.map((row, rowIndex) => <div
                     key={rowIndex}
                     className={Styles.weekAgendaRow}>
-                    {row.map(
-                        ({event, start, end}, i) =>
-                            event ? (
-                                <CalendarEventWrapper
-                                    end={end}
-                                    eventRecord={event}
-                                    key={i}
-                                    start={start}
-                                    week={week}/>
-                            ) : (
-                                <div
-                                    key={i}
-                                    style={{
-                                        width: 100 / 7 + "%",
-                                    }}/>
-                            ))}
+                    {row.map(({event, start, end}, i) =>
+                        event ? (
+                            <CalendarEventWrapper
+                                end={end}
+                                eventRecord={event}
+                                key={i}
+                                start={start}
+                                week={week}/>
+                        ) : (
+                            <div
+                                key={i}
+                                style={{
+                                    width: 100 / 7 + "%",
+                                }}/>
+                        )
+                    )}
                 </div>)}
             </div>
         </div>;
@@ -111,10 +111,10 @@ const CalendarDayBackground = ({
     let style;
     if (draggingEvent &&
         draggingEventDateRange &&
-        isWithinRange(
-            date,
-            draggingEventDateRange.start,
-            draggingEventDateRange.end)) {
+        isWithinInterval(date, {
+            start: draggingEventDateRange.start,
+            end: draggingEventDateRange.end,
+        })) {
         const {start, end} = draggingEventDateRange;
         const color = quip.apps.ui.ColorMap[draggingEvent.getColor()].VALUE;
         let boxShadows = [
@@ -145,8 +145,8 @@ const CalendarDayBackground = ({
                 [Styles.isInOtherMonth]: isInOtherMonth,
             })}>
             {!isSmallScreen && isToday
-                ? formatDate(date, "MMMM D")
-                : formatDate(date, "D")}
+                ? formatDate(date, "MMMM d")
+                : formatDate(date, "d")}
         </div>
     </div>;
 };

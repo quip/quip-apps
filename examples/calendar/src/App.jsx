@@ -13,6 +13,7 @@ import Calendar from "./components/Calendar.jsx";
 import {setMenuDisplayMonth} from "./menus";
 import {RootRecord} from "./model";
 import {getIsSmallScreen} from "./util";
+import manifest from "../app/manifest.json";
 
 type Props = {
     rootNode: Element,
@@ -37,6 +38,21 @@ export default class App extends React.Component<Props, null> {
         setMenuDisplayMonth(displayMonth);
         //, window.__REDUX_DEVTOOLS_EXTENSION__ &&
         // window.__REDUX_DEVTOOLS_EXTENSION__()
+    }
+
+    componentDidCatch(error, info) {
+        const params = {
+            "message": error.message,
+            "version_number": manifest.version_number + "",
+            "version_name": manifest.version_name + "",
+        };
+        if (error.stack) {
+            params["stack"] = error.stack;
+        }
+        if (info && info.componentStack) {
+            params["component_stack"] = info.componentStack;
+        }
+        quip.apps.recordQuipMetric("calendar_error", params);
     }
 
     render() {

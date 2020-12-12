@@ -3,8 +3,8 @@
     "manifest_version": 1,
     "name": "Calendar",
     "description": "Plan and share events, launches, or anything else that needs scheduling.",
-    "version_name": "1.0",
-    "version_number": 1,
+    "version_name": "1.1.2",
+    "version_number": 4,
     "min_api_version": "0.1.022",
     "disable_app_level_comments": true,
     "sizing_mode": "fill_container",
@@ -14,5 +14,6 @@
     "toolbar_icon": "calendar",
     "thumbnail": "icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
-    "css_files": ["dist/app.css"]
+    "css_files": ["dist/app.css"],
+    "use_color_theme": true
 }

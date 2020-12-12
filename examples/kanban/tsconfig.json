@@ -1,0 +1,23 @@
+// Copyright 2020 Quip
+
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "downlevelIteration": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "react": ["node_modules/@types/react"]
+        }
+    },
+    "include": ["./src/**/*", "custom.d.ts"]
+}

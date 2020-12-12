@@ -39,10 +39,7 @@ export function allMenuCommands() {
             id: "addStep",
             label: quiptext("Add Step"),
             handler: () => {
-                quip.apps
-                    .getRootRecord()
-                    .get("steps")
-                    .add({});
+                quip.apps.getRootRecord().get("steps").add({});
                 quip.apps.recordQuipMetric("add_step");
             },
         },
