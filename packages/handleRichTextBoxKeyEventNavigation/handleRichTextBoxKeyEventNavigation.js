@@ -90,24 +90,27 @@ function findAdjcentFocusableElem_(record, findPrev) {
         ...recordDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
     ];
 
-    const tabbableEls = findPrev ? tabbableElems : tabbableElems.reverse();
-
-    for (let i = 0; i < tabbableEls.length; i++) {
-        if (tabbableEls[i] === recordDom) {
-            if (i > 0) {
-                return tabbableEls[i - 1];
-            }
+    for (let i = 0; i < tabbableElems.length; i++) {
+        if (tabbableElems[i] === recordDom) {
+            return getElem_(findPrev, i, tabbableElems);
         }
-        if (recordElems.includes(tabbableEls[i])) {
+        if (recordElems.includes(tabbableElems[i])) {
             const recordEl = findPrev
                 ? recordElems[0]
                 : recordElems[recordElems.length - 1];
-            const index = tabbableEls.findIndex(item => item === recordEl);
-            if (index > 0) {
-                return tabbableEls[index - 1];
-            }
+            const index = tabbableElems.findIndex(item => item === recordEl);
+            return getElem_(findPrev, index, tabbableElems);
         }
     }
 
+    return null;
+}
+
+function getElem_(findPrev, index, tabbableElems) {
+    if (findPrev && index > 0) {
+        return tabbableElems[index - 1];
+    } else if (!findPrev && index < tabbableElems.length - 1) {
+        return tabbableElems[index + 1];
+    }
     return null;
 }
