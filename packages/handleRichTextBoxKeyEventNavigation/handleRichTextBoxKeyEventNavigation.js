@@ -3,6 +3,7 @@
 const TAB = 9;
 const ESCAPE = 27;
 
+// Sync with quip/static/ts/src/core/a11y.ts
 const TABBABLE_ELEMENT_SELECTOR = [
     "a[href]",
     "button",
@@ -13,21 +14,21 @@ const TABBABLE_ELEMENT_SELECTOR = [
 ]
     .map(
         tagName =>
-            tagName + ":not([disabled]):not([tabindex^='-']):not(.a11y-skip)"
+            `${tagName}:not([disabled]):not([tabindex^='-'])` +
+            `:not(.a11y-skip):not(.a11y-no-auto-focus)`
     )
-    .concat(["[tabindex='0']:not([class*='a11y-hidden'])"])
+    .concat([
+        "[tabindex='0']:not([class*='a11y-hidden'])" +
+            ":not([class*='a11y-no-auto-focus'])",
+    ])
     .join(", ");
 
-// tabToAdjacentFocusableElement is a boolean. It allows to tab to the adjacent
-// focusable item if it is enable.
-export default function (e, record, tabToAdjacentFocusableElement = false) {
+export default function (e, record) {
     let next;
 
     if (e.keyCode === TAB) {
         if (e.shiftKey) {
-            if (tabToAdjacentFocusableElement) {
-                next = findPrevFocusableElem_(record);
-            }
+            next = findAdjcentFocusableElem_(record, true);
             if (!next) {
                 next = record.getPreviousSibling();
             }
@@ -36,9 +37,7 @@ export default function (e, record, tabToAdjacentFocusableElement = false) {
                 next = records[records.length - 1];
             }
         } else {
-            if (tabToAdjacentFocusableElement) {
-                next = findNextFocusableElem_(record);
-            }
+            next = findAdjcentFocusableElem_(record, false);
             if (!next) {
                 next = record.getNextSibling();
             }
@@ -74,11 +73,11 @@ export default function (e, record, tabToAdjacentFocusableElement = false) {
     return false;
 }
 
-// Depends on the implementation, there might be nested div elements
-// for a record's rich text box DOMNode. However, record.focus()
-// will only focus on one of them. When tabbing to the previous focusable
-// element, we need to skip all the elements for record's DOMNode.
-function findPrevFocusableElem_(record) {
+// Depends on the implementation, there might be nested elements for a record's
+// rich text box DOMNode. Therefore, we need to skip all elements contained in
+// the current record's DOMNode to navigate to a focusable element outside the
+// record
+function findAdjcentFocusableElem_(record, findPrev) {
     const tabbableElems = [
         ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
     ];
@@ -86,51 +85,26 @@ function findPrevFocusableElem_(record) {
     if (!recordDom) {
         return null;
     }
+
     const recordElems = [
         ...recordDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
     ];
-    for (let i = 0; i < tabbableElems.length; i++) {
-        if (tabbableElems[i] === recordDom) {
+
+    const tabbableEls = findPrev ? tabbableElems : tabbableElems.reverse();
+
+    for (let i = 0; i < tabbableEls.length; i++) {
+        if (tabbableEls[i] === recordDom) {
             if (i > 0) {
-                return tabbableElems[i - 1];
+                return tabbableEls[i - 1];
             }
         }
-        if (recordElems.includes(tabbableElems[i])) {
-            const index = tabbableElems.findIndex(
-                item => item === recordElems[0]
-            );
+        if (recordElems.includes(tabbableEls[i])) {
+            const recordEl = findPrev
+                ? recordElems[0]
+                : recordElems[recordElems.length - 1];
+            const index = tabbableEls.findIndex(item => item === recordEl);
             if (index > 0) {
-                return tabbableElems[index - 1];
-            }
-        }
-    }
-
-    return null;
-}
-
-function findNextFocusableElem_(record) {
-    const tabbableElems = [
-        ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
-    ];
-    const recordDom = record.getDom();
-    if (!recordDom) {
-        return null;
-    }
-    const recordElems = [
-        ...recordDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
-    ];
-    for (let i = 0; i < tabbableElems.length; i++) {
-        if (tabbableElems[i] === recordDom) {
-            if (i < tabbableElems.length - 1) {
-                return tabbableElems[i + 1];
-            }
-        }
-        if (recordElems.includes(tabbableElems[i])) {
-            const index = tabbableElems.findIndex(
-                item => item === recordElems[recordElems.length - 1]
-            );
-            if (index < tabbableElems.length - 1) {
-                return tabbableElems[index + 1];
+                return tabbableEls[index - 1];
             }
         }
     }
