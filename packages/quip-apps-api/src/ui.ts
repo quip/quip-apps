@@ -44,6 +44,8 @@ export class Canvas extends Component<{
 }
 
 export const Color = {
+    BACKGROUND: "#ffffff",
+    SECONDARY_BACKGROUND: "#ffffff",
     TEXT: "#5c6470",
     SECONDARY_TEXT: "#8d95a1",
     ACTION: "#3d87f5",
