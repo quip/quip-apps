@@ -28,7 +28,7 @@ export default function (e, record) {
 
     if (e.keyCode === TAB) {
         if (e.shiftKey) {
-            next = findAdjcentFocusableElem_(record, true);
+            next = findAdjacentFocusableElem_(record, true);
             if (!next) {
                 next = record.getPreviousSibling();
             }
@@ -37,7 +37,7 @@ export default function (e, record) {
                 next = records[records.length - 1];
             }
         } else {
-            next = findAdjcentFocusableElem_(record, false);
+            next = findAdjacentFocusableElem_(record, false);
             if (!next) {
                 next = record.getNextSibling();
             }
@@ -77,7 +77,7 @@ export default function (e, record) {
 // rich text box DOMNode. Therefore, we need to skip all elements contained in
 // the current record's DOMNode to navigate to a focusable element outside the
 // record
-function findAdjcentFocusableElem_(record, findPrev) {
+function findAdjacentFocusableElem_(record, findPrev) {
     const tabbableElems = [
         ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
     ];
