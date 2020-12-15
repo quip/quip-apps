@@ -3,18 +3,44 @@
 const TAB = 9;
 const ESCAPE = 27;
 
-export default function(e, record) {
+// Sync with quip/static/ts/src/core/a11y.ts
+const TABBABLE_ELEMENT_SELECTOR = [
+    "a[href]",
+    "button",
+    "[contenteditable]:not([contenteditable='false'])",
+    "input",
+    "select",
+    "textarea",
+]
+    .map(
+        tagName =>
+            `${tagName}:not([disabled]):not([tabindex^='-'])` +
+            `:not(.a11y-skip):not(.a11y-no-auto-focus)`
+    )
+    .concat([
+        "[tabindex='0']:not([class*='a11y-hidden'])" +
+            ":not([class*='a11y-no-auto-focus'])",
+    ])
+    .join(", ");
+
+export default function (e, record) {
     let next;
 
     if (e.keyCode === TAB) {
         if (e.shiftKey) {
-            next = record.getPreviousSibling();
+            next = findAdjacentFocusableElem_(record, true);
+            if (!next) {
+                next = record.getPreviousSibling();
+            }
             if (!next) {
                 const records = record.getContainingList().getRecords();
                 next = records[records.length - 1];
             }
         } else {
-            next = record.getNextSibling();
+            next = findAdjacentFocusableElem_(record, false);
+            if (!next) {
+                next = record.getNextSibling();
+            }
             if (!next) {
                 next = record.getContainingList().getRecords()[0];
             }
@@ -26,8 +52,10 @@ export default function(e, record) {
         if (next.getRichTextRecord) {
             next = next.getRichTextRecord();
         }
-        // Clear the focus just in case it was focused before.
-        next.clearFocus();
+        // Clear the focus of the record just in case it was focused before.
+        if (next.clearFocus) {
+            next.clearFocus();
+        }
         next.focus();
         return true;
     }
@@ -43,4 +71,46 @@ export default function(e, record) {
         }
     }
     return false;
+}
+
+// Depends on the implementation, there might be nested elements for a record's
+// rich text box DOMNode. Therefore, we need to skip all elements contained in
+// the current record's DOMNode to navigate to a focusable element outside the
+// record
+function findAdjacentFocusableElem_(record, findPrev) {
+    const tabbableElems = [
+        ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
+    ];
+    const recordDom = record.getDom();
+    if (!recordDom) {
+        return null;
+    }
+
+    const recordElems = [
+        ...recordDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
+    ];
+
+    for (let i = 0; i < tabbableElems.length; i++) {
+        if (tabbableElems[i] === recordDom) {
+            return getElem_(findPrev, i, tabbableElems);
+        }
+        if (recordElems.includes(tabbableElems[i])) {
+            const recordEl = findPrev
+                ? recordElems[0]
+                : recordElems[recordElems.length - 1];
+            const index = tabbableElems.findIndex(item => item === recordEl);
+            return getElem_(findPrev, index, tabbableElems);
+        }
+    }
+
+    return null;
+}
+
+function getElem_(findPrev, index, tabbableElems) {
+    if (findPrev && index > 0) {
+        return tabbableElems[index - 1];
+    } else if (!findPrev && index < tabbableElems.length - 1) {
+        return tabbableElems[index + 1];
+    }
+    return null;
 }
