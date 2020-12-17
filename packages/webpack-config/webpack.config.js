@@ -43,7 +43,7 @@ module.exports = {
     output: {
         path: path.resolve(cwd, "./app/dist"),
         filename: "app.js",
-        publicPath: "dist",
+        publicPath: "/dist/",
     },
     module: {
         rules: [
