@@ -66,6 +66,8 @@ export interface ToolbarState {
     toolbarCommandIds?: string[];
     disabledCommandIds?: string[];
     highlightedCommandIds?: string[];
+    destructiveCommandIds?: string[];
+    mobileCommandIds?: string[];
 }
 
 export interface InitOptions {
