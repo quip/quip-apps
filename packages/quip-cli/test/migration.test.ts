@@ -196,18 +196,18 @@ describe("qla migration", () => {
             .command(["migration", "-v=50", "dry", "--dry-run"])
             .it("outputs dry run info", async (ctx) => {
                 expect(ctx.stdout).toMatch(
-                    new RegExp(`Would create: .+${path.sep}migrations$`, "m")
+                    new RegExp(`Would create: .+\\${path.sep}migrations$`, "m")
                 );
                 expect(ctx.stdout).toMatch(
                     new RegExp(
-                        `Would create: .+${path.sep}migrations${path.sep}20150614_dry.js$`,
+                        `Would create: .+\\${path.sep}migrations\\${path.sep}20150614_dry.js$`,
                         "m"
                     )
                 );
                 expect(ctx.stdout).toMatch(/Would add migration:/);
                 expect(ctx.stdout).toMatch(`"version_number": 50,`);
                 expect(ctx.stdout).toMatch(
-                    `"js_file": "migrations${path.sep}20150614_dry.js"`
+                    `"js_file": "${path.join("migrations", "20150614_dry.js")}"`
                 );
             });
     });
