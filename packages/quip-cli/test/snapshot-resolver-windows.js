@@ -23,5 +23,5 @@ module.exports = {
     },
 
     // Example test path, used for preflight consistency check of the implementation above
-    testPathForConsistencyCheck: "some/example.test.js",
+    testPathForConsistencyCheck: `some${path.sep}example.test.js`,
 };
