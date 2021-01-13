@@ -73,6 +73,8 @@ export interface ToolbarState {
 export interface InitOptions {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[] | undefined;
+    mobileToolbarCommandIds?: string[] | undefined;
+    destructiveCommandIds?: string[] | undefined;
     initializationCallback?: (
         element: Element,
         parameters: InitializationParameters
@@ -93,6 +95,7 @@ export enum DocumentMenuActions {
 export enum DocumentMenuCommands {
     SEPARATOR = "SEPARATOR",
     MENU_MAIN = "MENU_MAIN",
+    MOBILE_TOOLBAR_MENU = "MOBILE_TOOLBAR_MENU",
     COPY_ANCHOR_LINK = "COPY_ANCHOR_LINK",
     CUT_ELEMENT = "CUT_ELEMENT",
     COPY_ELEMENT = "COPY_ELEMENT",
