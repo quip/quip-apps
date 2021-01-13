@@ -1,5 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`qla migration running with --dry-run outputs dry run info 1`] = `
+"Would create: C:\\\\Users\\\\IEUser\\\\code\\\\quip-apps\\\\packages\\\\quip-cli\\\\test\\\\fixtures\\\\folders\\\\migrations
+Would create: C:\\\\Users\\\\IEUser\\\\code\\\\quip-apps\\\\packages\\\\quip-cli\\\\test\\\\fixtures\\\\folders\\\\migrations\\\\20150614_dry.js
+Would add migration:
+{
+    \\"version_number\\": 50,
+    \\"js_file\\": \\"migrations\\\\\\\\20150614_dry.js\\"
+}
+"
+`;
+
 exports[`qla migration running with a file name creates a migration with a filesystem friendly name 1`] = `
 Object {
   "js_file": "migrations\\\\20150614_add_new_flobs_to_all_the_fleebs.js",
