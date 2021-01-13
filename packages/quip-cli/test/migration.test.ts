@@ -206,9 +206,7 @@ describe("qla migration", () => {
                 );
                 expect(ctx.stdout).toMatch(/Would add migration:/);
                 expect(ctx.stdout).toMatch(`"version_number": 50,`);
-                expect(ctx.stdout).toMatch(
-                    `"js_file": "${path.join("migrations", "20150614_dry.js")}"`
-                );
+                expect(ctx.stdout).toMatchSnapshot();
             });
     });
 });
