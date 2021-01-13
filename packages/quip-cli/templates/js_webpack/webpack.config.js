@@ -3,9 +3,9 @@ const devMode = process.env.NODE_ENV === "development";
 
 module.exports = {
     mode: devMode ? "development" : "production",
-    entry: [path.resolve(__dirname, "./src/root.jsx")],
+    entry: [path.resolve(__dirname, "src", "root.jsx")],
     output: {
-        path: path.resolve(__dirname, "./dist"),
+        path: path.resolve(__dirname, "dist"),
         filename: "app.js",
         publicPath: "/dist/",
     },
