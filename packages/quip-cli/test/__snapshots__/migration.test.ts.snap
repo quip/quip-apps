@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`qla migration running with --dry-run outputs dry run info 1`] = `
-"Would create: /Users/jditson/code/quip-apps/packages/quip-cli/test/fixtures/folders/migrations
-Would create: /Users/jditson/code/quip-apps/packages/quip-cli/test/fixtures/folders/migrations/20150614_dry.js
+"Would create: migrations
+Would create: migrations/20150614_dry.js
 Would add migration:
 {
     \\"version_number\\": 50,
