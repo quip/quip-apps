@@ -11,20 +11,22 @@ const snapshotDir = `__snapshots_${
 
 // In general this is unfortunate, but jest really resists having any .snap files in the working tree and will fail tests if it finds unused ones.
 // Until we can think of a better way to get environment dependent snapshots or avoid the need to have them, this will work.
-const findOtherSnapshotDirs = (source) =>
+const findIrrelevantSnapshots = (source, ext) =>
     readdirSync(source, { withFileTypes: true })
-        .filter(
-            (dirent) =>
-                dirent.isDirectory() &&
+        .filter((dirent) => dirent.isDirectory())
+        .reduce((snapshots, dirent) => {
+            const dirPath = path.join(source, dirent.name);
+            if (
                 /^__snapshots_/.test(dirent.name) &&
                 dirent.name !== snapshotDir
-        )
-        .reduce((dirs, dirent) => {
-            dirs.push(dirent.name);
-            dirs = dirs.concat(
-                findOtherSnapshotDirs(path.join(source, dirent.name))
-            );
-            return dirs;
+            ) {
+                snapshots = snapshots.concat(
+                    readdirSync(dirPath)
+                        .filter((f) => new RegExp(`\.${ext}$`).test(f))
+                        .map((f) => path.join(dirPath, f))
+                );
+            }
+            return snapshots.concat(findIrrelevantSnapshots(dirPath, ext));
         }, []);
 
 module.exports = {
@@ -49,5 +51,5 @@ module.exports = {
 
     snapshotDir,
 
-    findOtherSnapshotDirs,
+    findIrrelevantSnapshots,
 };
