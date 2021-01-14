@@ -4,8 +4,8 @@
     "description": "Quip Live App Boilerplate",
     "license": "UNLICENSED",
     "scripts": {
-        "start": "NODE_ENV=development webpack-dev-server --https",
-        "build": "NODE_ENV=production webpack",
+        "start": "webpack-dev-server --https",
+        "build": "webpack",
         "test": "webpack && jest --silent",
         "test:watch": "npm test -- --watch",
         "test:coverage": "npm test -- --coverage"
