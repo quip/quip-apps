@@ -80,7 +80,9 @@
     "scripts": {
         "postpack": "rm -f oclif.manifest.json",
         "prepack": "rm -rf lib && tsc -b && oclif-dev manifest",
-        "test": "node test/relevant-snapshots.js rename && jest; node test/relevant-snapshots.js reset",
+        "pretest": "node test/relevant-snapshots.js rename",
+        "test": "jest",
+        "posttest": "node test/relevant-snapshots.js reset",
         "prettier": "prettier --write test/**/*.js test/**/*.ts src/**/*.ts",
         "test:cover": "jest --coverage",
         "test:watch": "jest --watch",
