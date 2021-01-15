@@ -5,4 +5,6 @@ module.exports = {
     testEnvironment: "node",
     roots: ["test"],
     globalSetup: "./test/global-setup.js",
+    globalTeardown: "./test/global-teardown.js",
+    snapshotResolver: "./test/snapshot-resolver",
 };

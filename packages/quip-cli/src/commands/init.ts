@@ -37,7 +37,7 @@ const packageName = (name: string) =>
 
 const getAppDir = (name: string, dir?: string) => {
     if (dir && dir.length) {
-        if (dir.startsWith("/")) {
+        if (path.isAbsolute(dir)) {
             return dir;
         }
         return path.join(process.cwd(), dir);

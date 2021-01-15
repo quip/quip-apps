@@ -42,6 +42,7 @@
         "chai": "^4.2.0",
         "jest": "^26.1.0",
         "mockdate": "^3.0.2",
+        "rimraf": "^3.0.2",
         "ts-jest": "^26.1.1",
         "ts-node": "^8.10.2",
         "typescript": "^3.9.5"
@@ -79,7 +80,9 @@
     "scripts": {
         "postpack": "rm -f oclif.manifest.json",
         "prepack": "rm -rf lib && tsc -b && oclif-dev manifest",
+        "pretest": "node test/relevant-snapshots.js rename",
         "test": "jest",
+        "posttest": "node test/relevant-snapshots.js reset",
         "prettier": "prettier --write test/**/*.js test/**/*.ts src/**/*.ts",
         "test:cover": "jest --coverage",
         "test:watch": "jest --watch",

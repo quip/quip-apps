@@ -80,7 +80,12 @@ export default class Migration extends Command {
         const migrationsFolder = path.join(process.cwd(), flags.folder);
         if (dryRun) {
             if (!(await pathExists(migrationsFolder))) {
-                this.log(`Would create: ${migrationsFolder}`);
+                this.log(
+                    `Would create: ${path.relative(
+                        path.dirname(manifestPath),
+                        migrationsFolder
+                    )}`
+                );
             }
         } else {
             ops.push(() => mkdirp(migrationsFolder));
@@ -93,7 +98,12 @@ export default class Migration extends Command {
             migrationPath = path.join(migrationsFolder, name + extension);
         }
         if (dryRun) {
-            this.log(`Would create: ${migrationPath}`);
+            this.log(
+                `Would create: ${path.relative(
+                    path.dirname(manifestPath),
+                    migrationPath
+                )}`
+            );
         } else {
             ops.push(() =>
                 copy(

@@ -30,12 +30,7 @@ describe("qla migration", () => {
             .it("creates a migration with today's date", async (ctx) => {
                 const manifest = await readManifest();
                 expect(manifest.migrations).toBeDefined();
-                expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                    Object {
-                      "js_file": "migrations/20150614_01.js",
-                      "version_number": 1,
-                    }
-                `);
+                expect(manifest.migrations[0]).toMatchSnapshot();
                 const migration = await fs.promises.readFile(
                     manifest.migrations[0].js_file,
                     "utf-8"
@@ -47,7 +42,8 @@ describe("qla migration", () => {
                 fs.statSync(
                     path.join(
                         getFixtureDir("no-args"),
-                        "migrations/20150614_01.js"
+                        "migrations",
+                        "20150614_01.js"
                     )
                 )
             ).not.toThrowError();
@@ -58,18 +54,7 @@ describe("qla migration", () => {
                 "increments the migration number when adding another",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations).toMatchInlineSnapshot(`
-                        Array [
-                          Object {
-                            "js_file": "migrations/20150614_01.js",
-                            "version_number": 1,
-                          },
-                          Object {
-                            "js_file": "migrations/20150614_02.js",
-                            "version_number": 1,
-                          },
-                        ]
-                    `);
+                    expect(manifest.migrations).toMatchSnapshot();
                 }
             );
     });
@@ -92,12 +77,7 @@ describe("qla migration", () => {
                 "creates a migration with a filesystem friendly name",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                        Object {
-                          "js_file": "migrations/20150614_add_new_flobs_to_all_the_fleebs.js",
-                          "version_number": 1,
-                        }
-                    `);
+                    expect(manifest.migrations[0]).toMatchSnapshot();
                 }
             );
         oclifTest
@@ -106,12 +86,7 @@ describe("qla migration", () => {
                 "increments the migration number when adding another",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations[1]).toMatchInlineSnapshot(`
-                        Object {
-                          "js_file": "migrations/20150614_add_new_flobs_to____all_the_fleebs.js",
-                          "version_number": 1,
-                        }
-                    `);
+                    expect(manifest.migrations[1]).toMatchSnapshot();
                 }
             );
     });
@@ -132,12 +107,7 @@ describe("qla migration", () => {
             .command(["migration", "version", "-v=42"])
             .it("adds the correct version_number", async (ctx) => {
                 const manifest = await readManifest();
-                expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                    Object {
-                      "js_file": "migrations/20150614_version.js",
-                      "version_number": 42,
-                    }
-                `);
+                expect(manifest.migrations[0]).toMatchSnapshot();
             });
     });
 
@@ -154,17 +124,13 @@ describe("qla migration", () => {
                 expect(ctx.stderr).toBeFalsy();
                 const manifest = await readManifest("custom");
                 expect(manifest.migrations).toBeDefined();
-                expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                    Object {
-                      "js_file": "../migrations/20150614_01.js",
-                      "version_number": 1,
-                    }
-                `);
+                expect(manifest.migrations[0]).toMatchSnapshot();
                 expect(() =>
                     fs.statSync(
                         path.join(
                             getFixtureDir("custom-manifest-path"),
-                            "migrations/20150614_01.js"
+                            "migrations",
+                            "20150614_01.js"
                         )
                     )
                 ).not.toThrowError();
@@ -184,17 +150,13 @@ describe("qla migration", () => {
                 expect(ctx.stderr).toBeFalsy();
                 const manifest = await readManifest("app");
                 expect(manifest.migrations).toBeDefined();
-                expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                    Object {
-                      "js_file": "../migrations/20150614_subdir.js",
-                      "version_number": 1,
-                    }
-                `);
+                expect(manifest.migrations[0]).toMatchSnapshot();
                 expect(() =>
                     fs.statSync(
                         path.join(
                             getFixtureDir("subdir"),
-                            "migrations/20150614_subdir.js"
+                            "migrations",
+                            "20150614_subdir.js"
                         )
                     )
                 ).not.toThrowError();
@@ -214,17 +176,13 @@ describe("qla migration", () => {
                 "creates a new folder and adds a migration to the specified folder",
                 async (ctx) => {
                     const manifest = await readManifest();
-                    expect(manifest.migrations[0]).toMatchInlineSnapshot(`
-                        Object {
-                          "js_file": "created-folder/20150614_some-name.js",
-                          "version_number": 1,
-                        }
-                    `);
+                    expect(manifest.migrations[0]).toMatchSnapshot();
                     expect(() =>
                         fs.statSync(
                             path.join(
                                 getFixtureDir("folders"),
-                                "created-folder/20150614_some-name.js"
+                                "created-folder",
+                                "20150614_some-name.js"
                             )
                         )
                     ).not.toThrowError();
@@ -237,15 +195,18 @@ describe("qla migration", () => {
             .stdout()
             .command(["migration", "-v=50", "dry", "--dry-run"])
             .it("outputs dry run info", async (ctx) => {
-                expect(ctx.stdout).toMatch(/Would create: \/.+\/migrations$/m);
                 expect(ctx.stdout).toMatch(
-                    /Would create: \/.+\/migrations\/20150614_dry.js$/m
+                    new RegExp(`Would create: migrations$`, "m")
+                );
+                expect(ctx.stdout).toMatch(
+                    new RegExp(
+                        `Would create: migrations\\${path.sep}20150614_dry.js$`,
+                        "m"
+                    )
                 );
                 expect(ctx.stdout).toMatch(/Would add migration:/);
                 expect(ctx.stdout).toMatch(`"version_number": 50,`);
-                expect(ctx.stdout).toMatch(
-                    `"js_file": "migrations/20150614_dry.js"`
-                );
+                expect(ctx.stdout).toMatchSnapshot();
             });
     });
 });

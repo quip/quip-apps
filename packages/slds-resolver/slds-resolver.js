@@ -1,5 +1,10 @@
 const path = require("path");
 
+const SLDSRootPattern = new RegExp(
+    path.join("@salesforce-ux", "design-system")
+);
+const AssetsPattern = new RegExp(`^${path.sep}assets`);
+
 class SLDSResolver {
     apply(resolver) {
         const target = resolver.ensureHook("existingFile");
@@ -7,10 +12,8 @@ class SLDSResolver {
             .getHook("file")
             .tapAsync("SLDSPlugin", (request, resolveContext, callback) => {
                 if (
-                    /@salesforce-ux\/design-system/.test(
-                        request.descriptionFileRoot
-                    ) &&
-                    /^\/assets/.test(request.path)
+                    SLDSRootPattern.test(request.descriptionFileRoot) &&
+                    AssetsPattern.test(request.path)
                 ) {
                     const aliased = Object.assign({}, request, {
                         path: path.join(

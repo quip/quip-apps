@@ -4,13 +4,14 @@ on: [push]
 
 jobs:
     quip-apps-api:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         defaults:
             run:
                 working-directory: packages/quip-apps-api
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
+                os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}
@@ -24,13 +25,14 @@ jobs:
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quip-cli:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         defaults:
             run:
                 working-directory: packages/quip-cli
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
+                os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}
@@ -44,13 +46,14 @@ jobs:
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quip-test-utils:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         defaults:
             run:
                 working-directory: packages/quip-test-utils
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
+                os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}
@@ -65,13 +68,14 @@ jobs:
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     quiptext:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         defaults:
             run:
                 working-directory: packages/quiptext
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
+                os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}
@@ -85,10 +89,11 @@ jobs:
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     all:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
                 node-version: [10.x, 12.x]
+                os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}

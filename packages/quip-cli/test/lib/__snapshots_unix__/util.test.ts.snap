@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`readRecursive basics 1`] = `
+Array [
+  "test-dir/test-subdir/sub-sub-1",
+  "test-dir/test-subdir/sub-sub-2",
+  "test-dir/test-subfile",
+  "test-file",
+]
+`;
+
+exports[`readRecursive skips 1`] = `
+Array [
+  "test-dir/test-subfile",
+  "test-file",
+]
+`;
