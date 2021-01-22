@@ -412,6 +412,7 @@ export default class Client {
         callback(this.peopleToSearchForValue);
     }
     sendMessage(text: string, mentionIds: string[]) {}
+    setPayload(payload: string) {}
     setSelectedEntity(record: Record) {
         this.setSelectedRecord(record);
     }
