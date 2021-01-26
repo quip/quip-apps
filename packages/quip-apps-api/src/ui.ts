@@ -43,6 +43,36 @@ export class Canvas extends Component<{
     }
 }
 
+type FocusSnapshot = {restore(): void};
+type FocusLayer = {
+    takeSnapshot(): FocusSnapshot;
+};
+class CoreFocusStack {
+    push(focusLayer?: FocusLayer): FocusLayer {
+        return focusLayer || this.newDefaultFocusLayer();
+    }
+
+    pop(focusLayer: FocusLayer) {}
+
+    replaceRootLayer(layer: FocusLayer): FocusLayer {
+        return layer;
+    }
+
+    popRootLayer(oldRootLayer: FocusLayer) {}
+
+    newDefaultFocusLayer(): FocusLayer {
+        return {
+            takeSnapshot() {
+                    return {
+                        restore() {
+                        },
+                    };
+            },
+        };
+    }
+}
+export const FocusStack = new CoreFocusStack();
+
 export const Color = {
     TEXT: "#5c6470",
     SECONDARY_TEXT: "#8d95a1",
