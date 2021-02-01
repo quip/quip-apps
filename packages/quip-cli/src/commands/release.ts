@@ -23,15 +23,17 @@ interface ReleaseOpts {
     json?: boolean;
     site: string;
     config: string;
+    majorChanges?: string;
 }
 
 export const release = async (opts: ReleaseOpts) => {
-    const { manifest, build, destination } = opts;
+    const { manifest, build, destination, majorChanges } = opts;
     const fetch = await cliAPI(opts.config, opts.site);
     return successOnly(
         fetch<ReleaseAppResponse>(`app/${manifest.id}/release`, "post", {
             build,
             destination,
+            major_changes: majorChanges,
         }),
         opts.json || false
     );
@@ -57,6 +59,12 @@ export default class Release extends Command {
             char: "p",
             description: "release production version",
             exclusive: ["beta"],
+        }),
+        "major-changes": flags.enum({
+            hidden: true,
+            description:
+                "First party only: required when using --prod. Pass either YES or NO to indicate if this build contains major security, availability, or confidentiality changes",
+            options: ["YES", "NO"],
         }),
         json: flags.boolean({
             char: "j",
@@ -137,6 +145,7 @@ export default class Release extends Command {
             site: flags.site,
             config: flags.config,
             json: flags.json,
+            majorChanges: flags["major-changes"],
         });
         if (response) {
             println(
