@@ -15,20 +15,20 @@ const TABBABLE_ELEMENT_SELECTOR = [
     .map(
         tagName =>
             `${tagName}:not([disabled]):not([tabindex^='-'])` +
-            `:not(.a11y-skip):not(.a11y-no-auto-focus)`
-    )
+            `:not(.a11y-skip):not(.a11y-no-auto-focus)`)
     .concat([
         "[tabindex='0']:not([class*='a11y-hidden'])" +
             ":not([class*='a11y-no-auto-focus'])",
     ])
     .join(", ");
 
+
 export default function (e, record) {
     let next;
 
     if (e.keyCode === TAB) {
         if (e.shiftKey) {
-            next = findAdjacentFocusableElem_(record, true);
+            next = findAdjacentFocusableElem_(record.getDom(), true);
             if (!next) {
                 next = record.getPreviousSibling();
             }
@@ -37,7 +37,7 @@ export default function (e, record) {
                 next = records[records.length - 1];
             }
         } else {
-            next = findAdjacentFocusableElem_(record, false);
+            next = findAdjacentFocusableElem_(record.getDom(), false);
             if (!next) {
                 next = record.getNextSibling();
             }
@@ -77,21 +77,21 @@ export default function (e, record) {
 // rich text box DOMNode. Therefore, we need to skip all elements contained in
 // the current record's DOMNode to navigate to a focusable element outside the
 // record
-function findAdjacentFocusableElem_(record, findPrev) {
-    const tabbableElems = [
-        ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
-    ];
-    const recordDom = record.getDom();
-    if (!recordDom) {
+function findAdjacentFocusableElem_(richTextBoxDom, findPrev) {
+    if (!richTextBoxDom) {
         return null;
     }
 
+    const tabbableElems = [
+        ...document.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
+    ];
+
     const recordElems = [
-        ...recordDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
+        ...richTextBoxDom.querySelectorAll(TABBABLE_ELEMENT_SELECTOR),
     ];
 
     for (let i = 0; i < tabbableElems.length; i++) {
-        if (tabbableElems[i] === recordDom) {
+        if (tabbableElems[i] === richTextBoxDom) {
             return getElem_(findPrev, i, tabbableElems);
         }
         if (recordElems.includes(tabbableElems[i])) {
@@ -113,4 +113,25 @@ function getElem_(findPrev, index, tabbableElems) {
         return tabbableElems[index + 1];
     }
     return null;
+}
+
+/**
+ * @param {KeyboardEvent} e 
+ * @param {HTMLElement} dom 
+ */
+export function processKey(e, dom) {
+    let next;
+
+    if (e.keyCode === TAB) {
+        if (e.shiftKey) {
+            next = findAdjacentFocusableElem_(dom, true);
+        } else {
+            next = findAdjacentFocusableElem_(dom, false);
+        }
+    }
+    if (next) {
+        next.focus();
+        return true;
+    }
+    return false;
 }
