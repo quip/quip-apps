@@ -140,8 +140,10 @@ module.exports = {
     },
     devServer: {
         contentBase: path.resolve(cwd, "app/dist"),
-        // host: "docker.qa",
         port: 8888,
         inline: false,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+        },
     },
 };
