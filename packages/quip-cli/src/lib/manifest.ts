@@ -2,30 +2,26 @@ import fs from "fs";
 import path from "path";
 import prettier from "prettier";
 import { Manifest } from "./types";
-import { pathExists } from "./util";
+import { pathExists, readRecursive } from "./util";
 
 export const findManifest = async (
     dir: string
 ): Promise<string | undefined> => {
-    const files = await fs.promises.readdir(dir);
-    const dirs: string[] = [];
-    for (const file of files) {
-        const filePath = path.join(dir, file);
-        if (file === "manifest.json") {
-            return filePath;
-        } else {
-            const stat = await fs.promises.stat(filePath);
-            if (stat.isDirectory()) {
-                dirs.push(filePath);
-            }
+    const allFiles = await readRecursive(dir, "node_modules");
+    let minDistance = Infinity;
+    let closestManifest: string | undefined;
+    for (const file of allFiles) {
+        const filename = path.basename(file);
+        if (filename !== "manifest.json") {
+            continue;
+        }
+        const fileDistance = file.split(path.sep).length;
+        if (fileDistance <= minDistance) {
+            minDistance = fileDistance;
+            closestManifest = file;
         }
     }
-    for (const dir of dirs) {
-        const manifest = await findManifest(dir);
-        if (manifest) {
-            return manifest;
-        }
-    }
+    return closestManifest;
 };
 
 interface FormattingInfo {
