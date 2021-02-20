@@ -1,7 +1,7 @@
 {
     "name": "quip-cli",
     "description": "A Command Line Interface for the Quip Live Apps platform",
-    "version": "0.1.2-alpha.32",
+    "version": "0.1.2",
     "author": "Quip",
     "bin": {
         "quip-cli": "./bin/run",
