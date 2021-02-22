@@ -1,0 +1,28 @@
+name: Publish npm packages @next tags
+on:
+    push:
+        branches:
+            - next
+jobs:
+    npm-publish-next:
+        # Publishes HEAD as a new -alpha.x version under the @next tag
+        name: Publish next tag
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Set up Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12.x
+            - run: |
+                  git config --local user.email "ospreyquip@gmail.com"
+                  git config --local user.name "Osp Rey [CI]"
+            - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+            - run: npm install
+            - run: npm test
+            - run: npm run build
+            - run: ./node_modules/.bin/lerna publish --conventional-commits --conventional-prerelease --pre-dist-tag next --yes
+        env:
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            CI: true
