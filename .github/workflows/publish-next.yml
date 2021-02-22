@@ -22,7 +22,7 @@ jobs:
             - run: npm install
             - run: npm test
             - run: npm run build
-            - run: ./node_modules/.bin/lerna publish prerelease --pre-dist-tag next --yes
+            - run: ./node_modules/.bin/lerna publish --conventional-commits --conventional-prerelease --pre-dist-tag next --yes
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             CI: true
