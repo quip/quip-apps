@@ -6,7 +6,8 @@
     "command": {
         "publish": {
             "allowBranch": [
-                "master"
+                "next",
+                "public"
             ]
         }
     },
