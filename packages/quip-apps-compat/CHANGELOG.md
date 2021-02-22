@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.2.0-alpha.2 (2021-02-22)
+
+
+### Bug Fixes
+
+* Bump node-notifier from 8.0.0 to 8.0.1 in /examples/kanban ([#162](https://github.com/quip/quip-apps/issues/162)) ([4eda783](https://github.com/quip/quip-apps/commit/4eda7834b05b1a48f5985905f456ac085ce307fb))
+
+
+
+
+
 # 0.2.0-alpha.1 (2021-02-22)
 
 **Note:** Version bump only for package quip-apps-compat
