@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.2.0-alpha.3 (2021-02-22)
+
+
+### Bug Fixes
+
+* Make platform host logic work for all quip sites ([#180](https://github.com/quip/quip-apps/issues/180)) ([5cd10d5](https://github.com/quip/quip-apps/commit/5cd10d51f8d2f1bbd03564cfde5ca08f550d8b99))
+
+
+
+
+
 # 0.2.0-alpha.2 (2021-02-22)
 
 
