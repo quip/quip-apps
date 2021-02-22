@@ -121,9 +121,18 @@ const cliAPI = async (configPath: string, site: string) => {
     return doAPICall;
 };
 
-const platformHost = (site: string) => {
-    const subdomainCount = site.split(".").length - 2;
-    return subdomainCount > 0 ? `platform-${site}` : `platform.${site}`;
+export const platformHost = (site: string) => {
+    const siteParts = site.split(".");
+    if (site === "staging.quip.com") {
+        return "platform-staging.quip.com";
+    }
+    if (siteParts.length > 2) {
+        if (siteParts.slice(-2).join(".") === "onquip.com") {
+            return `platform.${siteParts.slice(-3).join(".")}`;
+        }
+        return `platform.${siteParts.slice(-2).join(".")}`;
+    }
+    return `platform.${site}`;
 };
 
 export const callAPI = async <T = any>(
