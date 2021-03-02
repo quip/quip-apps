@@ -3,6 +3,7 @@ import chalk from "chalk";
 import fs from "fs";
 import path from "path";
 import semver, { ReleaseType } from "semver";
+import { NPM_BINARY_NAME } from "../lib/config";
 import { findManifest, getManifest, writeManifest } from "../lib/manifest";
 import { println } from "../lib/print";
 import { runCmd, runCmdPromise } from "../lib/util";
@@ -75,7 +76,14 @@ export const bump = async (
         extraArgs.push("--git-tag-version", "false");
     }
     // run with --force since we will have a dirty tree (cause we added manifest.json above)
-    await runCmd(dir, "npm", "version", "--force", version, ...extraArgs);
+    await runCmd(
+        dir,
+        NPM_BINARY_NAME,
+        "version",
+        "--force",
+        version,
+        ...extraArgs
+    );
     if (!silent) {
         println(
             chalk`{magenta Successfully updated ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
