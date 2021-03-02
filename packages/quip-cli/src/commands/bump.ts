@@ -61,7 +61,7 @@ export const bump = async (
     if (!noGit) {
         // stage manifest.json since we want the increment to be part of our version tag
         try {
-            await runCmd(dir, "git", "add", manifestPath);
+            await runCmdPromise(dir, "git", "add", manifestPath);
         } catch (e) {
             // silent failure ok here, since it just means we're not using git
         }
