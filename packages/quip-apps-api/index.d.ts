@@ -15,6 +15,7 @@ import Client_, {
     CreationSource as CreationSource_,
     DocumentMenuCommands as DocumentMenuCommands_,
     EventType as EventType_,
+    InitOptions as InitOptions_,
     MenuCommand as MenuCommand_,
     MenuIcons as MenuIcons_,
     RootEntityConstructor as RootEntityConstructor_,
@@ -107,4 +108,5 @@ declare namespace quip {
     export type RecordPropertyDefinition = RecordPropertyDefinition_;
     export type RecordType = RecordType_;
     export type MigrationFn = MigrationFn_;
+    export type InitOptions = InitOptions_;
 }
