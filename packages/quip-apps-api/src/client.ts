@@ -74,6 +74,7 @@ export interface InitOptions {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[] | undefined;
     mobileToolbarCommandIds?: string[] | undefined;
+    toolbarState?: ToolbarState;
     destructiveCommandIds?: string[] | undefined;
     initializationCallback?: (
         element: Element,
