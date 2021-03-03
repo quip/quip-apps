@@ -4,7 +4,11 @@ import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
 import cliAPI, { successOnly } from "../lib/cli-api";
-import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import {
+    defaultConfigPath,
+    DEFAULT_SITE,
+    NPM_BINARY_NAME,
+} from "../lib/config";
 import { print, println } from "../lib/print";
 import { Manifest } from "../lib/types";
 import { copy, runCmd } from "../lib/util";
@@ -350,13 +354,13 @@ export default class Init extends Command {
             );
             // npm install
             println(chalk`{green installing dependencies...}`);
-            await runCmd(appDir, "npm", "install");
+            await runCmd(appDir, NPM_BINARY_NAME, "install");
             // bump the version since we already have a version 0 in the console
             println(chalk`{green bumping version...}`);
             await bump(appDir, "minor", { silent: flags.json });
             // npm run build
             println(chalk`{green building app...}`);
-            await runCmd(appDir, "npm", "run", "build");
+            await runCmd(appDir, NPM_BINARY_NAME, "run", "build");
             // then publish the new version
             println(chalk`{green uploading bundle...}`);
             const newManifest = await doPublish(

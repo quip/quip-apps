@@ -5,6 +5,9 @@ import { pathExists } from "./util";
 
 export const DEFAULT_SITE = "quip.com";
 export const SKIP_SSL_FOR_SITES = new Set(["quip.codes"]);
+export const NPM_BINARY_NAME = /^win/.test(process.platform)
+    ? "npm.cmd"
+    : "npm";
 
 interface QLAConfigSite {
     accessToken: string;

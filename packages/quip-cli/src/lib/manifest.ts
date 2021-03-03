@@ -21,7 +21,7 @@ export const findManifest = async (
             closestManifest = file;
         }
     }
-    return closestManifest;
+    return closestManifest ? path.join(dir, closestManifest) : undefined;
 };
 
 interface FormattingInfo {
