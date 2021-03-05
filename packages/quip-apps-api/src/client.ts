@@ -456,6 +456,10 @@ export default class Client {
     startDisplayingAboveMenus() {}
     stopDisplayingAboveMenus() {}
     updateDisplayDimensions() {}
+    updateTemplateParams(
+        templateParams: {[name: string]: string},
+        isTemplate?: boolean
+    ) {}
     updateToolbar(toolbarState: ToolbarState) {}
     updateToolbarCommandsState(
         disabledCommandIds: string[],
