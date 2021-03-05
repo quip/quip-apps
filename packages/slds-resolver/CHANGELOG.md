@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.2.0-alpha.6 (2021-03-05)
+
+**Note:** Version bump only for package slds-resolver
+
+
+
+
+
 # 0.2.0-alpha.5 (2021-03-03)
 
 **Note:** Version bump only for package slds-resolver
