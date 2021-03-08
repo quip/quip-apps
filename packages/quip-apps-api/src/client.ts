@@ -246,6 +246,7 @@ export default class Client {
     disableResizing() {}
     dismissBackdrop(skipCallback?: boolean) {}
     enableResizing(options: ResizingOptions) {}
+    exitApp() {}
     fetchElementHtml(styleId: number = 0, styleIdSuffix: string = "") {
         return this.elementHtmlValue;
     }
