@@ -5,6 +5,7 @@ import {CanvasRecordCommentAnchorRecord} from "./canvas-record";
 import Record from "./record";
 import User from "./user";
 import RichTextRecord from "./rich-text-record";
+import ImageRecord from "./image-record";
 
 // TODO: handle children in this file correctly (if they differ from current
 // handling) so that trees will be snapshottable
@@ -123,6 +124,38 @@ export class CommentsTrigger extends Component<{
 }> {
     render() {
         return React.createElement("div", undefined, "ui.CommentsTrigger");
+    }
+}
+
+export enum ImageMode {
+    NONE,
+    FOCUSED,
+    COMMENT,
+    CROP,
+}
+
+export class Image extends Component<{
+    record: ImageRecord;
+    width: number;
+    onWidthAndAspectRatioUpdate: (
+        width: number | null,
+        aspectRatio: number | null
+    ) => void;
+    minWidth: number;
+    minHeight: number;
+    placeholderWidth: number;
+    placeholderHeight: number;
+    placeholderText: string;
+    mode: ImageMode;
+    onFocusChanged?: (focused: boolean) => void;
+    onImageLoaded?: (record: ImageRecord) => void;
+    // Called when completing or canceling commenting or cropping.
+    onOperationCompleted?: () => void;
+    altText?: string;
+    className?: string;
+}> {
+    render() {
+        return React.createElement("div", undefined, "ui.Image");
     }
 }
 
