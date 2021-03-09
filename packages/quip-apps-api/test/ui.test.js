@@ -1,4 +1,3 @@
-// Copyright 2019 Quip
 const test = require("tape");
 const React = require("react");
 const TestRenderer = require("react-test-renderer");
