@@ -1,28 +1,23 @@
-/* @flow */
 // Copyright 2017 Quip
 
-// $FlowIssueQuipModule
-import quip from "quip";
-import isEqual from "date-fns/isEqual";
+import quip from "quip-apps-api";
+import quiptext from "quiptext";
 import {localizedColorLabel} from "quip-apps-compat";
-
-import {EventRecord, colors} from "./model";
-
+import {EventRecord, colors, RootRecord} from "./model";
 let selectedEvent: EventRecord;
-
 let displayMonth: Date;
 export function setMenuDisplayMonth(d: Date) {
     displayMonth = d;
     refreshToolbar();
 }
-
 export function allMenuCommands() {
     return [
         {
             id: "set-display-month",
             label: quiptext("Set Default Month"),
             handler: () => {
-                quip.apps.getRootRecord().setDisplayMonth(displayMonth);
+                (quip.apps.getRootRecord() as RootRecord).setDisplayMonth(
+                    displayMonth);
                 refreshToolbar();
             },
         },
@@ -50,38 +45,36 @@ export function allMenuCommands() {
         })),
     ];
 }
-
 export function refreshToolbar() {
     quip.apps.updateToolbar({
         menuCommands: allMenuCommands(),
         toolbarCommandIds: getToolbarComandIds(),
-        disabledCommands: getDisabledCommands(),
-        highlightedCommands: getHighlightedCommands(),
+        disabledCommandIds: getDisabledCommands(),
+        highlightedCommandIds: getHighlightedCommandIds(),
     });
 }
-
 export function showEventContextMenu(
-    e: Event,
+    e: Element,
     eventRecord: EventRecord,
-    onDismiss: Function
+    onDismiss: () => void
 ) {
     selectedEvent = eventRecord;
-
     const commands = [...colors, quip.apps.DocumentMenuCommands.SEPARATOR];
+
     if (quip.apps.viewerCanSeeComments()) {
         commands.push("comment");
     }
-    commands.push("delete-event");
 
+    commands.push("delete-event");
     quip.apps.showContextMenuFromButton(
         e,
         commands,
-        getHighlightedCommands(),
+        getHighlightedCommandIds(),
         [],
         onDismiss);
 }
 
-function getHighlightedCommands() {
+function getHighlightedCommandIds() {
     if (!selectedEvent) {
         return [];
     } else {
@@ -96,10 +89,13 @@ function getDisabledCommands() {
 
 function getToolbarComandIds() {
     let toolbarCommandIds = [];
-    const rootRecordDate = quip.apps.getRootRecord().getDisplayMonth();
+    const rootRecord = quip.apps.getRootRecord() as RootRecord;
+    const rootRecordDate = rootRecord.getDisplayMonth();
+
     if (displayMonth.getFullYear() !== rootRecordDate.getFullYear() ||
         displayMonth.getMonth() !== rootRecordDate.getMonth()) {
         toolbarCommandIds.push("set-display-month");
     }
+
     return toolbarCommandIds;
 }

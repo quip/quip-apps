@@ -1,29 +1,25 @@
-/* @flow */
 // Copyright 2017 Quip
 
-// $FlowIssueQuipModule
-import quip from "quip";
+import quip from "quip-apps-api";
 import React from "react";
 import {connect} from "react-redux";
-
 import {setFocusedEvent, setSelectedEvent} from "../actions";
 import {EventRecord} from "../model";
-
-const {RichTextBox} = quip.apps.ui;
-
+const {RichTextBox, ColorMap} = quip.apps.ui;
 type Props = {
-    eventRecord: EventRecord,
-    focused: boolean,
-    color: string,
-    setFocusedEvent: Function,
-    setSelectedEvent: Function,
-    titleRecord: quip.apps.RichTextRecord,
-    week: ?Array<Date>,
+    eventRecord: EventRecord;
+    focused: boolean;
+    isMoving: boolean;
+    color: keyof typeof ColorMap;
+    setFocusedEvent: Function;
+    setSelectedEvent: Function;
+    titleRecord: quip.apps.RichTextRecord;
+    week: Array<Date> | undefined | null;
 };
 
 class EventRichTextBox extends React.Component<Props, null> {
-    blurTimeout: ?number;
-    focusTimeout: ?number;
+    blurTimeout: number | undefined | null;
+    focusTimeout: number | undefined | null;
 
     componentDidMount() {
         if (this.props.focused) {
@@ -44,10 +40,12 @@ class EventRichTextBox extends React.Component<Props, null> {
             window.clearTimeout(this.focusTimeout);
             this.focusTimeout = null;
         }
+
         if (this.blurTimeout) {
             window.clearTimeout(this.blurTimeout);
             this.blurTimeout = null;
         }
+
         if (this.props.focused) {
             this.props.setFocusedEvent(null);
         }
@@ -57,8 +55,7 @@ class EventRichTextBox extends React.Component<Props, null> {
         const {eventRecord, setFocusedEvent, week} = this.props;
         setFocusedEvent(eventRecord, week && week[0].getTime());
     };
-
-    onBlur = e => {
+    onBlur = () => {
         // delay is to allow the focusedEvent to remain in
         // state so that a quick click onto a calendar day
         // will be able to detect that we we were focused.
@@ -66,6 +63,7 @@ class EventRichTextBox extends React.Component<Props, null> {
             window.clearTimeout(this.blurTimeout);
             this.blurTimeout = null;
         }
+
         this.blurTimeout = window.setTimeout(() => {
             if (this.props.focused) {
                 this.props.setFocusedEvent(null);
@@ -74,12 +72,19 @@ class EventRichTextBox extends React.Component<Props, null> {
     };
 
     render() {
-        const {color, focused, titleRecord, week} = this.props;
+        const {color, focused, titleRecord, week, isMoving} = this.props;
         let key = `rtb-${titleRecord.id()}`;
+
         if (week) {
             key = `-${key}-${color}-${week[0].getTime()}`;
         }
-        var extraRichTextBoxProps = {};
+
+        var extraRichTextBoxProps: {
+            [
+                allowedInlineStyles: string
+            ]: typeof quip.apps.RichTextRecord.InlineStyle[keyof typeof quip.apps.RichTextRecord.InlineStyle][];
+        } = {};
+
         if (quip.apps.isApiVersionAtLeast("0.1.039")) {
             extraRichTextBoxProps.allowedInlineStyles = [
                 quip.apps.RichTextRecord.InlineStyle.ITALIC,
@@ -88,16 +93,20 @@ class EventRichTextBox extends React.Component<Props, null> {
                 quip.apps.RichTextRecord.InlineStyle.CODE,
             ];
         }
+
         return <div
             onMouseDown={this.onMouseDown}
-            style={{cursor: "text", wordBreak: "break-word"}}>
+            style={{
+                cursor: "text",
+                wordBreak: "break-word",
+            }}>
             <RichTextBox
                 allowedStyles={[quip.apps.RichTextRecord.Style.TEXT_PLAIN]}
                 color={color}
                 disableSelection={!focused}
                 key={key}
                 onBlur={this.onBlur}
-                readOnly={!focused}
+                readOnly={!focused || isMoving}
                 record={titleRecord}
                 useDocumentTheme={false}
                 width="100%"
@@ -109,6 +118,7 @@ class EventRichTextBox extends React.Component<Props, null> {
 const mapStateToProps = (state, ownProps) => {
     const eventRecord = ownProps.eventRecord;
     let focused = false;
+
     if (state.focusedEvent && state.focusedEvent.id() === eventRecord.id()) {
         // Multi-week events need to know which week is being focused
         if (ownProps.week && state.focusedEventTimestamp) {
@@ -120,18 +130,20 @@ const mapStateToProps = (state, ownProps) => {
         }
     }
     /*
-    console.log(
-        "focused",
-        focused,
-        state.focusedEvent,
-        state.focusedEvent && state.focusedEvent.id() === eventRecord.id(),
-    );
-    */
+  console.log(
+      "focused",
+      focused,
+      state.focusedEvent,
+      state.focusedEvent && state.focusedEvent.id() === eventRecord.id(),
+  );
+  */
+
     return {
         focused,
         titleRecord: eventRecord.get("title"),
     };
 };
+
 export default connect(mapStateToProps, {
     setFocusedEvent,
     setSelectedEvent,

@@ -1,3 +1,19 @@
+.stepContainer {
+    flex: 1;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+
+    &:focus,
+    &:focus-within,
+    &:hover {
+        .commentsTrigger {
+            visibility: initial;
+        }
+    }
+}
+
 .step {
     flex: 1;
     display: flex;
@@ -15,7 +31,6 @@
     );
     margin-right: -6px;
     font-weight: bold;
-
     word-break: break-word;
 
     &.fixedWidth {
@@ -24,15 +39,15 @@
     &:last-child {
         margin-right: 0px;
     }
-    &:hover .commentsTrigger {
-        visibility: initial;
-    }
 }
 
 .commentsTrigger {
-    align-self: center;
-    padding: 3px 6px;
+    padding: 0;
     visibility: hidden;
+    position: absolute;
+    right: 30px;
+    border: 0;
+    background: transparent;
 
     &.commented {
         visibility: initial;
@@ -41,6 +56,7 @@
 
 .contents {
     display: flex;
+    width: 75%;
 }
 
 .label {
@@ -48,9 +64,18 @@
 }
 
 .chevron {
+    position: absolute;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    right: 5px;
     align-self: center;
     cursor: pointer;
     height: 20px;
     text-align: center;
     width: 20px;
+
+    &:focus {
+        border: 2px solid ~"rgb(var(--quipAction, 61, 135, 245))";
+    }
 }

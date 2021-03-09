@@ -261,28 +261,39 @@ export class Main extends React.Component {
         const {rows, columns} = toJSON(record);
         const {widths, heights} = this.state;
 
-        return <TableView
-            ref={node => record.setDom(ReactDOM.findDOMNode(node))}
-            customRenderer={DefaultCardRenderer()}
-            columns={columns}
-            rows={rows}
-            heights={heights}
-            widths={widths}
-            setRowHeight={quip.apps.isMobile() ? this.setRowHeight_ : undefined}
-            setWidths={this.setWidths}
-            getMinWidth={this.getMinWidth}
-            onColumnDrop={this.onColumnDrop_}
-            onColumnAdd={this.onColumnAdd_}
-            onColumnDelete={this.onColumnDelete_}
-            onColumnSort={this.onColumnSort_}
-            onRowDrop={this.onRowDrop_}
-            onRowDelete={this.onRowDelete_}
-            onResizeEnd={this.onResizeEnd_}
-            onCardClicked={(id, column) => {
-                if (column.type === COLUMN_TYPE.TEXT) {
-                    quip.apps.getRecordById(id).get("contents").focus();
+        return <div
+            onKeyDown={e => {
+                if (e.key === "Escape") {
+                    if (quip.apps.isApiVersionAtLeast("0.1.052")) {
+                        quip.apps.exitApp();
+                    }
                 }
-            }}
-            metricType={"project_tracker"}/>;
+            }}>
+            <TableView
+                ref={node => record.setDom(ReactDOM.findDOMNode(node))}
+                customRenderer={DefaultCardRenderer()}
+                columns={columns}
+                rows={rows}
+                heights={heights}
+                widths={widths}
+                setRowHeight={
+                    quip.apps.isMobile() ? this.setRowHeight_ : undefined
+                }
+                setWidths={this.setWidths}
+                getMinWidth={this.getMinWidth}
+                onColumnDrop={this.onColumnDrop_}
+                onColumnAdd={this.onColumnAdd_}
+                onColumnDelete={this.onColumnDelete_}
+                onColumnSort={this.onColumnSort_}
+                onRowDrop={this.onRowDrop_}
+                onRowDelete={this.onRowDelete_}
+                onResizeEnd={this.onResizeEnd_}
+                onCardClicked={(id, column) => {
+                    if (column.type === COLUMN_TYPE.TEXT) {
+                        quip.apps.getRecordById(id).get("contents").focus();
+                    }
+                }}
+                metricType={"project_tracker"}/>
+        </div>;
     }
 }

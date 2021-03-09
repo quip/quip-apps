@@ -27,7 +27,6 @@
         "lodash.omit": "^4.5.0",
         "prop-types": "^15.7.2",
         "quip-apps-chevron": "0.0.45",
-        "quip-apps-handle-richtextbox-key-event-navigation": "0.1.2-alpha.15",
         "quip-apps-webpack-config": "0.0.45"
     }
 }

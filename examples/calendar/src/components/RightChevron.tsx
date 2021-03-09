@@ -1,9 +1,7 @@
-/* @flow */
 // Copyright 2017 Quip
 import React from "react";
-
 type Props = {
-    className?: string,
+    className?: string;
 };
 
 class RightChevron extends React.Component<Props, null> {

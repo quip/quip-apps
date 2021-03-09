@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import quip from "quip";
+import quip from "quip-apps-api";
 
-import App from "./App.jsx";
+import App from "./App";
 
 import {allMenuCommands} from "./menus";
 
 import "./root.less";
+import {RootRecord} from "./model";
 
 quip.apps.initialize({
     menuCommands: allMenuCommands(),
@@ -14,15 +15,15 @@ quip.apps.initialize({
 
     initializationCallback: function (
         root,
+        // @ts-ignore TODO remove after adding quip-apps-private
         {isCreation, creationSource, payload}
     ) {
-        const rootRecord = quip.apps.getRootRecord();
+        const rootRecord = quip.apps.getRootRecord() as RootRecord;
 
         let isNew = false;
         if (isCreation) {
             rootRecord.setDisplayMonth(new Date());
             isNew = true;
-            //quip.apps.sendMessage("created a Calendar");
         } else if (quip.apps.CreationSource &&
             creationSource === quip.apps.CreationSource.TEMPLATE) {
             rootRecord.clearData();
