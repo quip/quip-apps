@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Record from "./record";
 
 export class CanvasRecordCommentAnchorRecord extends Record {

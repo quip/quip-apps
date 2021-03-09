@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Record from "./record";
 import CanvasRecord from "./canvas-record";
 import {BlobWithThumbnails} from "./client";

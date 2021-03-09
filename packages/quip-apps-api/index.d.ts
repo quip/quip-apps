@@ -1,5 +1,3 @@
-// Copyright Quip 2019
-
 import Auth_ from "./dist/auth";
 import BaseOAuth_, {
     HttpHeaders as HttpHeaders_,

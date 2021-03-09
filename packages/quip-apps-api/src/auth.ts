@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Client from "./client";
 
 export default class Auth {

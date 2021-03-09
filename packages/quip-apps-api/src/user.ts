@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 export default class User {
     firstNameValue: string = "Mock";
     idValue: string = "mock-user";

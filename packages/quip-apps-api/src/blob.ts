@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 export default class Blob {
     public dataValue?: ArrayBuffer;
     public filenameValue?: string;
