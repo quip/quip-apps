@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Auth_ from "./auth";
 import BaseOAuth_ from "./base-oauth";
 import Blob_ from "./blob";

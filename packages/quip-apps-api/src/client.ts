@@ -1,4 +1,3 @@
-// Copyright 2019 Quip
 import {ReactNode} from "react";
 import Auth from "./auth";
 import ClientBlob from "./blob";

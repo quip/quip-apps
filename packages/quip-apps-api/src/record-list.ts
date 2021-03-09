@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Record from "./record";
 import Client from "./client";
 

@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import React, {Component, ReactNode} from "react";
 import {CanvasRecordCommentAnchorRecord} from "./canvas-record";
 import Record from "./record";

@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Client from "./client";
 import ClientError from "./client-error";
 import RecordIndex from "./record-index";
