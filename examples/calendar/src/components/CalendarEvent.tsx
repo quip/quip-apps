@@ -1,53 +1,51 @@
-/* @flow */
 // Copyright 2017 Quip
 
-// $FlowIssueQuipModule
-import quip from "quip";
+import quip from "quip-apps-api";
 import React from "react";
 import {connect} from "react-redux";
 import classNames from "classnames";
 import isWithinInterval from "date-fns/isWithinInterval";
-
 import {setMovingEvent, setSelectedEvent} from "../actions";
 import {dateAtPoint} from "../util";
 import {EventRecord} from "../model";
-
 import Styles from "./CalendarEvent.less";
-import EventEndHandle from "./EventEndHandle.jsx";
-import EventDropdown from "./EventDropdown.jsx";
-import EventRichTextBox from "./EventRichTextBox.jsx";
-
+import EventEndHandle from "./EventEndHandle";
+import EventDropdown from "./EventDropdown";
+import EventRichTextBox from "./EventRichTextBox";
 type CalendarEventProps = {
-    commentCount: number,
-    eventRecord: EventRecord,
-    isStartDateWithinThisWeek: boolean,
-    isEndDateWithinThisWeek: boolean,
-    isInMovingEventWrapper?: boolean,
-    isMobileApp: boolean,
-    isMoving: boolean,
-    isSelected: boolean,
-    isSmallScreen: boolean,
-    setMovingEvent: Function,
-    setSelectedEvent: Function,
-    week: Array<Date>,
+    commentCount: number;
+    eventRecord: EventRecord;
+    isStartDateWithinThisWeek: boolean;
+    isEndDateWithinThisWeek: boolean;
+    isInMovingEventWrapper?: boolean;
+    isMobileApp: boolean;
+    isMoving: boolean;
+    isSelected: boolean;
+    isSmallScreen: boolean;
+    setMovingEvent: Function;
+    setSelectedEvent: Function;
+    week: Array<Date>;
 };
 
 class CalendarEvent extends React.Component<CalendarEventProps, null> {
-    el: ?HTMLDivElement;
-
+    el: HTMLDivElement | undefined | null;
     onMouseDownCommentBubble = e => {
         e.stopPropagation();
     };
-
     onMouseDownBottomRow = e => {
         if (e.button === 2 || this.props.isMobileApp) {
             return;
         }
+
         if (!this.el) {
             return;
         }
+
         const mouseStartCoordinates = {
-            date: dateAtPoint({x: e.pageX, y: e.pageY}),
+            date: dateAtPoint({
+                x: e.pageX,
+                y: e.pageY,
+            }),
             x: e.pageX,
             y: e.pageY,
         };
@@ -70,7 +68,6 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
             isSelected,
             week,
         } = this.props;
-
         const color = eventRecord.getColor();
         const eventHandleFillColor = isSelected
             ? quip.apps.ui.ColorMap.WHITE.VALUE
@@ -78,7 +75,6 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
         const textColor = isSelected
             ? quip.apps.ui.ColorMap.WHITE.KEY
             : eventRecord.getColor();
-
         return <div
             className={classNames(Styles.event, {
                 [Styles.extendLeft]: !isStartDateWithinThisWeek,
@@ -87,12 +83,14 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
             })}
             ref={el => {
                 this.el = el;
+
                 if (!isInMovingEventWrapper && el) {
                     eventRecord.setDomEvent({
                         weekStartTime: week[0].getTime(),
                         el,
                     });
                 }
+
                 if (!isInMovingEventWrapper &&
                     !isSmallScreen &&
                     isStartDateWithinThisWeek) {
@@ -114,6 +112,7 @@ class CalendarEvent extends React.Component<CalendarEventProps, null> {
                     })}>
                     <EventRichTextBox
                         eventRecord={eventRecord}
+                        isMoving={isMoving}
                         color={textColor}
                         week={week}/>
                 </div>
@@ -186,9 +185,8 @@ const mapStateToProps = (state, ownProps) => {
         isSmallScreen: state.isSmallScreen,
     };
 };
-CalendarEvent = connect(mapStateToProps, {
+
+export default connect(mapStateToProps, {
     setMovingEvent,
     setSelectedEvent,
 })(CalendarEvent);
-
-export default CalendarEvent;

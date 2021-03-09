@@ -58,12 +58,13 @@ export default class AddCard extends React.Component {
                     zIndex: zIndex,
                 };
 
-                return <div
+                return <button
+                    aria-label={quiptext("Add a new card")}
                     className={classNames}
                     style={elementStyle}
                     onClick={this.onClick_}>
                     <AddCardIcon/>
-                </div>;
+                </button>;
             }}
         </Motion>;
     }

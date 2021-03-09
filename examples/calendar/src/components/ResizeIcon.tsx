@@ -1,13 +1,9 @@
-/* @flow */
 // Copyright 2017 Quip
 import React from "react";
-
 import Styles from "./ResizeIcon.less";
-
 type Props = {
-    fill: string,
+    fill: string;
 };
-
 export default class ResizeIcon extends React.Component<Props, null> {
     render() {
         const {fill} = this.props;

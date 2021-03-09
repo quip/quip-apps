@@ -1,8 +1,7 @@
-/* @flow */
 // Copyright 2017 Quip
 
 const polyfills = {
-    elementsFromPoint: function (x: number, y: number) {
+    elementsFromPoint: function (x, y) {
         if (window.document.elementsFromPoint) {
             return window.document.elementsFromPoint(x, y);
         }

@@ -1,10 +1,5 @@
 // Copyright 2017 Quip
-// @flow
-
-// TODO(elsigh): import here breaks util.test.js - jest complains about module
-// $FlowIssueQuipModule
-// import quip from "quip";
-
+import quip from "quip-apps-api";
 import addDays from "date-fns/addDays";
 import differenceInDays from "date-fns/differenceInDays";
 import format from "date-fns/format";
@@ -17,7 +12,6 @@ import lastDayOfMonth from "date-fns/lastDayOfMonth";
 import startOfMonth from "date-fns/startOfMonth";
 import subDays from "date-fns/subDays";
 import subMonths from "date-fns/subMonths";
-
 import de from "date-fns/locale/de";
 import es from "date-fns/locale/es";
 import fr from "date-fns/locale/fr";
@@ -29,20 +23,16 @@ import pt from "date-fns/locale/pt";
 import ru from "date-fns/locale/ru";
 import tr from "date-fns/locale/tr";
 import zh_cn from "date-fns/locale/zh-CN";
-
 import range from "lodash.range";
-
 import polyfills from "./polyfills";
-import type {EventRecord} from "./model";
-
-import type {
+import {EventRecord} from "./model";
+import {
     DateRange,
     MouseCoordinates,
     MouseStartCoordinates,
     MovingEventRect,
     MovingEventRectMap,
 } from "./types";
-
 const SUPPORTED_LANGUAGES = {
     "de": de,
     "es": es,
@@ -63,35 +53,32 @@ const makeDateRange = (startDate: Date, numberOfDays: number) =>
 export const getCalendarMonth = (monthDate: Date): Array<Date> => {
     const daysInMonth = getDaysInMonth(monthDate);
     const firstDayOfWeek = getDay(startOfMonth(monthDate));
-
     const prevMonthDate = subMonths(monthDate, 1);
     const previousMonthDays = makeDateRange(
         subDays(lastDayOfMonth(prevMonthDate), firstDayOfWeek - 1),
         firstDayOfWeek);
-
     const lastDayOfMonthInWeek = getDay(lastDayOfMonth(monthDate));
     const nextMonthDays = makeDateRange(
         addDays(lastDayOfMonth(monthDate), 1),
         6 - lastDayOfMonthInWeek);
-
     return [
         ...previousMonthDays,
         ...makeDateRange(startOfMonth(monthDate), daysInMonth),
         ...nextMonthDays,
     ];
 };
-
 export const formatDate = (date, dateFormat) => {
     const user = quip.apps.getViewingUser();
     let options;
+
     if (user && user.getLanguage && user.getLanguage() in SUPPORTED_LANGUAGES) {
         options = {
             "locale": SUPPORTED_LANGUAGES[user.getLanguage()],
         };
     }
+
     return format(date, dateFormat, options);
 };
-
 export const isSameDay = (date1: Date, date2: Date): boolean => {
     // Simplified implementation of isSameDay from date-fns that does not call
     // setHours on the start/end dates before comparing them (setHours is
@@ -102,47 +89,43 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
         date1.getFullYear() == date2.getFullYear()
     );
 };
-
 const startOfDayCache = {};
-
 export const startOfDay = (date: Date): Date => {
     // Caching implementation of startOfDay from date-fns that avoids repeatedly
     // calling setHours (slow on iOS) when used with the same timestamp (which
     // often happens when rendering a calendar month).
     const cacheKey = "start-of-day-" + date.getTime();
     let result = startOfDayCache[cacheKey];
+
     if (!result) {
         result = new Date(date.getTime());
         result.setHours(0, 0, 0, 0);
         startOfDayCache[cacheKey] = result;
     }
+
     return result;
 };
-
 const endOfDayCache = {};
-
 export const endOfDay = (date: Date): Date => {
     // See startOfDay comments.
     const cacheKey = "end-of-day-" + date.getTime();
     let result = endOfDayCache[cacheKey];
+
     if (!result) {
         result = new Date(date.getTime());
         result.setHours(23, 59, 59, 999);
         endOfDayCache[cacheKey] = result;
     }
+
     return result;
 };
-
 export const dayInMonth = (date: Date, month: Date) =>
     isWithinInterval(date, {
         start: startOfMonth(month),
         end: lastDayOfMonth(month),
     });
-
 export const getIsSmallScreen = (): boolean =>
-    // $FlowIssueQuipModule
     quip.apps.getContainerWidth() <= 600;
-
 export const isElAtPoint = (
     xy: MouseCoordinates,
     className: string
@@ -152,34 +135,34 @@ export const isElAtPoint = (
         .elementsFromPoint(x, y)
         .find(el => el.classList.contains(className));
 };
-
 export const elAtPoint = (
     xy: MouseCoordinates,
     className: string
-): ?HTMLElement => {
+): HTMLElement | undefined | null => {
     const {x, y} = xy;
     return polyfills
         .elementsFromPoint(x, y)
         .find(el => el.classList.contains(className));
 };
-
 export const dayElAtPoint = (xy: MouseCoordinates) =>
     elAtPoint(xy, "Calendar__day");
-
 export const dateAtPoint = (xy: MouseCoordinates) => {
     const dayEl = dayElAtPoint(xy);
+
     if (!dayEl) {
         return;
     }
+
     const dateString = Number(dayEl.getAttribute("data-date-time"));
+
     if (!dateString) {
         return;
     }
+
     let d = new Date();
     d.setTime(dateString);
     return d;
 };
-
 export const getMovingEventDateRange = (
     movingEvent: EventRecord,
     mouseCoordinates: MouseCoordinates,
@@ -187,35 +170,51 @@ export const getMovingEventDateRange = (
 ) => {
     const {start, end} = movingEvent.getDateRange();
     const endDragDate = dateAtPoint(mouseCoordinates);
+
     if (endDragDate) {
         const diffInDays = differenceInDays(
             mouseStartCoordinates.date,
             endDragDate);
+
         if (Math.abs(diffInDays) !== 0) {
             const newStartDate = subDays(start, diffInDays);
             const newEndDate = subDays(end, diffInDays);
-            return {start: newStartDate, end: newEndDate};
+            return {
+                start: newStartDate,
+                end: newEndDate,
+            };
         }
     }
-    return {start, end};
-};
 
+    return {
+        start,
+        end,
+    };
+};
 export const getResizingEventDateRange = (
     resizingEvent: EventRecord,
     mouseCoordinates: MouseCoordinates
 ) => {
     const {start, end} = resizingEvent.getDateRange();
     const newEndDate = dateAtPoint(mouseCoordinates);
+
     if (newEndDate &&
         (isAfter(newEndDate, start) || isEqual(newEndDate, start))) {
         const diffInDays = differenceInDays(end, newEndDate);
+
         if (Math.abs(diffInDays) !== 0) {
-            return {start, end: newEndDate};
+            return {
+                start,
+                end: newEndDate,
+            };
         }
     }
-    return {start, end};
-};
 
+    return {
+        start,
+        end,
+    };
+};
 export const areDateRangesEqual = function (
     a: DateRange,
     b: DateRange
@@ -223,28 +222,29 @@ export const areDateRangesEqual = function (
     if (a.start.getTime() !== b.start.getTime()) {
         return false;
     }
+
     if (a.end.getTime() !== b.end.getTime()) {
         return false;
     }
+
     return true;
 };
-
 export function getMovingEventRectMap(
     movingEvent: EventRecord,
     mouseStartCoordinates: MouseStartCoordinates,
     mouseCoordinates?: MouseCoordinates
 ): MovingEventRectMap {
     const movingEventElMap = movingEvent.getDomNodesForEvent();
-    //console.log("getMovingEventRectMap movingEventElMap", movingEventElMap);
+
     let rectMap = {};
     Object.keys(movingEventElMap).forEach((weekStartTime, i) => {
         const el = movingEventElMap[weekStartTime];
+
         if (el.ownerDocument.body.contains(el)) {
             rectMap[weekStartTime] = getMovingEventRect(
                 el,
                 mouseStartCoordinates,
                 mouseCoordinates);
-            //console.log("weekStartTime", weekStartTime, rectMap[weekStartTime]);
         }
     });
     return rectMap;
@@ -253,7 +253,7 @@ export function getMovingEventRectMap(
 function getMovingEventRect(
     el: HTMLDivElement,
     mouseStartCoordinates: MouseStartCoordinates,
-    mouseCoordinates: ?MouseCoordinates
+    mouseCoordinates?: MouseCoordinates | null
 ): MovingEventRect {
     mouseCoordinates = mouseCoordinates || mouseStartCoordinates;
     const rect = el.getBoundingClientRect();
@@ -262,19 +262,10 @@ function getMovingEventRect(
     const top = mouseCoordinates.y - offsetY;
     const left = mouseCoordinates.x - offsetX;
     const wrapperEl = el.parentElement;
-    // $FlowFixMe
+
     const width = wrapperEl.offsetWidth;
     const height = rect.height;
-    /*
-    console.log(
-        "getMovingEventRect: ",
-        left,
-        top,
-        rect,
-        mouseStartCoordinates,
-        mouseCoordinates,
-    );
-    */
+
     return {
         height,
         left,

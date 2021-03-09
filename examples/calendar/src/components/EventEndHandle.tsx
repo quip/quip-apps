@@ -1,18 +1,14 @@
-/* @flow */
 // Copyright 2017 Quip
-
 import React from "react";
 import {connect} from "react-redux";
-
 import Styles from "./EventEndHandle.less";
-import ResizeIcon from "./ResizeIcon.jsx";
+import ResizeIcon from "./ResizeIcon";
 import {setResizingEvent} from "../actions";
 import {EventRecord} from "../model";
-
 type Props = {
-    eventRecord: EventRecord,
-    fill: string,
-    setResizingEvent: Function,
+    eventRecord: EventRecord;
+    fill: string;
+    setResizingEvent: Function;
 };
 
 class EventEndHandle extends React.Component<Props, null> {
@@ -20,6 +16,7 @@ class EventEndHandle extends React.Component<Props, null> {
         if (e.button === 2) {
             return;
         }
+
         this.props.setResizingEvent(this.props.eventRecord);
         e.stopPropagation();
     };
@@ -34,4 +31,6 @@ class EventEndHandle extends React.Component<Props, null> {
     }
 }
 
-export default connect(null, {setResizingEvent})(EventEndHandle);
+export default connect(null, {
+    setResizingEvent,
+})(EventEndHandle);

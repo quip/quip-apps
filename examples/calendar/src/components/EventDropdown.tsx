@@ -1,33 +1,29 @@
-/* @flow */
 // Copyright 2017 Quip
 
-// $FlowIssueQuipModule
-import quip from "quip";
+import quip from "quip-apps-api";
 import React from "react";
 import {connect} from "react-redux";
-
 import Chevron from "quip-apps-chevron";
-
 import Styles from "./EventDropdown.less";
 import {setMenuOpenRecord} from "../actions";
 import {EventRecord} from "../model";
-
 import {showEventContextMenu} from "../menus";
-
 type Props = {
-    color: string,
-    eventRecord: EventRecord,
-    isMenuOpen: boolean,
-    setMenuOpenRecord: Function,
-    style?: Object,
+    color: string;
+    eventRecord: EventRecord;
+    isMenuOpen: boolean;
+    setMenuOpenRecord: Function;
+    style?: object;
 };
 
 class EventDropdown extends React.Component<Props, null> {
     handleMouseDown = e => {
         const {eventRecord, isMenuOpen, setMenuOpenRecord} = this.props;
+
         if (isMenuOpen) {
             return;
         }
+
         this.props.setMenuOpenRecord(eventRecord);
         showEventContextMenu(e.currentTarget, eventRecord, () => {
             setMenuOpenRecord(null);
