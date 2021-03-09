@@ -228,7 +228,7 @@ export default abstract class Record {
     getDataVersion() {
         return this.dataVersionValue;
     }
-    getDom() {
+    getDom(): Element {
         throw new ClientError(
             "Please override getDom() to return the DOM node for this " +
                 "Record instance."
