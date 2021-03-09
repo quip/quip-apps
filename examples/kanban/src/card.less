@@ -2,7 +2,8 @@
 
 @import "base.less";
 
-.card {
+@backgroundInverse: var(--quipBackgroundInverse, 0, 0, 0);
+.cardContainer {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -10,7 +11,35 @@
     left: 0;
     padding: 2px;
     border-radius: 3px;
-    @backgroundInverse: var(--quipBackgroundInverse, 0, 0, 0);
+
+    .chevron {
+        position: absolute;
+        cursor: pointer;
+        display: flex;
+        height: 25px;
+        width: 25px;
+        z-index: 1;
+        top: 8px;
+        right: -1px;
+        border: 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    .chevron:focus {
+        border: 2px solid ~"rgb(var(--quipBlue))";
+    }
+
+    &.header .chevron {
+        stroke: ~"rgba(@{backgroundInverse}, 0.2)";
+    }
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    border-radius: 3px;
     cursor: default;
 
     .titleRow {
@@ -19,19 +48,6 @@
 
     &.header .titleRow {
         align-items: center;
-    }
-
-    .chevron {
-        cursor: pointer;
-        display: flex;
-        height: 25px;
-        width: 25px;
-        z-index: 1;
-    }
-
-    &.header .chevron {
-        height: 100%;
-        stroke: ~"rgba(@{backgroundInverse}, 0.2)";
     }
 
     &.header .remoteEditor article .content {
@@ -74,6 +90,7 @@
         flex: 1;
         cursor: text;
         word-break: break-word;
+        margin-right: 25px;
         -webkit-line-break: after-white-space;
     }
 
@@ -83,7 +100,7 @@
 
     &.header {
         .remoteEditor article {
-            padding: 5px 8px 2px 0;
+            padding: 5px 30px 2px 0;
         }
 
         :global article .section[data-section-type="0"] > .content {

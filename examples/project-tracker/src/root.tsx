@@ -15,7 +15,46 @@ import {Main} from "./components/main.jsx";
 
 registerModels();
 
-quip.apps.initialize({
+const menuCommands = [
+    {
+        id: "sortAscending",
+        label: quiptext("Sort Ascending"),
+        handler: (name, context) => context[name](),
+    },
+    {
+        id: "sortDescending",
+        label: quiptext("Sort Descending"),
+        handler: (name, context) => context[name](),
+    },
+    {
+        id: "addColumn",
+        label: quiptext("Add Column"),
+        subCommands: Object.keys(COLUMN_TYPE).map(type => type + "AddColumn"),
+    },
+    {
+        id: "addRow",
+        label: quiptext("Add Row"),
+        handler: () => (quip.apps.getRootRecord() as RootRecord).addRow(),
+    },
+    {
+        id: "deleteColumn",
+        label: quiptext("Delete Column"),
+        handler: (name, context) => context[name](),
+    },
+    {
+        id: "deleteRow",
+        label: quiptext("Delete Row"),
+        handler: (name, context) => context[name](),
+    },
+    ...Object.keys(COLUMN_TYPE).map(type => ({
+        id: type + "AddColumn",
+        label: COLUMN_TYPE_LABELS[TABLE_VIEW_COLUMN_TYPE[type]],
+        isHeader: false,
+        handler: (name, context) => context["addColumn"](type),
+    })),
+];
+const toolbarCommandIds = ["addRow"];
+const initializationOptions: quip.InitOptions = {
     // @ts-ignore: used for 'payload' remove after moving to quip-apps-private
     initializationCallback: async (root, {isCreation, payload}) => {
         const rootRecord = quip.apps.getRootRecord() as RootRecord;
@@ -89,44 +128,17 @@ quip.apps.initialize({
 
         ReactDOM.render(<Connected/>, root);
     },
-    toolbarCommandIds: ["addRow"],
-    menuCommands: [
-        {
-            id: "sortAscending",
-            label: quiptext("Sort Ascending"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "sortDescending",
-            label: quiptext("Sort Descending"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "addColumn",
-            label: quiptext("Add Column"),
-            subCommands: Object.keys(COLUMN_TYPE).map(
-                type => type + "AddColumn"),
-        },
-        {
-            id: "addRow",
-            label: quiptext("Add Row"),
-            handler: () => (quip.apps.getRootRecord() as RootRecord).addRow(),
-        },
-        {
-            id: "deleteColumn",
-            label: quiptext("Delete Column"),
-            handler: (name, context) => context[name](),
-        },
-        {
-            id: "deleteRow",
-            label: quiptext("Delete Row"),
-            handler: (name, context) => context[name](),
-        },
-        ...Object.keys(COLUMN_TYPE).map(type => ({
-            id: type + "AddColumn",
-            label: COLUMN_TYPE_LABELS[TABLE_VIEW_COLUMN_TYPE[type]],
-            isHeader: false,
-            handler: (name, context) => context["addColumn"](type),
-        })),
-    ],
-});
+    // TODO: Remove toolbarCommandIds and menuCommands if minApiVersion is at least 0.1.053
+    //       Use toolbarState instead.
+    toolbarCommandIds,
+    menuCommands,
+};
+
+if (quip.apps.isApiVersionAtLeast("0.1.053")) {
+    initializationOptions.toolbarState = {
+        menuCommands,
+        toolbarCommandIds,
+        mobileToolbarCommandIds: toolbarCommandIds,
+    };
+}
+quip.apps.initialize(initializationOptions);

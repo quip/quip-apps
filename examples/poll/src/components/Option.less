@@ -1,11 +1,20 @@
 // Copyright 2017 Quip
 
-.root {
-    margin-bottom: 8px;
-    display: flex;
+@boxShadowColor: var(--quipBlue, 61, 135, 245);
+@focusIndicatorBorder: 2px solid ~"rgb(@{boxShadowColor})";
+
+.rowContainer {
     position: relative;
-    justify-content: center;
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
+    margin-bottom: 8px;
+}
+
+.root {
+    align-items: center;
+    flex-grow: 1;
+    position: relative;
     -webkit-font-smoothing: antialiased;
 
     &:last-child {
@@ -13,39 +22,58 @@
     }
 }
 
-.inputCheckContainer {
-    width: 24px;
-    height: 24px;
-    margin: 6px 12px 6px 0;
-    cursor: pointer;
+.radioButton,
+.checkbox {
+    opacity: 0;
+    position: fixed;
+    width: 0;
+}
+
+.radioButtonContainer .radioButton + .inputCircle,
+.checkboxContainer .checkbox + .inputCheckbox {
+    position: relative;
+
+    &::after {
+        content: " ";
+        top: 0;
+        left: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        box-shadow: 0 0 1px 2px ~"rgb(@{boxShadowColor})";
+        border-radius: 4px;
+    }
+}
+
+.radioButtonContainer .radioButton + .inputCircle {
+    &::after {
+        border-radius: 50%;
+    }
+}
+
+.radioButtonContainer .radioButton:focus + .inputCircle,
+.checkboxContainer .checkbox:focus + .inputCheckbox {
+    &::after {
+        opacity: 1;
+    }
 }
 
 .inputCircle,
 .inputCheckbox {
+    @borderColor: var(--quipBackgroundInverse, 0, 0, 0);
     width: 24px;
     height: 24px;
-    margin: 6px 12px 6px 0;
+    margin-right: 12px;
     border-radius: 50%;
     cursor: pointer;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid ~"rgba(@{borderColor}, 0.1)";
     align-self: center;
 
     &.selected {
         border: none;
     }
-}
-
-.inputCircle::after {
-    position: absolute;
-    content: "";
-    width: 8px;
-    height: 8px;
-    background-color: white;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .inputCheckbox {
@@ -87,7 +115,7 @@
 
 .optionContents {
     display: flex;
-    width: 100%;
+    width: 95%;
     align-items: center;
 }
 
@@ -135,13 +163,22 @@
 }
 
 .dropdown {
+    position: absolute;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    right: 5px;
+    top: 8px;
     align-items: center;
     cursor: pointer;
     display: flex;
-    position: relative;
     text-align: center;
     width: 30px;
     z-index: 2;
+
+    &:focus {
+        border: @focusIndicatorBorder;
+    }
 }
 
 .root:hover .commentsTrigger {

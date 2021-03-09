@@ -10,7 +10,6 @@ import manifest from "../../app/manifest.json";
 export default class App extends React.Component {
     static propTypes = {
         color: PropTypes.string.isRequired,
-        // TODO(elsigh): type for RecordList?
         options: PropTypes.any.isRequired,
         rootRecord: PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
     };
@@ -49,26 +48,42 @@ export default class App extends React.Component {
     render() {
         const {options, color, rootRecord} = this.props;
         const totalVotes = rootRecord.getTotalVotes();
+        const allowMultiple = rootRecord.get("allowMultiple");
+        const optionEls = options
+            .getRecords()
+            .map((option, i, records) => <Option
+                key={option.getId()}
+                record={option}
+                textRecord={option.getRichTextRecord()}
+                color={color}
+                totalVotes={totalVotes}
+                votesCount={option.getVotesCount()}
+                selected={option.isVoted()}
+                onSelect={this.selectOption}
+                onDelete={this.deleteOption}
+                isLast={i === records.length - 1}
+                multiple={allowMultiple}/>);
 
-        return <div
-            style={{
-                // TODO(elsigh): fixes being above custom scroller
-                marginBottom: 20,
-            }}>
-            {options
-                .getRecords()
-                .map((option, i, records) => <Option
-                    key={option.getId()}
-                    record={option}
-                    textRecord={option.getRichTextRecord()}
-                    color={color}
-                    totalVotes={totalVotes}
-                    votesCount={option.getVotesCount()}
-                    selected={option.isVoted()}
-                    onSelect={this.selectOption}
-                    onDelete={this.deleteOption}
-                    isLast={i === records.length - 1}
-                    multiple={rootRecord.get("allowMultiple")}/>)}
-        </div>;
+        return allowMultiple ? (
+            <ul
+                role="listbox"
+                aria-multiselectable="true"
+                aria-label={quiptext("multiple-vote poll")}
+                style={{
+                    paddingInlineStart: 0,
+                    marginBottom: 20,
+                }}>
+                {optionEls}
+            </ul>
+        ) : (
+            <div
+                role="radiogroup"
+                aria-label={quiptext("single-vote poll")}
+                style={{
+                    marginBottom: 20,
+                }}>
+                {optionEls}
+            </div>
+        );
     }
 }

@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import React from "react";
 import quip from "quip";
 import cx from "classnames";
-import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 import Chevron from "quip-apps-chevron";
 import Styles from "./Option.less";
 
@@ -44,19 +43,6 @@ export default class Option extends React.Component {
             isContextMenuOpen: false,
         };
     }
-
-    handleKeyEvent = e => {
-        if (e.keyCode === RETURN_KEY) {
-            return true;
-        }
-
-        // Both keydown and keyup event will be triggered. Ignore keydown event
-        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
-        if (e.type === "keydown") {
-            return false;
-        }
-        return handleRichTextBoxKeyEventNavigation(e, this.props.record);
-    };
 
     showContextMenu = e => {
         if (this.state.isContextMenuOpen) {
@@ -102,6 +88,7 @@ export default class Option extends React.Component {
             selected,
             multiple,
         } = this.props;
+        const {isContextMenuOpen} = this.state;
 
         const user = quip.apps.getViewingUser();
         const progressPct = totalVotes ? (votesCount / totalVotes) * 100 : 0;
@@ -114,99 +101,133 @@ export default class Option extends React.Component {
                 quip.apps.RichTextRecord.InlineStyle.CODE,
             ];
         }
-        return <div className={Styles.root} ref={node => record.setDom(node)}>
-            {user && multiple && <div
-                className={cx(Styles.inputCheckbox, {
-                    [Styles.selected]: selected,
-                })}
-                onClick={() => this.selectOption(!selected)}
-                style={{
-                    backgroundColor: selected
-                        ? quip.apps.ui.ColorMap[color].VALUE
-                        : "",
-                }}>
-                {selected && <Checkmark/>}
-            </div>}
 
-            {user && !multiple && <div
-                className={cx(Styles.inputCircle, {
-                    [Styles.selected]: selected,
-                })}
-                onClick={() => this.selectOption(!selected)}
-                style={{
-                    backgroundColor: selected
-                        ? quip.apps.ui.ColorMap[color].VALUE
-                        : "",
-                }}/>}
+        const voteId = record.id() + "_vote_count";
+        const ElementType = multiple ? "li" : "div";
 
-            <div className={Styles.optionContainer}>
+        return <ElementType
+            className={Styles.rowContainer}
+            role={multiple ? "option" : null}
+            aria-checked={selected}>
+            {user && multiple && <div className={Styles.checkboxContainer}>
+                <input
+                    type="checkbox"
+                    aria-label={textRecord.getTextContent()}
+                    aria-describedby={voteId}
+                    checked={selected}
+                    className={Styles.checkbox}
+                    onClick={() => this.selectOption(!selected)}/>
                 <div
-                    className={Styles.optionBorder}
+                    className={cx(Styles.inputCheckbox, {
+                        [Styles.selected]: selected,
+                    })}
+                    onClick={() => this.selectOption(!selected)}
                     style={{
-                        borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
+                        backgroundColor: selected
+                            ? quip.apps.ui.ColorMap[color].VALUE
+                            : "",
+                    }}>
+                    {selected && <Checkmark/>}
+                </div>
+            </div>}
+            {user && !multiple && <div className={Styles.radioButtonContainer}>
+                <input
+                    type="radio"
+                    aria-label={textRecord.getTextContent()}
+                    aria-describedby={voteId}
+                    checked={selected}
+                    className={Styles.radioButton}
+                    onClick={() => this.selectOption(!selected)}/>
+                <div
+                    className={cx(Styles.inputCircle, {
+                        [Styles.selected]: selected,
+                    })}
+                    onClick={() => this.selectOption(!selected)}
+                    style={{
+                        backgroundColor: selected
+                            ? quip.apps.ui.ColorMap[color].VALUE
+                            : "",
                     }}/>
-                <div className={Styles.option}>
-                    <div className={Styles.optionContents}>
-                        <div className={Styles.label}>
-                            <RichTextBox
-                                color={color}
-                                ref={c => (this._richTextBox = c)}
-                                record={textRecord}
-                                width="100%"
-                                minHeight={20}
-                                scrollable={false}
-                                useDocumentTheme={false}
-                                allowedStyles={[
-                                    quip.apps.RichTextRecord.Style.TEXT_PLAIN,
-                                ]}
-                                handleKeyEvent={this.handleKeyEvent}
-                                {...extraRichTextBoxProps}/>
-                        </div>
+            </div>}
+            <div className={Styles.root} ref={node => record.setDom(node)}>
+                <div className={Styles.optionContainer}>
+                    <div
+                        className={Styles.optionBorder}
+                        style={{
+                            borderColor:
+                                quip.apps.ui.ColorMap[color].VALUE_STROKE,
+                        }}/>
+                    <div className={Styles.option}>
+                        <div className={Styles.optionContents}>
+                            <div className={Styles.label}>
+                                <RichTextBox
+                                    color={color}
+                                    ref={c => (this._richTextBox = c)}
+                                    record={textRecord}
+                                    width="100%"
+                                    minHeight={20}
+                                    scrollable={false}
+                                    useDocumentTheme={false}
+                                    allowedStyles={[
+                                        quip.apps.RichTextRecord.Style
+                                            .TEXT_PLAIN,
+                                    ]}
+                                    allowDefaultTabNavigation={true}
+                                    {...extraRichTextBoxProps}/>
+                            </div>
 
-                        <div
-                            className={cx(Styles.commentsTrigger, {
-                                [Styles.commented]:
-                                    record.getCommentCount() > 0,
-                            })}>
-                            <CommentsTrigger
-                                color={color}
-                                record={record}
-                                showEmpty/>
-                        </div>
+                            <div
+                                className={cx(Styles.commentsTrigger, {
+                                    [Styles.commented]:
+                                        record.getCommentCount() > 0,
+                                })}>
+                                <CommentsTrigger
+                                    color={color}
+                                    record={record}
+                                    showEmpty/>
+                            </div>
 
-                        <div
-                            className={cx(Styles.votes, {
-                                [Styles.voted]: votesCount > 0,
-                            })}
-                            style={{
-                                color: quip.apps.ui.ColorMap[color].VALUE,
-                            }}>
-                            {votesCount === 1
-                                ? quiptext("1 vote")
-                                : quiptext("%(count)s votes", {
-                                      "count": votesCount,
-                                  })}
+                            <div
+                                id={voteId}
+                                className={cx(Styles.votes, {
+                                    [Styles.voted]: votesCount > 0,
+                                })}
+                                style={{
+                                    color: quip.apps.ui.ColorMap[color].VALUE,
+                                }}>
+                                {votesCount === 0
+                                    ? quiptext("0 votes")
+                                    : votesCount === 1
+                                    ? quiptext("1 vote")
+                                    : quiptext("%(count)s votes", {
+                                          "count": votesCount,
+                                      })}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className={Styles.dropdown} onClick={this.showContextMenu}>
-                    <Chevron color={quip.apps.ui.ColorMap[color].VALUE}/>
+                    <div
+                        className={cx(Styles.progress, {
+                            [Styles.progressFull]: progressPct === 100,
+                            [Styles.progressEmpty]: progressPct === 0,
+                        })}
+                        style={{
+                            backgroundColor:
+                                quip.apps.ui.ColorMap[color].VALUE_LIGHT,
+                            boxShadow: `-1px 0 0 ${quip.apps.ui.ColorMap[color].VALUE_LIGHT} inset`,
+                            right: `${100 - progressPct}%`,
+                            borderColor:
+                                quip.apps.ui.ColorMap[color].VALUE_STROKE,
+                        }}/>
                 </div>
-
-                <div
-                    className={cx(Styles.progress, {
-                        [Styles.progressFull]: progressPct === 100,
-                        [Styles.progressEmpty]: progressPct === 0,
-                    })}
-                    style={{
-                        backgroundColor:
-                            quip.apps.ui.ColorMap[color].VALUE_LIGHT,
-                        boxShadow: `-1px 0 0 ${quip.apps.ui.ColorMap[color].VALUE_LIGHT} inset`,
-                        right: `${100 - progressPct}%`,
-                        borderColor: quip.apps.ui.ColorMap[color].VALUE_STROKE,
-                    }}/>
             </div>
-        </div>;
+            <button
+                className={Styles.dropdown}
+                onClick={this.showContextMenu}
+                aria-label={quiptext("More options")}
+                aria-expanded={isContextMenuOpen}>
+                <Chevron color={quip.apps.ui.ColorMap[color].VALUE}/>
+            </button>
+        </ElementType>;
     }
 }

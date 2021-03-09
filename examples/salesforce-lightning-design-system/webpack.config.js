@@ -58,5 +58,8 @@ module.exports = {
         contentBase: path.resolve(__dirname),
         port: 8888,
         inline: false,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+        },
     },
 };

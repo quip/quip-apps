@@ -1,37 +1,30 @@
-/* @flow */
 // Copyright 2017 Quip
 
-// $FlowIssueQuipModule
-import quip from "quip";
+import quip from "quip-apps-api";
 import React from "react";
 import {connect} from "react-redux";
 import classNames from "classnames";
-
 import differenceInDays from "date-fns/differenceInDays";
 import startOfWeek from "date-fns/startOfWeek";
-
 import {EventRecord} from "../model";
 import {startOfDay} from "../util";
-
-import CalendarEvent from "./CalendarEvent.jsx";
+import CalendarEvent from "./CalendarEvent";
 import Styles from "./CalendarEvent.less";
-
-import type {MouseCoordinates, MovingEventRect} from "../types";
-
+import {MouseCoordinates, MovingEventRect} from "../types";
 type Props = {
-    DEBUG_ORDER: boolean,
-    end: Date,
-    eventRecord: EventRecord,
-    eventRecordIndex: number,
-    movingEvent: ?EventRecord,
-    movingEventRect: ?MovingEventRect,
-    mouseCoordinates: ?MouseCoordinates,
-    numDays: number,
-    showMovingEventGuideAfter: ?boolean,
-    showMovingEventGuideBefore: ?boolean,
-    showMovingEventGuideColor: ?string,
-    start: Date,
-    week: Array<Date>,
+    DEBUG_ORDER: boolean;
+    end: Date;
+    eventRecord: EventRecord;
+    eventRecordIndex: number;
+    movingEvent: EventRecord | undefined | null;
+    movingEventRect: MovingEventRect | undefined | null;
+    mouseCoordinates: MouseCoordinates | undefined | null;
+    numDays: number;
+    showMovingEventGuideAfter: boolean | undefined | null;
+    showMovingEventGuideBefore: boolean | undefined | null;
+    showMovingEventGuideColor: string | undefined | null;
+    start: Date;
+    week: Array<Date>;
 };
 
 class CalendarEventWrapper extends React.Component<Props, null> {
@@ -50,7 +43,6 @@ class CalendarEventWrapper extends React.Component<Props, null> {
             showMovingEventGuideColor,
             week,
         } = this.props;
-
         const showMovingEventGuide =
             showMovingEventGuideAfter || showMovingEventGuideBefore;
         return <div
@@ -111,6 +103,7 @@ const mapStateToProps = (state, ownProps) => {
     const movingEventRect = movingEvent
         ? state.movingEventRectMap[startOfWeek(start).getTime()]
         : null;
+
     // Uses startOfDay to normalize for time.
     const numDays =
         Math.abs(differenceInDays(startOfDay(start), startOfDay(end))) + 1;
@@ -125,11 +118,11 @@ const mapStateToProps = (state, ownProps) => {
         showMovingEventGuideColor,
     };
 };
-export default connect(mapStateToProps)(CalendarEventWrapper);
 
+export default connect(mapStateToProps)(CalendarEventWrapper);
 type MovingEventWrapperProps = {
-    children: any,
-    movingEventRect: MovingEventRect,
+    children: any;
+    movingEventRect: MovingEventRect;
 };
 
 const MovingEventWrapper = ({

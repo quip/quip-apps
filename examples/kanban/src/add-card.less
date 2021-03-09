@@ -10,6 +10,8 @@
     left: 0;
     border-radius: 3px;
     cursor: pointer;
+    border: 0;
+    background: transparent;
     box-shadow: 0px 0px 0px 1px @ui-border-color inset;
     svg {
         fill: @gray;
@@ -17,6 +19,10 @@
 
     &:active {
         background-color: @gray-light;
+    }
+
+    &:focus {
+        border: 2px solid ~"rgb(var(--quipBlue))";
     }
 
     &.columnSelected {

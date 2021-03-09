@@ -70,9 +70,13 @@ quip.apps.registerClass(ColumnRecord, ColumnRecord.CONSTRUCTOR_KEY);
 // @ts-ignore TODO(GASPAR) remove after adding types CardRecord
 quip.apps.registerClass(CardRecord, CardRecord.CONSTRUCTOR_KEY);
 
-quip.apps.initialize({
-    menuCommands: allMenuCommands(),
-    toolbarCommandIds: ["insert-column"],
+const menuCommands = allMenuCommands();
+const toolbarCommandIds = ["insert-column"];
+const initializationOptions: quip.InitOptions = {
+    // TODO: Remove toolbarCommandIds and menuCommands if minApiVersion is at least 0.1.053
+    //       Use toolbarState instead.
+    menuCommands,
+    toolbarCommandIds,
     // @ts-ignore for payload, remove after moving to quip-apps-private
     initializationCallback: (root, {isCreation, creationSource, payload}) => {
         const boardRecord = quip.apps.getRootRecord() as BoardRecord;
@@ -119,4 +123,12 @@ quip.apps.initialize({
             root);
         refreshToolbar();
     },
-});
+};
+if (quip.apps.isApiVersionAtLeast("0.1.053")) {
+    initializationOptions.toolbarState = {
+        menuCommands,
+        toolbarCommandIds,
+        mobileToolbarCommandIds: toolbarCommandIds,
+    };
+}
+quip.apps.initialize(initializationOptions);
