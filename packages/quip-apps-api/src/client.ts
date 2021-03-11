@@ -460,6 +460,11 @@ export default class Client {
         templateParams: {[name: string]: string},
         isTemplate?: boolean
     ) {}
+    getTemplateParams(): Promise<{
+        templateParams: {[key: string]: string};
+        isTemplate: boolean;
+        canShowTemplateFlow: boolean;
+    }> { return Promise.resolve({templateParams: {}, isTemplate: false, canShowTemplateFlow: false});}
     updateToolbar(toolbarState: ToolbarState) {}
     updateToolbarCommandsState(
         disabledCommandIds: string[],
