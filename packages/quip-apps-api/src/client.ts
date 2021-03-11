@@ -461,7 +461,7 @@ export default class Client {
         isTemplate?: boolean
     ) {}
     getTemplateParams(): Promise<{
-        templateParams: {[key: string]: any};
+        templateParams: {[key: string]: string};
         isTemplate: boolean;
         canShowTemplateFlow: boolean;
     }> { return Promise.resolve({templateParams: {}, isTemplate: false, canShowTemplateFlow: false});}
