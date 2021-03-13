@@ -35,12 +35,12 @@ const waitForLogin = (
     return new Promise((resolve) => {
         server_ = http.createServer(async (req, res) => {
             const urlInfo = url.parse(req.url || "");
-            const query = qs.parse(urlInfo.query || "")
+            const query = qs.parse(urlInfo.query || "");
             resolve(query);
 
             if (query.next) {
                 res.statusCode = 302;
-                res.setHeader('Location', query.next);
+                res.setHeader("Location", query.next);
                 res.end();
             } else {
                 res.statusCode = 200;
@@ -99,12 +99,13 @@ export const login = async ({
         throw new Error("API returned invalid state.");
     } else if (!responseParams.code || responseParams.error) {
         throw new Error(
-            `Login Failed: ${responseParams.error ||
-            `no code returned, got ${JSON.stringify(
-                responseParams,
-                null,
-                2
-            )}`
+            `Login Failed: ${
+                responseParams.error ||
+                `no code returned, got ${JSON.stringify(
+                    responseParams,
+                    null,
+                    2
+                )}`
             }`
         );
     }
@@ -119,7 +120,8 @@ export const login = async ({
     const accessToken = tokenResponse.accessToken || tokenResponse.access_token;
     if (!accessToken || tokenResponse.error) {
         throw new Error(
-            `Failed to acquire access token: ${tokenResponse.error
+            `Failed to acquire access token: ${
+                tokenResponse.error
             } - response: ${JSON.stringify(tokenResponse, null, 2)}`
         );
     }
