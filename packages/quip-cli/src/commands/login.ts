@@ -28,20 +28,28 @@ const waitForLogin = (
         path.join(__dirname, "../..", "templates", "logged-in.html"),
         "utf-8"
     );
+    const loginCancelledPagePromise = fs.promises.readFile(
+        path.join(__dirname, "../..", "templates", "logged-in-cancelled.html"),
+        "utf-8"
+    );
     return new Promise((resolve) => {
         server_ = http.createServer(async (req, res) => {
             const urlInfo = url.parse(req.url || "");
-            const query = qs.parse(urlInfo.query || "")
+            const query = qs.parse(urlInfo.query || "");
             resolve(query);
-            
+
             if (query.next) {
-                res.statusCode=302;
-                res.setHeader('Location', query.next);
+                res.statusCode = 302;
+                res.setHeader("Location", query.next);
                 res.end();
             } else {
                 res.statusCode = 200;
                 res.setHeader("Content-Type", "text/html");
-                res.end(await pagePromise);
+                if (query.cancelled) {
+                    res.end(await loginCancelledPagePromise);
+                } else {
+                    res.end(await pagePromise);
+                }
             }
 
             server_?.close();

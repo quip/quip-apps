@@ -68,6 +68,7 @@ export default class Apps extends Command {
             if (flags.version) {
                 return await printAppInfo(flags.version);
             }
+
             const versions = await successOnly(
                 fetch<AppVersionsResponse>(`app/${id}/versions`),
                 flags.json
@@ -86,12 +87,19 @@ export default class Apps extends Command {
                         v.version_number !== development?.version_number
                 )
                 .map((v) => ({ ...v, icon: v.released ? "⚓️" : "" }));
-            const releasedVersions = []
+            const releasedVersions = [];
             if (release) {
-                releasedVersions.push({ ...release, icon: "🚢" })
+                releasedVersions.push({ ...release, icon: "🚢" });
             }
             if (development) {
-                releasedVersions.push({ ...development, icon: "🧪" })
+                releasedVersions.push({ ...development, icon: "🧪" });
+            }
+            const allVersions = releasedVersions.concat(otherVersions);
+            if (!allVersions.length) {
+                print(
+                    "No versions of the Live App exist. You can publish a version using the `publish` command."
+                );
+                return;
             }
             const response = await inquirer.prompt([
                 {
@@ -99,12 +107,10 @@ export default class Apps extends Command {
                     name: "version",
                     message:
                         "Select a version (🚢: prod, 🧪: beta, ⚓️: previously released)",
-                    choices: releasedVersions
-                        .concat(otherVersions)
-                        .map((v) => ({
-                            name: chalk`{green ${v.version_name} (${v.version_number}) ${v.icon}}`,
-                            value: v.version_number,
-                        })),
+                    choices: allVersions.map((v) => ({
+                        name: chalk`{green ${v.version_name} (${v.version_number}) ${v.icon}}`,
+                        value: v.version_number,
+                    })),
                 },
             ]);
             if (response && response.version) {
