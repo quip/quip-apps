@@ -22,7 +22,7 @@ export interface InitializationParameters {
     initOptions?: string;
     initOptionsSource?: string;
     creationBlobs?: Blob[];
-    creationSource: string;
+    creationSource: CreationSource;
 }
 
 export interface BlobWithThumbnails {
