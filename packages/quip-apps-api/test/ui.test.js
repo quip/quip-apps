@@ -4,6 +4,7 @@ const TestRenderer = require("react-test-renderer");
 const ui = require("../dist/ui");
 
 const UI_NAMESPACE = [
+    "Backdrop",
     "Button",
     "CalendarPicker",
     "Canvas",
@@ -27,6 +28,7 @@ test("ui namespace exposes standard components", t => {
 });
 
 const UI_REACT_COMPONENTS = [
+    ui.Backdrop,
     ui.Button,
     ui.CalendarPicker,
     ui.Canvas,
