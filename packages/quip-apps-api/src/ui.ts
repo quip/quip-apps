@@ -8,12 +8,20 @@ import ImageRecord from "./image-record";
 // TODO: handle children in this file correctly (if they differ from current
 // handling) so that trees will be snapshottable
 
+export class Backdrop extends Component<{
+    onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+}> {
+    render() {
+        return React.createElement("div", undefined, "ui.Backdrop");
+    }
+}
+
 export class Button extends Component<{
     className?: string;
-    onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     primary?: boolean;
-    text: ReactNode;
-    type?: string;
+    text: React.ReactNode;
+    type?: "button" | "submit" | "reset";
     disabled?: boolean;
 }> {
     render() {
@@ -32,10 +40,12 @@ export class CalendarPicker extends Component<{
 
 export class Canvas extends Component<{
     record: CanvasRecordCommentAnchorRecord;
-    isCurrentlyAdding: boolean;
-    isValid?: boolean;
-    width: number;
-    height: number;
+    isInCommentMode?: boolean;
+    onCommentAdd?: () => void;
+    cancelCommentMode?: () => any;
+    isCommentAnchorValidCallback?: (
+        anchor: CanvasRecordCommentAnchorRecord
+    ) => boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.Canvas");
@@ -160,8 +170,8 @@ export class Image extends Component<{
 export class ProfilePicture extends Component<{
     user: User;
     size: number;
-    round: boolean;
-    fallbackToInitials: boolean;
+    round?: boolean;
+    fallbackToInitials?: boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.ProfilePicture");

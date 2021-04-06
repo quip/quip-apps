@@ -1,5 +1,10 @@
 import Record from "./record";
 
+export interface RichTextRecordProperties {
+    RichText_defaultText: string;
+    RichText_placeholderText: string;
+}
+
 export default class RichTextRecord extends Record {
     public emptyValue: boolean = false;
     public placeholderTextValue: string = "";
