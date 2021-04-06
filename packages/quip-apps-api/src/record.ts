@@ -156,10 +156,10 @@ export default abstract class Record {
     }
 
     clear(key: string, skipDelete?: boolean) {
-        const record = this.data_[key];
+        const value = this.data_[key];
         delete this.data_[key];
-        if (skipDelete) {
-            return record;
+        if (skipDelete && value && (value instanceof Record || value instanceof RecordList)) {
+            return value;
         }
     }
 

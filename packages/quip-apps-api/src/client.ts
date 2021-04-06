@@ -46,16 +46,22 @@ enum QuipIcon {
     COMMENT_MENU_ITEM = 14,
 }
 
+export type ContextMenuMeta = {[key: string]: any}
+
+export type MenuCommandHandler = (
+    commandId: string,
+    contextMenu: ContextMenuMeta | null
+) => boolean;
+
 export interface MenuCommand {
     id: string;
     label?: string | ReactNode[];
     sublabel?: string;
-    // TODO: unsure what this type actually is
-    handler?: (command: string, params: Object) => void;
+    handler?: MenuCommandHandler;
     isHeader?: boolean;
     subCommands?: string[];
     actionId?: string;
-    actionParams?: Object;
+    actionParams?: {[key: string]: any};
     actionStarted?: () => void;
     quipIcon?: QuipIcon | MenuIcons;
 }
@@ -412,7 +418,7 @@ export default class Client {
     searchPeople(searchString: string, callback: (users: User[]) => void) {
         callback(this.peopleToSearchForValue);
     }
-    sendMessage(text: string, mentionIds: string[]) {}
+    sendMessage(text: string, mentionIds?: string[]) {}
     setPayload(payload: string) {}
     setSelectedEntity(record: Record) {
         this.setSelectedRecord(record);
