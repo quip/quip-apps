@@ -53,6 +53,7 @@ const defaultPackageOptions = (name: string) => ({
     name: packageName(name),
     description: "A Quip Live App",
     typescript: true,
+    use_color_theme: true,
 });
 
 const defaultManifestOptions = (
@@ -160,6 +161,12 @@ export default class Init extends Command {
                 message: "Use Typescript?",
                 default: defaultPackage.typescript,
             },
+            {
+                type: "confirm",
+                name: "use_color_theme",
+                message: "Use Color Theme?",
+                default: defaultPackage.use_color_theme,
+            },
         ]);
 
         const { addManifestConfig } = await inquirer.prompt([
@@ -194,16 +201,6 @@ export default class Init extends Command {
                     default: 300,
                     validate: validateNumber,
                     filter: Number,
-                },
-                {
-                    type: "number",
-                    name: "initial_width",
-                    message:
-                        "Specify an initial width for your app (optional)\nThis will be the width of the app while it is loading.\n",
-                    default: "none",
-                    validate: (input) =>
-                        input === "none" || validateNumber(input),
-                    filter: (val) => (val === "none" ? -1 : val),
                 },
             ]);
             Object.assign(manifestOptions, extraManifestOptions);
