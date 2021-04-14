@@ -51,7 +51,7 @@ export type ContextMenuMeta = {[key: string]: any}
 export type MenuCommandHandler = (
     commandId: string,
     contextMenu: ContextMenuMeta | null
-) => boolean;
+) => any;
 
 export interface MenuCommand {
     id: string;
