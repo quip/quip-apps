@@ -245,6 +245,7 @@ export class RichTextBox extends Component<{
     onBlur?: () => void;
     handleKeyEvent?: (e: React.KeyboardEvent<any>) => void;
     color?: keyof typeof ColorMap;
+    allowDefaultTabNavigation?: boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.RichTextBox");
