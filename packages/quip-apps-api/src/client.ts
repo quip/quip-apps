@@ -205,9 +205,9 @@ export default class Client {
     public viewerCanSeeCommentsValue: boolean = false;
     public viewingUserValue?: User;
     public viewportDimensionsValue: {
-        widthValue: number;
-        heightValue: number;
-    } = {widthValue: 1200, heightValue: 800};
+        width: number;
+        height: number;
+    } = {width: 1200, height: 800};
     public widthValue: number = 800;
 
     private rootRecord_?: RootRecord;
