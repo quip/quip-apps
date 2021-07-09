@@ -123,7 +123,7 @@ export default abstract class Record {
         return key in this.data_;
     }
 
-    set(key: string, value: any) {
+    set(key: string, value: any, isProgrammaticUpdate?: boolean) {
         const statics = this.constructor as typeof Record;
         const propTypes = statics.getProperties();
         const Type = propTypes[key] || "UNKNOWN";
