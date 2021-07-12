@@ -45,19 +45,15 @@ enum QuipIcon {
     JIRA = 13,
     COMMENT_MENU_ITEM = 14,
 }
-
-export type ContextMenuMeta = {[key: string]: any}
-
-export type MenuCommandHandler = (
-    commandId: string,
-    contextMenu: ContextMenuMeta | null
-) => boolean;
-
 export interface MenuCommand {
     id: string;
     label?: string | ReactNode[];
     sublabel?: string;
-    handler?: MenuCommandHandler;
+    handler?: (
+        commandId: string,
+        contextMenu: {[key: string]: any} | null,
+        additionalParams?: any
+    ) => any;
     isHeader?: boolean;
     subCommands?: string[];
     actionId?: string;
