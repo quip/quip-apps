@@ -55,7 +55,7 @@ export default class RecordList<T extends Record> {
         return !!this.recordsValue.find(i => i === item);
     }
 
-    delete() {
+    delete(isProgrammaticUpdate?: boolean) {
         this.isDeletedValue = true;
     }
 
@@ -71,7 +71,7 @@ export default class RecordList<T extends Record> {
         this.isDeletedValue;
     }
 
-    move(item: T, index: number) {
+    move(item: T, index: number, isProgrammaticUpdate?: boolean) {
         const parent = item.containingListValue;
         if (index < 0) {
             return false;
@@ -83,7 +83,7 @@ export default class RecordList<T extends Record> {
         return true;
     }
 
-    remove(item: T, skipDelete?: boolean) {
+    remove(item: T, skipDelete?: boolean, isProgrammaticUpdate?: boolean) {
         const idx = this.indexOf(item);
         if (idx > -1) {
             this.recordsValue.splice(idx, 1);
