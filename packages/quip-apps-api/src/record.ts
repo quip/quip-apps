@@ -155,7 +155,7 @@ export default abstract class Record {
         this.data_[key] = value;
     }
 
-    clear(key: string, skipDelete?: boolean) {
+    clear(key: string, skipDelete?: boolean, isProgrammaticUpdate?: boolean) {
         const value = this.data_[key];
         delete this.data_[key];
         if (skipDelete && value && (value instanceof Record || value instanceof RecordList)) {
@@ -163,13 +163,13 @@ export default abstract class Record {
         }
     }
 
-    clearData() {
+    clearData(isProgrammaticUpdate?: boolean) {
         for (const key in this.data_) {
             this.clear(key);
         }
     }
 
-    setDataVersion(version: number) {
+    setDataVersion(version: number, isProgrammaticUpdate?: boolean) {
         this.dataVersionValue = version;
     }
 
@@ -189,9 +189,9 @@ export default abstract class Record {
         return this.containingListValue;
     }
 
-    setDeleted() {}
+    setDeleted(isProgrammaticUpdate?: boolean) {}
 
-    delete() {
+    delete(isProgrammaticUpdate?: boolean) {
         this.isDeletedValue = true;
     }
 
@@ -239,7 +239,7 @@ export default abstract class Record {
     notifyListeners() {
         // TODO: this should probably trigger something to better simulate prod
     }
-    setOrphanedState() {}
+    setOrphanedState(isProgrammaticUpdate?: boolean) {}
     supportsComments() {
         // override to change this
         return false;
