@@ -16,7 +16,6 @@ import Client_, {
     EventType as EventType_,
     InitOptions as InitOptions_,
     MenuCommand as MenuCommand_,
-    MenuCommandHandler as MenuCommandHandler_,
     MenuIcons as MenuIcons_,
     RootEntityConstructor as RootEntityConstructor_,
     ToolbarState as ToolbarState_,
@@ -98,7 +97,6 @@ declare namespace quip {
     export type CanvasRecordCommentAnchorRecord = CanvasRecordCommentAnchorRecord_;
     export type BlobWithThumbnails = BlobWithThumbnails_;
     export type MenuCommand = MenuCommand_;
-    export type MenuCommandHandler = MenuCommandHandler_;
     export type ToolbarState = ToolbarState_;
     export type CreationSource = typeof CreationSource_;
     export type DocumentMenuCommands = typeof DocumentMenuCommands_;
