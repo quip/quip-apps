@@ -114,7 +114,7 @@ export default abstract class Record {
         return this.positionValue;
     }
 
-    get(key: string) {
+    get(key: string, isProgrammatic?: boolean) {
         // TODO: this is not exactly accurate for special types
         return this.data_[key];
     }
