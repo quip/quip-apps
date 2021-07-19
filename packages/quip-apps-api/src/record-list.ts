@@ -35,7 +35,7 @@ export default class RecordList<T extends Record> {
     // TODO: can this conform to valid props for this classes of type T?
     // Probably would need to deprecate getProperties in favor of static
     // properties definition
-    add(value: {[key: string]: any}, index?: number) {
+    add(value: {[key: string]: any}, index?: number, isProgrammatic?: boolean) {
         const RecordConstructor = this.recordConstructor_;
         const item = new RecordConstructor();
         item.initialize();
