@@ -63,13 +63,11 @@ const DEFAULT_PORT = 9898;
 
 export const login = async ({
     site,
-    transparent = false,
     hostname = DEFAULT_HOSTNAME,
     port = DEFAULT_PORT,
     config = defaultConfigPath(),
 }: {
     site: string;
-    transparent?: boolean;
     hostname?: string;
     port?: number;
     config?: string;
@@ -81,13 +79,9 @@ export const login = async ({
     let loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
         redirectURL
     )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
-    if (transparent) {
-        loginURL += "&transparent=true";
-    } else {
-        println(
-            `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
-        );
-    }
+    println(
+        `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
+    );
     let currentWindow: ChildProcess | undefined;
     const responseParams = await waitForLogin(hostname, port, async () => {
         currentWindow = await open(loginURL);
