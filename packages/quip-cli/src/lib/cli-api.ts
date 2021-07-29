@@ -100,7 +100,7 @@ const cliAPI = async (configPath: string, site: string) => {
             async (e) => {
                 if (e.message === UNAUTHORIZED) {
                     return (
-                        login({ transparent: true, site })
+                        login({ site })
                             .catch(() => {
                                 // if our attempt to transparently login fails, just throw the original error.
                                 throw e;
