@@ -22,6 +22,7 @@ export interface InitializationParameters {
     initOptions?: string;
     initOptionsSource?: string;
     creationBlobs?: Blob[];
+    /** @deprecated */
     creationSource: string;
 }
 
@@ -74,6 +75,7 @@ export interface InitOptions {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[] | undefined;
     mobileToolbarCommandIds?: string[] | undefined;
+    toolbarState?: ToolbarState;
     destructiveCommandIds?: string[] | undefined;
     initializationCallback?: (
         element: Element,
@@ -245,6 +247,7 @@ export default class Client {
     disableResizing() {}
     dismissBackdrop(skipCallback?: boolean) {}
     enableResizing(options: ResizingOptions) {}
+    exitApp() {}
     fetchElementHtml(styleId: number = 0, styleIdSuffix: string = "") {
         return this.elementHtmlValue;
     }
@@ -455,6 +458,10 @@ export default class Client {
     startDisplayingAboveMenus() {}
     stopDisplayingAboveMenus() {}
     updateDisplayDimensions() {}
+    updateTemplateParams(
+        templateParams: {[name: string]: string},
+        isTemplate?: boolean
+    ) {}
     updateToolbar(toolbarState: ToolbarState) {}
     updateToolbarCommandsState(
         disabledCommandIds: string[],
