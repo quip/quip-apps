@@ -21,6 +21,7 @@ export interface InitializationParameters {
     initOptions?: string;
     initOptionsSource?: string;
     creationBlobs?: Blob[];
+    /** @deprecated */
     creationSource: CreationSource;
 }
 
