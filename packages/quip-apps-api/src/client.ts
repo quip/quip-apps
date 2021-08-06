@@ -142,23 +142,19 @@ export default class Client {
     public authsValue: {[name: string]: Auth} = {};
     public blobsValue: {[id: string]: ClientBlob} = {};
     public boundingClientRectValue: {
-        leftValue: number;
-        topValue: number;
-        rightValue: number;
-        bottomValue: number;
-        xValue: number;
-        yValue: number;
-        widthValue: number;
-        heightValue: number;
+        left: number;
+        top: number;
+        right: number;
+        bottom: number;
+        width: number;
+        height: number;
     } = {
-        leftValue: 0,
-        topValue: 0,
-        rightValue: 0,
-        bottomValue: 0,
-        xValue: 0,
-        yValue: 0,
-        widthValue: 800,
-        heightValue: 400,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: 800,
+        height: 400,
     };
     public configParamsValue: {[key: string]: any} = {};
     public containerWidthValue: number = 800;
