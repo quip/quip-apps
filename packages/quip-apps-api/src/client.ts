@@ -168,10 +168,10 @@ export default class Client {
     public documentMembersValue: User[] = [];
     public documentTemplateSettingsValue: {
         salesforce_org_id: string;
-        salesforce_object_typ: string;
+        salesforce_object_type: string;
     } = {
         salesforce_org_id: "",
-        salesforce_object_typ: ""
+        salesforce_object_type: ""
     }
     public elementHtmlValue: string = "";
     public focusedRichTextRecordValue?: RichTextRecord;
