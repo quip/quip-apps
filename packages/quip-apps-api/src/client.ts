@@ -124,6 +124,7 @@ export enum EventType {
     ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
     WIDTH_UPDATE = "WIDTH_UPDATE",
     THREAD_MEMBERSHIP_CHANGED = "THREAD_MEMBERSHIP_CHANGED",
+    DOCUMENT_TEMPLATE_SETTINGS_CHANGED = "DOCUMENT_TEMPLATE_SETTINGS_CHANGED",
 }
 
 export enum MenuIcons {
@@ -165,6 +166,13 @@ export default class Client {
     public dateToPickValue: number = new Date().getTime();
     public displayWidthValue: number = 800;
     public documentMembersValue: User[] = [];
+    public documentTemplateSettingsValue: {
+        salesforce_org_id: string;
+        salesforce_object_type: string;
+    } = {
+        salesforce_org_id: "",
+        salesforce_object_type: ""
+    }
     public elementHtmlValue: string = "";
     public focusedRichTextRecordValue?: RichTextRecord;
     public isAndroidValue: boolean = false;
@@ -275,6 +283,9 @@ export default class Client {
     }
     getDocumentMembers() {
         return this.documentMembersValue;
+    }
+    getDocumentTemplateSettings(){
+        return this.documentTemplateSettingsValue;
     }
     getFocusedRichTextRecord() {
         return this.focusedRichTextRecordValue;
