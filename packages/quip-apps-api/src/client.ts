@@ -239,7 +239,7 @@ export default class Client {
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
     addEventListener(type: EventType, listener: () => void) {}
-    addAllowlistedlistedUser(userId: string) {}
+    addAllowlistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];
     }
