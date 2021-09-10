@@ -167,11 +167,11 @@ export default class Client {
     public displayWidthValue: number = 800;
     public documentMembersValue: User[] = [];
     public documentTemplateSettingsValue: {
-        salesforce_org_id: string;
-        salesforce_object_type: string;
+        orgId: string;
+        sObjectApiName: string;
     } = {
-        salesforce_org_id: "",
-        salesforce_object_type: ""
+        orgId: "",
+        sObjectApiName: ""
     }
     public elementHtmlValue: string = "";
     public focusedRichTextRecordValue?: RichTextRecord;
