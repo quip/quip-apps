@@ -474,8 +474,8 @@ export default class Client {
         templateParams: {[key: string]: string};
         isTemplate: boolean;
         canShowTemplateFlow: boolean;
-        templateDocVerion?: string
-    }> { return Promise.resolve({templateParams: {}, isTemplate: false, canShowTemplateFlow: false, templateDocVerion: ""});}
+        allowTemplateDocOrgAndObject?: boolean
+    }> { return Promise.resolve({templateParams: {}, isTemplate: false, canShowTemplateFlow: false, allowTemplateDocOrgAndObject: false});}
     updateToolbar(toolbarState: ToolbarState) {}
     updateToolbarCommandsState(
         disabledCommandIds: string[],
