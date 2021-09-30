@@ -40,6 +40,6 @@ After `init` completes, you should be able to at-mention the app in a document, 
 
 For more details on how to use the Live Apps, consult the official [Getting Started Guide](https://quip.com/dev/liveapps/) and [API Reference](https://quip.com/dev/liveapps/documentation).
 
-Questions? Ask other Quip developers on ![Salesforce Stack Exchange](https://salesforce.stackexchange.com/questions/ask?tags=quip,liveapps).
+Questions? Ask other Quip developers on [Salesforce Stack Exchange](https://salesforce.stackexchange.com/questions/ask?tags=quip,liveapps).
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
