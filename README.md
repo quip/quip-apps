@@ -16,7 +16,7 @@ You can interact with the Live Apps developer platform via our command line too,
 npm install -g quip-cli
 ```
 
-You will also want to log in to quip before interacting with the platform:
+You will also want to log in to Quip before interacting with the platform:
 
 ```
 quip-cli login
@@ -39,5 +39,7 @@ After `init` completes, you should be able to at-mention the app in a document, 
 [![CLI Demo](https://img.youtube.com/vi/IejJfRX-bKM/0.jpg)](https://www.youtube.com/watch?v=IejJfRX-bKM)
 
 For more details on how to use the Live Apps, consult the official [Getting Started Guide](https://quip.com/dev/liveapps/) and [API Reference](https://quip.com/dev/liveapps/documentation).
+
+Questions? Ask other Quip developers on ![Salesforce Stack Exchange](https://salesforce.stackexchange.com/questions/ask?tags=quip,liveapps).
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
