@@ -30,9 +30,9 @@ quip-cli init
 
 This will launch an interactive prompt which will ask you some questions about your application, then it will do the following:
 
--   Create a new application in the [dev console](https://quip.com/dev/console)
+-   Create a new application in the [dev console](https://quip.com/dev/console).
 -   Create an app directory in the current working directory based on the name provided.
--   Upload an initial bundle to Quip
+-   Upload an initial bundle to Quip.
 
 After `init` completes, you should be able to at-mention the app in a document, and point it at your development environment:
 
