@@ -5,6 +5,7 @@ This package contains the Quip command line interface, which is used for interac
 <!-- toc -->
 
 -   [Quip CLI](#quip-cli)
+-   [Requirements](#requirements)
 -   [Usage](#usage)
 -   [Commands](#commands)
 <!-- tocstop -->
@@ -22,7 +23,7 @@ $ npm install -g quip-cli
 $ quip-cli COMMAND
 running command...
 $ quip-cli (-v|--version|version)
-quip-cli/0.1.2 darwin-x64 node-v10.23.0
+quip-cli/0.2.0-alpha.31 darwin-x64 node-v16.8.0
 $ quip-cli --help [COMMAND]
 USAGE
   $ quip-cli COMMAND
@@ -42,7 +43,7 @@ USAGE
 -   [`quip-cli login`](#quip-cli-login)
 -   [`quip-cli migration [NAME]`](#quip-cli-migration-name)
 -   [`quip-cli publish`](#quip-cli-publish)
--   [`quip-cli release [BUILD NUMBER]`](#quip-cli-release-build-number)
+-   [`quip-cli release [BUILD]`](#quip-cli-release-build)
 
 ## `quip-cli apps`
 
@@ -60,7 +61,7 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/next/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/apps.ts)_
 
 ## `quip-cli bump [INCREMENT]`
 
@@ -71,8 +72,8 @@ USAGE
   $ quip-cli bump [INCREMENT]
 
 ARGUMENTS
-  INCREMENT  which number to bump - can be one of 'prerelease', 'major', 'minor', or 'patch'.
-             If left empty, only the build number will be bumped, leaving the version name unchanged.
+  INCREMENT  [default: none] which number to bump - can be one of 'prerelease', 'major', 'minor', 'patch', or 'none' -
+             defaults to 'none'
 
 OPTIONS
   -h, --help                             show CLI help
@@ -86,7 +87,7 @@ OPTIONS
                                          integer
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/next/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/bump.ts)_
 
 ## `quip-cli help [COMMAND]`
 
@@ -107,7 +108,7 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.1.0
 
 ## `quip-cli init`
 
-Initialize a new Live App project
+Initialize a new Live App Project
 
 ```
 USAGE
@@ -124,7 +125,7 @@ OPTIONS
   --no-release     don't release the initial version (leave app uninstallable and in the "unreleased" state)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/next/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/init.ts)_
 
 ## `quip-cli login`
 
@@ -143,7 +144,7 @@ OPTIONS
                           SEE ALSO: https://quip.com/dev/liveapps/1.x.x/reference/auth/#oauth2
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/next/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/login.ts)_
 
 ## `quip-cli migration [NAME]`
 
@@ -165,7 +166,7 @@ OPTIONS
                          in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/next/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/migration.ts)_
 
 ## `quip-cli publish`
 
@@ -182,18 +183,18 @@ OPTIONS
   -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/next/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/publish.ts)_
 
-## `quip-cli release [BUILD NUMBER]`
+## `quip-cli release [BUILD]`
 
 Release an app to Beta or Production
 
 ```
 USAGE
-  $ quip-cli release [BUILD NUMBER]
+  $ quip-cli release [BUILD]
 
 ARGUMENTS
-  BUILD NUMBER  the build number to release. If empty, the command will interactively ask to select the build to release.
+  BUILD  the build number to release
 
 OPTIONS
   -b, --beta       release beta version
@@ -203,6 +204,6 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/next/src/commands/release.ts)_
+_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.31/src/commands/release.ts)_
 
 <!-- commandsstop -->

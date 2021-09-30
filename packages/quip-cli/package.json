@@ -68,7 +68,7 @@
     "main": "lib/index.js",
     "oclif": {
         "commands": "./lib/commands",
-        "bin": "qla",
+        "bin": "quip-cli",
         "plugins": [
             "@oclif/plugin-help"
         ]
