@@ -123,9 +123,10 @@ USAGE
   $ qla login
 
 OPTIONS
-  -f, --force      forces a re-login even if a user is currently logged in
-  -h, --help       show CLI help
-  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -f, --force                  forces a re-login even if a user is currently logged in
+  -h, --help                   show CLI help
+  -s, --site=site              [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -t, --with-token=with-token  log in with a given access token instead of interactive web login redirect
 ```
 
 _See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/login.ts)_
