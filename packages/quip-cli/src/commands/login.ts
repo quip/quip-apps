@@ -138,6 +138,11 @@ export default class Login extends Command {
                 "use a specific quip site rather than the standard quip.com login",
             default: DEFAULT_SITE,
         }),
+        "with-token": flags.string({
+            char: "t",
+            description:
+                "log in with a given access token instead of interactive web login redirect",
+        }),
         port: flags.integer({
             hidden: true,
             description:
@@ -168,6 +173,7 @@ export default class Login extends Command {
         const { flags } = this.parse(Login);
 
         const { site, force, hostname, port, config } = flags;
+        const accessToken = flags["with-token"];
 
         if (!force && (await isLoggedIn(config, site))) {
             let alt = "";
@@ -181,7 +187,11 @@ export default class Login extends Command {
         }
 
         try {
-            await login({ site, hostname, port, config });
+            if (accessToken) {
+                await writeSiteConfig(config, site, { accessToken });
+            } else {
+                await login({ site, hostname, port, config });
+            }
             this.log("Successfully logged in.");
         } catch (e) {
             this.error(e);
