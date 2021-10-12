@@ -258,4 +258,42 @@ describe("qla login", () => {
                 );
             });
     });
+    describe("login with access token", async () => {
+        oclifTest
+            .stdout()
+            .command(["login", "--force", "--with-token", "FAKE-ACCESS-TOKEN"])
+            .it(
+                "logs in with custom access token when passing --with-token",
+                async () => {
+                    expect(mockedOpen).not.toHaveBeenCalled();
+                    expect(mockedCallAPI).not.toHaveBeenCalled();
+                    const config = (await fs.promises.readFile(
+                        path.join(homedir, ".quiprc"),
+                        "utf-8"
+                    )) as string;
+                    expect(config).toMatchInlineSnapshot(`
+                        "{
+                          \\"sites\\": {
+                            \\"quip.com\\": {
+                              \\"accessToken\\": \\"FAKE-ACCESS-TOKEN\\"
+                            },
+                            \\"quip.codes\\": {
+                              \\"accessToken\\": \\"hello\\"
+                            }
+                          }
+                        }"
+                    `);
+                }
+            );
+    });
+    oclifTest
+        .stdout()
+        .command(["login", "--with-token", "FAKE-ACCESS-TOKEN"])
+        .it("Doesn't log in if you're already logged in", async (ctx) => {
+            expect(ctx.stdout).toMatchInlineSnapshot(`
+                    "You're already logged in to quip.com. Pass --force to log in again or --site to log in to a different site.
+                    "
+                `);
+            expect(mockedOpen).not.toHaveBeenCalled();
+        });
 });
