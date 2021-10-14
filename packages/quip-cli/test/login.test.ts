@@ -300,7 +300,7 @@ describe("qla login", () => {
         .stdout()
         .command(["login", "--with-token="])
         .catch(err => {
-            expect(err.message).toContain("Flag --with-token expects a value.");
+            expect(err.message).toEqual("Flag --with-token expects a value.");
         })
         .it("stdout displays nothing when empty token is provided", (ctx) => {
             expect(ctx.stdout).toEqual("");
