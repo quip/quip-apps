@@ -175,6 +175,12 @@ export default class Login extends Command {
         const { site, force, hostname, port, config } = flags;
         const accessToken = flags["with-token"];
 
+        // displays error message if command has part as "--with-token=" without passing a value.
+        if (typeof accessToken !== 'undefined' && accessToken === "") {
+            this.error("Token cannot be empty, please provide a valid token.", {exit: false});
+            return;
+        }
+
         if (!force && (await isLoggedIn(config, site))) {
             let alt = "";
             if (site === DEFAULT_SITE) {
