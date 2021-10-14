@@ -288,11 +288,22 @@ describe("qla login", () => {
     oclifTest
         .stdout()
         .command(["login", "--with-token", "FAKE-ACCESS-TOKEN"])
-        .it("Doesn't log in if you're already logged in", async (ctx) => {
+        .it("Doesn't log in if you're already logged in", (ctx) => {
             expect(ctx.stdout).toMatchInlineSnapshot(`
                     "You're already logged in to quip.com. Pass --force to log in again or --site to log in to a different site.
                     "
                 `);
+            expect(mockedOpen).not.toHaveBeenCalled();
+        });
+
+    oclifTest
+        .stdout()
+        .command(["login", "--with-token="])
+        .catch(err => {
+            expect(err.message).toContain("Flag --with-token expects a value.");
+        })
+        .it("stdout displays nothing when empty token is provided", (ctx) => {
+            expect(ctx.stdout).toEqual("");
             expect(mockedOpen).not.toHaveBeenCalled();
         });
 });
