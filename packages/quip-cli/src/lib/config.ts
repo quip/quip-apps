@@ -28,7 +28,7 @@ export const writeSiteConfig = async (
 ) => {
     const qlaConfig = await readConfig(configPath);
     qlaConfig.sites[site] = config;
-    writeConfig(configPath, qlaConfig);
+    await writeConfig(configPath, qlaConfig);
 };
 
 const writeConfig = (configPath: string, config: QLAConfig) => {

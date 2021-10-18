@@ -59,6 +59,19 @@ jest.mock("../src/lib/cli-api");
 const mockedCallAPI = (callAPI as unknown) as jest.Mock<Promise<any>>;
 const mockGetStateString = (getStateString as unknown) as jest.Mock<string>;
 mockGetStateString.mockImplementation(() => "state1234");
+const readQuiprcContent = async () => {
+    const rcPath = path.join(homedir, ".quiprc");
+    expect(await pathExists(rcPath)).toBe(true);
+    const configStr = (await fs.promises.readFile(
+        rcPath,
+        "utf-8"
+    )) as string;
+    let parsed = {};
+    expect(() => {
+        parsed = JSON.parse(configStr);
+    }).not.toThrowError();
+    return parsed;
+};
 
 describe("qla login", () => {
     let configSpy: jest.SpyInstance;
@@ -112,17 +125,7 @@ describe("qla login", () => {
                         redirect_uri: "http%3A%2F%2F127.0.0.1%3A9898",
                     }
                 );
-                const rcPath = path.join(homedir, ".quiprc");
-                expect(await pathExists(rcPath)).toBe(true);
-                const configStr = (await fs.promises.readFile(
-                    rcPath,
-                    "utf-8"
-                )) as string;
-                let parsed = {};
-                expect(() => {
-                    parsed = JSON.parse(configStr);
-                }).not.toThrowError();
-                expect(parsed).toMatchInlineSnapshot(`
+                expect(await readQuiprcContent()).toMatchInlineSnapshot(`
                     Object {
                       "sites": Object {
                         "quip.com": Object {
@@ -258,4 +261,49 @@ describe("qla login", () => {
                 );
             });
     });
+    describe("login with access token", () => {
+        oclifTest
+            .stdout()
+            .command(["login", "--force", "--with-token", "FAKE-ACCESS-TOKEN"])
+            .it(
+                "logs in with custom access token when passing --with-token",
+                async () => {
+                    expect(mockedOpen).not.toHaveBeenCalled();
+                    expect(mockedCallAPI).not.toHaveBeenCalled();
+                    expect(await readQuiprcContent()).toMatchInlineSnapshot(`
+                    Object {
+                      "sites": Object {
+                        "quip.codes": Object {
+                          "accessToken": "hello",
+                        },
+                        "quip.com": Object {
+                          "accessToken": "FAKE-ACCESS-TOKEN",
+                        },
+                      },
+                    }
+                `);
+                }
+            );
+    });
+    oclifTest
+        .stdout()
+        .command(["login", "--with-token", "FAKE-ACCESS-TOKEN"])
+        .it("Doesn't log in if you're already logged in", (ctx) => {
+            expect(ctx.stdout).toMatchInlineSnapshot(`
+                    "You're already logged in to quip.com. Pass --force to log in again or --site to log in to a different site.
+                    "
+                `);
+            expect(mockedOpen).not.toHaveBeenCalled();
+        });
+
+    oclifTest
+        .stdout()
+        .command(["login", "--with-token="])
+        .catch(err => {
+            expect(err.message).toEqual("Flag --with-token expects a value.");
+        })
+        .it("stdout displays nothing when empty token is provided", (ctx) => {
+            expect(ctx.stdout).toEqual("");
+            expect(mockedOpen).not.toHaveBeenCalled();
+        });
 });
