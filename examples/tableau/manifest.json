@@ -1,0 +1,16 @@
+{
+    "id": "SBJAjAyN7na",
+    "manifest_version": 1,
+    "name": "tableau",
+    "description": "Make decisions faster with your Tableau dashboards",
+    "version_name": "0.1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 500,
+    "initial_width": 500,
+    "toolbar_color": "blue",
+    "toolbar_icon": "assets/icons/toolbar.svg",
+    "thumbnail": "assets/icons/thumbnail.svg",
+    "js_files": ["dist/app.js"],
+    "css_files": ["assets/styles.css"]
+}
