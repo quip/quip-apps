@@ -142,6 +142,7 @@ export default class Login extends Command {
             char: "t",
             description:
                 "log in with a given access token instead of interactive web login redirect",
+            helpValue: "token",
         }),
         port: flags.integer({
             hidden: true,
