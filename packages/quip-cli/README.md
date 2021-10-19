@@ -16,7 +16,7 @@ $ npm install -g quip-cli
 $ qla COMMAND
 running command...
 $ qla (-v|--version|version)
-quip-cli/0.1.2 darwin-x64 node-v10.23.0
+quip-cli/0.2.0-alpha.32 darwin-x64 node-v14.17.4
 $ qla --help [COMMAND]
 USAGE
   $ qla COMMAND
@@ -34,7 +34,7 @@ USAGE
 * [`qla login`](#qla-login)
 * [`qla migration [NAME]`](#qla-migration-name)
 * [`qla publish`](#qla-publish)
-* [`qla release [BUILD NUMBER]`](#qla-release-build-number)
+* [`qla release [BUILD]`](#qla-release-build)
 
 ## `qla apps`
 
@@ -52,7 +52,7 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/apps.ts)_
 
 ## `qla bump [INCREMENT]`
 
@@ -63,7 +63,8 @@ USAGE
   $ qla bump [INCREMENT]
 
 ARGUMENTS
-  INCREMENT  which number to bump - can be one of 'prerelease', 'major', 'minor', or 'patch' - defaults to 'patch'
+  INCREMENT  [default: none] which number to bump - can be one of 'prerelease', 'major', 'minor', 'patch', or 'none' -
+             defaults to 'none'
 
 OPTIONS
   -h, --help                             show CLI help
@@ -72,9 +73,12 @@ OPTIONS
 
   -p, --prerelease-name=prerelease-name  When specifying prerelease, use this as the prefix, e.g. -p alpha will produce
                                          v0.x.x-alpha.x
+
+  -v, --version-number=version-number    Bump the version to a specific number rather than just incrementing to the next
+                                         integer
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/bump.ts)_
 
 ## `qla help [COMMAND]`
 
@@ -112,7 +116,7 @@ OPTIONS
   --no-release     don't release the initial version (leave app uninstallable and in the "unreleased" state)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/init.ts)_
 
 ## `qla login`
 
@@ -126,11 +130,12 @@ OPTIONS
   -f, --force             forces a re-login even if a user is currently logged in
   -h, --help              show CLI help
   -s, --site=site         [default: quip.com] use a specific quip site rather than the standard quip.com login
+
   -t, --with-token=token  log in users with your specified access token instead of redirecting to a login page.
                           SEE ALSO: https://quip.com/dev/liveapps/1.x.x/reference/auth/#oauth2
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/login.ts)_
 
 ## `qla migration [NAME]`
 
@@ -152,7 +157,7 @@ OPTIONS
                          in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/migration.ts)_
 
 ## `qla publish`
 
@@ -169,18 +174,18 @@ OPTIONS
   -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/publish.ts)_
 
-## `qla release [BUILD NUMBER]`
+## `qla release [BUILD]`
 
 Release an app to Beta or Production
 
 ```
 USAGE
-  $ qla release [BUILD NUMBER]
+  $ qla release [BUILD]
 
 ARGUMENTS
-  BUILD NUMBER  the build number to release
+  BUILD  the build number to release
 
 OPTIONS
   -b, --beta       release beta version
@@ -190,7 +195,7 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.1.2/src/commands/release.ts)_
+_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.32/src/commands/release.ts)_
 <!-- commandsstop -->
 
 ## Running locally
