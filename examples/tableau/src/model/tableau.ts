@@ -7,4 +7,8 @@ export class TableauClient {
     get loggedIn() {
         return this.auth.isLoggedIn();
     }
+
+    async login() {
+        return this.auth.login();
+    }
 }

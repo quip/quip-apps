@@ -4,7 +4,7 @@
     "name": "Tableau",
     "description": "Make decisions faster with your Tableau dashboards",
     "version_name": "0.1.0",
-    "version_number": 2,
+    "version_number": 3,
     "sizing_mode": "fill_container",
     "initial_height": 500,
     "toolbar_color": "blue",

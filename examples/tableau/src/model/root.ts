@@ -47,4 +47,8 @@ export class RootEntity extends quip.apps.RootRecord {
             },
         };
     }
+
+    async login() {
+        await this.tableauClient.login();
+    }
 }

@@ -16,6 +16,9 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
 
     const setupMenuActions_ = () => {
         menuActions.setViewSize = rootRecord.getActions().onSetViewSize;
+        menuActions.login = () => {
+            rootRecord.login();
+        };
     };
 
     const refreshData_ = () => {
@@ -37,7 +40,7 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
         };
     }, []);
 
-    let view = <Login />;
+    let view = <Login isConfigured={!!data.viewUrl} rootRecord={rootRecord} />;
     if (data.loggedIn) {
         view = <Dashboard />;
     }
