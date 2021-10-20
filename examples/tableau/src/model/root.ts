@@ -1,7 +1,10 @@
 import quip from "quip-apps-api";
+import {tableauAuth, ViewSize} from "./tableau";
 
 export interface AppData {
     viewUrl: string;
+    size: ViewSize;
+    loggedIn: boolean;
 }
 
 export class RootEntity extends quip.apps.RootRecord {
@@ -10,25 +13,29 @@ export class RootEntity extends quip.apps.RootRecord {
     static getProperties() {
         return {
             viewUrl: "string",
+            size: "string",
         };
     }
 
     static getDefaultProperties() {
-        return {};
+        return {
+            size: ViewSize.Auto,
+        };
     }
 
     getData(): AppData {
         return {
             viewUrl: this.get("viewUrl"),
+            size: this.get("size"),
+            loggedIn: tableauAuth.isLoggedIn(),
         };
     }
 
     getActions() {
         return {
-            // onToggleHighlight: () => {
-            //     this.isHighlighted_ = !this.isHighlighted_;
-            //     this.notifyListeners();
-            // },
+            onSetViewSize: (size: ViewSize) => {
+                this.set("size", size);
+            },
         };
     }
 }
