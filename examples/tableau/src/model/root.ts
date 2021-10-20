@@ -1,5 +1,12 @@
 import quip from "quip-apps-api";
-import {tableauAuth, ViewSize} from "./tableau";
+import {TableauClient} from "./tableau";
+
+export enum ViewSize {
+    Auto = "AUTO",
+    Desktop = "DESKTOP",
+    Tablet = "TABLET",
+    Mobile = "MOBILE",
+}
 
 export interface AppData {
     viewUrl: string;
@@ -23,11 +30,13 @@ export class RootEntity extends quip.apps.RootRecord {
         };
     }
 
+    tableauClient = new TableauClient();
+
     getData(): AppData {
         return {
             viewUrl: this.get("viewUrl"),
             size: this.get("size"),
-            loggedIn: tableauAuth.isLoggedIn(),
+            loggedIn: this.tableauClient.loggedIn,
         };
     }
 

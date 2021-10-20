@@ -1,6 +1,5 @@
 import quip, {MenuCommand} from "quip-apps-api";
-import {AppData} from "./model/root";
-import { ViewSize } from "./model/tableau";
+import {AppData, ViewSize} from "./model/root";
 
 /**
  * Menu Actions are created at runtime based on a root record in
@@ -80,6 +79,11 @@ export class Menu {
             handler: () => menuActions.changeView(),
         },
         {
+            id: "set-view-size-header",
+            label: "Dashboard Size",
+            isHeader: true,
+        },
+        {
             id: "set-view-size-auto",
             label: "Automatic",
             handler: () => menuActions.setViewSize(ViewSize.Auto),
@@ -112,17 +116,52 @@ export class Menu {
     ];
 
     private getToolbarCommandIds_(data: AppData): string[] {
-        const toolbarCommandIds_: string[] = [];
+        const toolbarCommandIds_: string[] = [
+            quip.apps.DocumentMenuCommands.MENU_MAIN,
+        ];
         return toolbarCommandIds_;
     }
 
     private getMainMenuSubCommandIds_(data: AppData): string[] {
         const mainMenuSubCommandIds: string[] = [];
+        if (data.viewUrl) {
+            mainMenuSubCommandIds.push("change-view");
+            mainMenuSubCommandIds.push(
+                quip.apps.DocumentMenuCommands.SEPARATOR
+            );
+            mainMenuSubCommandIds.push("set-view-size-header");
+            mainMenuSubCommandIds.push("set-view-size-auto");
+            mainMenuSubCommandIds.push("set-view-size-desktop");
+            mainMenuSubCommandIds.push("set-view-size-tablet");
+            mainMenuSubCommandIds.push("set-view-size-mobile");
+            mainMenuSubCommandIds.push(
+                quip.apps.DocumentMenuCommands.SEPARATOR
+            );
+        }
+        mainMenuSubCommandIds.push(data.loggedIn ? "logout" : "login");
         return mainMenuSubCommandIds;
     }
 
     private getHighlightedCommandIds_(data: AppData): string[] {
         const highlightedCommandIds: string[] = [];
+        if (data.viewUrl) {
+            switch (data.size) {
+                case ViewSize.Auto:
+                    highlightedCommandIds.push("set-view-size-auto");
+                    break;
+                case ViewSize.Desktop:
+                    highlightedCommandIds.push("set-view-size-desktop");
+                    break;
+                case ViewSize.Tablet:
+                    highlightedCommandIds.push("set-view-size-tablet");
+                    break;
+                case ViewSize.Mobile:
+                    highlightedCommandIds.push("set-view-size-mobile");
+                    break;
+                default:
+                    break;
+            }
+        }
         return highlightedCommandIds;
     }
 
