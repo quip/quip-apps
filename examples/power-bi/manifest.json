@@ -1,0 +1,31 @@
+{
+    "id": "<<ENTER YOUR LIVE APP ID HERE>>",
+    "manifest_version": 1,
+    "name": "Power BI Dashboard",
+    "description": "Display a Power BI dashboard within a Quip document",
+    "version_name": "0.1.0",
+    "version_number": 1,
+    "sizing_mode": "fill_container",
+    "initial_height": 300,
+    "toolbar_color": "yellow",
+    "toolbar_icon": "assets/icons/toolbar.svg",
+    "thumbnail": "assets/icons/thumbnail.svg",
+    "js_files": ["dist/app.js"],
+    "css_files": ["assets/styles.css"],
+    "other_resources": ["assets/login.png"],
+    "intercept_url_patterns": ["https://app.powerbi.com/groups/me/reports/"],
+    "csp_sources": {
+        "frame_srcs": [
+            "https://app.powerbi.com/",
+            "https://content.powerapps.com/"
+        ],
+        "connect_srcs": [
+            "https://api.powerbi.com",
+            "https://content.powerapps.com/"
+        ],
+        "script_srcs": [
+            "https://api.powerbi.com",
+            "https://content.powerapps.com/"
+        ]
+    }
+}
