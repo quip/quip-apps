@@ -14,6 +14,7 @@ export interface AppData {
     loggedIn: boolean;
     selectOpen: boolean;
     newDashboardUrl: string;
+    token?: string;
 }
 
 export class RootEntity extends quip.apps.RootRecord {
@@ -44,6 +45,7 @@ export class RootEntity extends quip.apps.RootRecord {
             loggedIn: this.tableauClient.loggedIn,
             selectOpen: this.selectDashboardOpen,
             newDashboardUrl: this.newDashboardUrl,
+            token: this.tableauClient.token,
         };
     }
 
@@ -53,13 +55,25 @@ export class RootEntity extends quip.apps.RootRecord {
 
     async login() {
         await this.tableauClient.login();
-        this.openSelectDashboard();
+        if (!this.get("viewUrl")) {
+            this.openSelectDashboard();
+        }
         this.notifyListeners();
     }
 
     async logout() {
         await this.tableauClient.logout();
         this.notifyListeners();
+    }
+
+    async refreshToken() {
+        try {
+            await this.tableauClient.refreshToken();
+            this.notifyListeners();
+        } catch (err) {
+            console.log("Token refresh failed");
+            await this.logout();
+        }
     }
 
     openSelectDashboard() {
