@@ -1,8 +1,9 @@
 import quip from "quip-apps-api";
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, {ChangeEvent, useEffect, useMemo, useState} from "react";
 import {TABLEAU_BASE_URL} from "../config";
 import {AppData, RootEntity} from "../model/root";
 import Dialog from "./dialog";
+import {TableauViz} from "../tableau.embedding.3.0";
 
 interface DashboardProps {
     rootRecord: RootEntity;
@@ -65,8 +66,15 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
             />
         </div>
     );
+
+    const cachedViz = useMemo(() => {
+        const viz = new TableauViz();
+        viz.src = data.viewUrl;
+        return viz;
+    }, [data.viewUrl]);
+
     if (isConfigured) {
-        dashboard = <div>Display dashboard... {data.viewUrl}</div>;
+        dashboard = <div>{cachedViz}</div>;
     }
 
     let dashboardSelector = null;

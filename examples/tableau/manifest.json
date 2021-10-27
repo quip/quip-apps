@@ -12,5 +12,9 @@
     "thumbnail": "assets/icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["assets/styles.css"],
-    "other_resources": ["assets/logo.png"]
+    "other_resources": ["assets/logo.png"],
+    "csp_sources": {
+        "connect_srcs": "https://localhost:8443"
+    },
+    "intercept_url_patterns": ["https://localhost:8443/#/views/"]
 }
