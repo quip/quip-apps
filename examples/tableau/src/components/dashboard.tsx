@@ -3,7 +3,7 @@ import React, {ChangeEvent, useEffect, useMemo, useState} from "react";
 import {TABLEAU_BASE_URL} from "../config";
 import {AppData, RootEntity} from "../model/root";
 import Dialog from "./dialog";
-import {TableauViz} from "../tableau.embedding.3.0";
+// import {TableauViz} from "../tableau.embedding.3.0";
 
 interface DashboardProps {
     rootRecord: RootEntity;
@@ -26,6 +26,19 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
         return () => {
             // on unmount
             rootRecord.unlisten(refreshData_);
+        };
+    }, []);
+
+    useEffect(() => {
+        // on mount
+        const script = document.createElement("script");
+        script.src =
+            "https://embedding.tableauusercontent.com/dist-embedding/tableau.embedding.3.0.latest.js";
+        document.body.appendChild(script);
+
+        return () => {
+            // on unmount
+            document.body.removeChild(script);
         };
     }, []);
 
@@ -67,14 +80,19 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
         </div>
     );
 
-    const cachedViz = useMemo(() => {
-        const viz = new TableauViz();
-        viz.src = data.viewUrl;
+    const memoViz = useMemo(() => {
+        // @ts-ignore
+        const viz = <tableau-viz src={data.viewUrl}></tableau-viz>;
+        // const viz = new TableauViz();
+        // if (data.viewUrl) {
+        //     viz.src = data.viewUrl;
+        // }
+        // return viz;
         return viz;
     }, [data.viewUrl]);
 
     if (isConfigured) {
-        dashboard = <div>{cachedViz}</div>;
+        dashboard = <div>{memoViz}</div>;
     }
 
     let dashboardSelector = null;
