@@ -79,38 +79,33 @@ export class Menu {
             handler: () => menuActions.changeView(),
         },
         {
-            id: "set-view-size-header",
-            label: "Dashboard Size",
-            isHeader: true,
-        },
-        {
             id: "set-view-size-auto",
-            label: "Automatic",
+            label: "Automatic View",
             handler: () => menuActions.setViewSize(ViewSize.Auto),
         },
         {
             id: "set-view-size-desktop",
-            label: "Desktop",
+            label: "Desktop View",
             handler: () => menuActions.setViewSize(ViewSize.Desktop),
         },
         {
             id: "set-view-size-tablet",
-            label: "Tablet",
+            label: "Tablet View",
             handler: () => menuActions.setViewSize(ViewSize.Tablet),
         },
         {
             id: "set-view-size-mobile",
-            label: "Mobile",
+            label: "Mobile View",
             handler: () => menuActions.setViewSize(ViewSize.Mobile),
         },
         {
             id: "open-parameters",
-            label: "Parameters…",
+            label: "Parameters",
             handler: () => menuActions.openParameters(),
         },
         {
             id: "open-filters",
-            label: "Filters…",
+            label: "Filters",
             handler: () => menuActions.openFilters(),
         },
     ];
@@ -119,6 +114,10 @@ export class Menu {
         const toolbarCommandIds_: string[] = [
             quip.apps.DocumentMenuCommands.MENU_MAIN,
         ];
+        if (data.viewUrl) {
+            toolbarCommandIds_.push("open-parameters");
+            toolbarCommandIds_.push("open-filters");
+        }
         return toolbarCommandIds_;
     }
 
@@ -129,7 +128,6 @@ export class Menu {
             mainMenuSubCommandIds.push(
                 quip.apps.DocumentMenuCommands.SEPARATOR
             );
-            mainMenuSubCommandIds.push("set-view-size-header");
             mainMenuSubCommandIds.push("set-view-size-auto");
             mainMenuSubCommandIds.push("set-view-size-desktop");
             mainMenuSubCommandIds.push("set-view-size-tablet");

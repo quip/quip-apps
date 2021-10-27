@@ -11,4 +11,8 @@ export class TableauClient {
     async login() {
         return this.auth.login();
     }
+
+    async logout() {
+        return this.auth.logout();
+    }
 }

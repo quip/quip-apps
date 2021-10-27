@@ -12,6 +12,8 @@ export interface AppData {
     viewUrl: string;
     size: ViewSize;
     loggedIn: boolean;
+    selectOpen: boolean;
+    newDashboardUrl: string;
 }
 
 export class RootEntity extends quip.apps.RootRecord {
@@ -32,23 +34,53 @@ export class RootEntity extends quip.apps.RootRecord {
 
     tableauClient = new TableauClient();
 
+    private selectDashboardOpen = false;
+    private newDashboardUrl = "";
+
     getData(): AppData {
         return {
             viewUrl: this.get("viewUrl"),
             size: this.get("size"),
             loggedIn: this.tableauClient.loggedIn,
+            selectOpen: this.selectDashboardOpen,
+            newDashboardUrl: this.newDashboardUrl,
         };
     }
 
-    getActions() {
-        return {
-            onSetViewSize: (size: ViewSize) => {
-                this.set("size", size);
-            },
-        };
+    setViewSize(size: ViewSize) {
+        this.set("size", size);
     }
 
     async login() {
         await this.tableauClient.login();
+        this.openSelectDashboard();
+        this.notifyListeners();
+    }
+
+    async logout() {
+        await this.tableauClient.logout();
+        this.notifyListeners();
+    }
+
+    openSelectDashboard() {
+        this.selectDashboardOpen = true;
+        this.newDashboardUrl = "";
+        this.notifyListeners();
+    }
+
+    closeSelectDashboard() {
+        this.selectDashboardOpen = false;
+        this.newDashboardUrl = "";
+        this.notifyListeners();
+    }
+
+    setNewDashboardUrl(url: string) {
+        this.newDashboardUrl = url;
+        this.notifyListeners();
+    }
+
+    setNewDashboard() {
+        this.set("viewUrl", this.newDashboardUrl);
+        this.closeSelectDashboard();
     }
 }

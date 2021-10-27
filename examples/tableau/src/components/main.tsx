@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {menuActions, Menu} from "../menus";
-import {AppData, RootEntity} from "../model/root";
+import {AppData, RootEntity, ViewSize} from "../model/root";
 import Dashboard from "./dashboard";
 import Login from "./login";
 
@@ -15,10 +15,11 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
     const [data, setData] = useState<AppData>(rootRecord.getData());
 
     const setupMenuActions_ = () => {
-        menuActions.setViewSize = rootRecord.getActions().onSetViewSize;
-        menuActions.login = () => {
-            rootRecord.login();
-        };
+        menuActions.setViewSize = (size: ViewSize) =>
+            rootRecord.setViewSize(size);
+        menuActions.login = () => rootRecord.login();
+        menuActions.logout = () => rootRecord.logout();
+        menuActions.changeView = () => rootRecord.openSelectDashboard();
     };
 
     const refreshData_ = () => {
@@ -42,7 +43,7 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
 
     let view = <Login isConfigured={!!data.viewUrl} rootRecord={rootRecord} />;
     if (data.loggedIn) {
-        view = <Dashboard />;
+        view = <Dashboard rootRecord={rootRecord} />;
     }
 
     return <div>{view}</div>;

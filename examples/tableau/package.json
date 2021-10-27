@@ -1,10 +1,10 @@
 {
-    "name": "tableau",
+    "name": "quip-tableau",
     "version": "0.1.0",
     "description": "Make decisions faster with your Tableau dashboards",
-    "license": "UNLICENSED",
+    "license": "Apache-2.0",
     "scripts": {
-        "start": "webpack-dev-server --https",
+        "start": "NODE_DEV=development webpack-dev-server --https",
         "build": "webpack",
         "test": "webpack && jest --silent",
         "test:watch": "npm test -- --watch",

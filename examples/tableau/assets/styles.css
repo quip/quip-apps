@@ -1,6 +1,9 @@
 :root {
     --main-bg-color: #f3f2f2;
+    --main-h-color: #5c6470;
+    --main-label-color: #8d95a1;
     --main-border-radius: 5px;
+    --s: 0.75rem;
     --m: 1rem;
 }
 
@@ -25,4 +28,71 @@
 
 .margin-m {
     margin: var(--m);
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50vw;
+    min-width: 400px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.14);
+    border-radius: 6px;
+}
+
+.modal > div {
+    padding: var(--m);
+}
+
+.modal .header {
+    text-align: center;
+    color: var(--main-h-color);
+    font-weight: 600;
+    font-size: var(--m);
+
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.08);
+}
+
+.modal .body {
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.08);
+}
+
+.modal .footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--s);
+}
+
+.modal .footer button {
+    margin-left: var(--s);
+}
+
+.dialog {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 301;
+    top: 0;
+    left: 0;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.input-box label {
+    text-transform: uppercase;
+    margin-bottom: var(--s);
+    color: var(--main-label-color);
+    font-size: var(--s);
+    font-weight: 600;
+}
+
+.input-box input {
+    width: 100%;
 }
