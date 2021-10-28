@@ -1,0 +1,1 @@
+export const OAUTH_NAME = "power-bi";
