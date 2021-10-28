@@ -20,6 +20,7 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
         menuActions.login = () => rootRecord.login();
         menuActions.logout = () => rootRecord.logout();
         menuActions.changeView = () => rootRecord.openSelectDashboard();
+        menuActions.openInTableau = () => rootRecord.openInTableau();
     };
 
     const refreshData_ = () => {

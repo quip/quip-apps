@@ -18,6 +18,7 @@ export interface MenuActions {
     setViewSize: (size: ViewSize) => void;
     openParameters: () => void;
     openFilters: () => void;
+    openInTableau: () => void;
 }
 export const menuActions: MenuActions = {
     // Set the default implementation of menu actions here.
@@ -29,6 +30,7 @@ export const menuActions: MenuActions = {
     setViewSize: err("setViewSize"),
     openParameters: err("openParameters"),
     openFilters: err("openFilters"),
+    openInTableau: err("openInTableau"),
 };
 
 export class Menu {
@@ -108,6 +110,11 @@ export class Menu {
             label: "Filters",
             handler: () => menuActions.openFilters(),
         },
+        {
+            id: "open-in-tableau",
+            label: "Open in Tableau",
+            handler: () => menuActions.openInTableau(),
+        },
     ];
 
     private getToolbarCommandIds_(data: AppData): string[] {
@@ -117,6 +124,7 @@ export class Menu {
         if (data.viewUrl) {
             toolbarCommandIds_.push("open-parameters");
             toolbarCommandIds_.push("open-filters");
+            toolbarCommandIds_.push("open-in-tableau");
         }
         return toolbarCommandIds_;
     }

@@ -4,7 +4,7 @@
     "name": "Tableau",
     "description": "Make decisions faster with your Tableau dashboards",
     "version_name": "0.1.0",
-    "version_number": 6,
+    "version_number": 7,
     "sizing_mode": "fill_container",
     "initial_height": 500,
     "toolbar_color": "blue",
@@ -15,10 +15,7 @@
     "other_resources": ["assets/logo.png"],
     "csp_sources": {
         "frame_srcs": ["https://localhost:8443"],
-        "script_srcs": [
-            "https://embedding.tableauusercontent.com",
-            "https://localhost:8443"
-        ]
+        "script_srcs": ["https://embedding.tableauusercontent.com"]
     },
     "intercept_url_patterns": ["https://localhost:8443/#/views/"]
 }

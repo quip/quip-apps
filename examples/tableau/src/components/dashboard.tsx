@@ -1,7 +1,7 @@
 import quip from "quip-apps-api";
 import React, {ChangeEvent, useEffect, useMemo, useRef, useState} from "react";
 import {TABLEAU_BASE_URL, TABLEAU_JS_LIB} from "../config";
-import {AppData, RootEntity} from "../model/root";
+import {AppData, RootEntity, ViewSize} from "../model/root";
 import Dialog from "./dialog";
 
 interface DashboardProps {
@@ -18,13 +18,13 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
 
     useEffect(() => {
         // on mount
-
         rootRecord.listen(refreshData_);
         refreshData_();
 
         return () => {
             // on unmount
             rootRecord.unlisten(refreshData_);
+            quip.apps.clearEmbeddedIframe();
         };
     }, []);
 
@@ -59,21 +59,19 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     const vizContainer = useRef<HTMLDivElement | null>(null);
 
     const setContainer = (element: HTMLDivElement) => {
-        if (vizContainer.current) {
-            // @ts-ignore
-            quip.apps.clearEmbeddedIframe(vizContainer.current);
-        }
+        quip.apps.clearEmbeddedIframe();
 
-        vizContainer.current = element;
-        quip.apps.registerEmbeddedIframe(element);
-        console.log("Registered iframe");
+        if (element) {
+            vizContainer.current = element;
+            quip.apps.registerEmbeddedIframe(element);
+        }
     };
 
     const isNewUrlValid =
         data.newDashboardUrl.length > 0 &&
         data.newDashboardUrl.startsWith(TABLEAU_BASE_URL);
 
-    const isConfigured = !!data.viewUrl;
+    const isConfigured = !!data.viewUrl && !!data.token;
 
     let dashboard = (
         <div className="container config">
@@ -91,20 +89,33 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
         </div>
     );
 
-    const memoViz = useMemo(() => {
-        console.log("Recalculating memo", data.viewUrl, data.token);
-        return (
-            <tableau-viz
-                src={data.viewUrl}
-                width="100%"
-                id="dashboard"
-                token={data.token}
-                ref={(el) => setContainer(el)}></tableau-viz>
-        );
-    }, [data.viewUrl, data.token]);
-
     if (isConfigured) {
-        dashboard = <div>{memoViz}</div>;
+        let size = "default";
+        switch (data.size) {
+            case ViewSize.Auto:
+                size = "default";
+                break;
+            case ViewSize.Desktop:
+                size = "desktop";
+                break;
+            case ViewSize.Tablet:
+                size = "tablet";
+                break;
+            case ViewSize.Mobile:
+                size = "phone";
+                break;
+        }
+        dashboard = (
+            <div>
+                <tableau-viz
+                    src={data.viewUrl}
+                    width="100%"
+                    id="dashboard"
+                    token={data.token}
+                    device={size}
+                    ref={(el) => setContainer(el)}></tableau-viz>
+            </div>
+        );
     }
 
     let dashboardSelector = null;
