@@ -2,16 +2,17 @@ import quip from "quip-apps-api";
 import {TABLEAU_BASE_URL} from "../config";
 import {TableauClient} from "./tableau";
 
-export enum ViewSize {
-    Auto = "AUTO",
-    Desktop = "DESKTOP",
-    Tablet = "TABLET",
-    Mobile = "MOBILE",
+export enum ViewWidth {
+    "800px" = 800,
+    "900px" = 900,
+    "1000px" = 1000,
+    "1100px" = 1100,
+    "1200px" = 1200,
 }
 
 export interface AppData {
     viewUrl: string;
-    size: ViewSize;
+    width: ViewWidth;
     loggedIn: boolean;
     selectOpen: boolean;
     newDashboardUrl: string;
@@ -24,13 +25,13 @@ export class RootEntity extends quip.apps.RootRecord {
     static getProperties() {
         return {
             viewUrl: "string",
-            size: "string",
+            width: "number",
         };
     }
 
     static getDefaultProperties() {
         return {
-            size: ViewSize.Auto,
+            width: ViewWidth["1200px"],
         };
     }
 
@@ -55,7 +56,7 @@ export class RootEntity extends quip.apps.RootRecord {
 
         return {
             viewUrl: this.get("viewUrl"),
-            size: this.get("size"),
+            width: this.get("width"),
             loggedIn: this.tableauClient.loggedIn,
             selectOpen: this.selectDashboardOpen,
             newDashboardUrl: this.newDashboardUrl,
@@ -63,8 +64,8 @@ export class RootEntity extends quip.apps.RootRecord {
         };
     }
 
-    setViewSize(size: ViewSize) {
-        this.set("size", size);
+    setViewWidth(width: ViewWidth) {
+        this.set("width", width);
     }
 
     async login() {

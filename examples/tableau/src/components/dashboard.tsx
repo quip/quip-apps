@@ -1,7 +1,7 @@
 import quip from "quip-apps-api";
-import React, {ChangeEvent, useEffect, useMemo, useRef, useState} from "react";
+import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import {TABLEAU_BASE_URL, TABLEAU_JS_LIB} from "../config";
-import {AppData, RootEntity, ViewSize} from "../model/root";
+import {AppData, RootEntity} from "../model/root";
 import Dialog from "./dialog";
 
 interface DashboardProps {
@@ -90,29 +90,13 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     );
 
     if (isConfigured) {
-        let size = "default";
-        switch (data.size) {
-            case ViewSize.Auto:
-                size = "default";
-                break;
-            case ViewSize.Desktop:
-                size = "desktop";
-                break;
-            case ViewSize.Tablet:
-                size = "tablet";
-                break;
-            case ViewSize.Mobile:
-                size = "phone";
-                break;
-        }
         dashboard = (
             <div>
                 <tableau-viz
                     src={data.viewUrl}
-                    width={1200}
+                    width={data.width}
                     id="dashboard"
                     token={data.token}
-                    device={size}
                     ref={(el) => setContainer(el)}></tableau-viz>
             </div>
         );

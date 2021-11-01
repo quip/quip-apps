@@ -7,6 +7,22 @@
     --m: 1rem;
 }
 
+.main {
+    min-width: 800px;
+}
+
+@media screen and (max-width: 990px) {
+    .main {
+        min-width: 600px;
+    }
+}
+
+@media screen and (max-width: 790px) {
+    .main {
+        min-width: 400px;
+    }
+}
+
 .container {
     position: relative;
     display: flex;

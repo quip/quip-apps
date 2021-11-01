@@ -1,5 +1,5 @@
 import quip, {MenuCommand} from "quip-apps-api";
-import {AppData, ViewSize} from "./model/root";
+import {AppData, ViewWidth} from "./model/root";
 
 /**
  * Menu Actions are created at runtime based on a root record in
@@ -15,7 +15,7 @@ export interface MenuActions {
     login: () => void;
     logout: () => void;
     changeView: () => void;
-    setViewSize: (size: ViewSize) => void;
+    setViewWidth: (size: ViewWidth) => void;
     openParameters: () => void;
     openFilters: () => void;
     openInTableau: () => void;
@@ -27,7 +27,7 @@ export const menuActions: MenuActions = {
     login: err("login"),
     logout: err("logout"),
     changeView: err("changeView"),
-    setViewSize: err("setViewSize"),
+    setViewWidth: err("setViewWidth"),
     openParameters: err("openParameters"),
     openFilters: err("openFilters"),
     openInTableau: err("openInTableau"),
@@ -81,33 +81,20 @@ export class Menu {
             handler: () => menuActions.changeView(),
         },
         {
-            id: "set-view-size-auto",
-            label: "Automatic View",
-            handler: () => menuActions.setViewSize(ViewSize.Auto),
-        },
-        {
-            id: "set-view-size-desktop",
-            label: "Desktop View",
-            handler: () => menuActions.setViewSize(ViewSize.Desktop),
-        },
-        {
-            id: "set-view-size-tablet",
-            label: "Tablet View",
-            handler: () => menuActions.setViewSize(ViewSize.Tablet),
-        },
-        {
-            id: "set-view-size-mobile",
-            label: "Mobile View",
-            handler: () => menuActions.setViewSize(ViewSize.Mobile),
+            id: "set-width",
+            label: "Set Width…",
+            subCommands: Object.keys(ViewWidth)
+                .filter((k) => isNaN(+k))
+                .map((sizeName) => `set-width-${sizeName}`),
         },
         {
             id: "open-parameters",
-            label: "Parameters",
+            label: "Parameters…",
             handler: () => menuActions.openParameters(),
         },
         {
             id: "open-filters",
-            label: "Filters",
+            label: "Filters…",
             handler: () => menuActions.openFilters(),
         },
         {
@@ -115,6 +102,16 @@ export class Menu {
             label: "Open in Tableau",
             handler: () => menuActions.openInTableau(),
         },
+        ...Object.keys(ViewWidth)
+            .filter((k) => isNaN(+k))
+            .map((sizeName) => ({
+                id: `set-width-${sizeName}`,
+                label: sizeName,
+                handler: () =>
+                    menuActions.setViewWidth(
+                        ViewWidth[sizeName as keyof typeof ViewWidth]
+                    ),
+            })),
     ];
 
     private getToolbarCommandIds_(data: AppData): string[] {
@@ -122,9 +119,12 @@ export class Menu {
             quip.apps.DocumentMenuCommands.MENU_MAIN,
         ];
         if (data.viewUrl) {
+            toolbarCommandIds_.push("open-in-tableau");
+            toolbarCommandIds_.push(quip.apps.DocumentMenuCommands.SEPARATOR);
             toolbarCommandIds_.push("open-parameters");
             toolbarCommandIds_.push("open-filters");
-            toolbarCommandIds_.push("open-in-tableau");
+            toolbarCommandIds_.push(quip.apps.DocumentMenuCommands.SEPARATOR);
+            toolbarCommandIds_.push("set-width");
         }
         return toolbarCommandIds_;
     }
@@ -136,13 +136,6 @@ export class Menu {
             mainMenuSubCommandIds.push(
                 quip.apps.DocumentMenuCommands.SEPARATOR
             );
-            mainMenuSubCommandIds.push("set-view-size-auto");
-            mainMenuSubCommandIds.push("set-view-size-desktop");
-            mainMenuSubCommandIds.push("set-view-size-tablet");
-            mainMenuSubCommandIds.push("set-view-size-mobile");
-            mainMenuSubCommandIds.push(
-                quip.apps.DocumentMenuCommands.SEPARATOR
-            );
         }
         mainMenuSubCommandIds.push(data.loggedIn ? "logout" : "login");
         return mainMenuSubCommandIds;
@@ -151,22 +144,7 @@ export class Menu {
     private getHighlightedCommandIds_(data: AppData): string[] {
         const highlightedCommandIds: string[] = [];
         if (data.viewUrl) {
-            switch (data.size) {
-                case ViewSize.Auto:
-                    highlightedCommandIds.push("set-view-size-auto");
-                    break;
-                case ViewSize.Desktop:
-                    highlightedCommandIds.push("set-view-size-desktop");
-                    break;
-                case ViewSize.Tablet:
-                    highlightedCommandIds.push("set-view-size-tablet");
-                    break;
-                case ViewSize.Mobile:
-                    highlightedCommandIds.push("set-view-size-mobile");
-                    break;
-                default:
-                    break;
-            }
+            highlightedCommandIds.push(`set-width-${data.width}px`);
         }
         return highlightedCommandIds;
     }

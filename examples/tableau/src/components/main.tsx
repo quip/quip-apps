@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {menuActions, Menu} from "../menus";
-import {AppData, RootEntity, ViewSize} from "../model/root";
+import {AppData, RootEntity, ViewWidth} from "../model/root";
 import Dashboard from "./dashboard";
 import Login from "./login";
 
@@ -15,8 +15,8 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
     const [data, setData] = useState<AppData>(rootRecord.getData());
 
     const setupMenuActions_ = () => {
-        menuActions.setViewSize = (size: ViewSize) =>
-            rootRecord.setViewSize(size);
+        menuActions.setViewWidth = (size: ViewWidth) =>
+            rootRecord.setViewWidth(size);
         menuActions.login = () => rootRecord.login();
         menuActions.logout = () => rootRecord.logout();
         menuActions.changeView = () => rootRecord.openSelectDashboard();
@@ -34,6 +34,12 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
 
         setupMenuActions_();
         rootRecord.listen(refreshData_);
+
+        if (isCreation && creationUrl) {
+            rootRecord.setNewDashboardUrl(creationUrl);
+            rootRecord.setNewDashboard();
+        }
+
         refreshData_();
 
         return () => {
@@ -47,7 +53,7 @@ const Main = ({rootRecord, menu, isCreation, creationUrl}: MainProps) => {
         view = <Dashboard rootRecord={rootRecord} />;
     }
 
-    return <div>{view}</div>;
+    return <div className="main">{view}</div>;
 };
 
 export default Main;

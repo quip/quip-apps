@@ -7,7 +7,7 @@ const BUFFER = 60000; // delay to ensure tokens actually are ready for refresh
 export class TableauClient {
     auth = quip.apps.auth(QUIP_AUTH_NAME) as quip.apps.OAuth2;
 
-    private nextTokenCheck_: number;
+    private nextTokenCheck_: number | undefined;
     private tokenSubscribers_: Set<() => void> = new Set();
 
     constructor() {
@@ -29,10 +29,10 @@ export class TableauClient {
             // check expiration
             const jwt = this.auth.getTokenResponseParam("access_token");
             const payload = jwtDecode<JwtPayload>(jwt);
-            const ttl = payload.exp * 1000 - Date.now() - BUFFER; // ms till expiry
+            const ttl = (payload.exp ?? 0) * 1000 - Date.now() - BUFFER; // ms till expiry
 
             if (ttl > 0) {
-                this.nextTokenCheck_ = setTimeout(async () => {
+                this.nextTokenCheck_ = window.setTimeout(async () => {
                     await this.maintainTokenValidity();
                 }, ttl);
             } else {
