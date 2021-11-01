@@ -2,7 +2,7 @@ import quip from "quip-apps-api";
 import jwtDecode, {JwtPayload} from "jwt-decode";
 import {OAUTH2_CUSTOM_SCOPES, QUIP_AUTH_NAME} from "../config";
 
-const BUFFER = 1000; // delay to ensure tokens actually are ready for refresh
+const BUFFER = 60000; // delay to ensure tokens actually are ready for refresh
 
 export class TableauClient {
     auth = quip.apps.auth(QUIP_AUTH_NAME) as quip.apps.OAuth2;
@@ -29,14 +29,12 @@ export class TableauClient {
             // check expiration
             const jwt = this.auth.getTokenResponseParam("access_token");
             const payload = jwtDecode<JwtPayload>(jwt);
-            const ttl = payload.exp * 1000 - Date.now(); // ms till expiry
-
-            console.log("Token TTL is", ttl);
+            const ttl = payload.exp * 1000 - Date.now() - BUFFER; // ms till expiry
 
             if (ttl > 0) {
                 this.nextTokenCheck_ = setTimeout(async () => {
                     await this.maintainTokenValidity();
-                }, ttl + BUFFER);
+                }, ttl);
             } else {
                 await this.refreshToken();
             }
@@ -70,7 +68,6 @@ export class TableauClient {
     private async refreshToken() {
         try {
             await this.auth.refreshToken();
-            console.log("Token refreshed successfully");
             this.notifyTokenSubscribers();
             await this.maintainTokenValidity();
         } catch (err) {

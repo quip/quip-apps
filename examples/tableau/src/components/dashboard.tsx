@@ -109,7 +109,7 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
             <div>
                 <tableau-viz
                     src={data.viewUrl}
-                    width="100%"
+                    width={1200}
                     id="dashboard"
                     token={data.token}
                     device={size}
