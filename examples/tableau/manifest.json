@@ -4,7 +4,7 @@
     "name": "Tableau",
     "description": "Make decisions faster with your Tableau dashboards",
     "version_name": "0.1.0",
-    "version_number": 9,
+    "version_number": 10,
     "sizing_mode": "fit_content",
     "initial_width": 1200,
     "initial_height": 500,
@@ -15,13 +15,11 @@
     "css_files": ["assets/styles.css"],
     "other_resources": ["assets/logo.png"],
     "csp_sources": {
-        "frame_srcs": ["https://localhost:8443", "https://alpo-vet.tsi.lan"],
+        "frame_srcs": ["https://localhost:8443"],
         "script_srcs": ["https://embedding.tableauusercontent.com"]
     },
     "intercept_url_patterns": [
         "https://localhost:8443/#/views/",
-        "https://localhost:8443/views/",
-        "https://alpo-vet.tsi.lan/#/views/",
-        "https://alpo-vet.tsi.lan/views/"
+        "https://localhost:8443/views/"
     ]
 }
