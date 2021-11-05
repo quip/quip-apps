@@ -15,11 +15,13 @@
     "css_files": ["assets/styles.css"],
     "other_resources": ["assets/logo.png"],
     "csp_sources": {
-        "frame_srcs": ["https://localhost:8443"],
+        "frame_srcs": ["https://localhost:8443", "https://alpo-vet.tsi.lan"],
         "script_srcs": ["https://embedding.tableauusercontent.com"]
     },
     "intercept_url_patterns": [
         "https://localhost:8443/#/views/",
-        "https://localhost:8443/views/"
+        "https://localhost:8443/views/",
+        "https://alpo-vet.tsi.lan/#/views/",
+        "https://alpo-vet.tsi.lan/views/"
     ]
 }
