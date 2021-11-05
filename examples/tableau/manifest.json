@@ -4,7 +4,7 @@
     "name": "Tableau",
     "description": "Make decisions faster with your Tableau dashboards",
     "version_name": "0.1.0",
-    "version_number": 8,
+    "version_number": 9,
     "sizing_mode": "fit_content",
     "initial_width": 1200,
     "initial_height": 500,
