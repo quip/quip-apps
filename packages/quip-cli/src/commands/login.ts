@@ -142,7 +142,7 @@ export default class Login extends Command {
             char: "t",
             description:
                 "log in users with your specified access token instead of redirecting to a login page.\n" +
-                "SEE ALSO: https://quip.com/dev/liveapps/1.x.x/reference/auth/#oauth2",
+                "SEE ALSO: https://quip.com/dev/automation/documentation/current#tag/Authentication",
             helpValue: "token",
         }),
         port: flags.integer({
