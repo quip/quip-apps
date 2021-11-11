@@ -132,7 +132,7 @@ USAGE
   $ quip-cli login
 
 OPTIONS
-  -e, --export            Display token in terminal after login without store it in config file.
+  -e, --export            Display token in terminal after login without storing it in config file.
                           NOTE: this cannot work with `--with-token` together.
 
   -f, --force             forces a re-login even if a user is currently logged in

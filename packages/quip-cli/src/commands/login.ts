@@ -158,7 +158,7 @@ export default class Login extends Command {
         export: flags.boolean({
             char: "e",
             description:
-                "Display token in terminal after login without store it in config file.\n" +
+                "Display token in terminal after login without storing it in config file.\n" +
                 "NOTE: this cannot work with `--with-token` together.",
         }),
         port: flags.integer({
@@ -201,7 +201,7 @@ export default class Login extends Command {
         }
 
         if (accessToken !== undefined && displayTokenOnly) {
-            this.error("Flags --with-token and --export cannot work together.");
+            this.error("Flags --with-token and --export cannot be used together.");
             return;
         }
 
