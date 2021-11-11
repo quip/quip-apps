@@ -1,4 +1,5 @@
 import { Command, flags } from "@oclif/command";
+import chalk from "chalk";
 import fs from "fs";
 import http from "http";
 import open from "open";
@@ -66,11 +67,13 @@ export const login = async ({
     hostname = DEFAULT_HOSTNAME,
     port = DEFAULT_PORT,
     config = defaultConfigPath(),
+    displayTokenOnly = false,
 }: {
     site: string;
     hostname?: string;
     port?: number;
     config?: string;
+    displayTokenOnly?: boolean;
 }): Promise<void> => {
     const { code_challenge, code_verifier } = pkceChallenge(43);
     const state = getStateString();
@@ -80,7 +83,7 @@ export const login = async ({
         redirectURL
     )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
     println(
-        `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
+        `opening login URL in your browser. Log in to Quip there.\n${loginURL}\n`
     );
     let currentWindow: ChildProcess | undefined;
     const responseParams = await waitForLogin(hostname, port, async () => {
@@ -119,7 +122,11 @@ export const login = async ({
             } - response: ${JSON.stringify(tokenResponse, null, 2)}`
         );
     }
-    await writeSiteConfig(config, site, { accessToken });
+    if (displayTokenOnly) {
+        println(chalk`{magenta Your access token is "${accessToken}".}`);
+    } else {
+        await writeSiteConfig(config, site, {accessToken});
+    }
 };
 
 export default class Login extends Command {
@@ -144,6 +151,12 @@ export default class Login extends Command {
                 "log in users with your specified access token instead of redirecting to a login page.\n" +
                 "SEE ALSO: https://quip.com/dev/automation/documentation/current#tag/Authentication",
             helpValue: "token",
+        }),
+        export: flags.boolean({
+            char: "e",
+            description:
+                "Display token in terminal after login without store it in config file.\n" +
+                "NOTE: this cannot work with `--with-token` together.",
         }),
         port: flags.integer({
             hidden: true,
@@ -176,6 +189,7 @@ export default class Login extends Command {
 
         const { site, force, hostname, port, config } = flags;
         const accessToken = flags["with-token"];
+        const displayTokenOnly = flags["export"];
 
         // displays error message if command has "--with-token" flag without passing a value.
         if (accessToken === "") {
@@ -183,7 +197,12 @@ export default class Login extends Command {
             return;
         }
 
-        if (!force && (await isLoggedIn(config, site))) {
+        if (accessToken !== undefined && displayTokenOnly) {
+            this.error("Flags --with-token and --export cannot work together.");
+            return;
+        }
+
+        if (!force && !displayTokenOnly && (await isLoggedIn(config, site))) {
             let alt = "";
             if (site === DEFAULT_SITE) {
                 alt = " or --site to log in to a different site";
@@ -198,9 +217,9 @@ export default class Login extends Command {
             if (accessToken) {
                 await writeSiteConfig(config, site, { accessToken });
             } else {
-                await login({ site, hostname, port, config });
+                await login({ site, hostname, port, config, displayTokenOnly });
             }
-            this.log("Successfully logged in.");
+            !displayTokenOnly && this.log("Successfully logged in.");
         } catch (e) {
             this.error(e);
         }
