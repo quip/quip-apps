@@ -303,7 +303,7 @@ describe("qla login", () => {
         .stdout()
         .command(["login", "--with-token", "FAKE-ACCESS-TOKEN", "--export"])
         .catch(err => {
-            expect(err.message).toEqual("Flags --with-token and --export cannot work together.");
+            expect(err.message).toEqual("Flags --with-token and --export cannot be used together.");
         })
         .it("Flags conflict between --with-token and --export", (ctx) => {
             expect(ctx.stdout).toEqual("");
