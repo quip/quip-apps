@@ -68,12 +68,15 @@ export const login = async ({
     port = DEFAULT_PORT,
     config = defaultConfigPath(),
     displayTokenOnly = false,
+    // This is added for test purpose, otherwise the mock will have problem to fetch data from stdout.
+    log = console.log
 }: {
     site: string;
     hostname?: string;
     port?: number;
     config?: string;
     displayTokenOnly?: boolean;
+    log?: (message?: string, ...args: any[])=> void
 }): Promise<void> => {
     const { code_challenge, code_verifier } = pkceChallenge(43);
     const state = getStateString();
@@ -123,9 +126,9 @@ export const login = async ({
         );
     }
     if (displayTokenOnly) {
-        println(chalk`{magenta Your access token is "${accessToken}".}`);
+        log(chalk`{magenta Your access token is "${accessToken}".}`);
     } else {
-        await writeSiteConfig(config, site, {accessToken});
+        await writeSiteConfig(config, site, { accessToken });
     }
 };
 
@@ -217,7 +220,8 @@ export default class Login extends Command {
             if (accessToken) {
                 await writeSiteConfig(config, site, { accessToken });
             } else {
-                await login({ site, hostname, port, config, displayTokenOnly });
+                const log = this.log;
+                await login({ site, hostname, port, config, displayTokenOnly, log });
             }
             !displayTokenOnly && this.log("Successfully logged in.");
         } catch (e) {
