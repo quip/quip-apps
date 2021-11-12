@@ -8,8 +8,8 @@ import qs from "querystring";
 import url from "url";
 import { isLoggedIn } from "../lib/auth";
 import {
-    defaultConfigPath,
     DEFAULT_SITE,
+    defaultConfigPath,
     writeSiteConfig,
 } from "../lib/config";
 import pkceChallenge from "pkce-challenge";
@@ -67,17 +67,14 @@ export const login = async ({
     hostname = DEFAULT_HOSTNAME,
     port = DEFAULT_PORT,
     config = defaultConfigPath(),
-    displayTokenOnly = false,
-    // This is added for test purpose, otherwise the mock will have problem to fetch data from stdout.
-    log = console.log
+    saveSiteConfig = true,
 }: {
     site: string;
     hostname?: string;
     port?: number;
     config?: string;
-    displayTokenOnly?: boolean;
-    log?: (message?: string, ...args: any[])=> void
-}): Promise<void> => {
+    saveSiteConfig?: boolean;
+}): Promise<string> => {
     const { code_challenge, code_verifier } = pkceChallenge(43);
     const state = getStateString();
 
@@ -125,11 +122,10 @@ export const login = async ({
             } - response: ${JSON.stringify(tokenResponse, null, 2)}`
         );
     }
-    if (displayTokenOnly) {
-        log(chalk`{magenta Your access token is "${accessToken}".}`);
-    } else {
+    if (saveSiteConfig) {
         await writeSiteConfig(config, site, { accessToken });
     }
+    return accessToken;
 };
 
 export default class Login extends Command {
@@ -191,7 +187,7 @@ export default class Login extends Command {
         const { flags } = this.parse(Login);
 
         const { site, force, hostname, port, config } = flags;
-        const accessToken = flags["with-token"];
+        let accessToken = flags["with-token"];
         const displayTokenOnly = flags["export"];
 
         // displays error message if command has "--with-token" flag without passing a value.
@@ -201,7 +197,9 @@ export default class Login extends Command {
         }
 
         if (accessToken !== undefined && displayTokenOnly) {
-            this.error("Flags --with-token and --export cannot be used together.");
+            this.error(
+                "Flags --with-token and --export cannot be used together."
+            );
             return;
         }
 
@@ -220,10 +218,22 @@ export default class Login extends Command {
             if (accessToken) {
                 await writeSiteConfig(config, site, { accessToken });
             } else {
-                const log = this.log;
-                await login({ site, hostname, port, config, displayTokenOnly, log });
+                const saveSiteConfig = !displayTokenOnly;
+                accessToken = await login({
+                    site,
+                    hostname,
+                    port,
+                    config,
+                    saveSiteConfig,
+                });
             }
-            !displayTokenOnly && this.log("Successfully logged in.");
+            if (displayTokenOnly) {
+                this.log(
+                    chalk`{magenta Your access token is "${accessToken}".}`
+                );
+            } else {
+                this.log("Successfully logged in.");
+            }
         } catch (e) {
             this.error(e);
         }
