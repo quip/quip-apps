@@ -48,7 +48,7 @@ export const createBundle = async (
         if (!files) {
             return;
         }
-        files.forEach(matcher => {
+        files.forEach((matcher) => {
             if (isMigration(matcher)) {
                 addToFiles(matcher.js_file, source);
             } else {
@@ -92,25 +92,26 @@ export const doPublish = async (
         ignore
     );
     if (missing.size > 0) {
-        println(chalk`{red WARNING: the following files were defined in your manifest, but were not found.}
+        println(chalk`{yellow WARNING: the following files were defined in your manifest, but were not found.}
 {red This bundle may be incomplete, you should include these files or remove them from your manifest.}`);
         for (let [source, files] of missing) {
-            println(chalk`{red === ${source} ===}`);
-            files.forEach(f => println(chalk`{red ${f}}`));
+            println(chalk`{yellow === ${source} ===}`);
+            files.forEach((f) => println(chalk`{yellow ${f}}`));
         }
+        println(
+            chalk`{green Note: If only app.js is missing, please try to compile the live app by running \`npm run build\` and try publishing again.}`
+        );
+        return null;
     }
     const files = await Promise.all<[string, Buffer, string]>(
-        bundle.map(async name => {
+        bundle.map(async (name) => {
             const fileBuffer = await fs.promises.readFile(
                 path.join(root, name)
             );
             return [
                 name,
                 fileBuffer,
-                crypto
-                    .createHash("md5")
-                    .update(fileBuffer)
-                    .digest("hex"),
+                crypto.createHash("md5").update(fileBuffer).digest("hex"),
             ] as [string, Buffer, string];
         })
     );
@@ -192,7 +193,7 @@ export default class Publish extends Command {
             }
         } else {
             if (!flags.json) {
-                println(chalk`{red Publishing failed.}`);
+                println(chalk`{red \nPublishing failed.}`);
             }
             process.exit(1);
         }
