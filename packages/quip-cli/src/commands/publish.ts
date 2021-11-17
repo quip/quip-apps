@@ -6,7 +6,7 @@ import minimatch from "minimatch";
 import path from "path";
 import crypto from "crypto";
 import cliAPI, { successOnly } from "../lib/cli-api";
-import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import { DEFAULT_SITE, defaultConfigPath } from "../lib/config";
 import { findManifest, getManifest } from "../lib/manifest";
 import { println } from "../lib/print";
 import { isMigration, Manifest, Migration } from "../lib/types";
@@ -190,6 +190,12 @@ export default class Publish extends Command {
                 println(
                     chalk`{magenta Successfully published ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
                 );
+                let entryJsFile = "dist/app.js";
+                if (manifest.js_files?.length === 1) {
+                    entryJsFile = manifest.js_files[0];
+                }
+                const entryJsPath = path.join(process.cwd(), entryJsFile);
+                fs.existsSync(entryJsPath) && fs.unlinkSync(entryJsPath);
             }
         } else {
             if (!flags.json) {
