@@ -21,7 +21,7 @@ $ npm install -g quip-cli
 $ quip-cli COMMAND
 running command...
 $ quip-cli (-v|--version|version)
-quip-cli/0.2.0-alpha.36 darwin-x64 node-v14.18.1
+quip-cli/0.2.0-alpha.37 darwin-x64 node-v14.18.1
 $ quip-cli --help [COMMAND]
 USAGE
   $ quip-cli COMMAND
@@ -57,7 +57,7 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/apps.ts)_
 
 ## `quip-cli bump [INCREMENT]`
 
@@ -83,7 +83,7 @@ OPTIONS
                                          integer
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/bump.ts)_
 
 ## `quip-cli help [COMMAND]`
 
@@ -121,7 +121,7 @@ OPTIONS
   --no-release     don't release the initial version (leave app uninstallable and in the "unreleased" state)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/init.ts)_
 
 ## `quip-cli login`
 
@@ -132,15 +132,21 @@ USAGE
   $ quip-cli login
 
 OPTIONS
+  -e, --export            Get a new access token with login, then display the token in the terminal without storing it
+                          in the config file.
+                          Note: You can’t use both the `--export` and `--with-token` options in the same command.
+
   -f, --force             forces a re-login even if a user is currently logged in
+
   -h, --help              show CLI help
+
   -s, --site=site         [default: quip.com] use a specific quip site rather than the standard quip.com login
 
   -t, --with-token=token  log in users with your specified access token instead of redirecting to a login page.
                           SEE ALSO: https://quip.com/dev/automation/documentation/current#tag/Authentication
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/login.ts)_
 
 ## `quip-cli migration [NAME]`
 
@@ -162,7 +168,7 @@ OPTIONS
                          in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/migration.ts)_
 
 ## `quip-cli publish`
 
@@ -179,7 +185,7 @@ OPTIONS
   -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/publish.ts)_
 
 ## `quip-cli release [BUILD]`
 
@@ -200,5 +206,5 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.36/src/commands/release.ts)_
+_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.37/src/commands/release.ts)_
 <!-- commandsstop -->
