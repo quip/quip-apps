@@ -154,7 +154,7 @@ export default class Login extends Command {
         export: flags.boolean({
             char: "e",
             description:
-                "Display token in terminal after login without storing it in config file.\n" +
+                "Get a new access token with login, then display the token in the terminal without storing it in the config file.\n" +
                 "Note: You can’t use both the `--export` and `--with-token` options in the same command.",
         }),
         port: flags.integer({

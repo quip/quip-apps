@@ -132,8 +132,9 @@ USAGE
   $ quip-cli login
 
 OPTIONS
-  -e, --export            Display token in terminal after login without storing it in config file.
-                          NOTE: this cannot work with `--with-token` together.
+  -e, --export            Get a new access token with login, then display the token in the terminal without storing it
+                          in the config file.
+                          Note: You can’t use both the `--export` and `--with-token` options in the same command.
 
   -f, --force             forces a re-login even if a user is currently logged in
 
