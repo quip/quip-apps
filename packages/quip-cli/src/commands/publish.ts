@@ -95,11 +95,11 @@ export const doPublish = async (
         println(chalk`{yellow WARNING: the following files were defined in your manifest, but were not found.}
 {red This bundle may be incomplete, you should include these files or remove them from your manifest.}`);
         for (let [source, files] of missing) {
-            println(chalk`{yellow === ${source} ===}`);
-            files.forEach((f) => println(chalk`{yellow ${f}}`));
+            println(chalk`{red === ${source} ===}`);
+            files.forEach((f) => println(chalk`{red ${f}}`));
         }
         println(
-            chalk`{green Note: If only app.js is missing, please try to compile the live app by running \`npm run build\` and try publishing again.}`
+            chalk`{yellow Note: You can’t publish a live app without compiling it first. Compile the live app by using \`npm run build\` then try publishing again.}`
         );
         return null;
     }
