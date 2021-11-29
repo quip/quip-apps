@@ -1,6 +1,6 @@
 {
     "name": "quip-test-utils",
-    "version": "0.2.0-alpha.38",
+    "version": "0.2.0-alpha.39",
     "description": "Quip Live Apps Test Utilities",
     "main": "dist/test-utils.js",
     "scripts": {
