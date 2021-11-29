@@ -6,7 +6,7 @@ import minimatch from "minimatch";
 import path from "path";
 import crypto from "crypto";
 import cliAPI, { successOnly } from "../lib/cli-api";
-import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import { DEFAULT_SITE, defaultConfigPath } from "../lib/config";
 import { findManifest, getManifest } from "../lib/manifest";
 import { println } from "../lib/print";
 import { isMigration, Manifest, Migration } from "../lib/types";
@@ -48,7 +48,7 @@ export const createBundle = async (
         if (!files) {
             return;
         }
-        files.forEach(matcher => {
+        files.forEach((matcher) => {
             if (isMigration(matcher)) {
                 addToFiles(matcher.js_file, source);
             } else {
@@ -92,25 +92,26 @@ export const doPublish = async (
         ignore
     );
     if (missing.size > 0) {
-        println(chalk`{red WARNING: the following files were defined in your manifest, but were not found.}
+        println(chalk`{yellow WARNING: the following files were defined in your manifest, but were not found.}
 {red This bundle may be incomplete, you should include these files or remove them from your manifest.}`);
         for (let [source, files] of missing) {
             println(chalk`{red === ${source} ===}`);
-            files.forEach(f => println(chalk`{red ${f}}`));
+            files.forEach((f) => println(chalk`{red ${f}}`));
         }
+        println(
+            chalk`{yellow Note: You can’t publish a live app without compiling it first. Compile the live app by using \`npm run build\` then try publishing again.}`
+        );
+        return null;
     }
     const files = await Promise.all<[string, Buffer, string]>(
-        bundle.map(async name => {
+        bundle.map(async (name) => {
             const fileBuffer = await fs.promises.readFile(
                 path.join(root, name)
             );
             return [
                 name,
                 fileBuffer,
-                crypto
-                    .createHash("md5")
-                    .update(fileBuffer)
-                    .digest("hex"),
+                crypto.createHash("md5").update(fileBuffer).digest("hex"),
             ] as [string, Buffer, string];
         })
     );
@@ -189,10 +190,16 @@ export default class Publish extends Command {
                 println(
                     chalk`{magenta Successfully published ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
                 );
+                let entryJsFile = "dist/app.js";
+                if (manifest.js_files?.length === 1) {
+                    entryJsFile = manifest.js_files[0];
+                }
+                const entryJsPath = path.join(process.cwd(), entryJsFile);
+                fs.existsSync(entryJsPath) && fs.unlinkSync(entryJsPath);
             }
         } else {
             if (!flags.json) {
-                println(chalk`{red Publishing failed.}`);
+                println(chalk`{red \nPublishing failed.}`);
             }
             process.exit(1);
         }
