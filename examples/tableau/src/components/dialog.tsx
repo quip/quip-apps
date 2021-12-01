@@ -1,9 +1,11 @@
 import quip from "quip-apps-api";
-import {ReactNode, useEffect, useRef} from "react";
+import React, {ReactNode, useEffect, useRef} from "react";
 
 interface DialogProps {
     onDismiss: () => void;
     children: ReactNode;
+    title: string;
+    noBackdrop?: boolean;
 }
 
 const Dialog = (props: DialogProps) => {
@@ -11,13 +13,17 @@ const Dialog = (props: DialogProps) => {
 
     useEffect(() => {
         // mount
-        quip.apps.showBackdrop(props.onDismiss);
+        if (!props.noBackdrop) {
+            quip.apps.showBackdrop(props.onDismiss);
+        }
         if (containerRef.current) {
             quip.apps.addDetachedNode(containerRef.current);
         }
 
         return () => {
-            quip.apps.dismissBackdrop();
+            if (!props.noBackdrop) {
+                quip.apps.dismissBackdrop();
+            }
             if (containerRef.current) {
                 quip.apps.removeDetachedNode(containerRef.current);
             }
@@ -33,7 +39,10 @@ const Dialog = (props: DialogProps) => {
     };
     return (
         <div ref={containerRef} style={style} className="dialog">
-            {props.children}
+            <div className="modal">
+                <div className="header">{props.title}</div>
+                {props.children}
+            </div>
         </div>
     );
 };

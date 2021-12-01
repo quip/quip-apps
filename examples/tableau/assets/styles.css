@@ -3,6 +3,9 @@
     --main-h-color: #5c6470;
     --main-label-color: #8d95a1;
     --main-border-radius: 5px;
+    --highlight-color: #3d87f5;
+    --light-gray: rgba(0, 0, 0, 0.08);
+    --xs: 0.5rem;
     --s: 0.75rem;
     --m: 1rem;
 }
@@ -42,6 +45,10 @@
     max-width: 50px;
 }
 
+.margin-s {
+    margin: var(--s);
+}
+
 .margin-m {
     margin: var(--m);
 }
@@ -68,11 +75,11 @@
     font-weight: 600;
     font-size: var(--m);
 
-    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 1px 0px var(--light-gray);
 }
 
 .modal .body {
-    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 1px 0px var(--light-gray);
 }
 
 .modal .footer {
@@ -111,4 +118,71 @@
 
 .input-box input {
     width: 100%;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    width: 100%;
+}
+
+.radio-group > div {
+    flex: 1;
+    padding: var(--xs);
+    border: 1px solid rgb(var(--quipBorder));
+    border-right: none;
+    color: var(--main-h-color);
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+}
+
+.radio-group > div:first-child {
+    border-top-left-radius: var(--xs);
+    border-bottom-left-radius: var(--xs);
+}
+
+.radio-group > div:last-child {
+    border-top-right-radius: var(--xs);
+    border-bottom-right-radius: var(--xs);
+    border-right: 1px solid rgb(var(--quipBorder));
+}
+
+.radio-group > div.radio-selected {
+    background-color: var(--highlight-color);
+    color: white;
+}
+
+/* Toggle */
+.toggle-box {
+    width: 42px;
+    height: 24px;
+    border-radius: 16px;
+    background-color: var(--light-gray);
+    position: relative;
+    padding: 2px;
+
+    cursor: pointer;
+    transition: background-color 200ms;
+}
+
+.toggle-box.toggle-on {
+    background-color: var(--highlight-color);
+}
+
+.toggle-command {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
+
+    transition: left 200ms;
+}
+
+.toggle-command.toggle-on {
+    left: 20px;
 }

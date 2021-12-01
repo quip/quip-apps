@@ -3,6 +3,7 @@ import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import {TABLEAU_BASE_URL, TABLEAU_JS_LIB} from "../config";
 import {AppData, RootEntity} from "../model/root";
 import Dialog from "./dialog";
+import FilterManager from "./filters/filterManager";
 
 interface DashboardProps {
     rootRecord: RootEntity;
@@ -12,6 +13,7 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     const [data, setData] = useState<AppData>(rootRecord.getData());
 
     const refreshData_ = () => {
+        console.log("Data update");
         const data = rootRecord.getData();
         setData(data);
     };
@@ -58,12 +60,57 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
 
     const vizContainer = useRef<HTMLDivElement | null>(null);
 
+    const filterChangedHandler_ = async (e) => {
+        const worksheet = e.detail.worksheet;
+        const fieldName = e.detail.fieldName;
+        console.log("Filter changed", e);
+        const filters = await worksheet.getFiltersAsync();
+        const filter = filters.find((f) => f.fieldName === fieldName);
+        if (filter) {
+            // rootRecord.setFilter(
+            //     filter.fieldId,
+            //     filter.fieldName,
+            //     filter.appliedValues.map((v) => v.value).join(",")
+            // );
+        }
+    };
+
+    const initVizHandler_ = () => {
+        vizContainer.current?.addEventListener(
+            "filterchanged",
+            filterChangedHandler_
+        );
+
+        // const parameters = (
+        //     await Promise.all(
+        //         element.workbook.activeSheet.worksheets.map((ws) =>
+        //             ws._worksheetImpl.getParametersAsync()
+        //         )
+        //     )
+        // ).reduce((arr, params) => [...arr, ...params], []);
+
+        // window.vizParams = parameters;
+        // console.log(parameters);
+    };
+
     const setContainer = (element: HTMLDivElement) => {
         quip.apps.clearEmbeddedIframe();
+        if (vizContainer.current) {
+            vizContainer.current.removeEventListener(
+                "firstinteractive",
+                initVizHandler_
+            );
+            vizContainer.current.removeEventListener(
+                "filterchanged",
+                filterChangedHandler_
+            );
+        }
 
         if (element) {
             vizContainer.current = element;
+            window.viz = vizContainer.current;
             quip.apps.registerEmbeddedIframe(element);
+            element.addEventListener("firstinteractive", initVizHandler_);
         }
     };
 
@@ -90,6 +137,14 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     );
 
     if (isConfigured) {
+        console.log("Found filters", data.filters);
+        const filters = data.filters.map((filter) => (
+            <viz-filter
+                key={filter.id}
+                field={filter.name}
+                value={filter.value}></viz-filter>
+        ));
+
         dashboard = (
             <div>
                 <tableau-viz
@@ -97,7 +152,10 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                     width={data.width}
                     id="dashboard"
                     token={data.token}
-                    ref={(el) => setContainer(el)}></tableau-viz>
+                    ref={(el) => setContainer(el)}>
+                    {filters}
+                </tableau-viz>
+                <FilterManager rootRecord={rootRecord} />
             </div>
         );
     }
@@ -105,35 +163,32 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     let dashboardSelector = null;
     if (data.selectOpen) {
         dashboardSelector = (
-            <Dialog onDismiss={closeSelectDashboard}>
-                <div className="modal">
-                    <div className="header">Select a Tableau Dashboard</div>
-                    <div className="body">
-                        <div className="margin-m input-box">
-                            <label htmlFor="dash-url">
-                                Tableau Dashboard URL
-                            </label>
-                            <input
-                                id="dash-url"
-                                type="url"
-                                value={data.newDashboardUrl}
-                                onChange={updateNewDashboardUrl}
-                                placeholder="Enter Tableau Dashboard URL"
-                            />
-                        </div>
-                    </div>
-                    <div className="footer">
-                        <quip.apps.ui.Button
-                            text="Cancel"
-                            onClick={closeSelectDashboard}
-                        />
-                        <quip.apps.ui.Button
-                            text="Select Dashboard"
-                            primary
-                            disabled={!isNewUrlValid}
-                            onClick={selectDashboard}
+            <Dialog
+                title="Select a Tableau Dashboard"
+                onDismiss={closeSelectDashboard}>
+                <div className="body">
+                    <div className="margin-m input-box">
+                        <label htmlFor="dash-url">Tableau Dashboard URL</label>
+                        <input
+                            id="dash-url"
+                            type="url"
+                            value={data.newDashboardUrl}
+                            onChange={updateNewDashboardUrl}
+                            placeholder="Enter Tableau Dashboard URL"
                         />
                     </div>
+                </div>
+                <div className="footer">
+                    <quip.apps.ui.Button
+                        text="Cancel"
+                        onClick={closeSelectDashboard}
+                    />
+                    <quip.apps.ui.Button
+                        text="Select Dashboard"
+                        primary
+                        disabled={!isNewUrlValid}
+                        onClick={selectDashboard}
+                    />
                 </div>
             </Dialog>
         );

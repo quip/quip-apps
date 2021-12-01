@@ -10,6 +10,35 @@ export enum ViewWidth {
     "1200px" = 1200,
 }
 
+export enum FilterType {
+    RelativeDate,
+    Range,
+    Simple,
+}
+
+interface FilterData {
+    id: string;
+    name: string;
+    type: FilterType;
+    active: boolean;
+}
+
+type SimpleFilterData = FilterData & {
+    value: {
+        value: string;
+    };
+};
+
+type RangeFilterData = FilterData & {
+    value: {
+        min?: string;
+        max?: string;
+        showNull: boolean;
+    };
+};
+
+type Filter = SimpleFilterData | RangeFilterData;
+
 export interface AppData {
     viewUrl: string;
     width: ViewWidth;
@@ -17,6 +46,7 @@ export interface AppData {
     selectOpen: boolean;
     newDashboardUrl: string;
     token?: string;
+    filters: Filter[];
 }
 
 export class RootEntity extends quip.apps.RootRecord {
@@ -26,12 +56,14 @@ export class RootEntity extends quip.apps.RootRecord {
         return {
             viewUrl: "string",
             width: "number",
+            filters: quip.apps.RecordList.Type(TableauFilter),
         };
     }
 
     static getDefaultProperties() {
         return {
             width: ViewWidth["1200px"],
+            filters: [],
         };
     }
 
@@ -49,6 +81,13 @@ export class RootEntity extends quip.apps.RootRecord {
         });
     }
 
+    private getFilters(): Filter[] {
+        const filterRecords = this.get(
+            "filters"
+        ).getRecords() as TableauFilter[];
+        return filterRecords.map((record) => record.getData());
+    }
+
     getData(): AppData {
         if (!this.watchingTokens) {
             this.watchTokens();
@@ -61,6 +100,7 @@ export class RootEntity extends quip.apps.RootRecord {
             selectOpen: this.selectDashboardOpen,
             newDashboardUrl: this.newDashboardUrl,
             token: this.tableauClient.token,
+            filters: this.getFilters(),
         };
     }
 
@@ -106,7 +146,20 @@ export class RootEntity extends quip.apps.RootRecord {
         } else {
             this.set("viewUrl", this.newDashboardUrl);
         }
+        this.clearFilters();
+        this.clearParameters();
         this.closeSelectDashboard();
+    }
+
+    clearFilters() {
+        this.get("filters").delete();
+        this.clear("filters");
+        this.set("filters", []);
+    }
+
+    clearParameters() {
+        // this.get("filters").delete();
+        // this.set("filters", []);
     }
 
     openInTableau() {
@@ -114,5 +167,66 @@ export class RootEntity extends quip.apps.RootRecord {
         if (viewUrl) {
             quip.apps.openLink(viewUrl);
         }
+    }
+
+    setFilter(
+        id: string,
+        type: FilterType,
+        name: string,
+        value: {[key: string]: any}
+    ) {
+        // Check if filter already exists.
+        const filterRecords = this.get(
+            "filters"
+        ).getRecords() as TableauFilter[];
+        const foundRecord = filterRecords.find(
+            (record) => record.get("id") === id
+        );
+
+        if (foundRecord) {
+            // If so, update
+            foundRecord.set("value", value);
+        } else {
+            // If not, create
+            this.get("filters").add({
+                id,
+                name,
+                value,
+                type,
+                active: true,
+            });
+        }
+        // TODO: Do not notify listeners to avoid the dashboard reloading?!
+        this.notifyListeners();
+    }
+}
+
+export class TableauFilter extends quip.apps.Record {
+    static ID = "tableau-filter";
+
+    static getProperties() {
+        return {
+            id: "string",
+            name: "string",
+            value: "object",
+            type: "number",
+            active: "boolean",
+        };
+    }
+
+    static getDefaultProperties() {
+        return {
+            active: true,
+        };
+    }
+
+    getData(): Filter {
+        return {
+            id: this.get("id"),
+            name: this.get("name"),
+            value: this.get("value"),
+            type: this.get("type"),
+            active: this.get("active"),
+        };
     }
 }
