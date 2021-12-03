@@ -1,6 +1,6 @@
 import quip from "quip-apps-api";
 import React, {useState} from "react";
-import {FilterType, RootEntity} from "../../model/root";
+import {FilterType, PeriodType, RangeType, RootEntity} from "../../model/root";
 import Dialog from "../dialog";
 import RadioGroup from "../radioGroup";
 import {v4 as uuid} from "uuid";
@@ -29,11 +29,29 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
     const [rangeEnd, setRangeEnd] = useState("");
     const [showNull, setShowNull] = useState(false);
 
+    // relative date
+    const [timePeriod, setTimePeriod] = useState(PeriodType.Month);
+    const [rangeType, setRangeType] = useState(RangeType.Current);
+    const [rangeTypeN, setRangeTypeN] = useState(3);
+    const [anchorDate, setAnchorDate] = useState("");
+
     const isValid = () => {
         if (!filterName || filterName.trim().length === 0) return false;
 
         if (filterType === FilterType.Simple) {
-            if (!filterValue || filterValue.trim().length === 0) return false;
+            if (filterValue.trim().length === 0) return false;
+        } else if (filterType === FilterType.Range) {
+            if (rangeStart.trim().length === 0 && rangeEnd.trim().length === 0)
+                return false;
+        } else if (filterType === FilterType.RelativeDate) {
+            if (timePeriod.trim().length === 0) return false;
+            if (rangeType.trim().length === 0) return false;
+            if (
+                (rangeType === RangeType.LastN ||
+                    rangeType === RangeType.NextN) &&
+                rangeTypeN <= 1
+            )
+                return false;
         }
 
         return true;
@@ -45,6 +63,23 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
         if (filterType === FilterType.Simple) {
             payload = {
                 value: filterValue,
+            };
+        } else if (filterType === FilterType.Range) {
+            payload = {
+                min: rangeStart,
+                max: rangeEnd,
+                showNull,
+            };
+        } else if (filterType === FilterType.RelativeDate) {
+            payload = {
+                periodType: timePeriod,
+                rangeType,
+                rangeN:
+                    rangeType === RangeType.LastN ||
+                    rangeType === RangeType.NextN
+                        ? rangeTypeN
+                        : undefined,
+                anchorDate,
             };
         }
         rootRecord.setFilter(newId, filterType, filterName, payload);
@@ -90,13 +125,119 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
                         onChange={(e) => setRangeEnd(e.currentTarget.value)}
                     />
                 </div>
-                <div className="margin-s input-box">
+                <div className="margin-s input-box horizontal">
                     <label htmlFor="filter-field-range-show-null">
                         Show null values
                     </label>
                     <Toggle
                         on={showNull}
                         onChange={(val) => setShowNull(val)}
+                    />
+                </div>
+            </>
+        );
+    } else if (filterType === FilterType.RelativeDate) {
+        const rangeTypes = [
+            {
+                value: RangeType.Current,
+                label:
+                    timePeriod === PeriodType.Day
+                        ? "Today"
+                        : `This ${timePeriod}`,
+            },
+            {
+                value: RangeType.Last,
+                label:
+                    timePeriod === PeriodType.Day
+                        ? "Yesterday"
+                        : `Last ${timePeriod}`,
+            },
+            {
+                value: RangeType.Next,
+                label:
+                    timePeriod === PeriodType.Day
+                        ? "Tomorrow"
+                        : `Next ${timePeriod}`,
+            },
+            {value: RangeType.LastN, label: `Last N ${timePeriod}s`},
+            {value: RangeType.NextN, label: `Next N ${timePeriod}s`},
+            {
+                value: RangeType.ToDate,
+                label:
+                    timePeriod === PeriodType.Day
+                        ? "Up to today"
+                        : `Up to this ${timePeriod}`,
+            },
+        ];
+
+        let durationField;
+        if (rangeType === RangeType.LastN || rangeType === RangeType.NextN) {
+            durationField = (
+                <div className="margin-s input-box">
+                    <label htmlFor="filter-field-range-n">
+                        Number of {timePeriod}s
+                    </label>
+                    <input
+                        id="filter-field-range-n"
+                        type="number"
+                        min={0}
+                        step={1}
+                        placeholder="N"
+                        value={rangeTypeN}
+                        onChange={(e) => setRangeTypeN(+e.currentTarget.value)}
+                    />
+                </div>
+            );
+        }
+
+        filterTypeFields = (
+            <>
+                <div className="margin-s input-box">
+                    <label htmlFor="filter-field-time-granularity">
+                        Time Granularity
+                    </label>
+                    <select
+                        id="filter-field-time-granularity"
+                        value={timePeriod}
+                        onChange={(e) =>
+                            setTimePeriod(e.currentTarget.value as PeriodType)
+                        }>
+                        <option value={PeriodType.Year}>Years</option>
+                        <option value={PeriodType.Quarter}>Quarters</option>
+                        <option value={PeriodType.Month}>Months</option>
+                        <option value={PeriodType.Week}>Weeks</option>
+                        <option value={PeriodType.Day}>Days</option>
+                        <option value={PeriodType.Hour}>Hours</option>
+                        <option value={PeriodType.Minute}>Minutes</option>
+                        <option value={PeriodType.Second}>Seconds</option>
+                    </select>
+                </div>
+                <div className="margin-s input-box">
+                    <label htmlFor="filter-field-range-type">Time Period</label>
+                    <select
+                        id="filter-field-range-type"
+                        value={rangeType}
+                        onChange={(e) =>
+                            setRangeType(e.currentTarget.value as RangeType)
+                        }>
+                        {rangeTypes.map((r, idx) => (
+                            <option value={r.value} key={idx}>
+                                {r.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {durationField}
+                <div className="margin-s input-box">
+                    <label htmlFor="filter-field-anchor-date">
+                        Anchor Date (optional)
+                    </label>
+                    <input
+                        id="filter-field-anchor-date"
+                        type="date"
+                        placeholder="Set Date"
+                        value={anchorDate}
+                        onChange={(e) => setAnchorDate(e.currentTarget.value)}
                     />
                 </div>
             </>

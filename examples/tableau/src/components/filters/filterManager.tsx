@@ -1,9 +1,19 @@
 import quip from "quip-apps-api";
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {menuActions} from "../../menus";
-import {RootEntity} from "../../model/root";
+import {
+    Filter,
+    FilterType,
+    PeriodType,
+    RangeFilterData,
+    RangeType,
+    RelativeDateFilterData,
+    RootEntity,
+    SimpleFilterData,
+} from "../../model/root";
 import Dialog from "../dialog";
 import AddFilter from "./addFilter";
+import FilterRowItem from "./filterRowItem";
 
 interface FilterManagerProps {
     rootRecord: RootEntity;
@@ -31,11 +41,33 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
         setNewFilter(false);
     };
 
+    const updateFilter = (id: string, type: FilterType, newData: Filter) => {
+        rootRecord.setFilter(
+            id,
+            type,
+            newData.name,
+            newData.active,
+            newData.value
+        );
+    };
+
+    const toggleFilter = (id: string) => {
+        const filter = data.filters.find((f) => f.id === id);
+        if (filter) {
+            updateFilter(filter.id, filter.type, {
+                ...filter,
+                active: !filter.active,
+            });
+        }
+    };
+
     useEffect(() => {
         setupMenuActions_();
     }, []);
 
-    let manager;
+    const data = rootRecord.getData();
+
+    let manager = <div></div>;
     if (open) {
         let addFilter;
         if (newFilter) {
@@ -44,11 +76,77 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
             );
         }
 
+        let filters: ReactNode = <div>No filters yet. Create one now!</div>;
+        if (data.filters.length > 0) {
+            filters = data.filters.map((filter) => {
+                let subtitle = "";
+                if (filter.type === FilterType.Simple) {
+                    subtitle = `Equals ${
+                        (filter as SimpleFilterData).value.value
+                    }`;
+                } else if (filter.type === FilterType.Range) {
+                    const value = (filter as RangeFilterData).value;
+                    if (value.min !== "" && value.max === "") {
+                        subtitle = `Starting from ${value.min}`;
+                    } else if (value.min === "" && value.max !== "") {
+                        subtitle = `Up to ${value.max}`;
+                    } else {
+                        subtitle = `Between ${value.min} and ${value.max}`;
+                    }
+                } else if (filter.type === FilterType.RelativeDate) {
+                    const value = (filter as RelativeDateFilterData).value;
+                    switch (value.rangeType) {
+                        case RangeType.Current:
+                            subtitle =
+                                value.periodType === PeriodType.Day
+                                    ? "Today"
+                                    : `This ${value.periodType}`;
+                            break;
+                        case RangeType.Last:
+                            subtitle =
+                                value.periodType === PeriodType.Day
+                                    ? "Yesterday"
+                                    : `Last ${value.periodType}`;
+                            break;
+                        case RangeType.LastN:
+                            subtitle = `Last ${value.rangeN} ${value.periodType}s`;
+                            break;
+                        case RangeType.Next:
+                            subtitle =
+                                value.periodType === PeriodType.Day
+                                    ? "Tomorrow"
+                                    : `Next ${value.periodType}`;
+                            break;
+                        case RangeType.NextN:
+                            subtitle = `Next ${value.rangeN} ${value.periodType}s`;
+                            break;
+                        case RangeType.ToDate:
+                            subtitle =
+                                value.periodType === PeriodType.Day
+                                    ? "Up to today"
+                                    : `Up to this ${value.periodType}`;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                return (
+                    <FilterRowItem
+                        key={filter.id}
+                        title={filter.name}
+                        subtitle={subtitle}
+                        active={filter.active}
+                        onAction={() => console.log("Action")}
+                        onToggle={() => toggleFilter(filter.id)}
+                    />
+                );
+            });
+        }
+
         manager = (
             <Dialog title="Manage Filters" onDismiss={closeFilters}>
-                <div className="body">
-                    <div className="margin-m input-box"></div>
-                </div>
+                <div className="body scroll">{filters}</div>
                 <div
                     className="footer"
                     style={{justifyContent: "space-between"}}>
@@ -67,7 +165,7 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
         );
     }
 
-    return <>{manager}</>;
+    return manager;
 };
 
 export default FilterManager;

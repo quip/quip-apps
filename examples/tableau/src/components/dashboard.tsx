@@ -1,7 +1,7 @@
 import quip from "quip-apps-api";
 import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import {TABLEAU_BASE_URL, TABLEAU_JS_LIB} from "../config";
-import {AppData, RootEntity} from "../model/root";
+import {AppData, FilterType, RootEntity} from "../model/root";
 import Dialog from "./dialog";
 import FilterManager from "./filters/filterManager";
 
@@ -138,12 +138,43 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
 
     if (isConfigured) {
         console.log("Found filters", data.filters);
-        const filters = data.filters.map((filter) => (
-            <viz-filter
-                key={filter.id}
-                field={filter.name}
-                value={filter.value}></viz-filter>
-        ));
+        const filters = data.filters
+            .filter((filter) => filter.active)
+            .map((filter) => {
+                if (filter.type === FilterType.Simple) {
+                    return (
+                        <viz-filter
+                            key={filter.id}
+                            field={filter.name}
+                            value={filter.value.value}></viz-filter>
+                    );
+                } else if (filter.type === FilterType.Range) {
+                    return (
+                        <viz-range-filter
+                            key={filter.id}
+                            field={filter.name}
+                            min={filter.value.min}
+                            max={filter.value.max}
+                            null-option={
+                                filter.value.showNull
+                                    ? "allValues"
+                                    : "nonNullValues"
+                            }></viz-range-filter>
+                    );
+                } else if (filter.type === FilterType.RelativeDate) {
+                    return (
+                        <viz-relative-date-filter
+                            key={filter.id}
+                            field={filter.name}
+                            period-type={filter.value.periodType}
+                            range-type={filter.value.rangeType}
+                            range-n={filter.value.rangeN}
+                            anchor-date={
+                                filter.value.anchorDate
+                            }></viz-relative-date-filter>
+                    );
+                }
+            });
 
         dashboard = (
             <div>

@@ -121,7 +121,7 @@ export class Menu {
         if (data.viewUrl) {
             toolbarCommandIds_.push("open-in-tableau");
             toolbarCommandIds_.push(quip.apps.DocumentMenuCommands.SEPARATOR);
-            // toolbarCommandIds_.push("open-parameters");
+            toolbarCommandIds_.push("open-parameters");
             toolbarCommandIds_.push("open-filters");
             toolbarCommandIds_.push(quip.apps.DocumentMenuCommands.SEPARATOR);
             toolbarCommandIds_.push("set-width");

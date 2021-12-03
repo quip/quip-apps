@@ -13,7 +13,7 @@
     "thumbnail": "assets/icons/thumbnail.svg",
     "js_files": ["dist/app.js"],
     "css_files": ["assets/styles.css"],
-    "other_resources": ["assets/logo.png"],
+    "other_resources": ["assets/logo.png", "assets/dots.svg"],
     "csp_sources": {
         "frame_srcs": ["https://localhost:8443"],
         "script_srcs": ["https://embedding.tableauusercontent.com"]

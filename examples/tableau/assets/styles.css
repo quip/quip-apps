@@ -5,6 +5,7 @@
     --main-border-radius: 5px;
     --highlight-color: #3d87f5;
     --light-gray: rgba(0, 0, 0, 0.08);
+    --xxs: 0.25rem;
     --xs: 0.5rem;
     --s: 0.75rem;
     --m: 1rem;
@@ -108,6 +109,13 @@
     align-items: flex-start;
 }
 
+.input-box.horizontal {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: var(--m);
+    margin-bottom: var(--m);
+}
+
 .input-box label {
     text-transform: uppercase;
     margin-bottom: var(--s);
@@ -118,6 +126,18 @@
 
 .input-box input {
     width: 100%;
+}
+
+.input-box select {
+    width: 100%;
+    background-color: white;
+    border: 1px solid rgb(var(--quipBorder));
+    padding-left: var(--xs);
+    padding-right: var(--xs);
+    padding-top: var(--xxs);
+    padding-bottom: var(--xxs);
+    color: var(--main-h-color);
+    border-radius: var(--xs);
 }
 
 /* Radio Group */
@@ -185,4 +205,31 @@
 
 .toggle-command.toggle-on {
     left: 20px;
+}
+
+/* Filter Row Item */
+.filter-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--s);
+    padding-bottom: var(--s);
+    padding-left: var(--m);
+    padding-right: var(--m);
+    border-bottom: 1px solid rgb(var(--quipBorder));
+}
+
+.filter-row-item .left .title {
+    color: var(--main-h-color);
+    margin-bottom: var(--xxs);
+}
+
+.filter-row-item .right {
+    display: flex;
+}
+
+.modal .body.scroll {
+    max-height: 300px;
+    overflow-y: scroll;
+    padding: 0;
 }

@@ -16,6 +16,26 @@ export enum FilterType {
     Simple,
 }
 
+export enum PeriodType {
+    Year = "year",
+    Quarter = "quarter",
+    Month = "month",
+    Week = "week",
+    Day = "day",
+    Hour = "hour",
+    Minute = "minute",
+    Second = "second",
+}
+
+export enum RangeType {
+    Last = "last",
+    LastN = "lastn",
+    Next = "next",
+    NextN = "nextn",
+    Current = "current",
+    ToDate = "todate",
+}
+
 interface FilterData {
     id: string;
     name: string;
@@ -23,13 +43,13 @@ interface FilterData {
     active: boolean;
 }
 
-type SimpleFilterData = FilterData & {
+export type SimpleFilterData = FilterData & {
     value: {
         value: string;
     };
 };
 
-type RangeFilterData = FilterData & {
+export type RangeFilterData = FilterData & {
     value: {
         min?: string;
         max?: string;
@@ -37,7 +57,19 @@ type RangeFilterData = FilterData & {
     };
 };
 
-type Filter = SimpleFilterData | RangeFilterData;
+export type RelativeDateFilterData = FilterData & {
+    value: {
+        periodType: PeriodType;
+        rangeType: RangeType;
+        rangeN?: number;
+        anchorDate?: string;
+    };
+};
+
+export type Filter =
+    | SimpleFilterData
+    | RangeFilterData
+    | RelativeDateFilterData;
 
 export interface AppData {
     viewUrl: string;
@@ -173,6 +205,7 @@ export class RootEntity extends quip.apps.RootRecord {
         id: string,
         type: FilterType,
         name: string,
+        active: boolean,
         value: {[key: string]: any}
     ) {
         // Check if filter already exists.
@@ -185,6 +218,7 @@ export class RootEntity extends quip.apps.RootRecord {
 
         if (foundRecord) {
             // If so, update
+            foundRecord.set("active", active);
             foundRecord.set("value", value);
         } else {
             // If not, create
@@ -193,7 +227,7 @@ export class RootEntity extends quip.apps.RootRecord {
                 name,
                 value,
                 type,
-                active: true,
+                active,
             });
         }
         // TODO: Do not notify listeners to avoid the dashboard reloading?!
