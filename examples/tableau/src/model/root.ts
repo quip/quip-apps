@@ -233,6 +233,20 @@ export class RootEntity extends quip.apps.RootRecord {
         // TODO: Do not notify listeners to avoid the dashboard reloading?!
         this.notifyListeners();
     }
+
+    deleteFilter(id: string) {
+        const recordList = this.get(
+            "filters"
+        ) as quip.apps.RecordList<TableauFilter>;
+        const filterRecords = recordList.getRecords() as TableauFilter[];
+        const recordToDelete = filterRecords.find(
+            (record) => record.getData().id === id
+        );
+        if (recordToDelete) {
+            recordList.remove(recordToDelete);
+            this.notifyListeners();
+        }
+    }
 }
 
 export class TableauFilter extends quip.apps.Record {

@@ -89,7 +89,7 @@
     padding: var(--s);
 }
 
-.modal .footer button {
+.modal .footer button:not(:first-of-type) {
     margin-left: var(--s);
 }
 
@@ -226,10 +226,22 @@
 
 .filter-row-item .right {
     display: flex;
+    align-items: center;
+}
+
+.filter-row-item .right .action {
+    margin-left: var(--s);
+    padding-right: var(--s);
+    cursor: pointer;
 }
 
 .modal .body.scroll {
     max-height: 300px;
     overflow-y: scroll;
     padding: 0;
+}
+
+button.destructive {
+    background-color: rgb(var(--quipRed));
+    color: white;
 }

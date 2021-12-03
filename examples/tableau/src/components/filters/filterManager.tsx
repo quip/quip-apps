@@ -22,6 +22,7 @@ interface FilterManagerProps {
 const FilterManager = ({rootRecord}: FilterManagerProps) => {
     const [open, setOpen] = useState(false);
     const [newFilter, setNewFilter] = useState(false);
+    const [editFilter, setEditFilter] = useState<string | undefined>();
 
     const setupMenuActions_ = () => {
         menuActions.openFilters = () => {
@@ -34,11 +35,18 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
     };
 
     const addNewFilter = () => {
+        setEditFilter(undefined);
         setNewFilter(true);
     };
 
     const closeNewFilter = () => {
         setNewFilter(false);
+        setEditFilter(undefined);
+    };
+
+    const editExistingFilter = (id: string) => {
+        setEditFilter(id);
+        setNewFilter(true);
     };
 
     const updateFilter = (id: string, type: FilterType, newData: Filter) => {
@@ -72,7 +80,11 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
         let addFilter;
         if (newFilter) {
             addFilter = (
-                <AddFilter rootRecord={rootRecord} onClose={closeNewFilter} />
+                <AddFilter
+                    rootRecord={rootRecord}
+                    onClose={closeNewFilter}
+                    id={editFilter}
+                />
             );
         }
 
@@ -137,7 +149,7 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
                         title={filter.name}
                         subtitle={subtitle}
                         active={filter.active}
-                        onAction={() => console.log("Action")}
+                        onAction={() => editExistingFilter(filter.id)}
                         onToggle={() => toggleFilter(filter.id)}
                     />
                 );

@@ -24,7 +24,9 @@ const FilterRowItem = ({
             </div>
             <div className="right">
                 <Toggle on={active} onChange={onToggle} />
-                <div onClick={onAction}>Action</div>
+                <div onClick={onAction} className="action">
+                    <img src="assets/dots.svg" alt="Action" />
+                </div>
             </div>
         </div>
     );

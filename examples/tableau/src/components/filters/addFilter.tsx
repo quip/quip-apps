@@ -1,6 +1,14 @@
 import quip from "quip-apps-api";
-import React, {useState} from "react";
-import {FilterType, PeriodType, RangeType, RootEntity} from "../../model/root";
+import React, {useEffect, useState} from "react";
+import {
+    FilterType,
+    PeriodType,
+    RangeFilterData,
+    RangeType,
+    RelativeDateFilterData,
+    RootEntity,
+    SimpleFilterData,
+} from "../../model/root";
 import Dialog from "../dialog";
 import RadioGroup from "../radioGroup";
 import {v4 as uuid} from "uuid";
@@ -9,15 +17,16 @@ import Toggle from "../toggle";
 interface AddFilterProps {
     rootRecord: RootEntity;
     onClose: () => void;
+    id?: string;
 }
 
-const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
-    const filterTypes = [
-        {label: "Simple", value: FilterType.Simple},
-        {label: "Range", value: FilterType.Range},
-        {label: "Relative Date", value: FilterType.RelativeDate},
-    ];
+const filterTypes = [
+    {label: "Simple", value: FilterType.Simple},
+    {label: "Range", value: FilterType.Range},
+    {label: "Relative Date", value: FilterType.RelativeDate},
+];
 
+const AddFilter = ({rootRecord, onClose, id}: AddFilterProps) => {
     const [filterName, setFilterName] = useState("");
     const [filterType, setFilterType] = useState(FilterType.Simple);
 
@@ -34,6 +43,50 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
     const [rangeType, setRangeType] = useState(RangeType.Current);
     const [rangeTypeN, setRangeTypeN] = useState(3);
     const [anchorDate, setAnchorDate] = useState("");
+
+    useEffect(() => {
+        if (id) {
+            const data = rootRecord.getData();
+            const filter = data.filters.find((f) => f.id === id);
+            if (filter) {
+                setFilterName(filter.name);
+                setFilterType(filter.type);
+                switch (filter.type) {
+                    case FilterType.Simple:
+                        setFilterValue(
+                            (filter as SimpleFilterData).value.value
+                        );
+                        break;
+                    case FilterType.Range:
+                        setRangeStart(
+                            (filter as RangeFilterData).value.min ?? ""
+                        );
+                        setRangeEnd(
+                            (filter as RangeFilterData).value.max ?? ""
+                        );
+                        setShowNull((filter as RangeFilterData).value.showNull);
+                        break;
+                    case FilterType.RelativeDate:
+                        setTimePeriod(
+                            (filter as RelativeDateFilterData).value.periodType
+                        );
+                        setRangeType(
+                            (filter as RelativeDateFilterData).value.rangeType
+                        );
+                        setRangeTypeN(
+                            (filter as RelativeDateFilterData).value.rangeN ?? 3
+                        );
+                        setAnchorDate(
+                            (filter as RelativeDateFilterData).value
+                                .anchorDate ?? ""
+                        );
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }, [id]);
 
     const isValid = () => {
         if (!filterName || filterName.trim().length === 0) return false;
@@ -58,7 +111,7 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
     };
 
     const addFilter = () => {
-        const newId = uuid();
+        const newId = id ?? uuid();
         let payload: {[key: string]: any} = {};
         if (filterType === FilterType.Simple) {
             payload = {
@@ -82,7 +135,14 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
                 anchorDate,
             };
         }
-        rootRecord.setFilter(newId, filterType, filterName, payload);
+        rootRecord.setFilter(newId, filterType, filterName, true, payload);
+        onClose();
+    };
+
+    const deleteFilter = () => {
+        if (id) {
+            rootRecord.deleteFilter(id);
+        }
         onClose();
     };
 
@@ -269,14 +329,25 @@ const AddFilter = ({rootRecord, onClose}: AddFilterProps) => {
                 </div>
                 {filterTypeFields}
             </div>
-            <div className="footer">
-                <quip.apps.ui.Button text="Cancel" onClick={onClose} />
-                <quip.apps.ui.Button
-                    text="Done"
-                    primary
-                    onClick={addFilter}
-                    disabled={!isValid()}
-                />
+            <div
+                className="footer"
+                style={{justifyContent: id ? "space-between" : "flex-end"}}>
+                {id ? (
+                    <quip.apps.ui.Button
+                        text="Delete Filter"
+                        className="destructive"
+                        onClick={deleteFilter}
+                    />
+                ) : undefined}
+                <div>
+                    <quip.apps.ui.Button text="Cancel" onClick={onClose} />
+                    <quip.apps.ui.Button
+                        text="Done"
+                        primary
+                        onClick={addFilter}
+                        disabled={!isValid()}
+                    />
+                </div>
             </div>
         </Dialog>
     );
