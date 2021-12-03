@@ -4,6 +4,7 @@ import {TABLEAU_BASE_URL, TABLEAU_JS_LIB} from "../config";
 import {AppData, FilterType, RootEntity} from "../model/root";
 import Dialog from "./dialog";
 import FilterManager from "./filters/filterManager";
+import ParamManager from "./parameters/paramManager";
 
 interface DashboardProps {
     rootRecord: RootEntity;
@@ -13,7 +14,6 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     const [data, setData] = useState<AppData>(rootRecord.getData());
 
     const refreshData_ = () => {
-        console.log("Data update");
         const data = rootRecord.getData();
         setData(data);
     };
@@ -176,6 +176,16 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                 }
             });
 
+        const parameters = data.params
+            .filter((param) => param.active)
+            .map((param) => (
+                <viz-parameter
+                    key={param.id}
+                    name={param.name}
+                    value={param.value}
+                />
+            ));
+
         dashboard = (
             <div>
                 <tableau-viz
@@ -185,8 +195,10 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                     token={data.token}
                     ref={(el) => setContainer(el)}>
                     {filters}
+                    {parameters}
                 </tableau-viz>
                 <FilterManager rootRecord={rootRecord} />
+                <ParamManager rootRecord={rootRecord} />
             </div>
         );
     }

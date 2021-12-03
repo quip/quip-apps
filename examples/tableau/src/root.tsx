@@ -3,9 +3,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Main from "./components/main";
 import {Menu} from "./menus";
-import {RootEntity, TableauFilter} from "./model/root";
+import {RootEntity, TableauFilter, TableauParam} from "./model/root";
 
 quip.apps.registerClass(TableauFilter, TableauFilter.ID);
+quip.apps.registerClass(TableauParam, TableauParam.ID);
 quip.apps.registerClass(RootEntity, RootEntity.ID);
 
 const menu = new Menu();

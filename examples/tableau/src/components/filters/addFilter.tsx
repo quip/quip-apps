@@ -135,7 +135,16 @@ const AddFilter = ({rootRecord, onClose, id}: AddFilterProps) => {
                 anchorDate,
             };
         }
-        rootRecord.setFilter(newId, filterType, filterName, true, payload);
+        let active = true;
+        if (id) {
+            const record = rootRecord
+                .getData()
+                .filters.find((p) => p.id === id);
+            if (record) {
+                active = record.active;
+            }
+        }
+        rootRecord.setFilter(newId, filterType, filterName, active, payload);
         onClose();
     };
 

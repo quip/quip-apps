@@ -1,7 +1,7 @@
 import React from "react";
-import Toggle from "../toggle";
+import Toggle from "./toggle";
 
-interface FilterRowItemProps {
+interface RowItemProps {
     title: string;
     subtitle: string;
     active: boolean;
@@ -9,13 +9,13 @@ interface FilterRowItemProps {
     onAction: () => void;
 }
 
-const FilterRowItem = ({
+const RowItem = ({
     title,
     subtitle,
     active,
     onToggle,
     onAction,
-}: FilterRowItemProps) => {
+}: RowItemProps) => {
     return (
         <div className="filter-row-item">
             <div className="left">
@@ -32,4 +32,4 @@ const FilterRowItem = ({
     );
 };
 
-export default FilterRowItem;
+export default RowItem;

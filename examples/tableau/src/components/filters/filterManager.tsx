@@ -13,7 +13,7 @@ import {
 } from "../../model/root";
 import Dialog from "../dialog";
 import AddFilter from "./addFilter";
-import FilterRowItem from "./filterRowItem";
+import RowItem from "../rowItem";
 
 interface FilterManagerProps {
     rootRecord: RootEntity;
@@ -88,7 +88,9 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
             );
         }
 
-        let filters: ReactNode = <div>No filters yet. Create one now!</div>;
+        let filters: ReactNode = (
+            <div className="empty-message">No filters yet. Create one now!</div>
+        );
         if (data.filters.length > 0) {
             filters = data.filters.map((filter) => {
                 let subtitle = "";
@@ -144,7 +146,7 @@ const FilterManager = ({rootRecord}: FilterManagerProps) => {
                 }
 
                 return (
-                    <FilterRowItem
+                    <RowItem
                         key={filter.id}
                         title={filter.name}
                         subtitle={subtitle}

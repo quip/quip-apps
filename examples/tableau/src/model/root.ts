@@ -71,6 +71,13 @@ export type Filter =
     | RangeFilterData
     | RelativeDateFilterData;
 
+export interface Param {
+    id: string;
+    name: string;
+    value: string;
+    active: boolean;
+}
+
 export interface AppData {
     viewUrl: string;
     width: ViewWidth;
@@ -79,6 +86,7 @@ export interface AppData {
     newDashboardUrl: string;
     token?: string;
     filters: Filter[];
+    params: Param[];
 }
 
 export class RootEntity extends quip.apps.RootRecord {
@@ -89,6 +97,7 @@ export class RootEntity extends quip.apps.RootRecord {
             viewUrl: "string",
             width: "number",
             filters: quip.apps.RecordList.Type(TableauFilter),
+            params: quip.apps.RecordList.Type(TableauParam),
         };
     }
 
@@ -96,6 +105,7 @@ export class RootEntity extends quip.apps.RootRecord {
         return {
             width: ViewWidth["1200px"],
             filters: [],
+            params: [],
         };
     }
 
@@ -120,6 +130,11 @@ export class RootEntity extends quip.apps.RootRecord {
         return filterRecords.map((record) => record.getData());
     }
 
+    private getParams(): Param[] {
+        const paramRecords = this.get("params").getRecords() as TableauParam[];
+        return paramRecords.map((record) => record.getData());
+    }
+
     getData(): AppData {
         if (!this.watchingTokens) {
             this.watchTokens();
@@ -133,6 +148,7 @@ export class RootEntity extends quip.apps.RootRecord {
             newDashboardUrl: this.newDashboardUrl,
             token: this.tableauClient.token,
             filters: this.getFilters(),
+            params: this.getParams(),
         };
     }
 
@@ -190,8 +206,9 @@ export class RootEntity extends quip.apps.RootRecord {
     }
 
     clearParameters() {
-        // this.get("filters").delete();
-        // this.set("filters", []);
+        this.get("params").delete();
+        this.clear("params");
+        this.set("params", []);
     }
 
     openInTableau() {
@@ -218,6 +235,8 @@ export class RootEntity extends quip.apps.RootRecord {
 
         if (foundRecord) {
             // If so, update
+            foundRecord.set("name", name);
+            foundRecord.set("type", type);
             foundRecord.set("active", active);
             foundRecord.set("value", value);
         } else {
@@ -238,8 +257,47 @@ export class RootEntity extends quip.apps.RootRecord {
         const recordList = this.get(
             "filters"
         ) as quip.apps.RecordList<TableauFilter>;
-        const filterRecords = recordList.getRecords() as TableauFilter[];
+        const filterRecords = recordList.getRecords();
         const recordToDelete = filterRecords.find(
+            (record) => record.getData().id === id
+        );
+        if (recordToDelete) {
+            recordList.remove(recordToDelete);
+            this.notifyListeners();
+        }
+    }
+
+    setParam(id: string, name: string, active: boolean, value: string) {
+        // Check if filter already exists.
+        const paramRecords = this.get("params").getRecords() as TableauParam[];
+        const foundRecord = paramRecords.find(
+            (record) => record.get("id") === id
+        );
+
+        if (foundRecord) {
+            // If so, update
+            foundRecord.set("name", name);
+            foundRecord.set("active", active);
+            foundRecord.set("value", value);
+        } else {
+            // If not, create
+            this.get("params").add({
+                id,
+                name,
+                value,
+                active,
+            });
+        }
+        // TODO: Do not notify listeners to avoid the dashboard reloading?!
+        this.notifyListeners();
+    }
+
+    deleteParam(id: string) {
+        const recordList = this.get(
+            "params"
+        ) as quip.apps.RecordList<TableauParam>;
+        const paramRecords = recordList.getRecords();
+        const recordToDelete = paramRecords.find(
             (record) => record.getData().id === id
         );
         if (recordToDelete) {
@@ -274,6 +332,34 @@ export class TableauFilter extends quip.apps.Record {
             name: this.get("name"),
             value: this.get("value"),
             type: this.get("type"),
+            active: this.get("active"),
+        };
+    }
+}
+
+export class TableauParam extends quip.apps.Record {
+    static ID = "tableau-param";
+
+    static getProperties() {
+        return {
+            id: "string",
+            name: "string",
+            value: "string",
+            active: "boolean",
+        };
+    }
+
+    static getDefaultProperties() {
+        return {
+            active: true,
+        };
+    }
+
+    getData(): Param {
+        return {
+            id: this.get("id"),
+            name: this.get("name"),
+            value: this.get("value"),
             active: this.get("active"),
         };
     }

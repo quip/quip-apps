@@ -9,6 +9,7 @@
     --xs: 0.5rem;
     --s: 0.75rem;
     --m: 1rem;
+    --l: 2rem;
 }
 
 .main {
@@ -244,4 +245,9 @@
 button.destructive {
     background-color: rgb(var(--quipRed));
     color: white;
+}
+
+.empty-message {
+    padding: var(--l);
+    text-align: center;
 }
