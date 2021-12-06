@@ -137,7 +137,6 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     );
 
     if (isConfigured) {
-        console.log("Found filters", data.filters);
         const filters = data.filters
             .filter((filter) => filter.active)
             .map((filter) => {
