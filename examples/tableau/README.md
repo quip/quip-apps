@@ -71,6 +71,7 @@ When done, get the Client ID and Secret and update them in Quip's Developer Cons
 11. Run the following Tableau Services Manager (TSM) commands to tell Tableau to trust those tokens:
 
 ```
+tsm configuration set -k features.OAuthExternalAuthorizationServer -v true
 tsm configuration set -k vizportal.oauth.external_authorization.enabled -v true
 tsm configuration set -k vizportal.oauth.external_authorization_server.issuer -v YOUR_TOKEN_ISSUER
 ```
