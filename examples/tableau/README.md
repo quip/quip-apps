@@ -14,7 +14,7 @@ This live app allows users to embed Tableau dashboards in Quip documents, making
 -   [x] Your Quip site must be signed up to Quip Advanced or higher
 -   [x] You should be comfortable with Node.js, and be running a modern version of Node.js on your machine (v12+)
 -   [x] You must be running Tableau Server v2021.4 or higher (Tableau Online is not supported)
--   [x] You must be using a supported identity provider, capable of issuing OAuth 2.0 JWT tokens, whose payload include audience `tableau`, scope `tableau:embed:read`, subject the Tableau username, and a unique JTI
+-   [x] You must be using a supported identity provider, capable of issuing OAuth 2.0 JWT tokens, whose payload include audience `tableau`, scope `tableau:views:embed`, subject the Tableau username, and a unique JTI
 
 ### Set Up Your Machine
 
@@ -49,7 +49,7 @@ quip-cli release --beta (and select the only version that appears in the list)
 Name: tableau
 Client ID: test
 Client Secret: test
-Scope: offline_access tableau:embed:read
+Scope: offline_access tableau:views:embed
 Refresh Token Strategy: STANDARD
 ```
 
@@ -60,7 +60,8 @@ Then click on Update. Copy the Redirect URL, it will be required in the next ste
 ```
 Audience: tableau
 Subject: Tableau username
-Scopes: tableau:embed:read offline_access
+Scopes: tableau:views:embed offline_access
+Token Expiration: 10 minutes
 Unique JTI
 ```
 

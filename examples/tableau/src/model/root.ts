@@ -119,7 +119,8 @@ export class RootEntity extends quip.apps.RootRecord {
     private watchTokens() {
         this.watchingTokens = true;
         this.tableauClient.subscribeToTokenUpdates(() => {
-            this.notifyListeners();
+            // No need to update token in UI - Tableau handles session
+            // this.notifyListeners();
         });
     }
 

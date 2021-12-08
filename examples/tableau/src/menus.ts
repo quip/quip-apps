@@ -118,7 +118,7 @@ export class Menu {
         const toolbarCommandIds_: string[] = [
             quip.apps.DocumentMenuCommands.MENU_MAIN,
         ];
-        if (data.viewUrl) {
+        if (data.loggedIn && data.viewUrl) {
             toolbarCommandIds_.push("open-in-tableau");
             toolbarCommandIds_.push(quip.apps.DocumentMenuCommands.SEPARATOR);
             toolbarCommandIds_.push("open-parameters");
@@ -131,7 +131,7 @@ export class Menu {
 
     private getMainMenuSubCommandIds_(data: AppData): string[] {
         const mainMenuSubCommandIds: string[] = [];
-        if (data.viewUrl) {
+        if (data.loggedIn && data.viewUrl) {
             mainMenuSubCommandIds.push("change-view");
             mainMenuSubCommandIds.push(
                 quip.apps.DocumentMenuCommands.SEPARATOR
@@ -143,7 +143,7 @@ export class Menu {
 
     private getHighlightedCommandIds_(data: AppData): string[] {
         const highlightedCommandIds: string[] = [];
-        if (data.viewUrl) {
+        if (data.loggedIn && data.viewUrl) {
             highlightedCommandIds.push(`set-width-${data.width}px`);
         }
         return highlightedCommandIds;
