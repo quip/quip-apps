@@ -118,7 +118,7 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
         data.newDashboardUrl.length > 0 &&
         data.newDashboardUrl.startsWith(TABLEAU_BASE_URL);
 
-    const isConfigured = !!data.viewUrl && !!data.token;
+    const isConfigured = !!data.viewUrl && data.loggedIn;
 
     let dashboard = (
         <div className="container config">
@@ -137,6 +137,8 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     );
 
     if (isConfigured) {
+        const token = rootRecord.getToken();
+
         const filters = data.filters
             .filter((filter) => filter.active)
             .map((filter) => {
@@ -191,7 +193,7 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                     src={data.viewUrl}
                     width={data.width}
                     id="dashboard"
-                    token={data.token}
+                    token={token}
                     ref={(el) => setContainer(el)}>
                     {filters}
                     {parameters}
