@@ -34,7 +34,6 @@ class Client {
   async login() {
     return await this.auth.login({
       access_type: "offline",
-      prompt: "consent",
     });
   }
 
