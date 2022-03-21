@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.2.0-alpha.41 (2022-03-21)
+
+**Note:** Version bump only for package quip-test-utils
+
+
+
+
+
 # 0.2.0-alpha.40 (2021-12-17)
 
 **Note:** Version bump only for package quip-test-utils
