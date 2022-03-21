@@ -218,17 +218,20 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                 </div>
             );
         } else {
-            <div>
-                <p>
-                    You can only view the dashboard in this document from web!
-                </p>
-                <quip.apps.ui.Button
-                    text="Open in Tableau"
-                    className="margin-m"
-                    primary
-                    onClick={openInTableau}
-                />
-            </div>;
+            dashboard = (
+                <div>
+                    <p>
+                        You can only view the dashboard in this document from
+                        web!
+                    </p>
+                    <quip.apps.ui.Button
+                        text="Open in Tableau"
+                        className="margin-m"
+                        primary
+                        onClick={openInTableau}
+                    />
+                </div>
+            );
         }
     }
 
