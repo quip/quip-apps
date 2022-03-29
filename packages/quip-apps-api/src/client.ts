@@ -173,6 +173,7 @@ export default class Client {
         orgId: "",
         sObjectApiName: ""
     }
+    public initialVersionNumberValue: number = 0;
     public elementHtmlValue: string = "";
     public focusedRichTextRecordValue?: RichTextRecord;
     public isAndroidValue: boolean = false;
@@ -287,6 +288,11 @@ export default class Client {
     getDocumentTemplateSettings(){
         return this.documentTemplateSettingsValue;
     }
+
+    getInitialVersionNumber() {
+        return this.initialVersionNumberValue;
+    }
+
     getFocusedRichTextRecord() {
         return this.focusedRichTextRecordValue;
     }
