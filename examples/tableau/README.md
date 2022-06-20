@@ -1,6 +1,6 @@
-# Tableau Live App (PILOT)
+# Tableau Live App
 
-Disclaimer: the source code of this live app is provided as is, and is not yet an official product or feature. Support is only provided to customers who have signed up to the pilot program. For more information, please contact your Account Executive.
+Disclaimer: the source code of this live app is provided as is, and is not yet an official product or feature. Support is not provided.
 
 ## What is it?
 
