@@ -23,7 +23,7 @@ module.exports = {
         rules: [
             {
                 test: /\.[jt]sx?$/,
-                include: [/src/],
+                include: [path.resolve(__dirname, "src")],
                 use: "babel-loader",
             },
         ],
