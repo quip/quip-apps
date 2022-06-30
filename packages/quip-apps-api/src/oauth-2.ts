@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import BaseOAuth, {HttpResponse} from "./base-oauth";
 
 export default class OAuth2 extends BaseOAuth {

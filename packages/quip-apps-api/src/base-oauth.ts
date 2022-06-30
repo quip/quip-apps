@@ -1,6 +1,12 @@
-// Copyright 2019 Quip
-
 import Auth from "./auth";
+
+export interface OAuthRequestParams {
+    url: string;
+    method?: string;
+    query?: {[key: string]: string};
+    headers?: {[key: string]: string};
+    data?: {[key: string]: any};
+}
 
 export default class BaseOAuth extends Auth {
     public tokenResponseValue: {
@@ -23,7 +29,7 @@ export default class BaseOAuth extends Auth {
     logout(): Promise<HttpResponse> {
         return Promise.resolve(new HttpResponse());
     }
-    request<T = Object>(params: Object): Promise<HttpResponse<T>> {
+    request<T = Object>(params: OAuthRequestParams): Promise<HttpResponse<T>> {
         return Promise.resolve(this.nextHttpResponseValue as HttpResponse<T>);
     }
 }

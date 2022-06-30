@@ -1,0 +1,116 @@
+.root {
+  position: relative;
+}
+
+.error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.error > div {
+  color: #970000;
+  background-color: #FFFFFF;
+  font-weight: bold;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+  border: 1px solid #970000;
+  cursor: pointer;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.login-btn {
+  display: flex;
+  justify-content: center;
+}
+
+.login-btn > div {
+  margin-top: 2rem;
+  cursor: pointer;
+}
+
+.dashboard {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.dash-element {
+  height: 800px;
+}
+
+.dash-element > iframe {
+  border: 0;
+}
+
+.dash-selector {
+  width: 100%;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  padding: 1rem 0;
+  border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.dash-row {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-top: 0;
+  cursor: pointer;
+}
+
+.dash-row:hover {
+  background-color: #eeeeee;
+}
+
+.no-click {
+  cursor: default;
+  text-align: center;
+}
+
+.no-click:hover {
+  background-color: #FFFFFF;
+}
+
+.dash-row:last-child, .field:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.field {
+  border: 1px solid #ccc;
+  border-top: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.field label {
+  margin-right: 2rem;
+}
+
+.field input {
+  flex: 1;
+}

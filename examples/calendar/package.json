@@ -8,40 +8,50 @@
         "url": "git@github.com:quip/quip-apps.git"
     },
     "scripts": {
-        "test": "jest",
         "start": "NODE_ENV=development webpack-dev-server --https",
-        "build": "NODE_ENV=production webpack; create-quip-app pack ./app"
+        "build": "NODE_ENV=production webpack; create-quip-app --output app/app.ele pack .",
+        "lint": "eslint --ext .jsx --ext .js ./src/",
+        "test": "webpack && jest --silent --passWithNoTests",
+        "test:watch": "npm test -- --watch",
+        "test:coverage": "npm test -- --coverage"
     },
     "author": "Quip",
     "devDependencies": {
+        "@babel/cli": "^7.12.10",
+        "@babel/core": "^7.12.10",
+        "@babel/preset-env": "^7.12.10",
+        "@babel/preset-react": "^7.12.10",
+        "@babel/preset-typescript": "^7.12.7",
+        "@types/classnames": "^2.2.11",
+        "@types/enzyme": "^3.10.8",
+        "@types/jest": "^26.0.18",
+        "@types/prop-types": "^15.7.3",
+        "awesome-typescript-loader": "^5.2.1",
+        "babel-jest": "^26.6.3",
         "babel-preset-env": "^1.6.0",
-        "babel-preset-flow": "^6.23.0",
         "babel-preset-react": "^6.24.1",
+        "core-js": "^3.8.1",
+        "create-quip-app": "^0.1.2-alpha.16",
         "empty": "^0.10.1",
-        "eslint": "^4.6.1",
-        "eslint-config-prettier": "^2.4.0",
-        "eslint-plugin-flowtype": "^2.35.1",
-        "eslint-plugin-jest": "^21.2.0",
-        "eslint-plugin-prettier": "^2.2.0",
-        "eslint-plugin-react": "^7.3.0",
-        "flow-typed": "^2.2.0",
+        "enzyme": "^3.11.0",
+        "enzyme-adapter-react-16": "^1.15.5",
+        "enzyme-to-json": "^3.6.1",
+        "eslint": "^6.3.0",
+        "eslint-plugin-jest": "^22.16.0",
+        "eslint-plugin-react": "^7.14.3",
         "hoist-non-react-statics": "^2.3.1",
-        "jest": "^21.2.1",
-        "prettier": "^1.6.1",
+        "jest": "^26.6.3",
+        "quip-apps-webpack-config": "^0.1.2-alpha.32",
         "react-redux": "^5.0.6",
-        "redux": "^3.7.2"
-    },
-    "babel": {
-        "presets": [
-            "env",
-            "flow",
-            "react"
-        ]
+        "redux": "^3.7.2",
+        "terser-webpack-plugin": "^5.0.3",
+        "typescript": "^4.1.2",
+        "webpack": "^4.44.2",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-server": "^3.11.0"
     },
     "dependencies": {
-        "babel-preset-jest": "^21.2.0",
         "classnames": "^2.2.5",
-        "create-quip-app": "0.0.45",
         "date-fns": "^2.12.0",
         "lodash.chunk": "^4.2.0",
         "lodash.debounce": "^4.0.8",
@@ -50,9 +60,12 @@
         "lodash.range": "^3.2.0",
         "lodash.throttle": "^4.1.1",
         "moment": "^2.22.2",
+        "quip-apps-api": "^0.1.2-alpha.17",
         "quip-apps-chevron": "0.0.45",
         "quip-apps-compat": "0.0.45",
-        "quip-apps-webpack-config": "0.0.45",
+        "quiptext": "^0.1.2-alpha.16",
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
         "svg-react-loader": "^0.4.6"
     }
 }

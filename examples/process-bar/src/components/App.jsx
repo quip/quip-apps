@@ -62,6 +62,19 @@ export default class App extends React.Component {
             this.onContainerResize_);
     }
 
+    getSelectedStepIndex() {
+        const {steps, selected} = this.props;
+
+        const stepRecords = steps.getRecords();
+        for (let i = 0; i < stepRecords.length; i++) {
+            const step = stepRecords[i];
+            if (selected === step.getId()) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     render() {
         const {steps, selected, color} = this.props;
         const inGridLayout = quip.apps.inGridLayout && quip.apps.inGridLayout();
@@ -69,23 +82,30 @@ export default class App extends React.Component {
         if (inGridLayout) {
             stepWidth = quip.apps.getContainerWidth() / steps.count();
         }
+        const completedIndex = this.getSelectedStepIndex();
+        const stepRecords = steps.getRecords();
 
-        return <div
-            tabIndex="0"
+        return <ul
             className={cx(Styles.container, {
                 [Styles.fixedWidth]: !inGridLayout,
-            })}>
-            {steps
-                .getRecords()
-                .map(step => <Step
-                    color={color}
-                    selected={selected === step.getId()}
-                    key={step.getId()}
-                    record={step}
-                    width={stepWidth}
-                    onSelected={this.setSelected}
-                    onDelete={this.deleteStep}/>)}
-        </div>;
+            })}
+            onKeyDown={e => {
+                if (e.key === "Escape") {
+                    if (quip.apps.isApiVersionAtLeast("0.1.052")) {
+                        quip.apps.exitApp();
+                    }
+                }
+            }}>
+            {stepRecords.map((step, i) => <Step
+                color={color}
+                selected={selected === step.getId()}
+                completed={i < completedIndex}
+                key={step.getId()}
+                record={step}
+                width={stepWidth}
+                onSelected={this.setSelected}
+                onDelete={this.deleteStep}/>)}
+        </ul>;
     }
 
     onContainerResize_ = () => {

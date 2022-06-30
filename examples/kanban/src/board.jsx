@@ -142,6 +142,13 @@ class Board extends React.Component {
             ref={ref => {
                 this._ref = ref;
             }}
+            onKeyDown={e => {
+                if (e.key === "Escape") {
+                    if (quip.apps.isApiVersionAtLeast("0.1.052")) {
+                        quip.apps.exitApp();
+                    }
+                }
+            }}
             onMouseDown={e => {
                 if (e.target === this._ref) this.setFocusedCard(null);
             }}
@@ -300,7 +307,7 @@ class Board extends React.Component {
         });
     };
 
-    onCardContextMenu_ = (e, cardRecord) => {
+    onCardContextMenu_ = (e, cardRecord, closeMenuCallback) => {
         e.preventDefault();
         e.stopPropagation();
         if (this.state.contextMenuCard) {
@@ -315,6 +322,7 @@ class Board extends React.Component {
             this.setState({
                 contextMenuCard: null,
             });
+            closeMenuCallback && closeMenuCallback();
         });
     };
 

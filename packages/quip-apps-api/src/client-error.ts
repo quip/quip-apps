@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 export default class ClientError extends Error {
     constructor(message: string, errorName?: string) {
         super();

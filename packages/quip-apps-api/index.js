@@ -1,5 +1,3 @@
-// Copyright Quip 2019
-
 /**
  * @fileoverview This module exposes a fake interface of the entire quip API, so
  * that code that expects to be in a Quip Live Apps environment can still

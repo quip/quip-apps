@@ -5,7 +5,6 @@
 import PropTypes from "prop-types";
 import {Motion} from "react-motion";
 import cx from "classnames";
-import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 import {CardRecord, entityListener} from "./model.tsx";
 import {
     animateTo,
@@ -19,6 +18,7 @@ import Chevron from "quip-apps-chevron";
 import Grabber from "./icons/Grabber.js";
 
 import styles from "./card.less";
+import quiptext from "quiptext";
 
 export const kHorizontalMargin = 4; // 4 * 2 = 8
 const kPaddingBetweenCards = 12; // 8
@@ -47,6 +47,7 @@ class Card extends React.Component {
         this.state = {
             editing: false,
             commentHover: false,
+            isContextMenuOpen: false,
         };
         // Each card calculates its height only after its remote editor has
         // first been rendered. Until then, it won"t be able to know its correct
@@ -102,6 +103,7 @@ class Card extends React.Component {
             columnWidth,
             isDraggingSomething,
         } = this.props;
+        const {isContextMenuOpen} = this.state;
 
         const isMobile = quip.apps.isMobile();
 
@@ -163,16 +165,20 @@ class Card extends React.Component {
                     width: columnWidth - kHorizontalMargin * 2,
                     // Yosemite fix
                     WebkitTransform: `translate3d(${translateX}px,
-                            ${translateY}px, 0) scale(${scale})`,
-                    transform: `translate3d(${translateX}px,
                         ${translateY}px, 0) scale(${scale})`,
-                    boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
+                    transform: `translate3d(${translateX}px,
+                    ${translateY}px, 0) scale(${scale})`,
                     zIndex: zIndex,
                 };
 
+                let cardStyle = {
+                    width: columnWidth - kHorizontalMargin * 2,
+                    boxShadow: `0px 5px 20px -10px rgba(0,0,0,${draggingBoxShadowOpacity})`,
+                };
+
                 if (!isHeader) {
-                    style.boxShadow += `, inset 0px 0px 0px 1px ${quip.elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
-                    style.backgroundColor = selected
+                    cardStyle.boxShadow += `, inset 0px 0px 0px 1px ${quip.elements.ui.ColorMap[entityColor].VALUE_STROKE}`;
+                    cardStyle.backgroundColor = selected
                         ? quip.apps.ui.ColorMap[entityColor].VALUE
                         : quip.apps.ui.ColorMap[entityColor].VALUE_LIGHT;
                 }
@@ -187,78 +193,89 @@ class Card extends React.Component {
                 }
 
                 return <div
-                    ref={node => (entity.domNode = node)}
-                    className={cx(styles.card, {
-                        [styles.header]: isHeader,
-                        [styles.selected]: selected,
-                        [styles.isFocused]: focused,
-                        [styles.dragging]: dragging,
-                    })}
                     style={style}
-                    onMouseEnter={this.onMouseEnter_}
-                    onMouseLeave={this.onMouseLeave_}>
-                    <div className={styles.titleRow}>
-                        {isHeader && <div
-                            ref={n => (this.commentWrapper = n)}
-                            style={{
-                                visibility: isMobile ? "hidden" : "",
-                            }}
-                            className={cx(
-                                "quip-color-text-secondary",
-                                styles.draggable,
-                                styles.draggableHeader)}
-                            onMouseDown={isMobile ? null : this.onMouseDown_}>
-                            <Grabber/>
-                        </div>}
-                        <div className={styles.remoteEditor}>
-                            <quip.apps.ui.RichTextBox
-                                allowedStyles={[
-                                    quip.apps.RichTextRecord.Style.TEXT_PLAIN,
-                                ]}
-                                color={richTextBoxColor}
-                                scrollable={true}
-                                width="100%"
-                                onComponentHeightChanged={
-                                    this.onEditorHeightChanged_
-                                }
-                                entity={entity}
-                                readOnly={readOnly}
-                                disableSelection={readOnly}
-                                onFocus={this.onEditorFocus}
-                                onBlur={this.stopEditing_}
-                                useDocumentTheme={false}
-                                handleKeyEvent={this.handleKeyEvent_}
-                                {...extraRichTextBoxProps}/>
-                        </div>
-                        <div
-                            className={styles.chevron}
-                            onClick={this.onClickChevron_}>
-                            <Chevron
-                                color={
-                                    richTextBoxColor &&
-                                    quip.apps.ui.ColorMap[richTextBoxColor]
-                                        .VALUE
-                                }/>
-                        </div>
-                    </div>
-                    {!isHeader && <div
-                        ref={n => (this.commentWrapper = n)}
-                        className={cx(styles.commentWrapper, {
-                            [styles.draggable]: !isMobile,
+                    className={cx(styles.cardContainer, {
+                        [styles.header]: isHeader,
+                    })}>
+                    <div
+                        ref={node => (entity.domNode = node)}
+                        className={cx(styles.card, {
+                            [styles.header]: isHeader,
+                            [styles.selected]: selected,
+                            [styles.isFocused]: focused,
+                            [styles.dragging]: dragging,
                         })}
-                        onMouseDown={isMobile ? null : this.onMouseDown_}>
-                        <div
-                            className={cx(styles.realCommentWrapper, {
-                                [styles.realCommentWrapperHide]: !showComments,
-                            })}>
-                            <quip.apps.ui.CommentsTrigger
-                                className={styles.commentsTrigger}
-                                color={entityColor}
-                                invertColor={selected}
-                                entity={entity}
-                                showEmpty={true}/>
+                        style={cardStyle}
+                        onMouseEnter={this.onMouseEnter_}
+                        onMouseLeave={this.onMouseLeave_}>
+                        <div className={styles.titleRow}>
+                            {isHeader && <div
+                                ref={n => (this.commentWrapper = n)}
+                                style={{
+                                    visibility: isMobile ? "hidden" : "",
+                                }}
+                                className={cx(
+                                    "quip-color-text-secondary",
+                                    styles.draggable,
+                                    styles.draggableHeader)}
+                                onMouseDown={
+                                    isMobile ? null : this.onMouseDown_
+                                }>
+                                <Grabber/>
+                            </div>}
+                            <div className={styles.remoteEditor}>
+                                <quip.apps.ui.RichTextBox
+                                    allowedStyles={[
+                                        quip.apps.RichTextRecord.Style
+                                            .TEXT_PLAIN,
+                                    ]}
+                                    color={richTextBoxColor}
+                                    scrollable={true}
+                                    width="100%"
+                                    onComponentHeightChanged={
+                                        this.onEditorHeightChanged_
+                                    }
+                                    entity={entity}
+                                    readOnly={readOnly}
+                                    disableSelection={readOnly}
+                                    onFocus={this.onEditorFocus}
+                                    onBlur={this.stopEditing_}
+                                    useDocumentTheme={false}
+                                    allowDefaultTabNavigation={true}
+                                    {...extraRichTextBoxProps}/>
+                            </div>
                         </div>
-                    </div>}
+                        {!isHeader && <div
+                            ref={n => (this.commentWrapper = n)}
+                            className={cx(styles.commentWrapper, {
+                                [styles.draggable]: !isMobile,
+                            })}
+                            onMouseDown={isMobile ? null : this.onMouseDown_}>
+                            <div
+                                className={cx(styles.realCommentWrapper, {
+                                    [styles.realCommentWrapperHide]: !showComments,
+                                })}>
+                                <quip.apps.ui.CommentsTrigger
+                                    className={styles.commentsTrigger}
+                                    color={entityColor}
+                                    invertColor={selected}
+                                    entity={entity}
+                                    showEmpty={true}/>
+                            </div>
+                        </div>}
+                    </div>
+                    <button
+                        className={styles.chevron}
+                        onClick={this.onClickChevron_}
+                        aria-expanded={isContextMenuOpen}
+                        aria-label={quiptext("More options")}
+                        style={{zIndex: zIndex + 1}}>
+                        <Chevron
+                            color={
+                                richTextBoxColor &&
+                                quip.apps.ui.ColorMap[richTextBoxColor].VALUE
+                            }/>
+                    </button>
                 </div>;
             }}
         </Motion>;
@@ -269,16 +286,12 @@ class Card extends React.Component {
     };
 
     onClickChevron_ = e => {
-        this.props.onContextMenu(e, this.props.entity);
-    };
-
-    handleKeyEvent_ = e => {
-        // Both keydown and keyup event will be triggered. Ignore keydown event
-        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
-        if (e.type === "keydown") {
-            return false;
-        }
-        return handleRichTextBoxKeyEventNavigation(e, this.props.entity);
+        this.props.onContextMenu(e, this.props.entity, () =>
+            this.setState({isContextMenuOpen: false})
+        );
+        this.setState({
+            isContextMenuOpen: true,
+        });
     };
 
     onMouseDown_ = e => {

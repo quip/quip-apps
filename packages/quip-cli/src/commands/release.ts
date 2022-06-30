@@ -79,7 +79,7 @@ export default class Release extends Command {
 
     static args = [
         {
-            name: "build number",
+            name: "build",
             description: "the build number to release",
             parse: (arg: string) => parseInt(arg),
         },

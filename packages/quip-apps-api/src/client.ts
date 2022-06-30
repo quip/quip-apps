@@ -1,4 +1,3 @@
-// Copyright 2019 Quip
 import {ReactNode} from "react";
 import Auth from "./auth";
 import ClientBlob from "./blob";
@@ -22,7 +21,8 @@ export interface InitializationParameters {
     initOptions?: string;
     initOptionsSource?: string;
     creationBlobs?: Blob[];
-    creationSource: string;
+    /** @deprecated */
+    creationSource: CreationSource;
 }
 
 export interface BlobWithThumbnails {
@@ -46,17 +46,19 @@ enum QuipIcon {
     JIRA = 13,
     COMMENT_MENU_ITEM = 14,
 }
-
 export interface MenuCommand {
     id: string;
     label?: string | ReactNode[];
     sublabel?: string;
-    // TODO: unsure what this type actually is
-    handler?: (command: string, params: Object) => void;
+    handler?: (
+        commandId: string,
+        contextMenu: {[key: string]: any} | null,
+        additionalParams?: any
+    ) => any;
     isHeader?: boolean;
     subCommands?: string[];
     actionId?: string;
-    actionParams?: Object;
+    actionParams?: {[key: string]: any};
     actionStarted?: () => void;
     quipIcon?: QuipIcon | MenuIcons;
 }
@@ -74,6 +76,7 @@ export interface InitOptions {
     menuCommands?: MenuCommand[];
     toolbarCommandIds?: string[] | undefined;
     mobileToolbarCommandIds?: string[] | undefined;
+    toolbarState?: ToolbarState;
     destructiveCommandIds?: string[] | undefined;
     initializationCallback?: (
         element: Element,
@@ -121,6 +124,7 @@ export enum EventType {
     ONLINE_STATUS_CHANGED = "ONLINE_STATUS_CHANGED",
     WIDTH_UPDATE = "WIDTH_UPDATE",
     THREAD_MEMBERSHIP_CHANGED = "THREAD_MEMBERSHIP_CHANGED",
+    DOCUMENT_TEMPLATE_SETTINGS_CHANGED = "DOCUMENT_TEMPLATE_SETTINGS_CHANGED",
 }
 
 export enum MenuIcons {
@@ -139,23 +143,19 @@ export default class Client {
     public authsValue: {[name: string]: Auth} = {};
     public blobsValue: {[id: string]: ClientBlob} = {};
     public boundingClientRectValue: {
-        leftValue: number;
-        topValue: number;
-        rightValue: number;
-        bottomValue: number;
-        xValue: number;
-        yValue: number;
-        widthValue: number;
-        heightValue: number;
+        left: number;
+        top: number;
+        right: number;
+        bottom: number;
+        width: number;
+        height: number;
     } = {
-        leftValue: 0,
-        topValue: 0,
-        rightValue: 0,
-        bottomValue: 0,
-        xValue: 0,
-        yValue: 0,
-        widthValue: 800,
-        heightValue: 400,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: 800,
+        height: 400,
     };
     public configParamsValue: {[key: string]: any} = {};
     public containerWidthValue: number = 800;
@@ -166,6 +166,13 @@ export default class Client {
     public dateToPickValue: number = new Date().getTime();
     public displayWidthValue: number = 800;
     public documentMembersValue: User[] = [];
+    public documentTemplateSettingsValue: {
+        orgId: string;
+        sObjectApiName: string;
+    } = {
+        orgId: "",
+        sObjectApiName: ""
+    }
     public elementHtmlValue: string = "";
     public focusedRichTextRecordValue?: RichTextRecord;
     public isAndroidValue: boolean = false;
@@ -199,9 +206,9 @@ export default class Client {
     public viewerCanSeeCommentsValue: boolean = false;
     public viewingUserValue?: User;
     public viewportDimensionsValue: {
-        widthValue: number;
-        heightValue: number;
-    } = {widthValue: 1200, heightValue: 800};
+        width: number;
+        height: number;
+    } = {width: 1200, height: 800};
     public widthValue: number = 800;
 
     private rootRecord_?: RootRecord;
@@ -232,7 +239,7 @@ export default class Client {
     addDetachedNode(node: Node) {}
     addDraggableNode(node: Node) {}
     addEventListener(type: EventType, listener: () => void) {}
-    addAllowlistedlistedUser(userId: string) {}
+    addAllowlistedUser(userId: string) {}
     auth(name: string) {
         return this.authsValue[name];
     }
@@ -245,6 +252,7 @@ export default class Client {
     disableResizing() {}
     dismissBackdrop(skipCallback?: boolean) {}
     enableResizing(options: ResizingOptions) {}
+    exitApp() {}
     fetchElementHtml(styleId: number = 0, styleIdSuffix: string = "") {
         return this.elementHtmlValue;
     }
@@ -275,6 +283,9 @@ export default class Client {
     }
     getDocumentMembers() {
         return this.documentMembersValue;
+    }
+    getDocumentTemplateSettings(){
+        return this.documentTemplateSettingsValue;
     }
     getFocusedRichTextRecord() {
         return this.focusedRichTextRecordValue;
@@ -411,7 +422,7 @@ export default class Client {
     searchPeople(searchString: string, callback: (users: User[]) => void) {
         callback(this.peopleToSearchForValue);
     }
-    sendMessage(text: string, mentionIds: string[]) {}
+    sendMessage(text: string, mentionIds?: string[]) {}
     setPayload(payload: string) {}
     setSelectedEntity(record: Record) {
         this.setSelectedRecord(record);
@@ -455,6 +466,16 @@ export default class Client {
     startDisplayingAboveMenus() {}
     stopDisplayingAboveMenus() {}
     updateDisplayDimensions() {}
+    updateTemplateParams(
+        templateParams: {[name: string]: string},
+        isTemplate?: boolean
+    ) {}
+    getTemplateParams(): Promise<{
+        templateParams: {[key: string]: string};
+        isTemplate: boolean;
+        canShowTemplateFlow: boolean;
+        allowTemplateDocOrgAndObject?: boolean
+    }> { return Promise.resolve({templateParams: {}, isTemplate: false, canShowTemplateFlow: false, allowTemplateDocOrgAndObject: false});}
     updateToolbar(toolbarState: ToolbarState) {}
     updateToolbarCommandsState(
         disabledCommandIds: string[],

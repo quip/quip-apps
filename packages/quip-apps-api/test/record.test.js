@@ -1,4 +1,3 @@
-// Copyright 2019 Quip
 const test = require("tape");
 const Record = require("../dist/record").default;
 const RecordList = require("../dist/record-list").default;

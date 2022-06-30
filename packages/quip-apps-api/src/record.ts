@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Client from "./client";
 import ClientError from "./client-error";
 import RecordIndex from "./record-index";
@@ -116,7 +114,7 @@ export default abstract class Record {
         return this.positionValue;
     }
 
-    get(key: string) {
+    get(key: string, isProgrammatic?: boolean) {
         // TODO: this is not exactly accurate for special types
         return this.data_[key];
     }
@@ -125,7 +123,7 @@ export default abstract class Record {
         return key in this.data_;
     }
 
-    set(key: string, value: any) {
+    set(key: string, value: any, isProgrammaticUpdate?: boolean) {
         const statics = this.constructor as typeof Record;
         const propTypes = statics.getProperties();
         const Type = propTypes[key] || "UNKNOWN";
@@ -157,21 +155,21 @@ export default abstract class Record {
         this.data_[key] = value;
     }
 
-    clear(key: string, skipDelete?: boolean) {
-        const record = this.data_[key];
+    clear(key: string, skipDelete?: boolean, isProgrammaticUpdate?: boolean) {
+        const value = this.data_[key];
         delete this.data_[key];
-        if (skipDelete) {
-            return record;
+        if (skipDelete && value && (value instanceof Record || value instanceof RecordList)) {
+            return value;
         }
     }
 
-    clearData() {
+    clearData(isProgrammaticUpdate?: boolean) {
         for (const key in this.data_) {
             this.clear(key);
         }
     }
 
-    setDataVersion(version: number) {
+    setDataVersion(version: number, isProgrammaticUpdate?: boolean) {
         this.dataVersionValue = version;
     }
 
@@ -191,9 +189,9 @@ export default abstract class Record {
         return this.containingListValue;
     }
 
-    setDeleted() {}
+    setDeleted(isProgrammaticUpdate?: boolean) {}
 
-    delete() {
+    delete(isProgrammaticUpdate?: boolean) {
         this.isDeletedValue = true;
     }
 
@@ -228,7 +226,7 @@ export default abstract class Record {
     getDataVersion() {
         return this.dataVersionValue;
     }
-    getDom() {
+    getDom(): Element {
         throw new ClientError(
             "Please override getDom() to return the DOM node for this " +
                 "Record instance."
@@ -241,7 +239,7 @@ export default abstract class Record {
     notifyListeners() {
         // TODO: this should probably trigger something to better simulate prod
     }
-    setOrphanedState() {}
+    setOrphanedState(isProgrammaticUpdate?: boolean) {}
     supportsComments() {
         // override to change this
         return false;

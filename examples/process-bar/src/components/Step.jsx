@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import React from "react";
 import quip from "quip";
 import cx from "classnames";
-import handleRichTextBoxKeyEventNavigation from "quip-apps-handle-richtextbox-key-event-navigation";
 import {setFocusedStep} from "../menus";
 import Styles from "./Step.less";
 import Chevron from "quip-apps-chevron";
@@ -20,6 +19,7 @@ export default class Step extends React.Component {
         onSelected: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
         selected: PropTypes.bool,
+        completed: PropTypes.bool,
     };
 
     constructor(props) {
@@ -78,15 +78,6 @@ export default class Step extends React.Component {
         selection.anchorOffset === selection.anchorNode.length;
     cursorOnLeft = selection => selection.anchorOffset === 0;
 
-    handleKeyEvent = e => {
-        // Both keydown and keyup event will be triggered. Ignore keydown event
-        // so that `handleRichTextBoxKeyEventNavigation` will not fire twice
-        if (e.type === "keydown") {
-            return false;
-        }
-        return handleRichTextBoxKeyEventNavigation(e, this.props.record);
-    };
-
     handleBlur = e => {
         setFocusedStep(null);
     };
@@ -96,7 +87,8 @@ export default class Step extends React.Component {
     };
 
     render() {
-        const {record, selected, color, width} = this.props;
+        const {record, selected, color, width, completed} = this.props;
+        const {isContextMenuOpen} = this.state;
         var extraRichTextBoxProps = {};
         if (quip.apps.isApiVersionAtLeast("0.1.039")) {
             extraRichTextBoxProps.allowedInlineStyles = [
@@ -117,53 +109,61 @@ export default class Step extends React.Component {
         if (width) {
             style.width = width;
         }
-        return <div
-            className={cx(Styles.step, {
-                [Styles.selected]: selected,
-                [Styles.fixedWidth]: !width,
-            })}
-            ref={node => {
-                this._node = node;
-                record.setDom(node);
-            }}
-            style={style}>
-            <div className={Styles.contents}>
-                <div className={Styles.label}>
-                    <quip.apps.ui.RichTextBox
-                        allowedStyles={[
-                            quip.apps.RichTextRecord.Style.TEXT_PLAIN,
-                        ]}
-                        color={
-                            selected ? quip.apps.ui.ColorMap.WHITE.KEY : color
-                        }
-                        handleKeyEvent={this.handleKeyEvent}
-                        minHeight={INPUT_HEIGHT}
-                        onBlur={this.handleBlur}
-                        onFocus={this.handleFocus}
-                        record={record}
-                        useDocumentTheme={false}
-                        width="100%"
-                        {...extraRichTextBoxProps}/>
-                </div>
-                <div
-                    className={cx(Styles.commentsTrigger, {
-                        [Styles.commented]: record.getCommentCount() > 0,
-                    })}>
-                    <quip.apps.ui.CommentsTrigger
-                        color={color}
-                        invertColor={selected}
-                        record={record}
-                        showEmpty/>
-                </div>
-                <div className={Styles.chevron} onClick={this.showContextMenu}>
-                    <Chevron
-                        color={
-                            selected
-                                ? quip.apps.ui.ColorMap.WHITE.VALUE
-                                : quip.apps.ui.ColorMap[color].VALUE
-                        }/>
+        return <li aria-current={completed} className={Styles.stepContainer}>
+            <div
+                className={cx(Styles.step, {
+                    [Styles.selected]: selected,
+                    [Styles.fixedWidth]: !width,
+                })}
+                ref={node => {
+                    this._node = node;
+                    record.setDom(node);
+                }}
+                style={style}>
+                <div className={Styles.contents}>
+                    <div className={Styles.label}>
+                        <quip.apps.ui.RichTextBox
+                            allowedStyles={[
+                                quip.apps.RichTextRecord.Style.TEXT_PLAIN,
+                            ]}
+                            color={
+                                selected
+                                    ? quip.apps.ui.ColorMap.WHITE.KEY
+                                    : color
+                            }
+                            allowDefaultTabNavigation={true}
+                            minHeight={INPUT_HEIGHT}
+                            onBlur={this.handleBlur}
+                            onFocus={this.handleFocus}
+                            record={record}
+                            useDocumentTheme={false}
+                            width="100%"
+                            {...extraRichTextBoxProps}/>
+                    </div>
                 </div>
             </div>
-        </div>;
+            <div
+                className={cx(Styles.commentsTrigger, {
+                    [Styles.commented]: record.getCommentCount() > 0,
+                })}>
+                <quip.apps.ui.CommentsTrigger
+                    color={color}
+                    invertColor={selected}
+                    record={record}
+                    showEmpty/>
+            </div>
+            <button
+                className={Styles.chevron}
+                onClick={this.showContextMenu}
+                aria-expanded={isContextMenuOpen}
+                aria-label={quiptext("More options")}>
+                <Chevron
+                    color={
+                        selected
+                            ? quip.apps.ui.ColorMap.WHITE.VALUE
+                            : quip.apps.ui.ColorMap[color].VALUE
+                    }/>
+            </button>
+        </li>;
     }
 }

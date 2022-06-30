@@ -88,21 +88,3 @@ jobs:
                   CI: true
         env:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-    all:
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                node-version: [10.x, 12.x]
-                os: [ubuntu-latest, windows-latest]
-        steps:
-            - uses: actions/checkout@v2
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
-            - run: npm install
-            - run: npm test
-              env:
-                  CI: true
-        env:
-            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

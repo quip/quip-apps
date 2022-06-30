@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Auth_ from "./auth";
 import BaseOAuth_ from "./base-oauth";
 import Blob_ from "./blob";
@@ -14,7 +12,9 @@ import Record_ from "./record";
 import RecordIndex_ from "./record-index";
 import RecordList_ from "./record-list";
 import registerMigration from "./register-migration";
-import RichTextRecord_ from "./rich-text-record";
+import RichTextRecord_, {
+    RichTextRecordProperties as RichTextRecordProperties_,
+} from "./rich-text-record";
 import RootRecord_ from "./root-record";
 import * as ui from "./ui";
 import UrlAuth_ from "./url-auth";
@@ -51,4 +51,11 @@ const quip = {
     apps: api,
     elements: api,
 };
+
+namespace quip {
+    namespace apps {
+        export type RichTextRecordProperties = RichTextRecordProperties_;
+    }
+}
+
 export = quip;

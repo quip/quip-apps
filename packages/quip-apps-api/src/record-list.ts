@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Record from "./record";
 import Client from "./client";
 
@@ -37,7 +35,7 @@ export default class RecordList<T extends Record> {
     // TODO: can this conform to valid props for this classes of type T?
     // Probably would need to deprecate getProperties in favor of static
     // properties definition
-    add(value: {[key: string]: any}, index?: number) {
+    add(value: {[key: string]: any}, index?: number, isProgrammatic?: boolean) {
         const RecordConstructor = this.recordConstructor_;
         const item = new RecordConstructor();
         item.initialize();
@@ -57,7 +55,7 @@ export default class RecordList<T extends Record> {
         return !!this.recordsValue.find(i => i === item);
     }
 
-    delete() {
+    delete(isProgrammaticUpdate?: boolean) {
         this.isDeletedValue = true;
     }
 
@@ -73,7 +71,7 @@ export default class RecordList<T extends Record> {
         this.isDeletedValue;
     }
 
-    move(item: T, index: number) {
+    move(item: T, index: number, isProgrammaticUpdate?: boolean) {
         const parent = item.containingListValue;
         if (index < 0) {
             return false;
@@ -85,7 +83,7 @@ export default class RecordList<T extends Record> {
         return true;
     }
 
-    remove(item: T, skipDelete?: boolean) {
+    remove(item: T, skipDelete?: boolean, isProgrammaticUpdate?: boolean) {
         const idx = this.indexOf(item);
         if (idx > -1) {
             this.recordsValue.splice(idx, 1);

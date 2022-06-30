@@ -1,5 +1,3 @@
-// Copyright 2019 Quip
-
 import Client, {EventType} from "./client";
 
 enum PreferenceType {

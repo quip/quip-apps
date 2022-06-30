@@ -1,7 +1,7 @@
 {
     "name": "quip-cli",
     "description": "A Command Line Interface for the Quip Live Apps platform",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "author": "Quip",
     "bin": {
         "quip-cli": "./bin/run",
@@ -68,7 +68,7 @@
     "main": "lib/index.js",
     "oclif": {
         "commands": "./lib/commands",
-        "bin": "qla",
+        "bin": "quip-cli",
         "plugins": [
             "@oclif/plugin-help"
         ]

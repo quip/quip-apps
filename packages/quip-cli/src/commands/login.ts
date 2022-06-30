@@ -1,4 +1,5 @@
 import { Command, flags } from "@oclif/command";
+import chalk from "chalk";
 import fs from "fs";
 import http from "http";
 import open from "open";
@@ -7,8 +8,8 @@ import qs from "querystring";
 import url from "url";
 import { isLoggedIn } from "../lib/auth";
 import {
-    defaultConfigPath,
     DEFAULT_SITE,
+    defaultConfigPath,
     writeSiteConfig,
 } from "../lib/config";
 import pkceChallenge from "pkce-challenge";
@@ -28,20 +29,28 @@ const waitForLogin = (
         path.join(__dirname, "../..", "templates", "logged-in.html"),
         "utf-8"
     );
+    const loginCancelledPagePromise = fs.promises.readFile(
+        path.join(__dirname, "../..", "templates", "logged-in-cancelled.html"),
+        "utf-8"
+    );
     return new Promise((resolve) => {
         server_ = http.createServer(async (req, res) => {
             const urlInfo = url.parse(req.url || "");
-            const query = qs.parse(urlInfo.query || "")
+            const query = qs.parse(urlInfo.query || "");
             resolve(query);
-            
+
             if (query.next) {
-                res.statusCode=302;
-                res.setHeader('Location', query.next);
+                res.statusCode = 302;
+                res.setHeader("Location", query.next);
                 res.end();
             } else {
                 res.statusCode = 200;
                 res.setHeader("Content-Type", "text/html");
-                res.end(await pagePromise);
+                if (query.cancelled) {
+                    res.end(await loginCancelledPagePromise);
+                } else {
+                    res.end(await pagePromise);
+                }
             }
 
             server_?.close();
@@ -55,17 +64,17 @@ const DEFAULT_PORT = 9898;
 
 export const login = async ({
     site,
-    transparent = false,
     hostname = DEFAULT_HOSTNAME,
     port = DEFAULT_PORT,
     config = defaultConfigPath(),
+    saveSiteConfig = true,
 }: {
     site: string;
-    transparent?: boolean;
     hostname?: string;
     port?: number;
     config?: string;
-}): Promise<void> => {
+    saveSiteConfig?: boolean;
+}): Promise<string> => {
     const { code_challenge, code_verifier } = pkceChallenge(43);
     const state = getStateString();
 
@@ -73,13 +82,9 @@ export const login = async ({
     let loginURL = `https://${site}/cli/login?client_id=quip-cli&response_type=code&redirect_uri=${encodeURIComponent(
         redirectURL
     )}&state=${state}&code_challenge=${code_challenge}&code_challenge_method=S256`;
-    if (transparent) {
-        loginURL += "&transparent=true";
-    } else {
-        println(
-            `opening login URL in your browser. Log in to Quip there.\n${loginURL}`
-        );
-    }
+    println(
+        `opening login URL in your browser. Log in to Quip there.\n${loginURL}\n`
+    );
     let currentWindow: ChildProcess | undefined;
     const responseParams = await waitForLogin(hostname, port, async () => {
         currentWindow = await open(loginURL);
@@ -117,7 +122,10 @@ export const login = async ({
             } - response: ${JSON.stringify(tokenResponse, null, 2)}`
         );
     }
-    await writeSiteConfig(config, site, { accessToken });
+    if (saveSiteConfig) {
+        await writeSiteConfig(config, site, { accessToken });
+    }
+    return accessToken;
 };
 
 export default class Login extends Command {
@@ -135,6 +143,19 @@ export default class Login extends Command {
             description:
                 "use a specific quip site rather than the standard quip.com login",
             default: DEFAULT_SITE,
+        }),
+        "with-token": flags.string({
+            char: "t",
+            description:
+                "log in users with your specified access token instead of redirecting to a login page.\n" +
+                "SEE ALSO: https://quip.com/dev/automation/documentation/current#tag/Authentication",
+            helpValue: "token",
+        }),
+        export: flags.boolean({
+            char: "e",
+            description:
+                "Get a new access token with login, then display the token in the terminal without storing it in the config file.\n" +
+                "Note: You can’t use both the `--export` and `--with-token` options in the same command.",
         }),
         port: flags.integer({
             hidden: true,
@@ -166,8 +187,23 @@ export default class Login extends Command {
         const { flags } = this.parse(Login);
 
         const { site, force, hostname, port, config } = flags;
+        let accessToken = flags["with-token"];
+        const displayTokenOnly = flags["export"];
 
-        if (!force && (await isLoggedIn(config, site))) {
+        // displays error message if command has "--with-token" flag without passing a value.
+        if (accessToken === "") {
+            this.error("Flag --with-token expects a value.");
+            return;
+        }
+
+        if (accessToken !== undefined && displayTokenOnly) {
+            this.error(
+                "Flags --with-token and --export cannot be used together."
+            );
+            return;
+        }
+
+        if (!force && !displayTokenOnly && (await isLoggedIn(config, site))) {
             let alt = "";
             if (site === DEFAULT_SITE) {
                 alt = " or --site to log in to a different site";
@@ -179,8 +215,25 @@ export default class Login extends Command {
         }
 
         try {
-            await login({ site, hostname, port, config });
-            this.log("Successfully logged in.");
+            if (accessToken) {
+                await writeSiteConfig(config, site, { accessToken });
+            } else {
+                const saveSiteConfig = !displayTokenOnly;
+                accessToken = await login({
+                    site,
+                    hostname,
+                    port,
+                    config,
+                    saveSiteConfig,
+                });
+            }
+            if (displayTokenOnly) {
+                this.log(
+                    chalk`{magenta Your access token is "${accessToken}".}`
+                );
+            } else {
+                this.log("Successfully logged in.");
+            }
         } catch (e) {
             this.error(e);
         }

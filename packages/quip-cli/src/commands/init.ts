@@ -4,7 +4,11 @@ import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
 import cliAPI, { successOnly } from "../lib/cli-api";
-import { defaultConfigPath, DEFAULT_SITE } from "../lib/config";
+import {
+    defaultConfigPath,
+    DEFAULT_SITE,
+    NPM_BINARY_NAME,
+} from "../lib/config";
 import { print, println } from "../lib/print";
 import { Manifest } from "../lib/types";
 import { copy, runCmd } from "../lib/util";
@@ -49,6 +53,7 @@ const defaultPackageOptions = (name: string) => ({
     name: packageName(name),
     description: "A Quip Live App",
     typescript: true,
+    use_color_theme: true,
 });
 
 const defaultManifestOptions = (
@@ -156,6 +161,12 @@ export default class Init extends Command {
                 message: "Use Typescript?",
                 default: defaultPackage.typescript,
             },
+            {
+                type: "confirm",
+                name: "use_color_theme",
+                message: "Use Color Theme?",
+                default: defaultPackage.use_color_theme,
+            },
         ]);
 
         const { addManifestConfig } = await inquirer.prompt([
@@ -190,16 +201,6 @@ export default class Init extends Command {
                     default: 300,
                     validate: validateNumber,
                     filter: Number,
-                },
-                {
-                    type: "number",
-                    name: "initial_width",
-                    message:
-                        "Specify an initial width for your app (optional)\nThis will be the width of the app while it is loading.\n",
-                    default: "none",
-                    validate: (input) =>
-                        input === "none" || validateNumber(input),
-                    filter: (val) => (val === "none" ? -1 : val),
                 },
             ]);
             Object.assign(manifestOptions, extraManifestOptions);
@@ -350,13 +351,13 @@ export default class Init extends Command {
             );
             // npm install
             println(chalk`{green installing dependencies...}`);
-            await runCmd(appDir, "npm", "install");
+            await runCmd(appDir, NPM_BINARY_NAME, "install");
             // bump the version since we already have a version 0 in the console
             println(chalk`{green bumping version...}`);
             await bump(appDir, "minor", { silent: flags.json });
             // npm run build
             println(chalk`{green building app...}`);
-            await runCmd(appDir, "npm", "run", "build");
+            await runCmd(appDir, NPM_BINARY_NAME, "run", "build");
             // then publish the new version
             println(chalk`{green uploading bundle...}`);
             const newManifest = await doPublish(

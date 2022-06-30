@@ -1,20 +1,27 @@
-// Copyright 2019 Quip
-
 import React, {Component, ReactNode} from "react";
 import {CanvasRecordCommentAnchorRecord} from "./canvas-record";
 import Record from "./record";
 import User from "./user";
 import RichTextRecord from "./rich-text-record";
+import ImageRecord from "./image-record";
 
 // TODO: handle children in this file correctly (if they differ from current
 // handling) so that trees will be snapshottable
 
+export class Backdrop extends Component<{
+    onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+}> {
+    render() {
+        return React.createElement("div", undefined, "ui.Backdrop");
+    }
+}
+
 export class Button extends Component<{
     className?: string;
-    onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     primary?: boolean;
-    text: ReactNode;
-    type?: string;
+    text: React.ReactNode;
+    type?: "button" | "submit" | "reset";
     disabled?: boolean;
 }> {
     render() {
@@ -33,10 +40,12 @@ export class CalendarPicker extends Component<{
 
 export class Canvas extends Component<{
     record: CanvasRecordCommentAnchorRecord;
-    isCurrentlyAdding: boolean;
-    isValid?: boolean;
-    width: number;
-    height: number;
+    isInCommentMode?: boolean;
+    onCommentAdd?: () => void;
+    cancelCommentMode?: () => any;
+    isCommentAnchorValidCallback?: (
+        anchor: CanvasRecordCommentAnchorRecord
+    ) => boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.Canvas");
@@ -126,11 +135,43 @@ export class CommentsTrigger extends Component<{
     }
 }
 
+export enum ImageMode {
+    NONE,
+    FOCUSED,
+    COMMENT,
+    CROP,
+}
+
+export class Image extends Component<{
+    record: ImageRecord;
+    width: number;
+    onWidthAndAspectRatioUpdate: (
+        width: number | null,
+        aspectRatio: number | null
+    ) => void;
+    minWidth: number;
+    minHeight: number;
+    placeholderWidth: number;
+    placeholderHeight: number;
+    placeholderText: string;
+    mode: ImageMode;
+    onFocusChanged?: (focused: boolean) => void;
+    onImageLoaded?: (record: ImageRecord) => void;
+    // Called when completing or canceling commenting or cropping.
+    onOperationCompleted?: () => void;
+    altText?: string;
+    className?: string;
+}> {
+    render() {
+        return React.createElement("div", undefined, "ui.Image");
+    }
+}
+
 export class ProfilePicture extends Component<{
     user: User;
     size: number;
-    round: boolean;
-    fallbackToInitials: boolean;
+    round?: boolean;
+    fallbackToInitials?: boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.ProfilePicture");
@@ -204,6 +245,7 @@ export class RichTextBox extends Component<{
     onBlur?: () => void;
     handleKeyEvent?: (e: React.KeyboardEvent<any>) => void;
     color?: keyof typeof ColorMap;
+    allowDefaultTabNavigation?: boolean;
 }> {
     render() {
         return React.createElement("div", undefined, "ui.RichTextBox");

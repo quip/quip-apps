@@ -3,21 +3,24 @@ import chalk from "chalk";
 import fs from "fs";
 import path from "path";
 import semver, { ReleaseType } from "semver";
+import { NPM_BINARY_NAME } from "../lib/config";
 import { findManifest, getManifest, writeManifest } from "../lib/manifest";
 import { println } from "../lib/print";
 import { runCmd, runCmdPromise } from "../lib/util";
 
 export const bump = async (
     dir: string,
-    increment: ReleaseType,
+    increment: ReleaseType | "none",
     options?: {
         prereleaseName?: string;
+        versionNumber?: number;
         message?: string;
         silent?: boolean;
         noGit?: boolean;
     }
 ) => {
-    const { message, silent, prereleaseName, noGit } = options || {};
+    const { message, silent, prereleaseName, noGit, versionNumber } =
+        options || {};
     const packagePath = path.join(dir, "package.json");
     const manifestPath = await findManifest(dir);
     if (!manifestPath) {
@@ -44,23 +47,30 @@ export const bump = async (
     }
     // read the package and get the next version
     const pkg = JSON.parse(await fs.promises.readFile(packagePath, "utf8"));
-    const version = semver.inc(pkg.version, increment, prereleaseName);
-    if (!version) {
-        throw new Error(
-            `Failed bumping version, semver doesn't understand ${pkg.version} as a valid version string.`
-        );
+    let version = pkg.version;
+    if (increment !== "none") {
+        version = semver.inc(version, increment, prereleaseName);
+        if (!version) {
+            throw new Error(
+                `Failed bumping version, semver doesn't understand ${version} as a valid version string.`
+            );
+        }
     }
 
     // update manifest.json to reflect the latest version
     const manifest = await getManifest(manifestPath);
-    manifest.version_number += 1;
+    if (versionNumber) {
+        manifest.version_number = versionNumber;
+    } else {
+        manifest.version_number += 1;
+    }
     manifest.version_name = version;
     await writeManifest(manifestPath, manifest);
 
     if (!noGit) {
         // stage manifest.json since we want the increment to be part of our version tag
         try {
-            await runCmd(dir, "git", "add", manifestPath);
+            await runCmdPromise(dir, "git", "add", manifestPath);
         } catch (e) {
             // silent failure ok here, since it just means we're not using git
         }
@@ -75,7 +85,14 @@ export const bump = async (
         extraArgs.push("--git-tag-version", "false");
     }
     // run with --force since we will have a dirty tree (cause we added manifest.json above)
-    await runCmd(dir, "npm", "version", "--force", version, ...extraArgs);
+    await runCmd(
+        dir,
+        NPM_BINARY_NAME,
+        "version",
+        "--force",
+        version,
+        ...extraArgs
+    );
     if (!silent) {
         println(
             chalk`{magenta Successfully updated ${manifest.name} v${manifest.version_name} (${manifest.version_number})}`
@@ -95,6 +112,11 @@ export default class Bump extends Command {
             description:
                 "Specify a commit message to use as the version commit message",
         }),
+        "version-number": flags.integer({
+            char: "v",
+            description:
+                "Bump the version to a specific number rather than just incrementing to the next integer",
+        }),
         "prerelease-name": flags.string({
             char: "p",
             description:
@@ -111,13 +133,14 @@ export default class Bump extends Command {
         {
             name: "increment",
             description:
-                "which number to bump - can be one of 'prerelease', 'major', 'minor', or 'patch' - defaults to 'patch'",
+                "which number to bump - can be one of 'prerelease', 'major', 'minor', 'patch', or 'none' - defaults to 'none'",
+            default: "none",
         },
     ];
 
     async run() {
         const { args, flags } = this.parse(Bump);
-        const increment = (args.increment || "patch").toLowerCase();
+        const increment = args.increment.toLowerCase();
         const manifestPath = await findManifest(process.cwd());
         const noGit = flags["no-git"];
         if (!manifestPath) {
@@ -143,7 +166,11 @@ export default class Bump extends Command {
             }
         }
 
-        if (!["major", "minor", "patch", "prerelease"].includes(increment)) {
+        if (
+            !["major", "minor", "patch", "prerelease", "none"].includes(
+                increment
+            )
+        ) {
             this._help();
             return;
         }
@@ -151,6 +178,7 @@ export default class Bump extends Command {
         bump(process.cwd(), increment, {
             message: flags.message,
             prereleaseName: flags["prerelease-name"],
+            versionNumber: flags["version-number"],
             noGit,
         });
     }

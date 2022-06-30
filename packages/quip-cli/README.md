@@ -4,22 +4,27 @@ This package contains the Quip command line interface, which is used for interac
 
 <!-- toc -->
 * [Quip CLI](#quip-cli)
+* [Requirements](#requirements)
 * [Usage](#usage)
 * [Commands](#commands)
 <!-- tocstop -->
+
+# Requirements
+
+Node v10 or higher.
 
 # Usage
 
 <!-- usage -->
 ```sh-session
 $ npm install -g quip-cli
-$ qla COMMAND
+$ quip-cli COMMAND
 running command...
-$ qla (-v|--version|version)
-quip-cli/0.1.2-alpha.13 darwin-x64 node-v10.15.0
-$ qla --help [COMMAND]
+$ quip-cli (-v|--version|version)
+quip-cli/0.2.0-alpha.38 darwin-x64 node-v14.18.1
+$ quip-cli --help [COMMAND]
 USAGE
-  $ qla COMMAND
+  $ quip-cli COMMAND
 ...
 ```
 <!-- usagestop -->
@@ -27,22 +32,22 @@ USAGE
 # Commands
 
 <!-- commands -->
-* [`qla apps`](#qla-apps)
-* [`qla bump [INCREMENT]`](#qla-bump-increment)
-* [`qla help [COMMAND]`](#qla-help-command)
-* [`qla init`](#qla-init)
-* [`qla login`](#qla-login)
-* [`qla migration [NAME]`](#qla-migration-name)
-* [`qla publish`](#qla-publish)
-* [`qla release [BUILD NUMBER]`](#qla-release-build-number)
+* [`quip-cli apps`](#quip-cli-apps)
+* [`quip-cli bump [INCREMENT]`](#quip-cli-bump-increment)
+* [`quip-cli help [COMMAND]`](#quip-cli-help-command)
+* [`quip-cli init`](#quip-cli-init)
+* [`quip-cli login`](#quip-cli-login)
+* [`quip-cli migration [NAME]`](#quip-cli-migration-name)
+* [`quip-cli publish`](#quip-cli-publish)
+* [`quip-cli release [BUILD]`](#quip-cli-release-build)
 
-## `qla apps`
+## `quip-cli apps`
 
 Browse, inspect, and manipulate your Apps
 
 ```
 USAGE
-  $ qla apps
+  $ quip-cli apps
 
 OPTIONS
   -h, --help             show CLI help
@@ -52,18 +57,19 @@ OPTIONS
   -v, --version=version  which version to show the details for. Only useful with --id
 ```
 
-_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/apps.ts)_
+_See code: [src/commands/apps.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/apps.ts)_
 
-## `qla bump [INCREMENT]`
+## `quip-cli bump [INCREMENT]`
 
 Bump the application version (and create a version commit/tag)
 
 ```
 USAGE
-  $ qla bump [INCREMENT]
+  $ quip-cli bump [INCREMENT]
 
 ARGUMENTS
-  INCREMENT  which number to bump - can be one of 'prerelease', 'major', 'minor', or 'patch' - defaults to 'patch'
+  INCREMENT  [default: none] which number to bump - can be one of 'prerelease', 'major', 'minor', 'patch', or 'none' -
+             defaults to 'none'
 
 OPTIONS
   -h, --help                             show CLI help
@@ -72,17 +78,20 @@ OPTIONS
 
   -p, --prerelease-name=prerelease-name  When specifying prerelease, use this as the prefix, e.g. -p alpha will produce
                                          v0.x.x-alpha.x
+
+  -v, --version-number=version-number    Bump the version to a specific number rather than just incrementing to the next
+                                         integer
 ```
 
-_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/bump.ts)_
+_See code: [src/commands/bump.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/bump.ts)_
 
-## `qla help [COMMAND]`
+## `quip-cli help [COMMAND]`
 
-display help for qla
+display help for quip-cli
 
 ```
 USAGE
-  $ qla help [COMMAND]
+  $ quip-cli help [COMMAND]
 
 ARGUMENTS
   COMMAND  command to show help for
@@ -93,13 +102,13 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.1.0/src/commands/help.ts)_
 
-## `qla init`
+## `quip-cli init`
 
 Initialize a new Live App Project
 
 ```
 USAGE
-  $ qla init
+  $ quip-cli init
 
 OPTIONS
   -d, --dir=dir    specify directory to create app in (defaults to the name provided)
@@ -109,33 +118,43 @@ OPTIONS
   -n, --name=name  set the name of the application
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
   --no-create      only create a local app (don't create an app in the dev console or assign an ID)
+  --no-release     don't release the initial version (leave app uninstallable and in the "unreleased" state)
 ```
 
-_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/init.ts)_
 
-## `qla login`
+## `quip-cli login`
 
 Logs in to Quip and stores credentials in the .quiprc file
 
 ```
 USAGE
-  $ qla login
+  $ quip-cli login
 
 OPTIONS
-  -f, --force      forces a re-login even if a user is currently logged in
-  -h, --help       show CLI help
-  -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
+  -e, --export            Get a new access token with login, then display the token in the terminal without storing it
+                          in the config file.
+                          Note: You can’t use both the `--export` and `--with-token` options in the same command.
+
+  -f, --force             forces a re-login even if a user is currently logged in
+
+  -h, --help              show CLI help
+
+  -s, --site=site         [default: quip.com] use a specific quip site rather than the standard quip.com login
+
+  -t, --with-token=token  log in users with your specified access token instead of redirecting to a login page.
+                          SEE ALSO: https://quip.com/dev/automation/documentation/current#tag/Authentication
 ```
 
-_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/login.ts)_
 
-## `qla migration [NAME]`
+## `quip-cli migration [NAME]`
 
 Creates a new migration
 
 ```
 USAGE
-  $ qla migration [NAME]
+  $ quip-cli migration [NAME]
 
 ARGUMENTS
   NAME  A short description to generate the filename with
@@ -149,15 +168,15 @@ OPTIONS
                          in the manifest
 ```
 
-_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/migration.ts)_
+_See code: [src/commands/migration.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/migration.ts)_
 
-## `qla publish`
+## `quip-cli publish`
 
 Uploads this bundle to the developer console, and sets it as the latest development version.
 
 ```
 USAGE
-  $ qla publish
+  $ quip-cli publish
 
 OPTIONS
   -h, --help           show CLI help
@@ -166,18 +185,18 @@ OPTIONS
   -s, --site=site      [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/publish.ts)_
 
-## `qla release [BUILD NUMBER]`
+## `quip-cli release [BUILD]`
 
 Release an app to Beta or Production
 
 ```
 USAGE
-  $ qla release [BUILD NUMBER]
+  $ quip-cli release [BUILD]
 
 ARGUMENTS
-  BUILD NUMBER  the build number to release
+  BUILD  the build number to release
 
 OPTIONS
   -b, --beta       release beta version
@@ -187,15 +206,5 @@ OPTIONS
   -s, --site=site  [default: quip.com] use a specific quip site rather than the standard quip.com login
 ```
 
-_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.1.2-alpha.13/src/commands/release.ts)_
+_See code: [src/commands/release.ts](https://github.com/quip/quip-apps/blob/v0.2.0-alpha.38/src/commands/release.ts)_
 <!-- commandsstop -->
-
-## Running locally
-
-When developing locally, you'll iterate by calling `bin/run <your-command>`.
-
-## Adding new commands
-
-This tool uses [oclif](https://oclif.io/) to handle arg parsing and user interactivity.
-
-To add a command to this repo, run `npx oclif command <name>`. For other options, check `npx oclif --help`
