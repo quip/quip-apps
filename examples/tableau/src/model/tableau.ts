@@ -60,7 +60,10 @@ export class TableauClient {
 
     get token() {
         if (this.loggedIn) {
-            return this.auth.getTokenResponseParam("access_token");
+            const token = this.auth.getTokenResponseParam("access_token");
+            // Refresh token after each use
+            this.refreshToken(); // it's async, don't wait for it to be refreshed...
+            return token;
         }
         return undefined;
     }

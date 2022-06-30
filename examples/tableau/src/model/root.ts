@@ -84,7 +84,6 @@ export interface AppData {
     loggedIn: boolean;
     selectOpen: boolean;
     newDashboardUrl: string;
-    token?: string;
     filters: Filter[];
     params: Param[];
 }
@@ -147,10 +146,13 @@ export class RootEntity extends quip.apps.RootRecord {
             loggedIn: this.tableauClient.loggedIn,
             selectOpen: this.selectDashboardOpen,
             newDashboardUrl: this.newDashboardUrl,
-            token: this.tableauClient.token,
             filters: this.getFilters(),
             params: this.getParams(),
         };
+    }
+
+    getToken() {
+        return this.tableauClient.token;
     }
 
     setViewWidth(width: ViewWidth) {

@@ -58,6 +58,10 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
         rootRecord.setNewDashboardUrl(event.currentTarget.value.trim());
     };
 
+    const openInTableau = () => {
+        rootRecord.openInTableau();
+    };
+
     const vizContainer = useRef<HTMLDivElement | null>(null);
 
     const filterChangedHandler_ = async (e) => {
@@ -116,9 +120,19 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
 
     const isNewUrlValid =
         data.newDashboardUrl.length > 0 &&
-        data.newDashboardUrl.startsWith(TABLEAU_BASE_URL);
+        data.newDashboardUrl.startsWith(TABLEAU_BASE_URL) &&
+        !data.newDashboardUrl.includes("/workbooks");
 
-    const isConfigured = !!data.viewUrl && !!data.token;
+    let urlError: string | undefined = undefined;
+    if (!isNewUrlValid && data.newDashboardUrl.length > 0) {
+        if (!data.newDashboardUrl.startsWith(TABLEAU_BASE_URL)) {
+            urlError = `The URL you entered does not start with ${TABLEAU_BASE_URL}`;
+        } else if (data.newDashboardUrl.includes("/workbooks")) {
+            urlError = "The URL you entered does not appear to be a dahboard";
+        }
+    }
+
+    const isConfigured = !!data.viewUrl && data.loggedIn;
 
     let dashboard = (
         <div className="container config">
@@ -137,69 +151,88 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
     );
 
     if (isConfigured) {
-        const filters = data.filters
-            .filter((filter) => filter.active)
-            .map((filter) => {
-                if (filter.type === FilterType.Simple) {
-                    return (
-                        <viz-filter
-                            key={filter.id}
-                            field={filter.name}
-                            value={filter.value.value}></viz-filter>
-                    );
-                } else if (filter.type === FilterType.Range) {
-                    return (
-                        <viz-range-filter
-                            key={filter.id}
-                            field={filter.name}
-                            min={filter.value.min}
-                            max={filter.value.max}
-                            null-option={
-                                filter.value.showNull
-                                    ? "allValues"
-                                    : "nonNullValues"
-                            }></viz-range-filter>
-                    );
-                } else if (filter.type === FilterType.RelativeDate) {
-                    return (
-                        <viz-relative-date-filter
-                            key={filter.id}
-                            field={filter.name}
-                            period-type={filter.value.periodType}
-                            range-type={filter.value.rangeType}
-                            range-n={filter.value.rangeN}
-                            anchor-date={
-                                filter.value.anchorDate
-                            }></viz-relative-date-filter>
-                    );
-                }
-            });
+        if (quip.apps.isDesktopWeb) {
+            const token = rootRecord.getToken();
 
-        const parameters = data.params
-            .filter((param) => param.active)
-            .map((param) => (
-                <viz-parameter
-                    key={param.id}
-                    name={param.name}
-                    value={param.value}
-                />
-            ));
+            const filters = data.filters
+                .filter((filter) => filter.active)
+                .map((filter) => {
+                    if (filter.type === FilterType.Simple) {
+                        return (
+                            <viz-filter
+                                key={filter.id}
+                                field={filter.name}
+                                value={filter.value.value}></viz-filter>
+                        );
+                    } else if (filter.type === FilterType.Range) {
+                        return (
+                            <viz-range-filter
+                                key={filter.id}
+                                field={filter.name}
+                                min={filter.value.min}
+                                max={filter.value.max}
+                                null-option={
+                                    filter.value.showNull
+                                        ? "allValues"
+                                        : "nonNullValues"
+                                }></viz-range-filter>
+                        );
+                    } else if (filter.type === FilterType.RelativeDate) {
+                        return (
+                            <viz-relative-date-filter
+                                key={filter.id}
+                                field={filter.name}
+                                period-type={filter.value.periodType}
+                                range-type={filter.value.rangeType}
+                                range-n={filter.value.rangeN}
+                                anchor-date={
+                                    filter.value.anchorDate
+                                }></viz-relative-date-filter>
+                        );
+                    }
+                });
 
-        dashboard = (
-            <div>
-                <tableau-viz
-                    src={data.viewUrl}
-                    width={data.width}
-                    id="dashboard"
-                    token={data.token}
-                    ref={(el) => setContainer(el)}>
-                    {filters}
-                    {parameters}
-                </tableau-viz>
-                <FilterManager rootRecord={rootRecord} />
-                <ParamManager rootRecord={rootRecord} />
-            </div>
-        );
+            const parameters = data.params
+                .filter((param) => param.active)
+                .map((param) => (
+                    <viz-parameter
+                        key={param.id}
+                        name={param.name}
+                        value={param.value}
+                    />
+                ));
+
+            dashboard = (
+                <div>
+                    <tableau-viz
+                        src={data.viewUrl}
+                        width={data.width}
+                        id="dashboard"
+                        token={token}
+                        ref={(el) => setContainer(el)}>
+                        {filters}
+                        {parameters}
+                    </tableau-viz>
+                    <FilterManager rootRecord={rootRecord} />
+                    <ParamManager rootRecord={rootRecord} />
+                </div>
+            );
+        } else {
+            dashboard = (
+                <div>
+                    <p>
+                        You can only view the dashboard in this document from
+                        web!
+                    </p>
+                    <quip.apps.ui.Button
+                        text="Open in Tableau"
+                        className="margin-m"
+                        primary
+                        onClick={openInTableau}
+                    />
+                </div>
+            );
+        }
     }
 
     let dashboardSelector = null;
@@ -216,9 +249,12 @@ const Dashboard = ({rootRecord}: DashboardProps) => {
                             type="url"
                             value={data.newDashboardUrl}
                             onChange={updateNewDashboardUrl}
-                            placeholder="Enter Tableau Dashboard URL"
+                            placeholder={`Enter Tableau Dashboard URL (it should start with ${TABLEAU_BASE_URL}...)`}
                         />
                     </div>
+                    {urlError ? (
+                        <div className="margin-m">{urlError}</div>
+                    ) : null}
                 </div>
                 <div className="footer">
                     <quip.apps.ui.Button
