@@ -1,6 +1,6 @@
 {
   "name": "slds-resolver",
-  "version": "0.2.1-alpha.1",
+  "version": "0.2.1-alpha.2",
   "description": "A Webpack Resolver plugin for handling SLDS assets",
   "author": "Jesse Ditson <jditson@quip.com>",
   "homepage": "https://github.com/quip/quip-apps#readme",
