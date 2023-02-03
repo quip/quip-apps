@@ -17,7 +17,7 @@
         "eslint-config-prettier": "^2.5.0",
         "eslint-plugin-prettier": "^2.3.1",
         "eslint-plugin-react": "^7.3.0",
-        "moment-timezone": "^0.5.14",
+        "moment-timezone": "^0.5.35",
         "prettier": "^1.7.0"
     },
     "dependencies": {
