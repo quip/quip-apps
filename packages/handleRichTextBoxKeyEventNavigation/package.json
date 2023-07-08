@@ -10,7 +10,7 @@
         "build": "cross-env-shell NODE_ENV=production webpack --output-library-target umd"
     },
     "dependencies": {
-        "quip-apps-webpack-config": "^0.0.45"
+        "quip-apps-webpack-config": "^0.1.3"
     },
     "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
     "devDependencies": {
