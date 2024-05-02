@@ -23,6 +23,7 @@
         "typescript": "^3.6.3"
     },
     "dependencies": {
+        "@types/node": "^14.18.1",
         "quip-apps-api": "next"
     }
 }
