@@ -10,7 +10,7 @@ jobs:
                 working-directory: packages/quip-apps-api
         strategy:
             matrix:
-                node-version: [10.x, 12.x]
+                node-version: [20.11.1]
                 os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm install
+            - run: npm ci
             - run: npm test
               env:
                   CI: true
@@ -31,7 +31,7 @@ jobs:
                 working-directory: packages/quip-cli
         strategy:
             matrix:
-                node-version: [10.x, 12.x]
+                node-version: [20.11.1]
                 os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm install
+            - run: npm ci
             - run: npm test
               env:
                   CI: true
@@ -52,7 +52,7 @@ jobs:
                 working-directory: packages/quip-test-utils
         strategy:
             matrix:
-                node-version: [10.x, 12.x]
+                node-version: [20.11.1]
                 os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
@@ -60,7 +60,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm install
+            - run: npm ci
             - run: npm run build
             - run: npm test
               env:
@@ -74,7 +74,7 @@ jobs:
                 working-directory: packages/quiptext
         strategy:
             matrix:
-                node-version: [10.x, 12.x]
+                node-version: [20.11.1]
                 os: [ubuntu-latest, windows-latest]
         steps:
             - uses: actions/checkout@v2
@@ -82,7 +82,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm install
+            - run: npm ci
             - run: npm test
               env:
                   CI: true
