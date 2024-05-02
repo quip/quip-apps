@@ -30,14 +30,14 @@
     "react": ">=15.0.0"
   },
   "devDependencies": {
-    "@types/react": "15.6.27",
+    "@types/react": "^18.3.1",
     "coveralls": "^3.0.6",
     "import-fresh": "^3.1.0",
     "nyc": "^14.1.1",
-    "react": "^16.9.0",
-    "react-test-renderer": "^17.0.1",
+    "react": "^18.3.1",
+    "react-test-renderer": "^18.3.1",
     "tape": "^4.11.0",
-    "typescript": "^3.6.3"
+    "typescript": "^5.4.5"
   },
   "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1"
 }
