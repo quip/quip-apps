@@ -16,6 +16,7 @@
     "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
     "devDependencies": {
         "cross-env": "^7.0.3",
-        "webpack-cli": "^5.1.4"
+        "webpack-cli": "^5.1.4",
+        "@babel/preset-env": "^7.5.5"
     }
 }
