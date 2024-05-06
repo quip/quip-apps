@@ -7,13 +7,15 @@
     "author": "Quip",
     "main": "dist/handleRichTextBoxKeyEventNavigation.js",
     "scripts": {
-        "build": "cross-env-shell NODE_ENV=production webpack --output-library-target umd"
+        "build": "cross-env-shell NODE_ENV=production webpack"
     },
     "dependencies": {
-        "quip-apps-webpack-config": "^0.2.1-alpha.2"
+        "quip-apps-webpack-config": "^0.2.1-alpha.2",
+        "@types/node": "^20.11.1"
     },
     "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
     "devDependencies": {
-        "cross-env": "^7.0.3"
+        "cross-env": "^7.0.3",
+        "webpack-cli": "^5.1.4"
     }
 }

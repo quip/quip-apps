@@ -22,11 +22,11 @@ export const useFixtureDir = (dir: string) => {
         return cleanFixtures(true);
     };
 };
-export const readManifestContent = async (dir?: string): Promise<string> => {
+export const readManifestContent = (dir?: string): string => {
     const mPath = dir ? path.join(dir, "manifest.json") : "manifest.json";
-    return String(await fs.promises.readFile(mPath, "utf-8"));
+    return String(fs.readFileSync(mPath, "utf-8"));
 };
-export const readManifest = async (dir?: string) => {
-    const content = await readManifestContent(dir);
+export const readManifest = (dir?: string) => {
+    const content = readManifestContent(dir);
     return JSON.parse(content);
 };

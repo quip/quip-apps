@@ -21,14 +21,14 @@ describe("qla migration", () => {
         afterAll(() => cleanup());
 
         test("verify manifest", async () => {
-            const manifest = await readManifest();
+            const manifest = readManifest();
             // We run this first to force snapshots to be updated when fixtures change.
             expect(manifest).toMatchSnapshot();
         });
         oclifTest
             .command(["migration"])
             .it("creates a migration with today's date", async (ctx) => {
-                const manifest = await readManifest();
+                const manifest = readManifest();
                 expect(manifest.migrations).toBeDefined();
                 expect(manifest.migrations[0]).toMatchSnapshot();
                 const migration = await fs.promises.readFile(
@@ -53,7 +53,7 @@ describe("qla migration", () => {
             .it(
                 "increments the migration number when adding another",
                 async (ctx) => {
-                    const manifest = await readManifest();
+                    const manifest = readManifest();
                     expect(manifest.migrations).toMatchSnapshot();
                 }
             );
@@ -67,7 +67,7 @@ describe("qla migration", () => {
         afterAll(() => cleanup());
 
         test("verify manifest", async () => {
-            const manifest = await readManifest();
+            const manifest = readManifest();
             // We run this first to force snapshots to be updated when fixtures change.
             expect(manifest).toMatchSnapshot();
         });
@@ -76,7 +76,7 @@ describe("qla migration", () => {
             .it(
                 "creates a migration with a filesystem friendly name",
                 async (ctx) => {
-                    const manifest = await readManifest();
+                    const manifest = readManifest();
                     expect(manifest.migrations[0]).toMatchSnapshot();
                 }
             );
@@ -85,7 +85,7 @@ describe("qla migration", () => {
             .it(
                 "increments the migration number when adding another",
                 async (ctx) => {
-                    const manifest = await readManifest();
+                    const manifest = readManifest();
                     expect(manifest.migrations[1]).toMatchSnapshot();
                 }
             );
@@ -99,14 +99,14 @@ describe("qla migration", () => {
         afterAll(() => cleanup());
 
         test("verify manifest", async () => {
-            const manifest = await readManifest();
+            const manifest = readManifest();
             // We run this first to force snapshots to be updated when fixtures change.
             expect(manifest).toMatchSnapshot();
         });
         oclifTest
             .command(["migration", "version", "-v=42"])
             .it("adds the correct version_number", async (ctx) => {
-                const manifest = await readManifest();
+                const manifest = readManifest();
                 expect(manifest.migrations[0]).toMatchSnapshot();
             });
     });
@@ -175,7 +175,7 @@ describe("qla migration", () => {
             .it(
                 "creates a new folder and adds a migration to the specified folder",
                 async (ctx) => {
-                    const manifest = await readManifest();
+                    const manifest = readManifest();
                     expect(manifest.migrations[0]).toMatchSnapshot();
                     expect(() =>
                         fs.statSync(

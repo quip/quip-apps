@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const Autoprefixer = require("autoprefixer");
@@ -30,7 +30,7 @@ function minimizers() {
                     mangle: false,
                 },
             }),
-            new OptimizeCSSAssetsPlugin({}),
+            new CssMinimizerPlugin({}),
         ];
     }
     return minimizers;
