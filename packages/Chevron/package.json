@@ -16,6 +16,8 @@
     "devDependencies": {
         "cross-env": "^7.0.3",
         "webpack-cli": "^5.1.4",
-        "webpack": "^5.91.0"
+        "webpack": "^5.91.0",
+        "@babel/core": "^7.5.5",
+        "@babel/preset-env": "^7.5.5"
     }
 }
