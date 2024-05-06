@@ -1,6 +1,6 @@
 {
   "name": "quiptext",
-  "version": "0.2.1-alpha.2",
+  "version": "0.2.1-alpha.3",
   "description": "shim for Quip Live Apps string internationalization",
   "main": "index.js",
   "types": "./dist/quiptext.d.ts",
@@ -29,14 +29,14 @@
     "react": ">=15.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.11.1",
     "@types/react": "^18.3.1",
     "coveralls": "^3.0.6",
     "import-fresh": "^3.1.0",
     "nyc": "^14.1.1",
     "react": "^18.3.1",
     "tape": "^4.11.0",
-    "typescript": "^5.4.5",
-    "@types/node": "^20.11.1"
+    "typescript": "^5.4.5"
   },
   "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1"
 }

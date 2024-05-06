@@ -1,6 +1,6 @@
 {
     "name": "quip-apps-handle-richtextbox-key-event-navigation",
-    "version": "0.2.1-alpha.2",
+    "version": "0.2.1-alpha.3",
     "description": "Quip Apps RichTextBox Key Event Navigation",
     "license": "Apache-2.0",
     "repository": "quip/quip-apps",
@@ -10,15 +10,15 @@
         "build": "cross-env-shell NODE_ENV=production webpack"
     },
     "dependencies": {
-        "quip-apps-webpack-config": "^0.2.1-alpha.2",
-        "@types/node": "^20.11.1"
+        "@types/node": "^20.11.1",
+        "quip-apps-webpack-config": "^0.2.1-alpha.3"
     },
     "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
     "devDependencies": {
-        "cross-env": "^7.0.3",
-        "webpack-cli": "^5.1.4",
         "@babel/core": "^7.5.5",
         "@babel/preset-env": "^7.5.5",
-        "@babel/preset-react": "^7.0.0"
+        "@babel/preset-react": "^7.0.0",
+        "cross-env": "^7.0.3",
+        "webpack-cli": "^5.1.4"
     }
 }
