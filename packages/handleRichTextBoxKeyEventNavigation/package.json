@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@types/node": "^20.11.1",
-        "quip-apps-webpack-config": "^0.2.1-alpha.3"
+        "quip-apps-webpack-config": "0.2.1-alpha.2"
     },
     "gitHead": "1633a60816f6da91d4b022751e9f3bfd45ae18c1",
     "devDependencies": {
