@@ -1,5 +1,7 @@
 # Quip Live Apps
 
+## Announcement: Quip will no longer allow customers to create new live apps after March 5th, 2025.  See help.salesforce.com for details.
+
 The Quip Live Apps platform enables developers to extend the Quip document canvas with interactive, custom components. The goal of the platform is to expand the scope and capabilities of Quip's living documents.
 
 <ul>
