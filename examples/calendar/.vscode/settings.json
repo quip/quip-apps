@@ -1,9 +1,0 @@
-{
-    "javascript.validate.enable": false,
-    "editor.formatOnSave": true,
-    "git.autofetch": false,
-    "files.exclude": {
-        "**/dist": true,
-        "**/app.ele": true
-    }
-}
