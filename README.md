@@ -7,7 +7,6 @@ The Quip Live Apps platform enables developers to extend the Quip document canva
 <ul>
     <li><a href="https://quip.com/dev/liveapps/">Getting Started</a> - Learn how to create a live app.</li>
     <li><a href="https://quip.com/dev/liveapps/documentation">API Reference</a> - Explore the nuts and bolts of the API.</li>
-    <li><a href="https://quip.com/dev/liveapps/samples">Example Apps</a> - Browse open-source code.</li>
 </ul>
 
 ## Quick Overview
