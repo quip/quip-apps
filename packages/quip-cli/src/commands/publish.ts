@@ -98,10 +98,6 @@ export const doPublish = async (
             println(chalk`{red === ${source} ===}`);
             files.forEach((f) => println(chalk`{red ${f}}`));
         }
-        println(
-            chalk`{yellow Note: You can’t publish a live app without compiling it first. Compile the live app by using \`npm run build\` then try publishing again.}`
-        );
-        return null;
     }
     const files = await Promise.all<[string, Buffer, string]>(
         bundle.map(async (name) => {
