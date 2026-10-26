@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.2.1-alpha.8 (2026-10-26)
+
+**Note:** Version bump only for package quip-apps-compat
+
+
+
+
+
 ## 0.2.1-alpha.7 (2025-04-15)
 
 **Note:** Version bump only for package quip-apps-compat
